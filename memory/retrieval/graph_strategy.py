@@ -1,0 +1,43 @@
+"""Graph traversal retrieval strategy."""
+
+from __future__ import annotations
+
+from memory.graph.graph_repository import GraphRepository
+from memory.graph.graph_traversal import GraphTraversal
+from memory.memory_repository import MemoryRepository
+from memory.retrieval.dense_strategy import DenseRetrievalStrategy
+from memory.retrieval.retrieval_request import RetrievalRequest
+from memory.retrieval.retrieval_result import RetrievalResult
+from memory.retrieval.retrieval_strategy import RetrievalStrategy
+
+
+class GraphTraversalStrategy(RetrievalStrategy):
+    name = "graph"
+
+    def __init__(self, graph_repository: GraphRepository, seed_strategy: DenseRetrievalStrategy | None = None) -> None:
+        self.graph_repository = graph_repository
+        self.seed_strategy = seed_strategy or DenseRetrievalStrategy()
+        self.traversal = GraphTraversal(graph_repository)
+
+    def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
+        seeds = self.seed_strategy.retrieve(request, repository)[: max(1, min(3, request.top_k))]
+        note_scores: dict[str, RetrievalResult] = {}
+        for seed in seeds:
+            seed_node = self.graph_repository.find_by_memory_id(seed.note.id)
+            if seed_node is None:
+                continue
+            neighborhood = self.traversal.weighted_neighborhood(seed_node.id, max_depth=2)
+            for node_id, graph_score in neighborhood.items():
+                node = self.graph_repository.nodes[node_id]
+                note = repository.get(node.memory_id)
+                if note is None:
+                    continue
+                score = min(1.0, graph_score * seed.score)
+                if score > note_scores.get(note.id, RetrievalResult(note, 0.0)).score:
+                    note_scores[note.id] = RetrievalResult(
+                        note=note,
+                        score=score,
+                        strategy_scores={self.name: score},
+                        explanation={"seed": seed.note.id, "graph_node": node_id},
+                    )
+        return sorted(note_scores.values(), key=lambda item: item.score, reverse=True)[: request.top_k]

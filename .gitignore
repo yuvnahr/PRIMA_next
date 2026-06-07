@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration and model/data caches
+.env
+*.log
+models/
+cache/
+Finetuned_Langue_Models/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,22 @@
+numpy>=1.24
+chromadb>=0.5
+networkx>=3.2
+sentence-transformers>=2.7
+spacy>=3.7
+
+# Optional compatibility/runtime dependencies for the legacy DistilBERT benchmark path:
+# pandas>=2.0
+# torch>=2.0
+# transformers>=4.40
+# scikit-learn>=1.4
+# faiss-cpu>=1.8
+
+# Optional legacy Reflexion benchmark dependencies:
+# langchain>=0.1.0
+# langchain-core>=0.1.0
+# langchain-community>=0.0.20
+# langchain-groq>=0.0.1
+# langgraph>=0.0.40
+# wikipedia>=1.4.0
+# beautifulsoup4>=4.12.0
+# python-dotenv>=1.0.0
