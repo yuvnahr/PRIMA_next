@@ -74,6 +74,14 @@ tests/
   evolution/
   lineage/
   reflection/
+workflow/
+  prima_workflow.py               # high-level Cognitive Control Bus facade
+  orchestration_engine.py         # lifecycle, retries, cancellation, event publication
+  execution_context.py            # per-request state and routed subsystem outputs
+  workflow_state.py               # phase/status models
+  task_router.py                  # phase routing
+  controller_registry.py          # dependency-injected controller pattern
+  workflow_events.py              # async in-process event bus
 ```
 
 ## Usage
@@ -131,6 +139,26 @@ print(result.is_correct)
 print(result.extracted_rules)
 ```
 
+Cognitive workflow:
+
+```python
+from affect import DynamicAffectEngine
+from memory import InMemoryMemoryRepository
+from memory.retrieval.retrieval_controller import RetrievalController
+from reflection import ReflectionEngine
+from workflow import PrimaWorkflow
+
+repository = InMemoryMemoryRepository()
+workflow = PrimaWorkflow.from_controllers(
+    affect_engine=DynamicAffectEngine(),
+    retrieval_controller=RetrievalController(repository),
+    reflection_engine=ReflectionEngine(),
+)
+
+context = await workflow.run("I am nervous about tomorrow")
+print(context.output)
+```
+
 ## Design Notes
 
 - Deterministic local fallback classifier is included so tests and PRIMA state behavior do not require network downloads.
@@ -143,6 +171,8 @@ print(result.extracted_rules)
 - Forgetting is soft: maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
 - Reflection preserves verifier-driven retry behavior, fuzzy answer matching, grounding validation, rejected-action feedback, and ExpeL rule extraction.
 - Reflection consumes affect signals and retrieval confidence as data; it does not call affect or retrieval internals.
+- Workflow is the sole subsystem coordinator: user input flows through affect, memory retrieval, planning, reflection, action, and output via injected controllers.
+- Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 
 ## Setup
 
@@ -151,6 +181,15 @@ python -m venv .venv
 . .venv/Scripts/Activate.ps1
 pip install -r requirements.txt
 python -m unittest discover
+```
+
+Rule-set checks after installing development dependencies:
+
+```powershell
+python -m pytest -q
+python -m ruff check .
+python -m mypy .
+python -m bandit -r .
 ```
 
 Optional legacy benchmark dependencies are listed as comments in `requirements.txt` because this repo should remain lightweight by default.
