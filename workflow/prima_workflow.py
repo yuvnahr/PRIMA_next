@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from action import ActionContext, ActionExecutor, ExecutionPolicy
 from affect.affect_engine import DynamicAffectEngine
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
@@ -125,19 +126,23 @@ class ReflectionController:
 class ActionController:
     """Workflow controller for action preparation."""
 
+    action_executor: ActionExecutor = field(default_factory=ActionExecutor)
     phase: WorkflowPhase = WorkflowPhase.ACTION
 
-    async def execute(self, context: ExecutionContext) -> dict[str, Any]:
-        """Produce a structured action request without executing external effects."""
-        execution_intent = getattr(context.plan, "execution_intent", None)
-        intent_type = getattr(getattr(execution_intent, "intent_type", None), "value", "respond")
-        plan_payload = context.plan.to_dict() if hasattr(context.plan, "to_dict") else context.plan
-        return {
-            "action_type": intent_type,
-            "requires_external_tool": bool(getattr(execution_intent, "requires_external_tool", False)),
-            "plan": plan_payload,
-            "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
-        }
+    async def execute(self, context: ExecutionContext) -> Any:
+        """Execute the planned action through policy-gated action tooling."""
+        policy = context.metadata.get("execution_policy")
+        if not isinstance(policy, ExecutionPolicy):
+            policy = ExecutionPolicy()
+        action_context = ActionContext(
+            plan=context.plan,
+            cognitive_state=context.cognitive_state,
+            world_prediction=context.metadata.get("world_prediction"),
+            uncertainty=context.metadata.get("uncertainty"),
+            policy=policy,
+            metadata={"execution_id": context.execution_id},
+        )
+        return await self.action_executor.execute(action_context)
 
 
 @dataclass(slots=True)
