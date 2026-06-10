@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Awaitable, Protocol, runtime_checkable
 
-from action.tool_invocation import ToolInvocation
+from action.tool_invocation import ToolInvocation, ToolInvocationKind
 from tools.tool_result import ToolResult
 from tools.tool_validator import ToolParameterSpec
 
@@ -14,7 +14,7 @@ from tools.tool_validator import ToolParameterSpec
 class ToolHandler(Protocol):
     """Protocol implemented by registered safe tool handlers."""
 
-    async def execute(self, invocation: ToolInvocation) -> ToolResult:
+    def execute(self, invocation: ToolInvocation) -> ToolResult | Awaitable[ToolResult]:
         """Execute a validated invocation."""
 
 
@@ -27,12 +27,20 @@ class RegisteredTool:
     schema: tuple[ToolParameterSpec, ...] = ()
     description: str = ""
     sandbox_tags: tuple[str, ...] = ()
+    invocation_kinds: tuple[ToolInvocationKind, ...] = (ToolInvocationKind.TOOL_CALL,)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "name", str(self.name).strip())
         object.__setattr__(self, "schema", tuple(self.schema))
         object.__setattr__(self, "sandbox_tags", tuple(str(item) for item in self.sandbox_tags))
+        object.__setattr__(
+            self,
+            "invocation_kinds",
+            tuple(ToolInvocationKind(item) for item in self.invocation_kinds),
+        )
+        if not self.invocation_kinds:
+            raise ValueError("Registered tool must support at least one invocation kind.")
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize public tool metadata without exposing the handler."""
@@ -41,6 +49,7 @@ class RegisteredTool:
             "schema": [spec.to_dict() for spec in self.schema],
             "description": self.description,
             "sandbox_tags": list(self.sandbox_tags),
+            "invocation_kinds": [kind.value for kind in self.invocation_kinds],
             "metadata": dict(self.metadata),
         }
 

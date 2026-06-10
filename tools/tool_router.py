@@ -18,4 +18,9 @@ class ToolRouter:
         """Return the registered tool for an invocation, if one exists."""
         if not invocation.tool_name:
             return None
-        return self.registry.get(invocation.tool_name)
+        tool = self.registry.get(invocation.tool_name)
+        if tool is None:
+            return None
+        if invocation.invocation_kind not in tool.invocation_kinds:
+            return None
+        return tool

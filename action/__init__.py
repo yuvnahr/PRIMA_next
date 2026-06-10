@@ -4,7 +4,7 @@ from action.action_context import ActionAuditRecord, ActionContext
 from action.action_executor import ActionExecutor
 from action.execution_policy import ExecutionPolicy, PolicyDecision
 from action.execution_result import ActionExecutionStatus, ExecutionResult, ExecutionStepResult
-from action.tool_invocation import ToolInvocation
+from action.tool_invocation import ToolInvocation, ToolInvocationKind
 
 __all__ = [
     "ActionAuditRecord",
@@ -16,4 +16,5 @@ __all__ = [
     "ExecutionStepResult",
     "PolicyDecision",
     "ToolInvocation",
+    "ToolInvocationKind",
 ]

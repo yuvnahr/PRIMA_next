@@ -142,7 +142,11 @@ class ActionController:
             policy=policy,
             metadata={"execution_id": context.execution_id},
         )
-        return await self.action_executor.execute(action_context)
+        result = await self.action_executor.execute(action_context)
+        payload = result.to_dict()
+        payload["execution_result"] = result
+        payload["plan"] = context.plan.to_dict() if hasattr(context.plan, "to_dict") else context.plan
+        return payload
 
 
 @dataclass(slots=True)
@@ -162,6 +166,7 @@ class OutputController:
             "memory_count": len(getattr(context.retrieval_response, "results", ())) if context.retrieval_response else 0,
             "plan_status": getattr(getattr(context.plan, "status", None), "value", None),
             "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
+            "action_status": context.action_result.get("status") if isinstance(context.action_result, dict) else None,
         }
 
 

@@ -72,6 +72,7 @@ class ExecutionResult:
         return {
             "status": self.status.value,
             "intent_type": self.intent_type,
+            "requires_external_tool": bool(self.metadata.get("tool_invocation_count", 0)),
             "steps": [step.to_dict() for step in self.steps],
             "audit_log": [record.to_dict() for record in self.audit_log],
             "output": self.output,

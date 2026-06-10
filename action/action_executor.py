@@ -7,7 +7,7 @@ from typing import Any
 
 from action.action_context import ActionContext
 from action.execution_result import ActionExecutionStatus, ExecutionResult, ExecutionStepResult
-from action.tool_invocation import ToolInvocation
+from action.tool_invocation import ToolInvocation, ToolInvocationKind
 from tools.tool_executor import ToolExecutor
 from tools.tool_result import ToolExecutionStatus
 
@@ -23,6 +23,23 @@ def _metadata(value: Any) -> dict[str, Any]:
     else:
         metadata = getattr(value, "metadata", {})
     return dict(metadata) if isinstance(metadata, dict) else {}
+
+
+def _dict_value(value: Any) -> dict[str, Any]:
+    return dict(value) if isinstance(value, dict) else {}
+
+
+def _string_tuple(value: Any) -> tuple[str, ...]:
+    if isinstance(value, str):
+        return (value,)
+    if isinstance(value, list | tuple | set):
+        return tuple(str(item) for item in value)
+    return ()
+
+
+def _invocation_kind(metadata: dict[str, Any]) -> ToolInvocationKind:
+    kind = metadata.get("invocation_kind", metadata.get("execution_kind", ToolInvocationKind.TOOL_CALL))
+    return ToolInvocationKind(kind)
 
 
 @dataclass(slots=True)
@@ -75,8 +92,16 @@ class ActionExecutor:
             metadata={
                 "plan_id": str(getattr(context.plan, "plan_id", "")),
                 "tool_invocation_count": len(invocations),
+                "external_action_count": sum(
+                    1 for invocation in invocations if invocation.invocation_kind == ToolInvocationKind.EXTERNAL_ACTION
+                ),
+                "environment_operation_count": sum(
+                    1
+                    for invocation in invocations
+                    if invocation.invocation_kind == ToolInvocationKind.ENVIRONMENT_OPERATION
+                ),
                 "sandboxed": True,
-                "validation_required": context.policy.require_validation,
+                "validation_required": True,
             },
         )
 
@@ -95,11 +120,31 @@ class ActionExecutor:
                 invocations.append(
                     ToolInvocation(
                         tool_name=str(tool_name),
-                        arguments=dict(intent_metadata.get("tool_args", {})),
+                        arguments=_dict_value(intent_metadata.get("tool_args", {})),
                         action_id=str(getattr(plan, "plan_id", "")) or None,
+                        invocation_kind=_invocation_kind(intent_metadata),
+                        sandboxed=bool(intent_metadata.get("sandboxed", True)),
+                        sandbox_tags=_string_tuple(intent_metadata.get("sandbox_tags", ())),
                         metadata={"source": "execution_intent"},
                     )
                 )
+        elif isinstance(plan, dict):
+            intent_data = plan.get("execution_intent") or {}
+            if isinstance(intent_data, dict) and bool(intent_data.get("requires_external_tool", False)):
+                tool_name = intent_data.get("tool_name")
+                intent_metadata = _dict_value(intent_data.get("metadata", {}))
+                if tool_name:
+                    invocations.append(
+                        ToolInvocation(
+                            tool_name=str(tool_name),
+                            arguments=_dict_value(intent_metadata.get("tool_args", {})),
+                            action_id=str(plan.get("plan_id", "")) or None,
+                            invocation_kind=_invocation_kind(intent_metadata),
+                            sandboxed=bool(intent_metadata.get("sandboxed", True)),
+                            sandbox_tags=_string_tuple(intent_metadata.get("sandbox_tags", ())),
+                            metadata={"source": "execution_intent"},
+                        )
+                    )
 
         for action in self._actions(plan):
             metadata = _metadata(action)
@@ -109,8 +154,11 @@ class ActionExecutor:
             invocations.append(
                 ToolInvocation(
                     tool_name=str(tool_name),
-                    arguments=dict(metadata.get("tool_args", {})),
+                    arguments=_dict_value(metadata.get("tool_args", {})),
                     action_id=self._action_id(action),
+                    invocation_kind=_invocation_kind(metadata),
+                    sandboxed=bool(metadata.get("sandboxed", True)),
+                    sandbox_tags=_string_tuple(metadata.get("sandbox_tags", ())),
                     metadata={"source": "plan_action", "action_type": self._action_type(action)},
                 )
             )

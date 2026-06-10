@@ -36,6 +36,14 @@ Persistent Cognitive State + Retrieved Memory Context + Affective Priors + Refle
 
 It emits structured plans, actions, execution intent, constraints, simulations, and replanning lineage. It does not execute tools, invoke LLMs, or orchestrate other subsystems.
 
+The action layer sits after planning and reflection:
+
+```text
+Plan -> Action Executor -> Policy-Gated Tool Router -> Registered Tool Handler -> Execution Result
+```
+
+It converts plans into bounded execution results. It validates arguments, enforces sandbox policy, audits tool calls, and only dispatches explicitly registered handlers. It does not allow arbitrary command execution or bypass validation.
+
 ## Package Layout
 
 ```text
@@ -98,6 +106,18 @@ workflow/
   task_router.py                  # phase routing
   controller_registry.py          # dependency-injected controller pattern
   workflow_events.py              # async in-process event bus
+action/
+  action_executor.py              # plan-to-execution facade
+  action_context.py               # workflow-provided action context and audit records
+  execution_result.py             # aggregate and per-step execution results
+  tool_invocation.py              # typed tool/external/environment invocation requests
+  execution_policy.py             # sandbox policy and policy decisions
+tools/
+  tool_router.py                  # explicit registry-based routing
+  tool_registry.py                # registered safe tool handlers and schemas
+  tool_executor.py                # policy, validation, timeout, audit, execution
+  tool_validator.py               # declarative argument validation and sanitization
+  tool_result.py                  # structured tool execution results
 ```
 
 ## Usage
@@ -187,6 +207,22 @@ context = await workflow.run("I am nervous about tomorrow")
 print(context.output)
 ```
 
+Policy-gated action execution:
+
+```python
+from action import ActionContext, ActionExecutor, ExecutionPolicy
+
+policy = ExecutionPolicy(
+    allowed_tools=("safe_lookup",),
+    allow_external_actions=True,
+    allowed_sandbox_tags=("read_only",),
+)
+result = await ActionExecutor(tool_executor=my_tool_executor).execute(ActionContext(plan=plan, policy=policy))
+
+print(result.status)
+print(result.audit_log)
+```
+
 ## Design Notes
 
 - Deterministic local fallback classifier is included so tests and PRIMA state behavior do not require network downloads.
@@ -204,6 +240,8 @@ print(context.output)
 - Planning is pure reasoning: it never executes tools, dispatches actions, invokes LLMs, or writes memory.
 - Workflow is the sole subsystem coordinator: user input flows through affect, memory retrieval, planning, reflection, action, and output via injected controllers.
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
+- Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
+- Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
 
 ## Setup
 
