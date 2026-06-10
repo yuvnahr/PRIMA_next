@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from affect.affect_engine import DynamicAffectEngine
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
+from planning import PlanningContext, TaskPlanner
+from planning.plan import Plan
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from workflow.controller_registry import ControllerRegistry
@@ -65,27 +67,23 @@ class MemoryRetrievalController:
 class PlanningController:
     """Workflow controller for planning."""
 
+    planner: TaskPlanner = field(default_factory=TaskPlanner)
     phase: WorkflowPhase = WorkflowPhase.PLANNING
 
-    async def execute(self, context: ExecutionContext) -> dict[str, Any]:
-        """Create a lightweight deterministic plan."""
-        retrieved_count = len(getattr(context.retrieval_response, "results", ())) if context.retrieval_response else 0
-        dominant_emotion = (
-            getattr(context.affect_update.profile, "dominant_emotion", "neutral")
-            if context.affect_update is not None
-            else "neutral"
+    async def execute(self, context: ExecutionContext) -> Plan:
+        """Create or revise a pure reasoning plan from workflow-routed context."""
+        planning_context = PlanningContext.from_subsystem_outputs(
+            objective=context.user_input,
+            cognitive_state=context.cognitive_state,
+            retrieval_response=context.retrieval_response,
+            affect_update=context.affect_update,
+            reflection_signals=tuple(context.metadata.get("reflection_signals", ())),
+            metadata={"execution_id": context.execution_id},
         )
-        return {
-            "objective": context.user_input,
-            "steps": (
-                "consider_affect",
-                "use_retrieved_memory",
-                "reflect_if_needed",
-                "prepare_action",
-            ),
-            "retrieved_memory_count": retrieved_count,
-            "dominant_emotion": dominant_emotion,
-        }
+        replan_reason = context.metadata.get("replan_reason")
+        if isinstance(context.plan, Plan) and replan_reason:
+            return self.planner.replan(planning_context, context.plan, str(replan_reason))
+        return self.planner.create_plan(planning_context)
 
 
 @dataclass(slots=True)
@@ -131,10 +129,13 @@ class ActionController:
 
     async def execute(self, context: ExecutionContext) -> dict[str, Any]:
         """Produce a structured action request without executing external effects."""
+        execution_intent = getattr(context.plan, "execution_intent", None)
+        intent_type = getattr(getattr(execution_intent, "intent_type", None), "value", "respond")
+        plan_payload = context.plan.to_dict() if hasattr(context.plan, "to_dict") else context.plan
         return {
-            "action_type": "respond",
-            "requires_external_tool": False,
-            "plan": context.plan,
+            "action_type": intent_type,
+            "requires_external_tool": bool(getattr(execution_intent, "requires_external_tool", False)),
+            "plan": plan_payload,
             "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
         }
 
@@ -154,6 +155,7 @@ class OutputController:
             if context.affect_update
             else "neutral",
             "memory_count": len(getattr(context.retrieval_response, "results", ())) if context.retrieval_response else 0,
+            "plan_status": getattr(getattr(context.plan, "status", None), "value", None),
             "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
         }
 

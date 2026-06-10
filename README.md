@@ -28,6 +28,14 @@ Retrieval -> Retrieval Confidence -> Adaptive Reflection -> Reflection Memories 
 
 It emits reflection signals, reflection memories, rules, confidence estimates, and state updates. It does not directly control retrieval, affect, memory consolidation, planning, or action execution.
 
+The planning layer sits between memory retrieval and reflection/action:
+
+```text
+Persistent Cognitive State + Retrieved Memory Context + Affective Priors + Reflection Signals -> Task Planner -> Plan
+```
+
+It emits structured plans, actions, execution intent, constraints, simulations, and replanning lineage. It does not execute tools, invoke LLMs, or orchestrate other subsystems.
+
 ## Package Layout
 
 ```text
@@ -68,6 +76,14 @@ reflection/
   failure_classifier.py          # typed failure source classification
   rule_extractor.py              # ExpeL-style rule distillation
   reflection_repository.py       # reflection/rule repository with Memory Fabric adapter
+planning/
+  task_planner.py                 # pure planner facade with replanning support
+  plan.py                         # immutable plan, action, constraint, intent, simulation models
+  planning_context.py             # workflow-routed context adapter
+  goal_selector.py                # state-aware goal selection
+  action_selector.py              # pure action and execution intent selection
+  plan_evaluator.py               # deterministic simulation and plan evaluation
+  planning_types.py               # planning enums
 tests/
   retrieval/
   graph/
@@ -139,6 +155,18 @@ print(result.is_correct)
 print(result.extracted_rules)
 ```
 
+Pure planning:
+
+```python
+from planning import PlanningContext, TaskPlanner
+
+context = PlanningContext(objective="Answer using retrieved memory")
+plan = TaskPlanner().create_plan(context)
+
+print(plan.execution_intent.intent_type)
+print(plan.simulation.predicted_confidence if plan.simulation else None)
+```
+
 Cognitive workflow:
 
 ```python
@@ -171,6 +199,9 @@ print(context.output)
 - Forgetting is soft: maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
 - Reflection preserves verifier-driven retry behavior, fuzzy answer matching, grounding validation, rejected-action feedback, and ExpeL rule extraction.
 - Reflection consumes affect signals and retrieval confidence as data; it does not call affect or retrieval internals.
+- Planning consumes workflow-routed state, retrieved memory summaries, affective priors, and reflection signals as data.
+- Planning produces structured plans with constraints, simulated transitions, evaluation scores, and replanning lineage.
+- Planning is pure reasoning: it never executes tools, dispatches actions, invokes LLMs, or writes memory.
 - Workflow is the sole subsystem coordinator: user input flows through affect, memory retrieval, planning, reflection, action, and output via injected controllers.
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 

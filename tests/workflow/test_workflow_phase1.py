@@ -5,6 +5,7 @@ from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
+from planning import Plan
 from reflection.reflection_engine import ReflectionEngine
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
@@ -130,10 +131,12 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(context.workflow_state.status, WorkflowStatus.COMPLETED)
         self.assertIsNotNone(context.affect_update)
         self.assertIsNotNone(context.retrieval_response)
-        self.assertIsNotNone(context.plan)
+        self.assertIsInstance(context.plan, Plan)
         self.assertIsNotNone(context.reflection_result)
         self.assertIsNotNone(context.action_result)
         self.assertIsNotNone(context.output)
+        self.assertFalse(context.action_result["requires_external_tool"])
+        self.assertEqual(context.action_result["plan"]["plan_id"], context.plan.plan_id)
 
 
 if __name__ == "__main__":
