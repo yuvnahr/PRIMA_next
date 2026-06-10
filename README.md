@@ -44,6 +44,14 @@ Plan -> Action Executor -> Policy-Gated Tool Router -> Registered Tool Handler -
 
 It converts plans into bounded execution results. It validates arguments, enforces sandbox policy, audits tool calls, and only dispatches explicitly registered handlers. It does not allow arbitrary command execution or bypass validation.
 
+The event layer provides in-process asynchronous communication:
+
+```text
+Subsystem Output -> Event Publisher -> Async Event Bus -> Filtered Subscribers -> Event Store
+```
+
+It replaces direct module coupling with typed events such as memory creation, reflection triggers, state changes, plan failures, and tool execution. It uses asyncio and an in-memory store; no external broker is required.
+
 ## Package Layout
 
 ```text
@@ -118,6 +126,13 @@ tools/
   tool_executor.py                # policy, validation, timeout, audit, execution
   tool_validator.py               # declarative argument validation and sanitization
   tool_result.py                  # structured tool execution results
+events/
+  event.py                        # immutable event envelope
+  event_bus.py                    # asyncio in-process publish/subscribe bus
+  event_types.py                  # canonical event type enum
+  subscribers.py                  # filtered subscriber records and registry
+  publishers.py                   # helper publisher factories for common events
+  event_store.py                  # append-only in-memory event history
 ```
 
 ## Usage
@@ -223,6 +238,18 @@ print(result.status)
 print(result.audit_log)
 ```
 
+Async events:
+
+```python
+from events import EventBus, EventPublisher, EventType
+
+bus = EventBus()
+bus.subscribe(handle_memory_created, event_types=(EventType.MEMORY_CREATED,), topics=("memory",))
+
+publisher = EventPublisher(source="memory.repository", topic="memory")
+await bus.publish(publisher.memory_created("mem_123"))
+```
+
 ## Design Notes
 
 - Deterministic local fallback classifier is included so tests and PRIMA state behavior do not require network downloads.
@@ -242,6 +269,7 @@ print(result.audit_log)
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 - Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
 - Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
+- Events are local and async: the shared bus uses `asyncio`, filtered subscribers, typed event envelopes, and an injected in-memory event store. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope for now.
 
 ## Setup
 
