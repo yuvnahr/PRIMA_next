@@ -14,7 +14,7 @@ class RetrievalResult:
     strategy_scores: dict[str, float] = field(default_factory=dict)
     explanation: dict[str, object] = field(default_factory=dict)
 
-    def with_score(self, score: float, strategy_scores: dict[str, float] | None = None) -> "RetrievalResult":
+    def with_score(self, score: float, strategy_scores: dict[str, float] | None = None) -> RetrievalResult:
         return RetrievalResult(
             note=self.note,
             score=max(0.0, min(1.0, score)),

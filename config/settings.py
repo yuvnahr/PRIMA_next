@@ -4,7 +4,6 @@ This module provides a single `get_settings()` function that returns a
 singleton Settings object. By default values are read from environment
 variables; sensitive values (API keys) should not be checked into source.
 """
-from typing import Optional
 
 try:
     from pydantic_settings import BaseSettings
@@ -18,8 +17,8 @@ except Exception:  # pragma: no cover - fall back to pydantic if pydantic-settin
 class Settings(BaseSettings):
     default_provider: str = "openai"
     default_model: str = "gpt-4o"
-    openai_api_key: Optional[str] = None
-    anthropic_api_key: Optional[str] = None
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
     ollama_url: str = "http://localhost:11434"
     rate_limit_per_minute: int = 60
 
@@ -28,7 +27,7 @@ class Settings(BaseSettings):
         env_prefix = ""
 
 
-_SETTINGS: Optional[Settings] = None
+_SETTINGS: Settings | None = None
 
 
 def get_settings() -> Settings:

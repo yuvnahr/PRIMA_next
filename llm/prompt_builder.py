@@ -2,7 +2,8 @@
 
 This module ensures inputs are sanitized before being composed into prompts.
 """
-from typing import Mapping, Any, Optional
+from collections.abc import Mapping
+from typing import Any
 
 from .llm_types import LLMRequest
 
@@ -14,7 +15,7 @@ except Exception:  # pragma: no cover - sanitizer should exist in the repo
         return x
 
 
-def build_prompt(template: str, variables: Mapping[str, Any], model: Optional[str] = None) -> LLMRequest:
+def build_prompt(template: str, variables: Mapping[str, Any], model: str | None = None) -> LLMRequest:
     """Builds a sanitized prompt from a simple Python format template.
 
     Note: templates should be simple and not include untrusted format specifiers.

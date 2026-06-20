@@ -3,7 +3,6 @@
 These checks are lightweight and intended to be called by an orchestration
 service or HTTP health endpoint.
 """
-from typing import Dict
 import socket
 
 try:
@@ -18,12 +17,12 @@ except Exception:
         return None
 
 
-def check_health() -> Dict[str, str]:
+def check_health() -> dict[str, str]:
     status = {"ok": "true"}
     settings = get_settings()
     # Check that the configured Ollama URL is reachable (if available)
     if settings is not None and getattr(settings, "ollama_url", None):
-        url = getattr(settings, "ollama_url")
+        url = settings.ollama_url
         if requests is None:
             status["ollama"] = "skipped (requests not installed)"
         else:

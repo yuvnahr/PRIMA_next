@@ -14,7 +14,7 @@ class ReflectionLineage:
     generated_rule_ids: tuple[str, ...] = ()
     generation: int = 0
 
-    def with_child(self, child_id: str) -> "ReflectionLineage":
+    def with_child(self, child_id: str) -> ReflectionLineage:
         return ReflectionLineage(
             parent_reflection_id=self.parent_reflection_id,
             child_reflection_ids=tuple(dict.fromkeys((*self.child_reflection_ids, child_id))),
@@ -23,7 +23,7 @@ class ReflectionLineage:
             generation=self.generation,
         )
 
-    def with_rule(self, rule_id: str) -> "ReflectionLineage":
+    def with_rule(self, rule_id: str) -> ReflectionLineage:
         return ReflectionLineage(
             parent_reflection_id=self.parent_reflection_id,
             child_reflection_ids=self.child_reflection_ids,
@@ -42,7 +42,7 @@ class ReflectionLineage:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "ReflectionLineage":
+    def from_dict(cls, data: dict[str, Any] | None) -> ReflectionLineage:
         data = data or {}
         return cls(
             parent_reflection_id=data.get("parent_reflection_id"),

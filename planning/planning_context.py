@@ -44,7 +44,7 @@ class PlanningMemory:
         object.__setattr__(self, "keywords", tuple(str(keyword) for keyword in self.keywords))
 
     @classmethod
-    def from_retrieval_result(cls, result: Any) -> "PlanningMemory":
+    def from_retrieval_result(cls, result: Any) -> PlanningMemory:
         """Create a planning memory from a retrieval result-like object."""
         note = getattr(result, "note", None)
         note_id = str(getattr(note, "id", "memory_unknown"))
@@ -94,7 +94,7 @@ class PlanningReflectionSignal:
         object.__setattr__(self, "confidence", clamp01(self.confidence))
 
     @classmethod
-    def from_signal(cls, signal: Any) -> "PlanningReflectionSignal":
+    def from_signal(cls, signal: Any) -> PlanningReflectionSignal:
         """Normalize an affect or reflection signal-like object."""
         severity = getattr(signal, "severity", getattr(signal, "strength", 0.0))
         confidence = getattr(signal, "confidence", severity)
@@ -158,7 +158,7 @@ class PlanningContext:
         reflection_result: Any | None = None,
         reflection_signals: Sequence[Any] = (),
         metadata: dict[str, Any] | None = None,
-    ) -> "PlanningContext":
+    ) -> PlanningContext:
         """Build a planning context from workflow-owned subsystem outputs."""
         confidence = getattr(retrieval_response, "confidence", None)
         retrieval_results = tuple(getattr(retrieval_response, "results", ()) or ())

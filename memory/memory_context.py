@@ -24,7 +24,7 @@ class StateSnapshot:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "StateSnapshot":
+    def from_dict(cls, data: dict[str, Any] | None) -> StateSnapshot:
         data = data or {}
         return cls(
             goal_state=dict(data.get("goal_state", {})),

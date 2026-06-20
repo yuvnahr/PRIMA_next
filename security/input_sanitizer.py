@@ -4,7 +4,7 @@ This is intentionally conservative and should be extended with policy-driven
 rules for your application's threat model.
 """
 import re
-from typing import Pattern
+from re import Pattern
 
 # Patterns that commonly indicate instruction-injection attempts. Keep this
 # list conservative; it's not a replacement for runtime monitoring.

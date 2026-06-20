@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import re
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Mapping, Sequence
 
 import numpy as np
 
@@ -289,7 +289,7 @@ class LegacyAffectClassifier:
         df: object,
         cache_size: int = 512,
         prefer_faiss: bool = False,
-    ) -> "LegacyAffectClassifier":
+    ) -> LegacyAffectClassifier:
         """Create a classifier from the legacy CSV dataframe shape.
 
         Expected columns match the previous implementation:

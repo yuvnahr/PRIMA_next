@@ -4,11 +4,11 @@ This is intentionally minimal. A production system should integrate with the
 application's identity and policy systems (RBAC, ABAC) and include audit
 callbacks.
 """
-from typing import Iterable, Optional
+from collections.abc import Iterable
 
 
 class PermissionPolicy:
-    def __init__(self, allowed_tools: Optional[Iterable[str]] = None):
+    def __init__(self, allowed_tools: Iterable[str] | None = None):
         self.allowed = set(allowed_tools or [])
 
     def is_allowed(self, tool_name: str) -> bool:

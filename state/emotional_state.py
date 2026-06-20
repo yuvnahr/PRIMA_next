@@ -39,7 +39,7 @@ class EmotionalState:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "EmotionalState":
+    def from_dict(cls, data: dict[str, Any]) -> EmotionalState:
         last_update = data.get("last_update_time")
         if isinstance(last_update, str):
             parsed_update = datetime.fromisoformat(last_update)

@@ -5,9 +5,11 @@ from __future__ import annotations
 import hashlib
 import re
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
-from typing import Any, Sequence
+from typing import Any
+from venv import logger
 
 import numpy as np
 
@@ -83,8 +85,12 @@ def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
             chunk_words = {word for chunk in chunks for word in chunk.split()}
             filtered_nouns = [noun for noun in nouns if noun not in chunk_words]
             return list(dict.fromkeys(chunks + filtered_nouns))[:top_k]
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(
+            "Keyword extraction failed: %s",
+            e
+        )
+        return chunks[:top_k]
 
     words = [word for word in tokenize(text) if len(word) > 2 and word not in GENERIC_NOUNS]
     bigrams = [f"{words[index]} {words[index + 1]}" for index in range(len(words) - 1)]
@@ -135,7 +141,7 @@ class MemoryNote:
             return [str(item) for item in existing]
         return extract_dominant_context_chain(self.content)
 
-    def with_updates(self, **updates: Any) -> "MemoryNote":
+    def with_updates(self, **updates: Any) -> MemoryNote:
         next_version = int(updates.pop("version", self.version + 1))
         return replace(self, **updates, version=next_version)
 
@@ -182,7 +188,7 @@ class MemoryNote:
         salience_score: float = 0.0,
         retention_score: float = 1.0,
         note_id: str | None = None,
-    ) -> "MemoryNote":
+    ) -> MemoryNote:
         keywords = extract_dominant_context_chain(content)
         return cls(
             id=note_id or f"mem_{uuid.uuid4()}",
@@ -199,10 +205,12 @@ class MemoryNote:
         )
 
     @classmethod
-    def from_record(cls, record: dict[str, Any]) -> "MemoryNote":
+    def from_record(cls, record: dict[str, Any]) -> MemoryNote:
         metadata = record.get("metadata", {})
         timestamp = metadata.get("timestamp")
-        parsed_timestamp = datetime.fromisoformat(timestamp) if isinstance(timestamp, str) else datetime.now(timezone.utc)
+        parsed_timestamp = (
+            datetime.fromisoformat(timestamp) if isinstance(timestamp, str) else datetime.now(timezone.utc)
+        )
         return cls(
             id=str(record.get("id") or metadata.get("id")),
             memory_type=MemoryType(metadata.get("memory_type", MemoryType.EPISODIC.value)),

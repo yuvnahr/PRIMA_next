@@ -3,12 +3,11 @@
 This file provides `init_tracing()` to configure the tracer and `get_tracer()`
 to obtain a tracer for instrumentation.
 """
-from typing import Optional
 
 try:
     from opentelemetry import trace as _trace
     from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+    from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
     _OTEL_AVAILABLE = True
 except Exception:
     _OTEL_AVAILABLE = False
@@ -23,7 +22,7 @@ def init_tracing(service_name: str = "prima-service") -> None:
     _trace.set_tracer_provider(provider)
 
 
-def get_tracer(name: Optional[str] = None):
+def get_tracer(name: str | None = None):
     if not _OTEL_AVAILABLE:
         class _Noop:
             def start_as_current_span(self, *args, **kwargs):

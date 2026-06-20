@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -15,7 +15,7 @@ class MemoryLineage:
     abstraction_level: int = 0
     origin_memory_ids: tuple[str, ...] = ()
 
-    def link_child(self, child_id: str) -> "MemoryLineage":
+    def link_child(self, child_id: str) -> MemoryLineage:
         children = tuple(dict.fromkeys((*self.child_ids, child_id)))
         return MemoryLineage(
             parent_ids=self.parent_ids,
@@ -26,7 +26,7 @@ class MemoryLineage:
             origin_memory_ids=self.origin_memory_ids,
         )
 
-    def next_generation(self, new_parent_ids: tuple[str, ...]) -> "MemoryLineage":
+    def next_generation(self, new_parent_ids: tuple[str, ...]) -> MemoryLineage:
         ancestors = tuple(dict.fromkeys((*self.ancestor_ids, *self.parent_ids, *new_parent_ids)))
         origins = self.origin_memory_ids or new_parent_ids
         return MemoryLineage(
@@ -49,7 +49,7 @@ class MemoryLineage:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "MemoryLineage":
+    def from_dict(cls, data: dict[str, Any] | None) -> MemoryLineage:
         data = data or {}
         return cls(
             parent_ids=tuple(data.get("parent_ids", ())),

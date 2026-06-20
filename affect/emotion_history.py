@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Iterable
 
 from affect.emotion_profile import EmotionProfile
 from affect.pad_model import PADState

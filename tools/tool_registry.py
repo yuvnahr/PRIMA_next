@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable
 from dataclasses import dataclass, field
-from typing import Any, Awaitable, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from action.tool_invocation import ToolInvocation, ToolInvocationKind
 from tools.tool_result import ToolResult

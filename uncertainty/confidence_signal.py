@@ -41,7 +41,7 @@ class ConfidenceSignal:
         evidence_factor = min(1.0, self.evidence_count / 5.0) if self.evidence_count else 0.25
         return self.weight * self.reliability * max(0.25, evidence_factor)
 
-    def calibrated(self, confidence: float, uncertainty: float, reliability: float | None = None) -> "ConfidenceSignal":
+    def calibrated(self, confidence: float, uncertainty: float, reliability: float | None = None) -> ConfidenceSignal:
         """Return a calibrated copy of this signal."""
         return ConfidenceSignal(
             source=self.source,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from memory.memory_note import MemoryNote
 from memory.memory_repository import MemoryRepository

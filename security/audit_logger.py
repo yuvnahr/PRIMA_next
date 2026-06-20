@@ -7,8 +7,7 @@ centralized logging/observability backend in production.
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
-
+from typing import Any
 
 logger = logging.getLogger("prima.audit")
 if not logger.handlers:
@@ -21,7 +20,7 @@ if not logger.handlers:
 
 class AuditLogger:
     @staticmethod
-    def log(event: str, data: Optional[Dict[str, Any]] = None) -> None:
+    def log(event: str, data: dict[str, Any] | None = None) -> None:
         payload = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "event": event,

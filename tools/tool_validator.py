@@ -7,7 +7,6 @@ from typing import Any
 
 from action.tool_invocation import ToolInvocation
 
-
 TYPE_MAP = {
     "str": str,
     "int": int,

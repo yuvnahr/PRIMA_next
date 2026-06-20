@@ -1,7 +1,6 @@
 """Simple synchronous token-bucket rate limiter."""
 import time
 from threading import Lock
-from typing import Optional
 
 
 class RateLimiter:
