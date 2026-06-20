@@ -1,7 +1,7 @@
 import unittest
 
-from memory.memory_note import MemoryNote, stable_embedding
 from memory.memory_context import StateSnapshot
+from memory.memory_note import MemoryNote, stable_embedding
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType, RetrievalWindow
 from memory.retrieval.dense_strategy import DenseRetrievalStrategy

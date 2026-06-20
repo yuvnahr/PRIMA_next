@@ -44,7 +44,7 @@ class Event:
         correlation_id: str | None = None,
         causation_id: str | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> "Event":
+    ) -> Event:
         """Create an event with default identifiers and UTC timestamp."""
         return cls(
             event_type=event_type,

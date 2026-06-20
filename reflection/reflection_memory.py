@@ -71,7 +71,7 @@ class Rule:
         applicability: tuple[str, ...] = (),
         lineage: ReflectionLineage | None = None,
         creation_context: dict[str, Any] | None = None,
-    ) -> "Rule":
+    ) -> Rule:
         return cls(
             rule_id=f"rule_{uuid.uuid4()}",
             rule_text=rule_text,

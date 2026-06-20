@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 import numpy as np
+from chromadb import logger
 
 from affect.emotion_profile import EmotionProfile
 
@@ -58,6 +59,9 @@ def choose_similarity_backend(matrix: np.ndarray, prefer_faiss: bool = False) ->
     if prefer_faiss:
         try:
             return FaissBackend(matrix)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(
+                "FAISS backend unavailable, falling back to NumPy: %s",
+                e
+            )
     return NumpyBackend(matrix)

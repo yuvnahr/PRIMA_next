@@ -10,7 +10,6 @@ from memory.retrieval.retrieval_request import RetrievalRequest
 from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_strategy import RetrievalStrategy
 
-
 WINDOW_HOURS = {
     RetrievalWindow.LAST_HOUR: 1,
     RetrievalWindow.LAST_DAY: 24,

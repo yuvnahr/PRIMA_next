@@ -1,0 +1,10 @@
+[bandit]
+
+exclude_dirs =
+    .venv,
+    venv,
+    __pycache__,
+    .pytest_cache,
+    build,
+    dist,
+    tests

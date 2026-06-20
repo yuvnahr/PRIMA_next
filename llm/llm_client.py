@@ -1,5 +1,4 @@
 """High-level LLM client that routes requests through provider adapters."""
-from typing import Optional
 
 from .llm_types import LLMRequest, LLMResponse
 from .provider import ProviderFactory
@@ -19,13 +18,13 @@ class LLMClient:
     rest of the application never imports provider SDKs directly.
     """
 
-    def __init__(self, provider_name: Optional[str] = None, settings=None, rate_limiter: Optional[RateLimiter] = None):
+    def __init__(self, provider_name: str | None = None, settings=None, rate_limiter: RateLimiter | None = None):
         self.settings = settings or get_settings()
         self.provider_name = provider_name or (getattr(self.settings, "default_provider", None) if self.settings else None) or "openai"
         self.provider = ProviderFactory.get_provider(self.provider_name, settings=self.settings)
         self.rate_limiter = rate_limiter or RateLimiter(getattr(self.settings, "rate_limit_per_minute", 60) if self.settings else 60)
 
-    def chat(self, prompt: str, model: Optional[str] = None, temperature: float = 0.0, max_tokens: Optional[int] = None) -> LLMResponse:
+    def chat(self, prompt: str, model: str | None = None, temperature: float = 0.0, max_tokens: int | None = None) -> LLMResponse:
         request = LLMRequest(model=model or getattr(self.settings, "default_model", ""), prompt=prompt, temperature=temperature, max_tokens=max_tokens)
         if not self.rate_limiter.allow():
             raise RuntimeError("Rate limit exceeded")

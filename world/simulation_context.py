@@ -28,7 +28,7 @@ class SimulationContext:
         plan: Any | None = None,
         constraints: tuple[Any, ...] = (),
         metadata: dict[str, Any] | None = None,
-    ) -> "SimulationContext":
+    ) -> SimulationContext:
         """Create context from either an explicit world state or cognitive state."""
         state = current_state or WorldState.from_cognitive_state(cognitive_state)
         plan_constraints = tuple(getattr(plan, "constraints", ()) or ())

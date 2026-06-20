@@ -28,7 +28,7 @@ class ReflectionSignal:
         confidence: float,
         source: str,
         metadata: dict[str, Any] | None = None,
-    ) -> "ReflectionSignal":
+    ) -> ReflectionSignal:
         return cls(
             signal_id=f"refl_sig_{uuid.uuid4()}",
             signal_type=signal_type,

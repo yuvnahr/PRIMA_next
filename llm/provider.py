@@ -7,10 +7,8 @@ lightweight and explicit about where secrets are read from.
 """
 from __future__ import annotations
 
-import json
 import os
 from abc import ABC, abstractmethod
-from typing import Optional
 
 try:
     import requests
@@ -18,7 +16,7 @@ except Exception:  # pragma: no cover - requests may not be installed in some en
     requests = None
 
 from .llm_types import LLMRequest, LLMResponse
-from .response_parser import parse_openai_response, parse_generic_response
+from .response_parser import parse_generic_response, parse_openai_response
 
 try:
     # lazy import of config if available

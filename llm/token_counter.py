@@ -3,10 +3,9 @@
 This provides a small, dependency-free fallback. For production use, integrate
 with a provider-specific tokenizer (e.g. tiktoken) and keep this as a fallback.
 """
-from typing import Optional
 
 
-def count_tokens(text: Optional[str]) -> int:
+def count_tokens(text: str | None) -> int:
     """Naive token counter (whitespace-based)."""
     if not text:
         return 0

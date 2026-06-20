@@ -6,7 +6,14 @@ import hashlib
 from dataclasses import dataclass, field, replace
 from typing import Any
 
-from planning.planning_types import ActionStatus, ActionType, ConstraintType, ExecutionIntentType, GoalPriority, PlanStatus
+from planning.planning_types import (
+    ActionStatus,
+    ActionType,
+    ConstraintType,
+    ExecutionIntentType,
+    GoalPriority,
+    PlanStatus,
+)
 
 
 def clamp01(value: float) -> float:
@@ -44,7 +51,7 @@ class PlanGoal:
         confidence: float,
         source: str,
         metadata: dict[str, Any] | None = None,
-    ) -> "PlanGoal":
+    ) -> PlanGoal:
         """Create a deterministic goal."""
         return cls(
             goal_id=stable_id("goal", description, priority.value, source),
@@ -87,7 +94,7 @@ class PlanConstraint:
         description: str,
         required: bool = True,
         metadata: dict[str, Any] | None = None,
-    ) -> "PlanConstraint":
+    ) -> PlanConstraint:
         """Create a deterministic constraint."""
         return cls(
             constraint_id=stable_id("constraint", constraint_type.value, description),
@@ -140,7 +147,7 @@ class PlanAction:
         expected_output: str,
         constraints: tuple[str, ...] = (),
         metadata: dict[str, Any] | None = None,
-    ) -> "PlanAction":
+    ) -> PlanAction:
         """Create a deterministic action proposal."""
         return cls(
             action_id=stable_id("action", action_type.value, description, inputs, expected_output),
@@ -152,7 +159,7 @@ class PlanAction:
             metadata=metadata or {},
         )
 
-    def with_status(self, status: ActionStatus) -> "PlanAction":
+    def with_status(self, status: ActionStatus) -> PlanAction:
         """Return this action with an updated planning status."""
         return replace(self, status=status)
 
@@ -309,7 +316,7 @@ class Plan:
         self,
         simulation: PlanSimulation,
         evaluation: PlanEvaluation,
-    ) -> "Plan":
+    ) -> Plan:
         """Return this plan with simulation and evaluation attached."""
         status = PlanStatus.NEEDS_REPLAN if evaluation.should_replan else PlanStatus.EVALUATED
         return replace(self, simulation=simulation, evaluation=evaluation, status=status)

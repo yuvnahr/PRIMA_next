@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from affect.emotion_profile import EmotionProfile
 
-
 NEGATIVE_EMOTIONS = {"sadness", "sad", "fear", "anger", "disgust", "disgust_loathing", "boredom"}
 
 

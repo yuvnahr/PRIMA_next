@@ -9,8 +9,8 @@ from memory.evolution.semantic_abstraction_engine import SemanticAbstractionEngi
 from memory.graph.graph_builder import GraphBuilder
 from memory.graph.graph_edge import GraphEdge
 from memory.graph.graph_node import GraphNode
-from memory.graph.graph_repository import GraphRepository
 from memory.graph.graph_reasoning_engine import GraphReasoningEngine
+from memory.graph.graph_repository import GraphRepository
 from memory.memory_note import MemoryNote, stable_embedding
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryLevel, MemoryType

@@ -28,7 +28,7 @@ class PADState:
         object.__setattr__(self, "arousal", clamp(self.arousal))
         object.__setattr__(self, "dominance", clamp(self.dominance))
 
-    def update(self, delta: "PADState", rate: float = 1.0) -> "PADState":
+    def update(self, delta: PADState, rate: float = 1.0) -> PADState:
         """Apply a scaled delta to the current state."""
         return PADState(
             self.pleasure + delta.pleasure * rate,
@@ -36,7 +36,7 @@ class PADState:
             self.dominance + delta.dominance * rate,
         )
 
-    def decay(self, factor: float = 0.92, baseline: "PADState | None" = None) -> "PADState":
+    def decay(self, factor: float = 0.92, baseline: PADState | None = None) -> PADState:
         """Decay this state toward a baseline."""
         base = baseline or PADState()
         return PADState(
@@ -45,7 +45,7 @@ class PADState:
             base.dominance + (self.dominance - base.dominance) * factor,
         )
 
-    def distance(self, other: "PADState") -> float:
+    def distance(self, other: PADState) -> float:
         """Euclidean distance between two PAD states."""
         return sqrt(
             (self.pleasure - other.pleasure) ** 2
@@ -53,7 +53,7 @@ class PADState:
             + (self.dominance - other.dominance) ** 2
         )
 
-    def merge(self, other: "PADState", weight: float = 0.5) -> "PADState":
+    def merge(self, other: PADState, weight: float = 0.5) -> PADState:
         """Blend this state with another state."""
         bounded_weight = max(0.0, min(1.0, weight))
         inverse = 1.0 - bounded_weight
@@ -74,7 +74,7 @@ class PADState:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, float]) -> "PADState":
+    def from_dict(cls, data: dict[str, float]) -> PADState:
         return cls(
             pleasure=data.get("pleasure", 0.0),
             arousal=data.get("arousal", 0.0),

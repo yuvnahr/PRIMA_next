@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from reflection.reflection_result import ReflectionResult
-from reflection.verifier_adapter import VerifierAdapter, VerificationResult
+from reflection.verifier_adapter import VerificationResult, VerifierAdapter
 
 
 @dataclass(frozen=True, slots=True)

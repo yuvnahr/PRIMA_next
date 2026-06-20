@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Mapping
 
 
 def _immutable_scores(scores: Mapping[str, float]) -> Mapping[str, float]:
@@ -43,7 +43,7 @@ class EmotionProfile:
         scores: Mapping[str, float],
         emotional_keywords: tuple[str, ...] = (),
         confidence: float | None = None,
-    ) -> "EmotionProfile":
+    ) -> EmotionProfile:
         dominant = max(scores, key=scores.get) if scores else "neutral"
         computed_confidence = confidence if confidence is not None else profile_confidence(scores)
         valence, arousal, dominance = scores_to_pad(scores)

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from events import Event, EventBus, EventType, PublishResult
 from workflow.workflow_state import WorkflowPhase, WorkflowStatus
@@ -72,7 +73,7 @@ class WorkflowEvent:
         )
 
     @classmethod
-    def from_event(cls, event: Event) -> "WorkflowEvent":
+    def from_event(cls, event: Event) -> WorkflowEvent:
         """Convert a shared bus event back into a workflow event."""
         workflow_type = event.metadata.get("workflow_event_type")
         if workflow_type is None:

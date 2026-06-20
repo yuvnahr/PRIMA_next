@@ -7,7 +7,6 @@ import re
 from reflection.reflection_lineage import ReflectionLineage
 from reflection.reflection_memory import Rule
 
-
 META_INSTRUCTION_RE = re.compile(r"<([A-Z_]+)>")
 
 

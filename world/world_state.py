@@ -46,7 +46,7 @@ class WorldState:
         execution_state: dict[str, Any] | None = None,
         constraints: tuple[str, ...] = (),
         metadata: dict[str, Any] | None = None,
-    ) -> "WorldState":
+    ) -> WorldState:
         """Create a world-state snapshot from a cognitive-state-like object."""
         return cls(
             goal_state=_as_dict(getattr(cognitive_state, "goal_state", {})),
@@ -60,7 +60,7 @@ class WorldState:
         )
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "WorldState":
+    def from_dict(cls, data: dict[str, Any] | None) -> WorldState:
         """Create a world-state snapshot from plain Python values."""
         data = data or {}
         return cls(
@@ -84,7 +84,7 @@ class WorldState:
         execution_state: dict[str, Any] | None = None,
         constraints: tuple[str, ...] | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> "WorldState":
+    ) -> WorldState:
         """Return a copy with selected sections replaced."""
         return replace(
             self,
@@ -98,7 +98,7 @@ class WorldState:
             metadata=self.metadata if metadata is None else metadata,
         )
 
-    def merge_transition(self, transition: dict[str, Any]) -> "WorldState":
+    def merge_transition(self, transition: dict[str, Any]) -> WorldState:
         """Apply a symbolic transition dictionary and return the predicted state."""
         goal_state = dict(self.goal_state)
         goal_state.update(dict(transition.get("goal_state", {})))

@@ -1,7 +1,6 @@
 """Validate and optionally scrub model outputs before use or logging."""
 import re
-from typing import Pattern
-
+from re import Pattern
 
 # Patterns that likely indicate the model is leaking secrets or sensitive data.
 _SENSITIVE_PATTERNS: Pattern = re.compile(

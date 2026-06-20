@@ -206,7 +206,7 @@ class PrimaWorkflow:
         reflection_engine: ReflectionEngine,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
-    ) -> "PrimaWorkflow":
+    ) -> PrimaWorkflow:
         """Create a workflow with default controller adapters."""
         registry = ControllerRegistry(
             controllers={

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Awaitable, Callable
 
 from events.event import Event
 from events.event_types import EventType
-
 
 EventHandler = Callable[[Event], None | Awaitable[None]]
 

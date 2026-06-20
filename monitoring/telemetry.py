@@ -1,6 +1,6 @@
 """Telemetry initialization helper that wires tracing and metrics."""
-from .tracing import init_tracing
 from .metrics import create_counter
+from .tracing import init_tracing
 
 
 def init_telemetry(service_name: str = "prima-service") -> None:

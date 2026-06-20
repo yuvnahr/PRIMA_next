@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from typing import Any
 
-
 JSON_FIELDS = {
     "affective_state",
     "context",
