@@ -1,0 +1,109 @@
+name: PRIMA-NEXT CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+          pip install \
+            pytest \
+            pytest-cov \
+            ruff \
+            mypy \
+            bandit
+
+      - name: Run Pytest
+        run: |
+          pytest -v
+
+      - name: Run Ruff
+        run: |
+          ruff check \
+            affect \
+            memory \
+            reflection \
+            state \
+            workflow \
+            planning \
+            uncertainty \
+            world \
+            action \
+            tools \
+            events \
+            llm \
+            security \
+            tests
+
+      - name: Run MyPy
+        run: |
+          mypy \
+            affect \
+            memory \
+            reflection \
+            state \
+            workflow \
+            planning \
+            uncertainty \
+            world \
+            action \
+            tools \
+            events \
+            llm \
+            security
+
+      - name: Run Bandit
+        run: |
+          bandit \
+            -r affect \
+            -r memory \
+            -r reflection \
+            -r state \
+            -r workflow \
+            -r planning \
+            -r uncertainty \
+            -r world \
+            -r action \
+            -r tools \
+            -r events \
+            -r llm \
+            -r security \
+            -ll
