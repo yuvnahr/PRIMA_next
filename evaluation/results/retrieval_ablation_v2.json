@@ -1,0 +1,42 @@
+{
+  "dense_only": {
+    "recall_at_1": 0.014074,
+    "recall_at_3": 0.039074,
+    "recall_at_5": 0.066852,
+    "mrr": 0.04037,
+    "ndcg_at_5": 0.04155,
+    "hit_rate": 0.077778,
+    "average_retrieval_latency": 0.873601,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_sparse": {
+    "recall_at_1": 0.040463,
+    "recall_at_3": 0.079352,
+    "recall_at_5": 0.103426,
+    "mrr": 0.077222,
+    "ndcg_at_5": 0.075846,
+    "hit_rate": 0.116667,
+    "average_retrieval_latency": 1.690746,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_sparse_temporal": {
+    "recall_at_1": 0.029352,
+    "recall_at_3": 0.063056,
+    "recall_at_5": 0.088889,
+    "mrr": 0.058704,
+    "ndcg_at_5": 0.066094,
+    "hit_rate": 0.088889,
+    "average_retrieval_latency": 2.303127,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_sparse_temporal_graph": {
+    "recall_at_1": 0.029352,
+    "recall_at_3": 0.063056,
+    "recall_at_5": 0.088889,
+    "mrr": 0.058704,
+    "ndcg_at_5": 0.066094,
+    "hit_rate": 0.088889,
+    "average_retrieval_latency": 2.722637,
+    "average_retrieved_memory_count": 5.0
+  }
+}

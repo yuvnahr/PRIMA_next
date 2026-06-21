@@ -1,0 +1,2870 @@
+[
+    {
+        "query":  "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_001"
+                                ],
+        "memory_id":  "sem_001",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use community plot materials when caring for tomato seedlings because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  200,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_002"
+                                ],
+        "memory_id":  "sem_002",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use greenhouse bench materials when caring for monstera leaves because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  201,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of ceramic planter supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_003"
+                                ],
+        "memory_id":  "sem_003",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use ceramic planter materials when caring for rose bushes because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  202,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_004"
+                                ],
+        "memory_id":  "sem_004",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use raised bed materials when caring for basil starts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  203,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of rain barrel corner supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_005"
+                                ],
+        "memory_id":  "sem_005",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use rain barrel corner materials when caring for succulent trays because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  204,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_006"
+                                ],
+        "memory_id":  "sem_006",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use propagation rack materials when caring for orchid roots because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  205,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_007"
+                                ],
+        "memory_id":  "sem_007",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use sunny patio materials when caring for lavender bed because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  206,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_008"
+                                ],
+        "memory_id":  "sem_008",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use nursery aisle materials when caring for fern shelf because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  207,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_009"
+                                ],
+        "memory_id":  "sem_009",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use balcony garden materials when caring for pepper sprouts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  208,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_010"
+                                ],
+        "memory_id":  "sem_010",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use kitchen window materials when caring for sweet pea vines because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  209,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_011"
+                                ],
+        "memory_id":  "sem_011",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use community plot materials when caring for tomato seedlings because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  210,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_012"
+                                ],
+        "memory_id":  "sem_012",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use greenhouse bench materials when caring for monstera leaves because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  211,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of ceramic planter supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_013"
+                                ],
+        "memory_id":  "sem_013",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use ceramic planter materials when caring for rose bushes because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  212,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_014"
+                                ],
+        "memory_id":  "sem_014",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use raised bed materials when caring for basil starts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  213,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of rain barrel corner supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_015"
+                                ],
+        "memory_id":  "sem_015",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use rain barrel corner materials when caring for succulent trays because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  214,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_016"
+                                ],
+        "memory_id":  "sem_016",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use propagation rack materials when caring for orchid roots because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  215,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_017"
+                                ],
+        "memory_id":  "sem_017",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use sunny patio materials when caring for lavender bed because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  216,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_018"
+                                ],
+        "memory_id":  "sem_018",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use nursery aisle materials when caring for fern shelf because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  217,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_019"
+                                ],
+        "memory_id":  "sem_019",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use balcony garden materials when caring for pepper sprouts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  218,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_020"
+                                ],
+        "memory_id":  "sem_020",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use kitchen window materials when caring for sweet pea vines because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  219,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_021"
+                                ],
+        "memory_id":  "sem_021",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use community plot materials when caring for tomato seedlings because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  220,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_022"
+                                ],
+        "memory_id":  "sem_022",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use greenhouse bench materials when caring for monstera leaves because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  221,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of ceramic planter supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_023"
+                                ],
+        "memory_id":  "sem_023",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use ceramic planter materials when caring for rose bushes because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  222,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_024"
+                                ],
+        "memory_id":  "sem_024",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use raised bed materials when caring for basil starts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  223,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of rain barrel corner supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_025"
+                                ],
+        "memory_id":  "sem_025",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use rain barrel corner materials when caring for succulent trays because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  224,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_026"
+                                ],
+        "memory_id":  "sem_026",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use propagation rack materials when caring for orchid roots because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  225,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_027"
+                                ],
+        "memory_id":  "sem_027",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use sunny patio materials when caring for lavender bed because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  226,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_028"
+                                ],
+        "memory_id":  "sem_028",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use nursery aisle materials when caring for fern shelf because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  227,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_029"
+                                ],
+        "memory_id":  "sem_029",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use balcony garden materials when caring for pepper sprouts because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  228,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+        "expected_memory_ids":  [
+                                    "sem_030"
+                                ],
+        "memory_id":  "sem_030",
+        "category":  "preference",
+        "memory_type":  "semantic",
+        "memory_text":  "My gardening preference is to use kitchen window materials when caring for sweet pea vines because gentle setups keep young plants stable.",
+        "semantic_relation":  "paraphrase",
+        "timestamp_offset_hours":  229,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_031"
+                                ],
+        "memory_id":  "sem_031",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the ceramic planter, especially when monstera leaves need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  170,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the raised bed and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_032"
+                                ],
+        "memory_id":  "sem_032",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the raised bed, especially when rose bushes need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  171,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_033"
+                                ],
+        "memory_id":  "sem_033",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the rain barrel corner, especially when basil starts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  172,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_034"
+                                ],
+        "memory_id":  "sem_034",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the propagation rack, especially when succulent trays need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  173,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_035"
+                                ],
+        "memory_id":  "sem_035",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the sunny patio, especially when orchid roots need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  174,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_036"
+                                ],
+        "memory_id":  "sem_036",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the nursery aisle, especially when lavender bed need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  175,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_037"
+                                ],
+        "memory_id":  "sem_037",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the balcony garden, especially when fern shelf need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  176,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_038"
+                                ],
+        "memory_id":  "sem_038",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the kitchen window, especially when pepper sprouts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  177,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the community plot and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_039"
+                                ],
+        "memory_id":  "sem_039",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the community plot, especially when sweet pea vines need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  178,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_040"
+                                ],
+        "memory_id":  "sem_040",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the greenhouse bench, especially when tomato seedlings need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  179,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_041"
+                                ],
+        "memory_id":  "sem_041",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the ceramic planter, especially when monstera leaves need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  180,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the raised bed and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_042"
+                                ],
+        "memory_id":  "sem_042",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the raised bed, especially when rose bushes need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  181,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_043"
+                                ],
+        "memory_id":  "sem_043",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the rain barrel corner, especially when basil starts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  182,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_044"
+                                ],
+        "memory_id":  "sem_044",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the propagation rack, especially when succulent trays need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  183,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_045"
+                                ],
+        "memory_id":  "sem_045",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the sunny patio, especially when orchid roots need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  184,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_046"
+                                ],
+        "memory_id":  "sem_046",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the nursery aisle, especially when lavender bed need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  185,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_047"
+                                ],
+        "memory_id":  "sem_047",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the balcony garden, especially when fern shelf need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  186,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_048"
+                                ],
+        "memory_id":  "sem_048",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the kitchen window, especially when pepper sprouts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  187,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the community plot and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_049"
+                                ],
+        "memory_id":  "sem_049",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the community plot, especially when sweet pea vines need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  188,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_050"
+                                ],
+        "memory_id":  "sem_050",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the greenhouse bench, especially when tomato seedlings need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  189,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_051"
+                                ],
+        "memory_id":  "sem_051",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the ceramic planter, especially when monstera leaves need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  190,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the raised bed and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_052"
+                                ],
+        "memory_id":  "sem_052",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the raised bed, especially when rose bushes need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  191,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_053"
+                                ],
+        "memory_id":  "sem_053",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the rain barrel corner, especially when basil starts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  192,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_054"
+                                ],
+        "memory_id":  "sem_054",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the propagation rack, especially when succulent trays need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  193,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_055"
+                                ],
+        "memory_id":  "sem_055",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the sunny patio, especially when orchid roots need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  194,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_056"
+                                ],
+        "memory_id":  "sem_056",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the nursery aisle, especially when lavender bed need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  195,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_057"
+                                ],
+        "memory_id":  "sem_057",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the balcony garden, especially when fern shelf need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  196,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_058"
+                                ],
+        "memory_id":  "sem_058",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the kitchen window, especially when pepper sprouts need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  197,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the community plot and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_059"
+                                ],
+        "memory_id":  "sem_059",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the community plot, especially when sweet pea vines need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  198,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+        "expected_memory_ids":  [
+                                    "sem_060"
+                                ],
+        "memory_id":  "sem_060",
+        "category":  "identity",
+        "memory_type":  "semantic",
+        "memory_text":  "A stable personal fact is that I am the caretaker for the greenhouse bench, especially when tomato seedlings need watering, pruning, or inspection.",
+        "semantic_relation":  "identity_fact",
+        "timestamp_offset_hours":  199,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Monday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_061",
+        "memory_id":  "sem_061",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Monday, I logged a time-sensitive update about basil starts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  0,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Tuesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  [
+                                    "sem_062",
+                                    "sem_061"
+                                ],
+        "memory_id":  "sem_062",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Tuesday, I logged a time-sensitive update about succulent trays: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  1,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Wednesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  [
+                                    "sem_063",
+                                    "sem_061",
+                                    "sem_062"
+                                ],
+        "memory_id":  "sem_063",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Wednesday, I logged a time-sensitive update about orchid roots: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  2,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Thursday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  [
+                                    "sem_064",
+                                    "sem_061",
+                                    "sem_062",
+                                    "sem_063"
+                                ],
+        "memory_id":  "sem_064",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Thursday, I logged a time-sensitive update about lavender bed: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  3,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Friday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  [
+                                    "sem_065",
+                                    "sem_061",
+                                    "sem_062",
+                                    "sem_063",
+                                    "sem_064"
+                                ],
+        "memory_id":  "sem_065",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Friday, I logged a time-sensitive update about fern shelf: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  4,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Saturday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_066",
+        "memory_id":  "sem_066",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Saturday, I logged a time-sensitive update about pepper sprouts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  85,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Sunday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_067",
+        "memory_id":  "sem_067",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Sunday, I logged a time-sensitive update about sweet pea vines: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  86,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Monday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_068",
+        "memory_id":  "sem_068",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Monday, I logged a time-sensitive update about tomato seedlings: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  87,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Tuesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_069",
+        "memory_id":  "sem_069",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Tuesday, I logged a time-sensitive update about monstera leaves: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  88,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Wednesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_070",
+        "memory_id":  "sem_070",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Wednesday, I logged a time-sensitive update about rose bushes: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  89,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Thursday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_071",
+        "memory_id":  "sem_071",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Thursday, I logged a time-sensitive update about basil starts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  90,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Friday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_072",
+        "memory_id":  "sem_072",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Friday, I logged a time-sensitive update about succulent trays: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  91,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Saturday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_073",
+        "memory_id":  "sem_073",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Saturday, I logged a time-sensitive update about orchid roots: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  92,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Sunday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_074",
+        "memory_id":  "sem_074",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Sunday, I logged a time-sensitive update about lavender bed: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  93,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Monday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_075",
+        "memory_id":  "sem_075",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Monday, I logged a time-sensitive update about fern shelf: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  94,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Tuesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_076",
+        "memory_id":  "sem_076",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Tuesday, I logged a time-sensitive update about pepper sprouts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  95,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Wednesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_077",
+        "memory_id":  "sem_077",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Wednesday, I logged a time-sensitive update about sweet pea vines: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  96,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Thursday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_078",
+        "memory_id":  "sem_078",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Thursday, I logged a time-sensitive update about tomato seedlings: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  97,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Friday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_079",
+        "memory_id":  "sem_079",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Friday, I logged a time-sensitive update about monstera leaves: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  98,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Saturday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_080",
+        "memory_id":  "sem_080",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Saturday, I logged a time-sensitive update about rose bushes: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  99,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Sunday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_081",
+        "memory_id":  "sem_081",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Sunday, I logged a time-sensitive update about basil starts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  100,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Monday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_082",
+        "memory_id":  "sem_082",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Monday, I logged a time-sensitive update about succulent trays: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  101,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Tuesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_083",
+        "memory_id":  "sem_083",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Tuesday, I logged a time-sensitive update about orchid roots: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  102,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Wednesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_084",
+        "memory_id":  "sem_084",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Wednesday, I logged a time-sensitive update about lavender bed: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  103,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Thursday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_085",
+        "memory_id":  "sem_085",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Thursday, I logged a time-sensitive update about fern shelf: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  104,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Friday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_086",
+        "memory_id":  "sem_086",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Friday, I logged a time-sensitive update about pepper sprouts: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  105,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Saturday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_087",
+        "memory_id":  "sem_087",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Saturday, I logged a time-sensitive update about sweet pea vines: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  106,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Sunday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_088",
+        "memory_id":  "sem_088",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Sunday, I logged a time-sensitive update about tomato seedlings: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  107,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Monday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_089",
+        "memory_id":  "sem_089",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Monday, I logged a time-sensitive update about monstera leaves: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  108,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "What recent Tuesday garden update should I remember about seasonal plant work?",
+        "expected_memory_ids":  "sem_090",
+        "memory_id":  "sem_090",
+        "category":  "temporal",
+        "memory_type":  "episodic",
+        "memory_text":  "On Tuesday, I logged a time-sensitive update about rose bushes: the newest check showed the plant needed attention before the next watering cycle.",
+        "semantic_relation":  "temporal_event",
+        "timestamp_offset_hours":  109,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_091"
+                                ],
+        "memory_id":  "sem_091",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt anxious while dealing with orchid roots, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  130,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_092"
+                                ],
+        "memory_id":  "sem_092",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt relieved while dealing with lavender bed, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  131,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_093"
+                                ],
+        "memory_id":  "sem_093",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt proud while dealing with fern shelf, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  132,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_094"
+                                ],
+        "memory_id":  "sem_094",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt frustrated while dealing with pepper sprouts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  133,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_095"
+                                ],
+        "memory_id":  "sem_095",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt hopeful while dealing with sweet pea vines, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  134,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_096"
+                                ],
+        "memory_id":  "sem_096",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt calm while dealing with tomato seedlings, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  135,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_097"
+                                ],
+        "memory_id":  "sem_097",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt worried while dealing with monstera leaves, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  136,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_098"
+                                ],
+        "memory_id":  "sem_098",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt delighted while dealing with rose bushes, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  137,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_099"
+                                ],
+        "memory_id":  "sem_099",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt focused while dealing with basil starts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  138,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_100"
+                                ],
+        "memory_id":  "sem_100",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt discouraged while dealing with succulent trays, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  139,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_101"
+                                ],
+        "memory_id":  "sem_101",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt anxious while dealing with orchid roots, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  140,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_102"
+                                ],
+        "memory_id":  "sem_102",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt relieved while dealing with lavender bed, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  141,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_103"
+                                ],
+        "memory_id":  "sem_103",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt proud while dealing with fern shelf, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  142,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_104"
+                                ],
+        "memory_id":  "sem_104",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt frustrated while dealing with pepper sprouts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  143,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_105"
+                                ],
+        "memory_id":  "sem_105",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt hopeful while dealing with sweet pea vines, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  144,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_106"
+                                ],
+        "memory_id":  "sem_106",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt calm while dealing with tomato seedlings, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  145,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_107"
+                                ],
+        "memory_id":  "sem_107",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt worried while dealing with monstera leaves, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  146,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_108"
+                                ],
+        "memory_id":  "sem_108",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt delighted while dealing with rose bushes, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  147,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_109"
+                                ],
+        "memory_id":  "sem_109",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt focused while dealing with basil starts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  148,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_110"
+                                ],
+        "memory_id":  "sem_110",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt discouraged while dealing with succulent trays, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  149,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_111"
+                                ],
+        "memory_id":  "sem_111",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt anxious while dealing with orchid roots, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  150,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_112"
+                                ],
+        "memory_id":  "sem_112",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt relieved while dealing with lavender bed, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  151,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_113"
+                                ],
+        "memory_id":  "sem_113",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt proud while dealing with fern shelf, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  152,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_114"
+                                ],
+        "memory_id":  "sem_114",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt frustrated while dealing with pepper sprouts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  153,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_115"
+                                ],
+        "memory_id":  "sem_115",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt hopeful while dealing with sweet pea vines, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  154,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_116"
+                                ],
+        "memory_id":  "sem_116",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt calm while dealing with tomato seedlings, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  155,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_117"
+                                ],
+        "memory_id":  "sem_117",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt worried while dealing with monstera leaves, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  156,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_118"
+                                ],
+        "memory_id":  "sem_118",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt delighted while dealing with rose bushes, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  157,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_119"
+                                ],
+        "memory_id":  "sem_119",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt focused while dealing with basil starts, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  158,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which memory captures the feeling I had when plant care became ",
+        "expected_memory_ids":  [
+                                    "sem_120"
+                                ],
+        "memory_id":  "sem_120",
+        "category":  "emotional",
+        "memory_type":  "emotional",
+        "memory_text":  "An emotional gardening memory: I felt discouraged while dealing with succulent trays, and that mood shaped how carefully I responded.",
+        "semantic_relation":  "affective_episode",
+        "timestamp_offset_hours":  159,
+        "graph_links":  [
+
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the kitchen window observation about ",
+        "expected_memory_ids":  [
+                                    "sem_122"
+                                ],
+        "memory_id":  "sem_121",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed fern shelf behaving differently near the kitchen window, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  110,
+        "graph_links":  [
+                            "sem_122"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier kitchen window clue?",
+        "expected_memory_ids":  [
+                                    "sem_122"
+                                ],
+        "memory_id":  "sem_122",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for fern shelf after connecting the kitchen window clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  100,
+        "graph_links":  [
+                            "sem_121"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the community plot observation about ",
+        "expected_memory_ids":  [
+                                    "sem_124"
+                                ],
+        "memory_id":  "sem_123",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed pepper sprouts behaving differently near the community plot, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  111,
+        "graph_links":  [
+                            "sem_124"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier community plot clue?",
+        "expected_memory_ids":  [
+                                    "sem_124"
+                                ],
+        "memory_id":  "sem_124",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for pepper sprouts after connecting the community plot clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  101,
+        "graph_links":  [
+                            "sem_123"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the greenhouse bench observation about ",
+        "expected_memory_ids":  [
+                                    "sem_126"
+                                ],
+        "memory_id":  "sem_125",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed sweet pea vines behaving differently near the greenhouse bench, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  112,
+        "graph_links":  [
+                            "sem_126"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier greenhouse bench clue?",
+        "expected_memory_ids":  [
+                                    "sem_126"
+                                ],
+        "memory_id":  "sem_126",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for sweet pea vines after connecting the greenhouse bench clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  102,
+        "graph_links":  [
+                            "sem_125"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the ceramic planter observation about ",
+        "expected_memory_ids":  [
+                                    "sem_128"
+                                ],
+        "memory_id":  "sem_127",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed tomato seedlings behaving differently near the ceramic planter, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  113,
+        "graph_links":  [
+                            "sem_128"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier ceramic planter clue?",
+        "expected_memory_ids":  [
+                                    "sem_128"
+                                ],
+        "memory_id":  "sem_128",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for tomato seedlings after connecting the ceramic planter clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  103,
+        "graph_links":  [
+                            "sem_127"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the raised bed observation about ",
+        "expected_memory_ids":  [
+                                    "sem_130"
+                                ],
+        "memory_id":  "sem_129",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed monstera leaves behaving differently near the raised bed, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  114,
+        "graph_links":  [
+                            "sem_130"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier raised bed clue?",
+        "expected_memory_ids":  [
+                                    "sem_130"
+                                ],
+        "memory_id":  "sem_130",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for monstera leaves after connecting the raised bed clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  104,
+        "graph_links":  [
+                            "sem_129"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the rain barrel corner observation about ",
+        "expected_memory_ids":  [
+                                    "sem_132"
+                                ],
+        "memory_id":  "sem_131",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed rose bushes behaving differently near the rain barrel corner, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  115,
+        "graph_links":  [
+                            "sem_132"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier rain barrel corner clue?",
+        "expected_memory_ids":  [
+                                    "sem_132"
+                                ],
+        "memory_id":  "sem_132",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for rose bushes after connecting the rain barrel corner clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  105,
+        "graph_links":  [
+                            "sem_131"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the propagation rack observation about ",
+        "expected_memory_ids":  [
+                                    "sem_134"
+                                ],
+        "memory_id":  "sem_133",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed basil starts behaving differently near the propagation rack, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  116,
+        "graph_links":  [
+                            "sem_134"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier propagation rack clue?",
+        "expected_memory_ids":  [
+                                    "sem_134"
+                                ],
+        "memory_id":  "sem_134",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for basil starts after connecting the propagation rack clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  106,
+        "graph_links":  [
+                            "sem_133"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the sunny patio observation about ",
+        "expected_memory_ids":  [
+                                    "sem_136"
+                                ],
+        "memory_id":  "sem_135",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed succulent trays behaving differently near the sunny patio, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  117,
+        "graph_links":  [
+                            "sem_136"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier sunny patio clue?",
+        "expected_memory_ids":  [
+                                    "sem_136"
+                                ],
+        "memory_id":  "sem_136",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for succulent trays after connecting the sunny patio clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  107,
+        "graph_links":  [
+                            "sem_135"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the nursery aisle observation about ",
+        "expected_memory_ids":  [
+                                    "sem_138"
+                                ],
+        "memory_id":  "sem_137",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed orchid roots behaving differently near the nursery aisle, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  118,
+        "graph_links":  [
+                            "sem_138"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier nursery aisle clue?",
+        "expected_memory_ids":  [
+                                    "sem_138"
+                                ],
+        "memory_id":  "sem_138",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for orchid roots after connecting the nursery aisle clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  108,
+        "graph_links":  [
+                            "sem_137"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the balcony garden observation about ",
+        "expected_memory_ids":  [
+                                    "sem_140"
+                                ],
+        "memory_id":  "sem_139",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed lavender bed behaving differently near the balcony garden, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  119,
+        "graph_links":  [
+                            "sem_140"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier balcony garden clue?",
+        "expected_memory_ids":  [
+                                    "sem_140"
+                                ],
+        "memory_id":  "sem_140",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for lavender bed after connecting the balcony garden clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  109,
+        "graph_links":  [
+                            "sem_139"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the kitchen window observation about ",
+        "expected_memory_ids":  [
+                                    "sem_142"
+                                ],
+        "memory_id":  "sem_141",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed fern shelf behaving differently near the kitchen window, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  120,
+        "graph_links":  [
+                            "sem_142"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier kitchen window clue?",
+        "expected_memory_ids":  [
+                                    "sem_142"
+                                ],
+        "memory_id":  "sem_142",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for fern shelf after connecting the kitchen window clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  110,
+        "graph_links":  [
+                            "sem_141"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the community plot observation about ",
+        "expected_memory_ids":  [
+                                    "sem_144"
+                                ],
+        "memory_id":  "sem_143",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed pepper sprouts behaving differently near the community plot, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  121,
+        "graph_links":  [
+                            "sem_144"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier community plot clue?",
+        "expected_memory_ids":  [
+                                    "sem_144"
+                                ],
+        "memory_id":  "sem_144",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for pepper sprouts after connecting the community plot clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  111,
+        "graph_links":  [
+                            "sem_143"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the greenhouse bench observation about ",
+        "expected_memory_ids":  [
+                                    "sem_146"
+                                ],
+        "memory_id":  "sem_145",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed sweet pea vines behaving differently near the greenhouse bench, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  122,
+        "graph_links":  [
+                            "sem_146"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier greenhouse bench clue?",
+        "expected_memory_ids":  [
+                                    "sem_146"
+                                ],
+        "memory_id":  "sem_146",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for sweet pea vines after connecting the greenhouse bench clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  112,
+        "graph_links":  [
+                            "sem_145"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the ceramic planter observation about ",
+        "expected_memory_ids":  [
+                                    "sem_148"
+                                ],
+        "memory_id":  "sem_147",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed tomato seedlings behaving differently near the ceramic planter, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  123,
+        "graph_links":  [
+                            "sem_148"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier ceramic planter clue?",
+        "expected_memory_ids":  [
+                                    "sem_148"
+                                ],
+        "memory_id":  "sem_148",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for tomato seedlings after connecting the ceramic planter clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  113,
+        "graph_links":  [
+                            "sem_147"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which follow-up note is connected to the raised bed observation about ",
+        "expected_memory_ids":  [
+                                    "sem_150"
+                                ],
+        "memory_id":  "sem_149",
+        "category":  "multihop",
+        "memory_type":  "episodic",
+        "memory_text":  "I noticed monstera leaves behaving differently near the raised bed, which became the first clue in a longer care sequence.",
+        "semantic_relation":  "multihop_seed",
+        "timestamp_offset_hours":  124,
+        "graph_links":  [
+                            "sem_150"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which second-step care decision followed from the earlier raised bed clue?",
+        "expected_memory_ids":  [
+                                    "sem_150"
+                                ],
+        "memory_id":  "sem_150",
+        "category":  "multihop",
+        "memory_type":  "semantic",
+        "memory_text":  "The follow-up decision was to adjust the care plan for monstera leaves after connecting the raised bed clue with prior watering patterns.",
+        "semantic_relation":  "multihop_target",
+        "timestamp_offset_hours":  114,
+        "graph_links":  [
+                            "sem_149"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the rain barrel corner note about ",
+        "expected_memory_ids":  [
+                                    "sem_152"
+                                ],
+        "memory_id":  "sem_151",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The rain barrel corner note recorded a surface observation about rose bushes and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  70,
+        "graph_links":  [
+                            "sem_152"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the rain barrel corner observation?",
+        "expected_memory_ids":  [
+                                    "sem_152"
+                                ],
+        "memory_id":  "sem_152",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says rose bushes changed because the rain barrel corner conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  60,
+        "graph_links":  [
+                            "sem_151"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the propagation rack note about ",
+        "expected_memory_ids":  [
+                                    "sem_154"
+                                ],
+        "memory_id":  "sem_153",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The propagation rack note recorded a surface observation about basil starts and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  71,
+        "graph_links":  [
+                            "sem_154"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the propagation rack observation?",
+        "expected_memory_ids":  [
+                                    "sem_154"
+                                ],
+        "memory_id":  "sem_154",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says basil starts changed because the propagation rack conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  61,
+        "graph_links":  [
+                            "sem_153"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the sunny patio note about ",
+        "expected_memory_ids":  [
+                                    "sem_156"
+                                ],
+        "memory_id":  "sem_155",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The sunny patio note recorded a surface observation about succulent trays and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  72,
+        "graph_links":  [
+                            "sem_156"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the sunny patio observation?",
+        "expected_memory_ids":  [
+                                    "sem_156"
+                                ],
+        "memory_id":  "sem_156",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says succulent trays changed because the sunny patio conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  62,
+        "graph_links":  [
+                            "sem_155"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the nursery aisle note about ",
+        "expected_memory_ids":  [
+                                    "sem_158"
+                                ],
+        "memory_id":  "sem_157",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The nursery aisle note recorded a surface observation about orchid roots and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  73,
+        "graph_links":  [
+                            "sem_158"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the nursery aisle observation?",
+        "expected_memory_ids":  [
+                                    "sem_158"
+                                ],
+        "memory_id":  "sem_158",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says orchid roots changed because the nursery aisle conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  63,
+        "graph_links":  [
+                            "sem_157"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the balcony garden note about ",
+        "expected_memory_ids":  [
+                                    "sem_160"
+                                ],
+        "memory_id":  "sem_159",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The balcony garden note recorded a surface observation about lavender bed and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  74,
+        "graph_links":  [
+                            "sem_160"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the balcony garden observation?",
+        "expected_memory_ids":  [
+                                    "sem_160"
+                                ],
+        "memory_id":  "sem_160",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says lavender bed changed because the balcony garden conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  64,
+        "graph_links":  [
+                            "sem_159"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the kitchen window note about ",
+        "expected_memory_ids":  [
+                                    "sem_162"
+                                ],
+        "memory_id":  "sem_161",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The kitchen window note recorded a surface observation about fern shelf and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  75,
+        "graph_links":  [
+                            "sem_162"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the kitchen window observation?",
+        "expected_memory_ids":  [
+                                    "sem_162"
+                                ],
+        "memory_id":  "sem_162",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says fern shelf changed because the kitchen window conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  65,
+        "graph_links":  [
+                            "sem_161"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the community plot note about ",
+        "expected_memory_ids":  [
+                                    "sem_164"
+                                ],
+        "memory_id":  "sem_163",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The community plot note recorded a surface observation about pepper sprouts and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  76,
+        "graph_links":  [
+                            "sem_164"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the community plot observation?",
+        "expected_memory_ids":  [
+                                    "sem_164"
+                                ],
+        "memory_id":  "sem_164",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says pepper sprouts changed because the community plot conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  66,
+        "graph_links":  [
+                            "sem_163"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the greenhouse bench note about ",
+        "expected_memory_ids":  [
+                                    "sem_166"
+                                ],
+        "memory_id":  "sem_165",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The greenhouse bench note recorded a surface observation about sweet pea vines and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  77,
+        "graph_links":  [
+                            "sem_166"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the greenhouse bench observation?",
+        "expected_memory_ids":  [
+                                    "sem_166"
+                                ],
+        "memory_id":  "sem_166",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says sweet pea vines changed because the greenhouse bench conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  67,
+        "graph_links":  [
+                            "sem_165"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the ceramic planter note about ",
+        "expected_memory_ids":  [
+                                    "sem_168"
+                                ],
+        "memory_id":  "sem_167",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The ceramic planter note recorded a surface observation about tomato seedlings and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  78,
+        "graph_links":  [
+                            "sem_168"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the ceramic planter observation?",
+        "expected_memory_ids":  [
+                                    "sem_168"
+                                ],
+        "memory_id":  "sem_168",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says tomato seedlings changed because the ceramic planter conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  68,
+        "graph_links":  [
+                            "sem_167"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the raised bed note about ",
+        "expected_memory_ids":  [
+                                    "sem_170"
+                                ],
+        "memory_id":  "sem_169",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The raised bed note recorded a surface observation about monstera leaves and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  79,
+        "graph_links":  [
+                            "sem_170"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the raised bed observation?",
+        "expected_memory_ids":  [
+                                    "sem_170"
+                                ],
+        "memory_id":  "sem_170",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says monstera leaves changed because the raised bed conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  69,
+        "graph_links":  [
+                            "sem_169"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the rain barrel corner note about ",
+        "expected_memory_ids":  [
+                                    "sem_172"
+                                ],
+        "memory_id":  "sem_171",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The rain barrel corner note recorded a surface observation about rose bushes and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  80,
+        "graph_links":  [
+                            "sem_172"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the rain barrel corner observation?",
+        "expected_memory_ids":  [
+                                    "sem_172"
+                                ],
+        "memory_id":  "sem_172",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says rose bushes changed because the rain barrel corner conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  70,
+        "graph_links":  [
+                            "sem_171"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the propagation rack note about ",
+        "expected_memory_ids":  [
+                                    "sem_174"
+                                ],
+        "memory_id":  "sem_173",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The propagation rack note recorded a surface observation about basil starts and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  81,
+        "graph_links":  [
+                            "sem_174"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the propagation rack observation?",
+        "expected_memory_ids":  [
+                                    "sem_174"
+                                ],
+        "memory_id":  "sem_174",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says basil starts changed because the propagation rack conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  71,
+        "graph_links":  [
+                            "sem_173"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the sunny patio note about ",
+        "expected_memory_ids":  [
+                                    "sem_176"
+                                ],
+        "memory_id":  "sem_175",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The sunny patio note recorded a surface observation about succulent trays and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  82,
+        "graph_links":  [
+                            "sem_176"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the sunny patio observation?",
+        "expected_memory_ids":  [
+                                    "sem_176"
+                                ],
+        "memory_id":  "sem_176",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says succulent trays changed because the sunny patio conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  72,
+        "graph_links":  [
+                            "sem_175"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the nursery aisle note about ",
+        "expected_memory_ids":  [
+                                    "sem_178"
+                                ],
+        "memory_id":  "sem_177",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The nursery aisle note recorded a surface observation about orchid roots and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  83,
+        "graph_links":  [
+                            "sem_178"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the nursery aisle observation?",
+        "expected_memory_ids":  [
+                                    "sem_178"
+                                ],
+        "memory_id":  "sem_178",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says orchid roots changed because the nursery aisle conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  73,
+        "graph_links":  [
+                            "sem_177"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which graph-linked memory sits next to the balcony garden note about ",
+        "expected_memory_ids":  [
+                                    "sem_180"
+                                ],
+        "memory_id":  "sem_179",
+        "category":  "graph",
+        "memory_type":  "episodic",
+        "memory_text":  "The balcony garden note recorded a surface observation about lavender bed and was linked to a deeper explanation.",
+        "semantic_relation":  "graph_seed",
+        "timestamp_offset_hours":  84,
+        "graph_links":  [
+                            "sem_180"
+                        ],
+        "manually_verified":  true
+    },
+    {
+        "query":  "Which connected explanation belongs with the balcony garden observation?",
+        "expected_memory_ids":  [
+                                    "sem_180"
+                                ],
+        "memory_id":  "sem_180",
+        "category":  "graph",
+        "memory_type":  "semantic",
+        "memory_text":  "The connected explanation says lavender bed changed because the balcony garden conditions altered light, water, and support needs.",
+        "semantic_relation":  "graph_target",
+        "timestamp_offset_hours":  74,
+        "graph_links":  [
+                            "sem_179"
+                        ],
+        "salience_score":  0.95,
+        "manually_verified":  true
+    }
+]

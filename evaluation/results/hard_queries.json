@@ -1,0 +1,122 @@
+[
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_092"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "best_rank": 2,
+    "category": "emotional"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_093"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "best_rank": 3,
+    "category": "emotional"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_094"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_095"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "best_rank": 5,
+    "category": "emotional"
+  },
+  {
+    "query": "Which connected explanation belongs with the propagation rack observation?",
+    "expected_memory_ids": [
+      "sem_154"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the sunny patio observation?",
+    "expected_memory_ids": [
+      "sem_156"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "best_rank": 3,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the nursery aisle observation?",
+    "expected_memory_ids": [
+      "sem_158"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "best_rank": 4,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the balcony garden observation?",
+    "expected_memory_ids": [
+      "sem_160"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "best_rank": 5,
+    "category": "graph"
+  }
+]

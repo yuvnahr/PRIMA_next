@@ -1,0 +1,2454 @@
+[
+  {
+    "query": "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_001"
+    ],
+    "retrieved_memory_ids": [
+      "sem_009",
+      "sem_019",
+      "sem_029",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_002"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_004"
+    ],
+    "retrieved_memory_ids": [
+      "sem_001",
+      "sem_002",
+      "sem_011",
+      "sem_021",
+      "sem_152"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_006"
+    ],
+    "retrieved_memory_ids": [
+      "sem_004",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_007"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_008"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_015",
+      "sem_025",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_009"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_010"
+    ],
+    "retrieved_memory_ids": [
+      "sem_034",
+      "sem_044",
+      "sem_054",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_011"
+    ],
+    "retrieved_memory_ids": [
+      "sem_009",
+      "sem_019",
+      "sem_029",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_012"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of ceramic planter supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_013"
+    ],
+    "retrieved_memory_ids": [
+      "sem_003",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_014"
+    ],
+    "retrieved_memory_ids": [
+      "sem_001",
+      "sem_002",
+      "sem_011",
+      "sem_021",
+      "sem_152"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of rain barrel corner supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_015"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_031",
+      "sem_041",
+      "sem_051",
+      "sem_152"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_016"
+    ],
+    "retrieved_memory_ids": [
+      "sem_004",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_017"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_018"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_015",
+      "sem_025",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_019"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_020"
+    ],
+    "retrieved_memory_ids": [
+      "sem_034",
+      "sem_044",
+      "sem_054",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of community plot supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_021"
+    ],
+    "retrieved_memory_ids": [
+      "sem_009",
+      "sem_019",
+      "sem_029",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of greenhouse bench supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_022"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of ceramic planter supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_023"
+    ],
+    "retrieved_memory_ids": [
+      "sem_003",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of raised bed supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_024"
+    ],
+    "retrieved_memory_ids": [
+      "sem_001",
+      "sem_002",
+      "sem_011",
+      "sem_021",
+      "sem_152"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of rain barrel corner supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_025"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_031",
+      "sem_041",
+      "sem_051",
+      "sem_152"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of propagation rack supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_026"
+    ],
+    "retrieved_memory_ids": [
+      "sem_004",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of sunny patio supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_027"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of nursery aisle supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_028"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_015",
+      "sem_025",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of balcony garden supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_029"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which saved preference explains my usual choice of kitchen window supplies for delicate starts?",
+    "expected_memory_ids": [
+      "sem_030"
+    ],
+    "retrieved_memory_ids": [
+      "sem_034",
+      "sem_044",
+      "sem_054",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_031"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the raised bed and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_032"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_033"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_034"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_035"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_036"
+    ],
+    "retrieved_memory_ids": [
+      "sem_156",
+      "sem_152",
+      "sem_154",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_037"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_038"
+    ],
+    "retrieved_memory_ids": [
+      "sem_136",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the community plot and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_039"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_040"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_041"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the raised bed and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_042"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_043"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_044"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_045"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_046"
+    ],
+    "retrieved_memory_ids": [
+      "sem_156",
+      "sem_152",
+      "sem_154",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_047"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_048"
+    ],
+    "retrieved_memory_ids": [
+      "sem_136",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the community plot and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_049"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_050"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the ceramic planter and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_051"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the raised bed and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_052"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the rain barrel corner and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_053"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the propagation rack and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_054"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the sunny patio and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_055"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the nursery aisle and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_056"
+    ],
+    "retrieved_memory_ids": [
+      "sem_156",
+      "sem_152",
+      "sem_154",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the balcony garden and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_057"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the kitchen window and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_058"
+    ],
+    "retrieved_memory_ids": [
+      "sem_136",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the community plot and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_059"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which identity note says I am responsible for the greenhouse bench and its plant care routine?",
+    "expected_memory_ids": [
+      "sem_060"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "What recent Monday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "6",
+      "1"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_086",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Saturday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "6",
+      "6"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Sunday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "6",
+      "7"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_087",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Monday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "6",
+      "8"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_086",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Tuesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "6",
+      "9"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_061",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Wednesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "0"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_063",
+      "sem_061",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Thursday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "1"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Friday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "2"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Saturday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "3"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Sunday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "4"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_087",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Monday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "5"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_086",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Tuesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "6"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_061",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Wednesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "7"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_063",
+      "sem_061",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Thursday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "8"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Friday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "7",
+      "9"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Saturday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "0"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Sunday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "1"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_087",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Monday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "2"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_086",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Tuesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "3"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_061",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Wednesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "4"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_063",
+      "sem_061",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Thursday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "5"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Friday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "6"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Saturday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "7"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Sunday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "8"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_087",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Monday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "8",
+      "9"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_086",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "What recent Tuesday garden update should I remember about seasonal plant work?",
+    "expected_memory_ids": [
+      "s",
+      "e",
+      "m",
+      "_",
+      "0",
+      "9",
+      "0"
+    ],
+    "retrieved_memory_ids": [
+      "sem_062",
+      "sem_061",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "TEMPORAL_MISS"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_096"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_097"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_098"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_099"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_100"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_101"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_102"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_103"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_104"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_105"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_106"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_107"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_108"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_109"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_110"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_111"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_112"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_113"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_114"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_115"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_116"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_117"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_118"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_119"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which memory captures the feeling I had when plant care became ",
+    "expected_memory_ids": [
+      "sem_120"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_093",
+      "sem_094",
+      "sem_095"
+    ],
+    "failure_type": "WRONG_MEMORY"
+  },
+  {
+    "query": "Which follow-up note is connected to the kitchen window observation about ",
+    "expected_memory_ids": [
+      "sem_122"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier kitchen window clue?",
+    "expected_memory_ids": [
+      "sem_122"
+    ],
+    "retrieved_memory_ids": [
+      "sem_038",
+      "sem_048",
+      "sem_058",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the community plot observation about ",
+    "expected_memory_ids": [
+      "sem_124"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_078",
+      "sem_061",
+      "sem_062",
+      "sem_063"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier community plot clue?",
+    "expected_memory_ids": [
+      "sem_124"
+    ],
+    "retrieved_memory_ids": [
+      "sem_158",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the greenhouse bench observation about ",
+    "expected_memory_ids": [
+      "sem_126"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier greenhouse bench clue?",
+    "expected_memory_ids": [
+      "sem_126"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_015",
+      "sem_025",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the ceramic planter observation about ",
+    "expected_memory_ids": [
+      "sem_128"
+    ],
+    "retrieved_memory_ids": [
+      "sem_077",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier ceramic planter clue?",
+    "expected_memory_ids": [
+      "sem_128"
+    ],
+    "retrieved_memory_ids": [
+      "sem_126",
+      "sem_146",
+      "sem_152",
+      "sem_154",
+      "sem_156"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the raised bed observation about ",
+    "expected_memory_ids": [
+      "sem_130"
+    ],
+    "retrieved_memory_ids": [
+      "sem_090",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier raised bed clue?",
+    "expected_memory_ids": [
+      "sem_130"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the rain barrel corner observation about ",
+    "expected_memory_ids": [
+      "sem_132"
+    ],
+    "retrieved_memory_ids": [
+      "sem_089",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier rain barrel corner clue?",
+    "expected_memory_ids": [
+      "sem_132"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the propagation rack observation about ",
+    "expected_memory_ids": [
+      "sem_134"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier propagation rack clue?",
+    "expected_memory_ids": [
+      "sem_134"
+    ],
+    "retrieved_memory_ids": [
+      "sem_160",
+      "sem_180",
+      "sem_038",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the sunny patio observation about ",
+    "expected_memory_ids": [
+      "sem_136"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier sunny patio clue?",
+    "expected_memory_ids": [
+      "sem_136"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the nursery aisle observation about ",
+    "expected_memory_ids": [
+      "sem_138"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_084",
+      "sem_083",
+      "sem_061",
+      "sem_062"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier nursery aisle clue?",
+    "expected_memory_ids": [
+      "sem_138"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the balcony garden observation about ",
+    "expected_memory_ids": [
+      "sem_140"
+    ],
+    "retrieved_memory_ids": [
+      "sem_082",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier balcony garden clue?",
+    "expected_memory_ids": [
+      "sem_140"
+    ],
+    "retrieved_memory_ids": [
+      "sem_160",
+      "sem_166",
+      "sem_180",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the kitchen window observation about ",
+    "expected_memory_ids": [
+      "sem_142"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier kitchen window clue?",
+    "expected_memory_ids": [
+      "sem_142"
+    ],
+    "retrieved_memory_ids": [
+      "sem_038",
+      "sem_048",
+      "sem_058",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the community plot observation about ",
+    "expected_memory_ids": [
+      "sem_144"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_078",
+      "sem_061",
+      "sem_062",
+      "sem_063"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier community plot clue?",
+    "expected_memory_ids": [
+      "sem_144"
+    ],
+    "retrieved_memory_ids": [
+      "sem_158",
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the greenhouse bench observation about ",
+    "expected_memory_ids": [
+      "sem_146"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier greenhouse bench clue?",
+    "expected_memory_ids": [
+      "sem_146"
+    ],
+    "retrieved_memory_ids": [
+      "sem_005",
+      "sem_015",
+      "sem_025",
+      "sem_152",
+      "sem_154"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the ceramic planter observation about ",
+    "expected_memory_ids": [
+      "sem_148"
+    ],
+    "retrieved_memory_ids": [
+      "sem_077",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier ceramic planter clue?",
+    "expected_memory_ids": [
+      "sem_148"
+    ],
+    "retrieved_memory_ids": [
+      "sem_126",
+      "sem_146",
+      "sem_152",
+      "sem_154",
+      "sem_156"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which follow-up note is connected to the raised bed observation about ",
+    "expected_memory_ids": [
+      "sem_150"
+    ],
+    "retrieved_memory_ids": [
+      "sem_090",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which second-step care decision followed from the earlier raised bed clue?",
+    "expected_memory_ids": [
+      "sem_150"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "MULTIHOP_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the rain barrel corner note about ",
+    "expected_memory_ids": [
+      "sem_152"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_161",
+      "sem_061",
+      "sem_062",
+      "sem_063"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the propagation rack note about ",
+    "expected_memory_ids": [
+      "sem_154"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the sunny patio note about ",
+    "expected_memory_ids": [
+      "sem_156"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the nursery aisle note about ",
+    "expected_memory_ids": [
+      "sem_158"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the balcony garden note about ",
+    "expected_memory_ids": [
+      "sem_160"
+    ],
+    "retrieved_memory_ids": [
+      "sem_078",
+      "sem_082",
+      "sem_165",
+      "sem_061",
+      "sem_062"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the kitchen window note about ",
+    "expected_memory_ids": [
+      "sem_162"
+    ],
+    "retrieved_memory_ids": [
+      "sem_081",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the kitchen window observation?",
+    "expected_memory_ids": [
+      "sem_162"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the community plot note about ",
+    "expected_memory_ids": [
+      "sem_164"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_064",
+      "sem_061",
+      "sem_062",
+      "sem_063"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the community plot observation?",
+    "expected_memory_ids": [
+      "sem_164"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the greenhouse bench note about ",
+    "expected_memory_ids": [
+      "sem_166"
+    ],
+    "retrieved_memory_ids": [
+      "sem_084",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the greenhouse bench observation?",
+    "expected_memory_ids": [
+      "sem_166"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the ceramic planter note about ",
+    "expected_memory_ids": [
+      "sem_168"
+    ],
+    "retrieved_memory_ids": [
+      "sem_065",
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the ceramic planter observation?",
+    "expected_memory_ids": [
+      "sem_168"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the raised bed note about ",
+    "expected_memory_ids": [
+      "sem_170"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the raised bed observation?",
+    "expected_memory_ids": [
+      "sem_170"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the rain barrel corner note about ",
+    "expected_memory_ids": [
+      "sem_172"
+    ],
+    "retrieved_memory_ids": [
+      "sem_064",
+      "sem_161",
+      "sem_061",
+      "sem_062",
+      "sem_063"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the rain barrel corner observation?",
+    "expected_memory_ids": [
+      "sem_172"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the propagation rack note about ",
+    "expected_memory_ids": [
+      "sem_174"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the propagation rack observation?",
+    "expected_memory_ids": [
+      "sem_174"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the sunny patio note about ",
+    "expected_memory_ids": [
+      "sem_176"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the sunny patio observation?",
+    "expected_memory_ids": [
+      "sem_176"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the nursery aisle note about ",
+    "expected_memory_ids": [
+      "sem_178"
+    ],
+    "retrieved_memory_ids": [
+      "sem_061",
+      "sem_062",
+      "sem_063",
+      "sem_064",
+      "sem_065"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the nursery aisle observation?",
+    "expected_memory_ids": [
+      "sem_178"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which graph-linked memory sits next to the balcony garden note about ",
+    "expected_memory_ids": [
+      "sem_180"
+    ],
+    "retrieved_memory_ids": [
+      "sem_078",
+      "sem_082",
+      "sem_165",
+      "sem_061",
+      "sem_062"
+    ],
+    "failure_type": "GRAPH_MISS"
+  },
+  {
+    "query": "Which connected explanation belongs with the balcony garden observation?",
+    "expected_memory_ids": [
+      "sem_180"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_154",
+      "sem_156",
+      "sem_158",
+      "sem_160"
+    ],
+    "failure_type": "GRAPH_MISS"
+  }
+]
