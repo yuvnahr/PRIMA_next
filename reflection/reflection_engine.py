@@ -42,7 +42,7 @@ class ReflectionEngine:
         failure_classifier: FailureClassifier | None = None,
         rule_extractor: RuleExtractor | None = None,
         confidence_estimator: ReflectionConfidenceEstimator | None = None,
-        trigger_threshold: float = 0.45,
+        trigger_threshold: float = 0.52,
     ) -> None:
         self.reflection_repository = reflection_repository or ReflectionRepository()
         self.failure_classifier = failure_classifier or FailureClassifier()
@@ -57,7 +57,11 @@ class ReflectionEngine:
         )
         signals = self._build_signals(context, failure_type)
         trigger_score = self.compute_trigger_score(context, signals)
-        should_reflect = trigger_score >= self.trigger_threshold
+        trigger_reasons = self.trigger_reasons(context, signals, trigger_score, failure_type)
+        should_reflect = trigger_score >= self.trigger_threshold and any(
+            bool(reason.get("triggered", False)) for reason in trigger_reasons
+        )
+        before_confidence = self._before_confidence(context)
 
         reflection_text = ""
         reflection_memory = None
@@ -107,6 +111,8 @@ class ReflectionEngine:
                 state_support=self._state_support(context),
             )
 
+        after_confidence = confidence.overall_confidence if should_reflect else before_confidence
+        utility_score = round(max(0.0, after_confidence - before_confidence), 6)
         return ReflectionResult(
             should_reflect=should_reflect,
             trigger_score=round(trigger_score, 6),
@@ -114,8 +120,91 @@ class ReflectionEngine:
             reflection_memory=reflection_memory,
             rules=tuple(rules),
             confidence=confidence,
-            state_updates={"last_reflection_trigger_score": round(trigger_score, 6), "last_failure_type": failure_type.value},
+            state_updates={
+                "last_reflection_trigger_score": round(trigger_score, 6),
+                "last_failure_type": failure_type.value,
+                "reflection_utility_score": utility_score,
+            },
+            trigger_reasons=trigger_reasons,
+            before_confidence=before_confidence,
+            after_confidence=after_confidence,
+            utility_score=utility_score,
         )
+
+
+    def trigger_reasons(
+        self,
+        context: ReflectionContext,
+        signals: tuple[ReflectionSignal, ...],
+        trigger_score: float,
+        failure_type: FailureType,
+    ) -> tuple[dict[str, object], ...]:
+        """Return structured reasons explaining why reflection did or did not trigger."""
+        reasons: list[dict[str, object]] = []
+        retrieval_confidence = self._retrieval_support(context.retrieval_confidence)
+        low_confidence_threshold = float(context.failure_metadata.get("threshold", 0.30))
+        audit_sample = bool(context.failure_metadata.get("audit_sample", False))
+        reasons.append(
+            {
+                "reason": "low_confidence",
+                "confidence": round(retrieval_confidence, 6),
+                "threshold": round(low_confidence_threshold, 6),
+                "triggered": retrieval_confidence < low_confidence_threshold and (low_confidence_threshold <= 0.30 or audit_sample),
+                "audit_sample": audit_sample,
+            }
+        )
+        signal_types = {signal.signal_type for signal in signals}
+        failure_reason = str(context.failure_metadata.get("reason", "")).lower()
+        reasons.extend(
+            (
+                {
+                    "reason": "tool_failure",
+                    "confidence": round(trigger_score, 6),
+                    "threshold": self.trigger_threshold,
+                    "triggered": failure_type == FailureType.TOOL_FAILURE,
+                },
+                {
+                    "reason": "contradiction",
+                    "confidence": round(trigger_score, 6),
+                    "threshold": self.trigger_threshold,
+                    "triggered": (
+                        failure_type in {FailureType.MEMORY_FAILURE, FailureType.STATE_CONFLICT, FailureType.EMOTIONAL_CONFLICT}
+                        or "contradiction" in failure_reason
+                        or "conflict" in failure_reason
+                    ),
+                },
+                {
+                    "reason": "hallucination",
+                    "confidence": round(trigger_score, 6),
+                    "threshold": self.trigger_threshold,
+                    "triggered": failure_type == FailureType.HALLUCINATION_RISK,
+                },
+                {
+                    "reason": "constraint_violation",
+                    "confidence": round(trigger_score, 6),
+                    "threshold": self.trigger_threshold,
+                    "triggered": (
+                        failure_type in {FailureType.PLANNING_FAILURE, FailureType.GOAL_CONFLICT}
+                        or "constraint" in failure_reason
+                        or "policy" in failure_reason
+                    ),
+                },
+                {
+                    "reason": "retrieval_ambiguity",
+                    "confidence": round(trigger_score, 6),
+                    "threshold": self.trigger_threshold,
+                    "triggered": ReflectionSignalType.RETRIEVAL_AMBIGUITY in signal_types
+                    and retrieval_confidence < low_confidence_threshold
+                    and (low_confidence_threshold <= 0.30 or audit_sample),
+                },
+            )
+        )
+        return tuple(reasons)
+
+    def _before_confidence(self, context: ReflectionContext) -> float:
+        retrieval = self._retrieval_support(context.retrieval_confidence)
+        state = self._state_support(context)
+        return round(max(0.0, min(1.0, retrieval * 0.65 + state * 0.35)), 6)
 
     def compute_trigger_score(self, context: ReflectionContext, signals: tuple[ReflectionSignal, ...]) -> float:
         failure_severity = max((signal.severity for signal in signals), default=0.0)

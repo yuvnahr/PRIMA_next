@@ -1,6 +1,6 @@
 {
   "system": {
-    "average_latency": 4.18198,
+    "average_latency": 3.82902,
     "average_confidence": 0.283752,
     "reflection_rate": 0.19,
     "memory_creation_rate": 1.0
@@ -438,7 +438,7 @@
     "correction_frequency": 19,
     "correction_rate": 0.19,
     "trigger_distribution": {
-      "low_confidence": 19,
+      "low_confidence": 38,
       "tool_failure": 0,
       "contradiction": 0,
       "hallucination": 0,

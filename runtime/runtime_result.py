@@ -18,6 +18,11 @@ class RuntimeResult:
     confidence_score: float
     latency_ms: float
     errors: tuple[str, ...] = field(default_factory=tuple)
+    reflection_reasons: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    reflection_before_confidence: float = 0.0
+    reflection_after_confidence: float = 0.0
+    reflection_utility_score: float = 0.0
+    correction_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the runtime result into JSON-friendly values."""
@@ -33,6 +38,11 @@ class RuntimeResult:
                 for note in self.memory_notes_created
             ],
             "reflection_triggered": self.reflection_triggered,
+            "reflection_reasons": [dict(reason) for reason in self.reflection_reasons],
+            "reflection_before_confidence": self.reflection_before_confidence,
+            "reflection_after_confidence": self.reflection_after_confidence,
+            "reflection_utility_score": self.reflection_utility_score,
+            "correction_count": self.correction_count,
             "confidence_score": self.confidence_score,
             "latency_ms": self.latency_ms,
             "errors": list(self.errors),

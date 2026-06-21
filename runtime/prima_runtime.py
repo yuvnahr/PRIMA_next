@@ -122,6 +122,11 @@ class PrimaRuntime:
             confidence_score=confidence_score,
             latency_ms=latency_ms,
             errors=errors + workflow_errors,
+            reflection_reasons=tuple(dict(reason) for reason in getattr(reflection_result, "trigger_reasons", ())),
+            reflection_before_confidence=float(getattr(reflection_result, "before_confidence", 0.0) or 0.0),
+            reflection_after_confidence=float(getattr(reflection_result, "after_confidence", 0.0) or 0.0),
+            reflection_utility_score=float(getattr(reflection_result, "utility_score", 0.0) or 0.0),
+            correction_count=1 if bool(getattr(reflection_result, "correction_applied", False)) else 0,
         )
 
     def _confidence_score(self, execution_context: ExecutionContext) -> float:

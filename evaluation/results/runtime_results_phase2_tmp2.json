@@ -1,0 +1,5602 @@
+[
+  {
+    "query": "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
+    "emotion": "trust",
+    "confidence": 0.061261,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.0,
+        "threshold": 0.3,
+        "triggered": true,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.6525,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.6525,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.6525,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.6525,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.6525,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.2275,
+    "reflection_after_confidence": 0.5975,
+    "reflection_utility_score": 0.37,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 0,
+    "latency_ms": 4.971,
+    "valence": -0.034815,
+    "arousal": 0.439461,
+    "dominance": 0.06973,
+    "errors": []
+  },
+  {
+    "query": "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+    "emotion": "trust",
+    "confidence": 0.165405,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.18361,
+        "threshold": 0.3,
+        "triggered": true,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.553948,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.553948,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.553948,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.553948,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.553948,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.346846,
+    "reflection_after_confidence": 0.691708,
+    "reflection_utility_score": 0.344862,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 1,
+    "latency_ms": 3.75,
+    "valence": 0.08385,
+    "arousal": 0.36955,
+    "dominance": 0.16385,
+    "errors": []
+  },
+  {
+    "query": "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+    "emotion": "trust",
+    "confidence": 0.564908,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.251471,
+        "threshold": 0.3,
+        "triggered": true,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.54469,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.54469,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.54469,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.54469,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.54469,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.390956,
+    "reflection_after_confidence": 0.768554,
+    "reflection_utility_score": 0.377598,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 2,
+    "latency_ms": 2.753,
+    "valence": 0.65,
+    "arousal": 0.25,
+    "dominance": 0.5,
+    "errors": []
+  },
+  {
+    "query": "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+    "emotion": "anticipation",
+    "confidence": 0.592446,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.305739,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.519133,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.519133,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.519133,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.519133,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.519133,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.42623,
+    "reflection_after_confidence": 0.42623,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 3,
+    "latency_ms": 3.603,
+    "valence": 0.25,
+    "arousal": 0.55,
+    "dominance": 0.15,
+    "errors": []
+  },
+  {
+    "query": "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+    "emotion": "joy",
+    "confidence": 0.299454,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.436372,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.292947,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.292947,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.292947,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.292947,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.292947,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.511142,
+    "reflection_after_confidence": 0.511142,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 4,
+    "latency_ms": 3.258,
+    "valence": 0.141892,
+    "arousal": 0.346146,
+    "dominance": 0.071021,
+    "errors": []
+  },
+  {
+    "query": "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+    "emotion": "joy",
+    "confidence": 0.270685,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.400988,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.538845,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.538845,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.538845,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.538845,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.538845,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.488142,
+    "reflection_after_confidence": 0.857648,
+    "reflection_utility_score": 0.369506,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.103,
+    "valence": 0.065934,
+    "arousal": 0.389211,
+    "dominance": 0.128272,
+    "errors": []
+  },
+  {
+    "query": "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+    "emotion": "joy",
+    "confidence": 0.275498,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.444873,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.281484,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.281484,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.281484,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.281484,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.281484,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.516667,
+    "reflection_after_confidence": 0.516667,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.37,
+    "valence": 0.026877,
+    "arousal": 0.358809,
+    "dominance": 0.094995,
+    "errors": []
+  },
+  {
+    "query": "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+    "emotion": "joy",
+    "confidence": 0.229835,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.35749,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.46235,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.46235,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.46235,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.46235,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.46235,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.459868,
+    "reflection_after_confidence": 0.459868,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.139,
+    "valence": 0.06545,
+    "arousal": 0.4571,
+    "dominance": 0.108,
+    "errors": []
+  },
+  {
+    "query": "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+    "emotion": "trust",
+    "confidence": 0.264356,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.380632,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.437009,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.437009,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.437009,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.437009,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.437009,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.474911,
+    "reflection_after_confidence": 0.474911,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.902,
+    "valence": 0.028322,
+    "arousal": 0.430719,
+    "dominance": 0.191159,
+    "errors": []
+  },
+  {
+    "query": "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+    "emotion": "trust",
+    "confidence": 0.25351,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.357963,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.444397,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.444397,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.444397,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.444397,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.444397,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.460176,
+    "reflection_after_confidence": 0.460176,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.748,
+    "valence": 0.10895,
+    "arousal": 0.46965,
+    "dominance": 0.1586,
+    "errors": []
+  },
+  {
+    "query": "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+    "emotion": "trust",
+    "confidence": 0.24547,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.393185,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.423954,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.423954,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.423954,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.423954,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.423954,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.48307,
+    "reflection_after_confidence": 0.48307,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.464,
+    "valence": -0.040591,
+    "arousal": 0.470771,
+    "dominance": 0.167367,
+    "errors": []
+  },
+  {
+    "query": "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+    "emotion": "fear",
+    "confidence": 0.210727,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.352255,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.45084,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.45084,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.45084,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.45084,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.45084,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.456466,
+    "reflection_after_confidence": 0.456466,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.519,
+    "valence": -0.19195,
+    "arousal": 0.46045,
+    "dominance": -0.0127,
+    "errors": []
+  },
+  {
+    "query": "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+    "emotion": "sadness",
+    "confidence": 0.276775,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.392898,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.429181,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.429181,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.429181,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.429181,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.429181,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.482884,
+    "reflection_after_confidence": 0.482884,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.539,
+    "valence": 0.078028,
+    "arousal": 0.298448,
+    "dominance": -0.012513,
+    "errors": []
+  },
+  {
+    "query": "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+    "emotion": "sadness",
+    "confidence": 0.277298,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.371853,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.46389,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.46389,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.46389,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.46389,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.46389,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.469204,
+    "reflection_after_confidence": 0.469204,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.29,
+    "valence": -0.75,
+    "arousal": -0.35,
+    "dominance": -0.55,
+    "errors": []
+  },
+  {
+    "query": "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+    "emotion": "trust",
+    "confidence": 0.251535,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.391125,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.474364,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.474364,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.474364,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.474364,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.474364,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.481731,
+    "reflection_after_confidence": 0.481731,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.371,
+    "valence": -0.1186,
+    "arousal": 0.48325,
+    "dominance": 0.05125,
+    "errors": []
+  },
+  {
+    "query": "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+    "emotion": "joy",
+    "confidence": 0.224564,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.372693,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.486613,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.486613,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.486613,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.486613,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.486613,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.46975,
+    "reflection_after_confidence": 0.46975,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.188,
+    "valence": 0.106012,
+    "arousal": 0.552856,
+    "dominance": 0.103507,
+    "errors": []
+  },
+  {
+    "query": "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn't arrived yet.",
+    "emotion": "trust",
+    "confidence": 0.26292,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.370349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.485915,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.485915,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.485915,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.485915,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.485915,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.468227,
+    "reflection_after_confidence": 0.468227,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.784,
+    "valence": 0.08015,
+    "arousal": 0.47245,
+    "dominance": 0.153,
+    "errors": []
+  },
+  {
+    "query": "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+    "emotion": "surprise",
+    "confidence": 0.223945,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349404,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.494715,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.494715,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.494715,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.494715,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.494715,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.454613,
+    "reflection_after_confidence": 0.454613,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.323,
+    "valence": 0.065966,
+    "arousal": 0.487337,
+    "dominance": 0.127377,
+    "errors": []
+  },
+  {
+    "query": "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+    "emotion": "trust",
+    "confidence": 0.233299,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.357323,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.467242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.467242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.467242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.467242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.467242,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45976,
+    "reflection_after_confidence": 0.45976,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.227,
+    "valence": 0.07615,
+    "arousal": 0.45435,
+    "dominance": 0.08585,
+    "errors": []
+  },
+  {
+    "query": "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+    "emotion": "surprise",
+    "confidence": 0.184306,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.466346,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.466346,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.466346,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.466346,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.466346,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.581,
+    "valence": -0.15,
+    "arousal": 0.05,
+    "dominance": -0.2,
+    "errors": []
+  },
+  {
+    "query": "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+    "emotion": "joy",
+    "confidence": 0.228829,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.470584,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.470584,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.470584,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.470584,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.470584,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.047,
+    "valence": -0.028707,
+    "arousal": 0.491483,
+    "dominance": 0.076954,
+    "errors": []
+  },
+  {
+    "query": "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+    "emotion": "trust",
+    "confidence": 0.262909,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.338721,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.469686,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.469686,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.469686,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.469686,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.469686,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.447669,
+    "reflection_after_confidence": 0.447669,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.722,
+    "valence": 0.160761,
+    "arousal": 0.376176,
+    "dominance": 0.239339,
+    "errors": []
+  },
+  {
+    "query": "Trying to coordinate my left hand's finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+    "emotion": "trust",
+    "confidence": 0.229781,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.539955,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.539955,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.539955,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.539955,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.539955,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.847375,
+    "reflection_utility_score": 0.40375,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.055,
+    "valence": -0.01295,
+    "arousal": 0.4925,
+    "dominance": 0.1699,
+    "errors": []
+  },
+  {
+    "query": "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+    "emotion": "trust",
+    "confidence": 0.231715,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.366899,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.531967,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.531967,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.531967,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.531967,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.531967,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.465984,
+    "reflection_after_confidence": 0.852535,
+    "reflection_utility_score": 0.386551,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.603,
+    "valence": 0.0209,
+    "arousal": 0.47215,
+    "dominance": 0.0916,
+    "errors": []
+  },
+  {
+    "query": "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+    "emotion": "trust",
+    "confidence": 0.251528,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.355538,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.457308,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.457308,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.457308,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.457308,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.457308,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.4586,
+    "reflection_after_confidence": 0.4586,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.152,
+    "valence": 0.068938,
+    "arousal": 0.46002,
+    "dominance": 0.222996,
+    "errors": []
+  },
+  {
+    "query": "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+    "emotion": "sadness",
+    "confidence": 0.270649,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.359704,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.473574,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.473574,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.473574,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.473574,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.473574,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.461308,
+    "reflection_after_confidence": 0.461308,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.694,
+    "valence": -0.75,
+    "arousal": -0.35,
+    "dominance": -0.55,
+    "errors": []
+  },
+  {
+    "query": "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+    "emotion": "joy",
+    "confidence": 0.258339,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.405629,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.553823,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.553823,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.553823,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.553823,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.553823,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.491159,
+    "reflection_after_confidence": 0.858344,
+    "reflection_utility_score": 0.367185,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.278,
+    "valence": -0.074925,
+    "arousal": 0.346296,
+    "dominance": 0.001151,
+    "errors": []
+  },
+  {
+    "query": "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+    "emotion": "trust",
+    "confidence": 0.230656,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.355489,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.495164,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.495164,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.495164,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.495164,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.495164,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.458568,
+    "reflection_after_confidence": 0.458568,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.326,
+    "valence": 0.129071,
+    "arousal": 0.474076,
+    "dominance": 0.132817,
+    "errors": []
+  },
+  {
+    "query": "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+    "emotion": "joy",
+    "confidence": 0.262636,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3697,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.563429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.563429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.563429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.563429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.563429,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.467805,
+    "reflection_after_confidence": 0.852955,
+    "reflection_utility_score": 0.38515,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.442,
+    "valence": 0.044494,
+    "arousal": 0.442392,
+    "dominance": 0.14024,
+    "errors": []
+  },
+  {
+    "query": "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+    "emotion": "trust",
+    "confidence": 0.229807,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.360301,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.491657,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.491657,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.491657,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.491657,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.491657,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.461696,
+    "reflection_after_confidence": 0.461696,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.553,
+    "valence": -0.058358,
+    "arousal": 0.42988,
+    "dominance": 0.120821,
+    "errors": []
+  },
+  {
+    "query": "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+    "emotion": "surprise",
+    "confidence": 0.239294,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.370194,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.538249,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.538249,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.538249,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.538249,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.538249,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.468126,
+    "reflection_after_confidence": 0.853029,
+    "reflection_utility_score": 0.384903,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.6,
+    "valence": -0.054146,
+    "arousal": 0.519181,
+    "dominance": 0.030669,
+    "errors": []
+  },
+  {
+    "query": "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+    "emotion": "anger",
+    "confidence": 0.249449,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.366086,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.444156,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.444156,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.444156,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.444156,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.444156,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.465456,
+    "reflection_after_confidence": 0.465456,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.534,
+    "valence": -0.092258,
+    "arousal": 0.553896,
+    "dominance": 0.219431,
+    "errors": []
+  },
+  {
+    "query": "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+    "emotion": "fear",
+    "confidence": 0.184743,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.350499,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.45976,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.45976,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.45976,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.45976,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.45976,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.455324,
+    "reflection_after_confidence": 0.455324,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.723,
+    "valence": -0.35,
+    "arousal": 0.85,
+    "dominance": -0.425,
+    "errors": []
+  },
+  {
+    "query": "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+    "emotion": "joy",
+    "confidence": 0.417851,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.374416,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.473536,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.473536,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.473536,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.473536,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.473536,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.47087,
+    "reflection_after_confidence": 0.47087,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.933,
+    "valence": 0.9,
+    "arousal": 0.65,
+    "dominance": 0.55,
+    "errors": []
+  },
+  {
+    "query": "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+    "emotion": "trust",
+    "confidence": 0.249499,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.351403,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.579132,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.579132,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.579132,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.579132,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.579132,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.455912,
+    "reflection_after_confidence": 0.85021,
+    "reflection_utility_score": 0.394298,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.285,
+    "valence": -0.05275,
+    "arousal": 0.5419,
+    "dominance": 0.104,
+    "errors": []
+  },
+  {
+    "query": "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+    "emotion": "anticipation",
+    "confidence": 0.618727,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.360067,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.508909,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.508909,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.508909,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.508909,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.508909,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.461544,
+    "reflection_after_confidence": 0.461544,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.813,
+    "valence": 0.25,
+    "arousal": 0.55,
+    "dominance": 0.15,
+    "errors": []
+  },
+  {
+    "query": "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+    "emotion": "trust",
+    "confidence": 0.226256,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.367661,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.509638,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.509638,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.509638,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.509638,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.509638,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.46648,
+    "reflection_after_confidence": 0.46648,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.974,
+    "valence": 0.013928,
+    "arousal": 0.399399,
+    "dominance": 0.082615,
+    "errors": []
+  },
+  {
+    "query": "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+    "emotion": "disgust",
+    "confidence": 0.230812,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.365852,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.503572,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.503572,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.503572,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.503572,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.503572,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.465304,
+    "reflection_after_confidence": 0.465304,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.011,
+    "valence": -0.198353,
+    "arousal": 0.388922,
+    "dominance": 0.047455,
+    "errors": []
+  },
+  {
+    "query": "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+    "emotion": "joy",
+    "confidence": 0.300647,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.383106,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.473764,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.473764,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.473764,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.473764,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.473764,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.476519,
+    "reflection_after_confidence": 0.476519,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.215,
+    "valence": 0.416917,
+    "arousal": 0.482533,
+    "dominance": 0.285385,
+    "errors": []
+  },
+  {
+    "query": "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+    "emotion": "joy",
+    "confidence": 0.582832,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.497205,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.497205,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.497205,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.497205,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.497205,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.414,
+    "valence": 0.9,
+    "arousal": 0.65,
+    "dominance": 0.55,
+    "errors": []
+  },
+  {
+    "query": "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+    "emotion": "boredom",
+    "confidence": 0.303323,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.37376,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.595291,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.595291,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.595291,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.595291,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.595291,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.470444,
+    "reflection_after_confidence": 0.470444,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.951,
+    "valence": -0.35,
+    "arousal": -0.75,
+    "dominance": -0.3,
+    "errors": []
+  },
+  {
+    "query": "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+    "emotion": "trust",
+    "confidence": 0.222217,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.610969,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.610969,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.610969,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.610969,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.610969,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.847375,
+    "reflection_utility_score": 0.40375,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.27,
+    "valence": -0.087375,
+    "arousal": 0.335922,
+    "dominance": -0.082715,
+    "errors": []
+  },
+  {
+    "query": "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+    "emotion": "trust",
+    "confidence": 0.205471,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.538405,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.538405,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.538405,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.538405,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.538405,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.204,
+    "valence": -0.054046,
+    "arousal": 0.503996,
+    "dominance": 0.174176,
+    "errors": []
+  },
+  {
+    "query": "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+    "emotion": "distraction",
+    "confidence": 0.400292,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.352704,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.536462,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.536462,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.536462,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.536462,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.536462,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.456758,
+    "reflection_after_confidence": 0.456758,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.796,
+    "valence": -0.15,
+    "arousal": 0.25,
+    "dominance": -0.35,
+    "errors": []
+  },
+  {
+    "query": "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+    "emotion": "joy",
+    "confidence": 0.230513,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.353986,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.528894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.528894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.528894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.528894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.528894,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.457591,
+    "reflection_after_confidence": 0.457591,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.251,
+    "valence": -0.107393,
+    "arousal": 0.487363,
+    "dominance": 0.104196,
+    "errors": []
+  },
+  {
+    "query": "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+    "emotion": "surprise",
+    "confidence": 0.221601,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.340168,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.49727,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.49727,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.49727,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.49727,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.49727,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.448609,
+    "reflection_after_confidence": 0.448609,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.399,
+    "valence": 0.123976,
+    "arousal": 0.507393,
+    "dominance": 0.150549,
+    "errors": []
+  },
+  {
+    "query": "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+    "emotion": "surprise",
+    "confidence": 0.219166,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.482894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.482894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.482894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.482894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.482894,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.802,
+    "valence": -0.0476,
+    "arousal": 0.5777,
+    "dominance": 0.04265,
+    "errors": []
+  },
+  {
+    "query": "I had to aggressively apologize for my neighbor's loud lawnmower echoing through my microphone during a high-stakes client call.",
+    "emotion": "joy",
+    "confidence": 0.214915,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.481938,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.481938,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.481938,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.481938,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.481938,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.205,
+    "valence": -0.0116,
+    "arousal": 0.3635,
+    "dominance": 0.1054,
+    "errors": []
+  },
+  {
+    "query": "Closing my laptop screen at exactly five o'clock feels like a triumphant mental boundary that allows me to finally decompress.",
+    "emotion": "joy",
+    "confidence": 0.234092,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.362051,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.456555,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.456555,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.456555,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.456555,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.456555,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.462833,
+    "reflection_after_confidence": 0.462833,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.272,
+    "valence": 0.05665,
+    "arousal": 0.5143,
+    "dominance": 0.1686,
+    "errors": []
+  },
+  {
+    "query": "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+    "emotion": "trust",
+    "confidence": 0.214196,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.468091,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.468091,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.468091,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.468091,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.468091,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.035,
+    "valence": -0.076124,
+    "arousal": 0.406993,
+    "dominance": 0.053147,
+    "errors": []
+  },
+  {
+    "query": "I sprinted through the rain only to see the subway doors close right in my face today.",
+    "emotion": "trust",
+    "confidence": 0.228741,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.344025,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.459044,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.459044,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.459044,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.459044,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.459044,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.451116,
+    "reflection_after_confidence": 0.451116,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.01,
+    "valence": -0.094539,
+    "arousal": 0.366232,
+    "dominance": 0.128457,
+    "errors": []
+  },
+  {
+    "query": "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+    "emotion": "boredom",
+    "confidence": 0.582323,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.486147,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.486147,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.486147,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.486147,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.486147,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.741,
+    "valence": -0.35,
+    "arousal": -0.75,
+    "dominance": -0.3,
+    "errors": []
+  },
+  {
+    "query": "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+    "emotion": "surprise",
+    "confidence": 0.245793,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.363579,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.566519,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.566519,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.566519,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.566519,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.566519,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.463826,
+    "reflection_after_confidence": 0.852037,
+    "reflection_utility_score": 0.388211,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 2.871,
+    "valence": 0.14975,
+    "arousal": 0.591467,
+    "dominance": 0.186826,
+    "errors": []
+  },
+  {
+    "query": "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+    "emotion": "trust",
+    "confidence": 0.263368,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.382705,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.48049,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.48049,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.48049,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.48049,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.48049,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.476258,
+    "reflection_after_confidence": 0.476258,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.603,
+    "valence": 0.095704,
+    "arousal": 0.421928,
+    "dominance": 0.261938,
+    "errors": []
+  },
+  {
+    "query": "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+    "emotion": "fear",
+    "confidence": 0.210439,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.363966,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.535575,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.535575,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.535575,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.535575,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.535575,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.464078,
+    "reflection_after_confidence": 0.464078,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.766,
+    "valence": -0.7274,
+    "arousal": 0.8387,
+    "dominance": -0.4562,
+    "errors": []
+  },
+  {
+    "query": "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+    "emotion": "fear",
+    "confidence": 0.184406,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.348529,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.590658,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.590658,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.590658,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.590658,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.590658,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.454044,
+    "reflection_after_confidence": 0.849779,
+    "reflection_utility_score": 0.395735,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.081,
+    "valence": -0.35,
+    "arousal": 0.85,
+    "dominance": -0.425,
+    "errors": []
+  },
+  {
+    "query": "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+    "emotion": "disgust",
+    "confidence": 0.226288,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.518631,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.518631,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.518631,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.518631,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.518631,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.111,
+    "valence": 0.0505,
+    "arousal": 0.45405,
+    "dominance": 0.17505,
+    "errors": []
+  },
+  {
+    "query": "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+    "emotion": "joy",
+    "confidence": 0.215993,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.483894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.483894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.483894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.483894,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.483894,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.82,
+    "valence": -0.11415,
+    "arousal": 0.45085,
+    "dominance": 0.08335,
+    "errors": []
+  },
+  {
+    "query": "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+    "emotion": "joy",
+    "confidence": 0.230489,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.483953,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.483953,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.483953,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.483953,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.483953,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.31,
+    "valence": 0.078072,
+    "arousal": 0.492008,
+    "dominance": 0.091508,
+    "errors": []
+  },
+  {
+    "query": "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+    "emotion": "trust",
+    "confidence": 0.23574,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.347622,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.468136,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.468136,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.468136,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.468136,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.468136,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.453454,
+    "reflection_after_confidence": 0.453454,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.093,
+    "valence": 0.026923,
+    "arousal": 0.442108,
+    "dominance": 0.060889,
+    "errors": []
+  },
+  {
+    "query": "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+    "emotion": "anger",
+    "confidence": 0.223701,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.474934,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.474934,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.474934,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.474934,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.474934,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.244,
+    "valence": -0.244456,
+    "arousal": 0.556144,
+    "dominance": 0.128322,
+    "errors": []
+  },
+  {
+    "query": "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+    "emotion": "joy",
+    "confidence": 0.276379,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.364705,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.528027,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.528027,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.528027,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.528027,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.528027,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.464558,
+    "reflection_after_confidence": 0.852206,
+    "reflection_utility_score": 0.387648,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.778,
+    "valence": 0.322777,
+    "arousal": 0.505844,
+    "dominance": 0.180769,
+    "errors": []
+  },
+  {
+    "query": "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+    "emotion": "surprise",
+    "confidence": 0.64686,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.4141,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.279985,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.279985,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.279985,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.279985,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.279985,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.496665,
+    "reflection_after_confidence": 0.496665,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.225,
+    "valence": 0.05,
+    "arousal": 0.85,
+    "dominance": -0.1,
+    "errors": []
+  },
+  {
+    "query": "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+    "emotion": "trust",
+    "confidence": 0.212337,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.480675,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.480675,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.480675,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.480675,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.480675,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.295,
+    "valence": 0.075075,
+    "arousal": 0.491992,
+    "dominance": 0.156306,
+    "errors": []
+  },
+  {
+    "query": "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+    "emotion": "joy",
+    "confidence": 0.235989,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.381138,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.463429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.463429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.463429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.463429,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.463429,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.47524,
+    "reflection_after_confidence": 0.47524,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.389,
+    "valence": -0.0917,
+    "arousal": 0.40305,
+    "dominance": 0.03105,
+    "errors": []
+  },
+  {
+    "query": "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+    "emotion": "surprise",
+    "confidence": 0.237287,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.492303,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.492303,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.492303,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.492303,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.492303,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.182,
+    "valence": 0.0023,
+    "arousal": 0.59385,
+    "dominance": 0.1862,
+    "errors": []
+  },
+  {
+    "query": "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+    "emotion": "fear",
+    "confidence": 0.226539,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349755,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.480053,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.480053,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.480053,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.480053,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.480053,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.454841,
+    "reflection_after_confidence": 0.454841,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.223,
+    "valence": -0.282432,
+    "arousal": 0.498448,
+    "dominance": -0.147798,
+    "errors": []
+  },
+  {
+    "query": "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+    "emotion": "fear",
+    "confidence": 0.251984,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.375689,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.454749,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.454749,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.454749,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.454749,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.454749,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.471698,
+    "reflection_after_confidence": 0.471698,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.197,
+    "valence": -0.17735,
+    "arousal": 0.55965,
+    "dominance": -0.0459,
+    "errors": []
+  },
+  {
+    "query": "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+    "emotion": "joy",
+    "confidence": 0.25661,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.375299,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.448384,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.448384,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.448384,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.448384,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.448384,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.471444,
+    "reflection_after_confidence": 0.471444,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.24,
+    "valence": 0.105145,
+    "arousal": 0.397702,
+    "dominance": 0.12972,
+    "errors": []
+  },
+  {
+    "query": "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+    "emotion": "trust",
+    "confidence": 0.199896,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.474124,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.474124,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.474124,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.474124,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.474124,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.518,
+    "valence": -0.095214,
+    "arousal": 0.52014,
+    "dominance": 0.116152,
+    "errors": []
+  },
+  {
+    "query": "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+    "emotion": "trust",
+    "confidence": 0.228994,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.461977,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.461977,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.461977,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.461977,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.461977,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.379,
+    "valence": -0.083283,
+    "arousal": 0.387888,
+    "dominance": 0.084484,
+    "errors": []
+  },
+  {
+    "query": "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+    "emotion": "joy",
+    "confidence": 0.218782,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.354473,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.453431,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.453431,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.453431,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.453431,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.453431,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.457907,
+    "reflection_after_confidence": 0.457907,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.316,
+    "valence": -0.111864,
+    "arousal": 0.40673,
+    "dominance": 0.006181,
+    "errors": []
+  },
+  {
+    "query": "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+    "emotion": "surprise",
+    "confidence": 0.598544,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3418,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.471498,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.471498,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.471498,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.471498,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.471498,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.44967,
+    "reflection_after_confidence": 0.44967,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.018,
+    "valence": 0.05,
+    "arousal": 0.85,
+    "dominance": -0.1,
+    "errors": []
+  },
+  {
+    "query": "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+    "emotion": "trust",
+    "confidence": 0.208436,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.48382,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.48382,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.48382,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.48382,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.48382,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.312,
+    "valence": 0.01265,
+    "arousal": 0.4579,
+    "dominance": 0.08705,
+    "errors": []
+  },
+  {
+    "query": "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+    "emotion": "joy",
+    "confidence": 0.396129,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.503229,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.503229,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.503229,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.503229,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.503229,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.248,
+    "valence": 0.9,
+    "arousal": 0.65,
+    "dominance": 0.55,
+    "errors": []
+  },
+  {
+    "query": "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+    "emotion": "joy",
+    "confidence": 0.244524,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3604,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.506599,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.506599,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.506599,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.506599,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.506599,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.46176,
+    "reflection_after_confidence": 0.46176,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 6.371,
+    "valence": 0.0554,
+    "arousal": 0.4729,
+    "dominance": 0.1044,
+    "errors": []
+  },
+  {
+    "query": "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+    "emotion": "trust",
+    "confidence": 0.257774,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.384074,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.492243,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.492243,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.492243,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.492243,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.492243,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.477148,
+    "reflection_after_confidence": 0.477148,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.703,
+    "valence": 0.105095,
+    "arousal": 0.484216,
+    "dominance": 0.155345,
+    "errors": []
+  },
+  {
+    "query": "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+    "emotion": "fear",
+    "confidence": 0.263754,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3697,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.615813,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.615813,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.615813,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.615813,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.615813,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.467805,
+    "reflection_after_confidence": 0.467805,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.074,
+    "valence": -0.75,
+    "arousal": 0.85,
+    "dominance": -0.75,
+    "errors": []
+  },
+  {
+    "query": "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+    "emotion": "joy",
+    "confidence": 0.340325,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3589,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.602789,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.602789,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.602789,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.602789,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.602789,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.460785,
+    "reflection_after_confidence": 0.460785,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.948,
+    "valence": 0.9,
+    "arousal": 0.65,
+    "dominance": 0.55,
+    "errors": []
+  },
+  {
+    "query": "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+    "emotion": "joy",
+    "confidence": 0.233912,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.352693,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.608248,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.608248,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.608248,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.608248,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.608248,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45675,
+    "reflection_after_confidence": 0.45675,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.453,
+    "valence": -0.05986,
+    "arousal": 0.487638,
+    "dominance": 0.011461,
+    "errors": []
+  },
+  {
+    "query": "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+    "emotion": "surprise",
+    "confidence": 0.358991,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.578195,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.578195,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.578195,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.578195,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.578195,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.655,
+    "valence": 0.05,
+    "arousal": 0.85,
+    "dominance": -0.1,
+    "errors": []
+  },
+  {
+    "query": "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+    "emotion": "trust",
+    "confidence": 0.230296,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.613255,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.613255,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.613255,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.613255,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.613255,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.955,
+    "valence": 0.05535,
+    "arousal": 0.40745,
+    "dominance": 0.14085,
+    "errors": []
+  },
+  {
+    "query": "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+    "emotion": "trust",
+    "confidence": 0.228643,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.352171,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.534432,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.534432,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.534432,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.534432,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.534432,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.456411,
+    "reflection_after_confidence": 0.456411,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.412,
+    "valence": -0.014515,
+    "arousal": 0.398549,
+    "dominance": 0.121822,
+    "errors": []
+  },
+  {
+    "query": "Convincing everyone to park three blocks away so she wouldn't recognize their cars took a lot of careful coordination.",
+    "emotion": "joy",
+    "confidence": 0.27063,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.365713,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.559965,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.559965,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.559965,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.559965,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.559965,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.465213,
+    "reflection_after_confidence": 0.852357,
+    "reflection_utility_score": 0.387144,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.984,
+    "valence": 0.077227,
+    "arousal": 0.434484,
+    "dominance": -0.016016,
+    "errors": []
+  },
+  {
+    "query": "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+    "emotion": "trust",
+    "confidence": 0.24689,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3616,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.53942,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.53942,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.53942,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.53942,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.53942,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.46254,
+    "reflection_after_confidence": 0.85174,
+    "reflection_utility_score": 0.3892,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.39,
+    "valence": 0.0164,
+    "arousal": 0.4906,
+    "dominance": 0.1164,
+    "errors": []
+  },
+  {
+    "query": "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+    "emotion": "surprise",
+    "confidence": 0.228502,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.353212,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.460858,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.460858,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.460858,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.460858,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.460858,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.457088,
+    "reflection_after_confidence": 0.457088,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 5.027,
+    "valence": -0.077645,
+    "arousal": 0.483982,
+    "dominance": 0.033034,
+    "errors": []
+  },
+  {
+    "query": "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+    "emotion": "surprise",
+    "confidence": 0.555591,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.36493,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.447748,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.447748,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.447748,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.447748,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.447748,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.464704,
+    "reflection_after_confidence": 0.464704,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.835,
+    "valence": -0.0711,
+    "arousal": 0.84135,
+    "dominance": 0.01245,
+    "errors": []
+  },
+  {
+    "query": "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+    "emotion": "sadness",
+    "confidence": 0.227498,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.360704,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.533007,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.533007,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.533007,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.533007,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.533007,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.461958,
+    "reflection_after_confidence": 0.851606,
+    "reflection_utility_score": 0.389648,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.935,
+    "valence": -0.134384,
+    "arousal": 0.250501,
+    "dominance": 0.028879,
+    "errors": []
+  },
+  {
+    "query": "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+    "emotion": "joy",
+    "confidence": 0.394227,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.499383,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.499383,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.499383,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.499383,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.499383,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.851,
+    "valence": 0.9,
+    "arousal": 0.65,
+    "dominance": 0.55,
+    "errors": []
+  },
+  {
+    "query": "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+    "emotion": "trust",
+    "confidence": 0.59107,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.57102,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.57102,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.57102,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.57102,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.57102,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.847375,
+    "reflection_utility_score": 0.40375,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.046,
+    "valence": 0.65,
+    "arousal": 0.25,
+    "dominance": 0.5,
+    "errors": []
+  },
+  {
+    "query": "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+    "emotion": "trust",
+    "confidence": 0.237096,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.359118,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.504615,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.504615,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.504615,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.504615,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.504615,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.460927,
+    "reflection_after_confidence": 0.460927,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.228,
+    "valence": 0.08235,
+    "arousal": 0.4565,
+    "dominance": 0.13145,
+    "errors": []
+  },
+  {
+    "query": "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+    "emotion": "trust",
+    "confidence": 0.250303,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.368489,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.493479,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.493479,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.493479,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.493479,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.493479,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.467018,
+    "reflection_after_confidence": 0.467018,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.684,
+    "valence": 0.101904,
+    "arousal": 0.509619,
+    "dominance": 0.184519,
+    "errors": []
+  },
+  {
+    "query": "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+    "emotion": "distraction",
+    "confidence": 0.621856,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.377638,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.489144,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.489144,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.489144,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.489144,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.489144,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.472965,
+    "reflection_after_confidence": 0.472965,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.812,
+    "valence": -0.15,
+    "arousal": 0.25,
+    "dominance": -0.35,
+    "errors": []
+  },
+  {
+    "query": "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+    "emotion": "trust",
+    "confidence": 0.23643,
+    "reflection_triggered": true,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.365785,
+        "threshold": 0.55,
+        "triggered": true,
+        "audit_sample": true
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.555242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.555242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.555242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.555242,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.555242,
+        "threshold": 0.52,
+        "triggered": true
+      }
+    ],
+    "reflection_before_confidence": 0.46526,
+    "reflection_after_confidence": 0.852368,
+    "reflection_utility_score": 0.387108,
+    "correction_count": 1,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.843,
+    "valence": 0.089228,
+    "arousal": 0.423347,
+    "dominance": 0.04499,
+    "errors": []
+  },
+  {
+    "query": "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+    "emotion": "trust",
+    "confidence": 0.219973,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3391,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.488327,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.488327,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.488327,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.488327,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.488327,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.447915,
+    "reflection_after_confidence": 0.447915,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 4.103,
+    "valence": -0.09175,
+    "arousal": 0.44415,
+    "dominance": 0.04095,
+    "errors": []
+  },
+  {
+    "query": "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+    "emotion": "trust",
+    "confidence": 0.211766,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.478241,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.478241,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.478241,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.478241,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.478241,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 8.69,
+    "valence": -0.09865,
+    "arousal": 0.39455,
+    "dominance": 0.108,
+    "errors": []
+  },
+  {
+    "query": "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+    "emotion": "trust",
+    "confidence": 0.224968,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349939,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.468123,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.468123,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.468123,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.468123,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.468123,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45496,
+    "reflection_after_confidence": 0.45496,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 8.689,
+    "valence": -0.017518,
+    "arousal": 0.458859,
+    "dominance": 0.073273,
+    "errors": []
+  },
+  {
+    "query": "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+    "emotion": "trust",
+    "confidence": 0.223974,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.3325,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.4688,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.4688,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.4688,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.4688,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.4688,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.443625,
+    "reflection_after_confidence": 0.443625,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.992,
+    "valence": 0.05976,
+    "arousal": 0.395946,
+    "dominance": 0.092993,
+    "errors": []
+  },
+  {
+    "query": "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+    "emotion": "trust",
+    "confidence": 0.597251,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.349,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.465526,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.465526,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.465526,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.465526,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.465526,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.45435,
+    "reflection_after_confidence": 0.45435,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.139,
+    "valence": 0.65,
+    "arousal": 0.25,
+    "dominance": 0.5,
+    "errors": []
+  },
+  {
+    "query": "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+    "emotion": "surprise",
+    "confidence": 0.245986,
+    "reflection_triggered": false,
+    "reflection_reasons": [
+      {
+        "reason": "low_confidence",
+        "confidence": 0.372517,
+        "threshold": 0.3,
+        "triggered": false,
+        "audit_sample": false
+      },
+      {
+        "reason": "tool_failure",
+        "confidence": 0.46639,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "contradiction",
+        "confidence": 0.46639,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "hallucination",
+        "confidence": 0.46639,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "constraint_violation",
+        "confidence": 0.46639,
+        "threshold": 0.52,
+        "triggered": false
+      },
+      {
+        "reason": "retrieval_ambiguity",
+        "confidence": 0.46639,
+        "threshold": 0.52,
+        "triggered": false
+      }
+    ],
+    "reflection_before_confidence": 0.469636,
+    "reflection_after_confidence": 0.469636,
+    "reflection_utility_score": 0.0,
+    "correction_count": 0,
+    "memory_created": true,
+    "retrieval_count": 5,
+    "latency_ms": 3.671,
+    "valence": 0.0041,
+    "arousal": 0.4328,
+    "dominance": -0.03835,
+    "errors": []
+  }
+]

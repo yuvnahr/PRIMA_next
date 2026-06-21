@@ -1,8 +1,8 @@
 {
   "system": {
-    "average_latency": 4.18198,
+    "average_latency": 4.2966,
     "average_confidence": 0.283752,
-    "reflection_rate": 0.19,
+    "reflection_rate": 0.05,
     "memory_creation_rate": 1.0
   },
   "affect": {
@@ -433,20 +433,20 @@
     "memory_growth": 100
   },
   "reflection": {
-    "trigger_frequency": 19,
-    "reflection_rate": 0.19,
-    "correction_frequency": 19,
-    "correction_rate": 0.19,
+    "trigger_frequency": 5,
+    "reflection_rate": 0.05,
+    "correction_frequency": 5,
+    "correction_rate": 0.05,
     "trigger_distribution": {
-      "low_confidence": 19,
+      "low_confidence": 38,
       "tool_failure": 0,
       "contradiction": 0,
       "hallucination": 0,
       "constraint_violation": 0
     },
     "utility_summary": {
-      "mean_utility": 0.07316,
-      "mean_triggered_utility": 0.385052,
+      "mean_utility": 0.018919,
+      "mean_triggered_utility": 0.378389,
       "max_utility": 0.40375
     },
     "success_criteria": {
