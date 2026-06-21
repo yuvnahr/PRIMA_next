@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Protocol
 
 import numpy as np
-from chromadb import logger
+
+logger = logging.getLogger(__name__)
 
 from affect.emotion_profile import EmotionProfile
 

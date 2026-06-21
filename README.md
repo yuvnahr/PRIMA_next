@@ -280,6 +280,14 @@ pip install -r requirements.txt
 python -m unittest discover
 ```
 
+Supervised affect evaluation:
+
+```powershell
+python -m evaluation.runners.emotion_eval_runner
+```
+
+The default runner evaluates PRIMA Affect against `evaluation/datasets/emotion_gold.json` and writes metrics to `evaluation/results/emotion_eval_results.json`. Transformer baselines are disabled by default to avoid network access; set `PRIMA_ENABLE_TRANSFORMER_BASELINES=1` only when local model weights are available.
+
 Rule-set checks after installing development dependencies:
 
 ```powershell

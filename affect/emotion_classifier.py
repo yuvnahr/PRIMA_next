@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from typing import Any, cast
 from dataclasses import dataclass
+from typing import Any, cast
 
 import numpy as np
 
@@ -19,6 +19,7 @@ TOKEN_RE = re.compile(r"[a-zA-Z']+")
 SCORE_LABELS = {
     "negative": 0,
     "positive": 0,
+    "neutral": 0,
     "uncertainty": 0,
     "litigious": 0,
     "model_strong": 0,
@@ -128,6 +129,21 @@ INTENSITY_MODIFIERS = {
     "not very": ("B_DECR", 0.7),
 }
 
+CANONICAL_EMOTION_ALIASES = {
+    "sad": "sadness",
+    "joy_ecstasy": "joy",
+    "amazement_surprise": "surprise",
+    "interest_vigilance": "surprise",
+    "disgust_loathing": "disgust",
+    "senerity": "trust",
+    "serenity": "trust",
+    "admire": "trust",
+    "acceptance": "trust",
+    "positive": "joy",
+    "negative": "sadness",
+}
+
+
 OPPOSITE_EMOTIONS = {
     "anticipation": "surprise",
     "anger": "joy",
@@ -156,24 +172,50 @@ OPPOSITE_EMOTIONS = {
 }
 
 FALLBACK_LEXICON = {
-    "anticipation": ["waiting", "tomorrow", "soon", "expect", "upcoming", "hopeful"],
-    "anger": ["angry", "mad", "furious", "annoying", "canceled", "delayed"],
-    "fear": ["scared", "nervous", "worried", "terrified", "anxious", "tests", "brakes"],
-    "sadness": ["sad", "failed", "passed away", "space", "rejected", "lonely"],
-    "trust": ["count", "reliable", "friend", "support", "safe", "back"],
-    "senerity": ["peace", "content", "okay", "calm", "fine", "let go"],
-    "joy": ["happy", "baby", "steps", "proposal", "accepted", "love"],
-    "joy_ecstasy": ["amazing", "dream", "thrilled", "ecstatic", "finished"],
-    "admire": ["talented", "dedication", "incredible", "overcame", "look up"],
-    "acceptance": ["terms", "made peace", "it is what it is", "unexpected"],
-    "surprise": ["won", "raffle", "found", "package", "promotion"],
-    "amazement_surprise": ["unbelievable", "shocking", "astonishing"],
+    "anticipation": [
+        "waiting", "tomorrow", "soon", "expect", "expecting", "upcoming", "hopeful", "looking forward",
+        "counting down", "planned", "preparing", "eager", "deadline", "awaiting",
+    ],
+    "anger": [
+        "angry", "mad", "furious", "rage", "outraged", "irritated", "frustrated", "annoying", "canceled",
+        "delayed", "insulted", "betrayed", "unfair", "yelled", "argument", "resent", "hostile", "livid",
+    ],
+    "fear": [
+        "afraid", "scared", "nervous", "worried", "terrified", "anxious", "panic", "panicked", "unsafe",
+        "threat", "danger", "dread", "horror", "frightened", "uneasy", "brakes", "tests", "alarm",
+    ],
+    "sadness": [
+        "sad", "grief", "grieving", "heartbroken", "miserable", "depressed", "failed", "passed away", "died",
+        "loss", "crying", "tears", "rejected", "lonely", "miss", "empty", "mourning", "devastated", "hurt",
+    ],
+    "trust": [
+        "trust", "trusted", "count on", "reliable", "friend", "support", "supported", "safe", "secure", "honest",
+        "loyal", "dependable", "comforted", "backed me up", "protected", "faith", "confidence", "reassured",
+    ],
+    "senerity": ["peace", "peaceful", "content", "okay", "calm", "fine", "relieved", "let go", "settled"],
+    "joy": [
+        "joy", "happy", "happiness", "pleasure", "delighted", "delight", "glad", "smiling", "celebrate",
+        "celebrated", "promoted", "promotion", "baby", "steps", "proposal", "accepted", "love", "proud",
+        "wonderful", "great news", "won", "success", "excited", "cheerful",
+    ],
+    "joy_ecstasy": ["amazing", "dream", "thrilled", "ecstatic", "finished", "fantastic", "overjoyed", "elated"],
+    "admire": ["talented", "dedication", "incredible", "overcame", "look up", "respect", "inspiring"],
+    "acceptance": ["terms", "made peace", "it is what it is"],
+    "surprise": [
+        "surprise", "surprised", "wonder", "wonderstruck", "awe", "amazed", "astonished", "unexpected", "suddenly",
+        "startled", "shocked", "raffle", "found", "package", "unplanned", "out of nowhere", "couldn't believe",
+    ],
+    "amazement_surprise": ["unbelievable", "shocking", "astonishing", "stunned"],
     "distraction": ["wandering", "replaying", "focus", "thinking", "staring"],
-    "boredom": ["bored", "nothing", "routine", "counting", "meeting"],
-    "disgust": ["mold", "hair", "dirty", "unclean", "gross"],
-    "disgust_loathing": ["cockroaches", "filthy", "loathing"],
-    "interest_vigilance": ["wonder", "interesting", "attention", "add up", "eye on"],
+    "boredom": ["bored", "nothing", "routine", "counting", "meeting", "tedious"],
+    "disgust": [
+        "disgust", "disgusted", "mold", "hair", "dirty", "unclean", "gross", "nauseated", "rotten", "filthy",
+        "repulsed", "sickened", "stench", "slimy", "spoiled",
+    ],
+    "disgust_loathing": ["cockroaches", "loathing", "revolting", "vile"],
+    "interest_vigilance": ["interesting", "attention", "add up", "eye on"],
 }
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -206,6 +248,17 @@ def normalize_scores(scores: Mapping[str, float]) -> dict[str, float]:
     if total <= 0:
         return {}
     return {key: round(value / total, 3) for key, value in scores.items() if value > 0}
+
+
+def canonicalize_scores(scores: Mapping[str, float]) -> dict[str, float]:
+    """Collapse legacy fine-grained labels into publication-facing emotion labels."""
+    canonical: dict[str, float] = {}
+    for label, score in scores.items():
+        mapped = CANONICAL_EMOTION_ALIASES.get(label, label)
+        canonical[mapped] = canonical.get(mapped, 0.0) + float(score)
+    return normalize_scores(canonical)
+
+
 
 
 def fix_score(current_score: float, direction: str, strength: float) -> float:
@@ -317,8 +370,8 @@ class LegacyAffectClassifier:
         if not scores:
             scores, keywords = self._classify_by_similarity(text)
 
-        resolved_scores = resolve_modifiers_and_negations(tokens, scores)
-        profile = EmotionProfile.from_scores(resolved_scores or scores, emotional_keywords=tuple(keywords))
+        resolved_scores = canonicalize_scores(resolve_modifiers_and_negations(tokens, scores) or scores)
+        profile = EmotionProfile.from_scores(resolved_scores, emotional_keywords=tuple(keywords))
         self.cache.set(text, profile)
         return profile
 
@@ -336,7 +389,7 @@ class LegacyAffectClassifier:
         """Classify with an externally supplied sentence embedding."""
         scores, keywords = self._classify_embedding(embedding, top_k=top_k)
         resolved = resolve_modifiers_and_negations(tokenize(text), scores) if modifier_detection else scores
-        return EmotionProfile.from_scores(resolved or scores, tuple(keywords))
+        return EmotionProfile.from_scores(canonicalize_scores(resolved or scores), tuple(keywords))
 
     def _classify_embedding(self, embedding: Sequence[float] | np.ndarray, top_k: int = 50) -> tuple[dict[str, float], list[str]]:
         query = np.array(embedding, dtype="float32")

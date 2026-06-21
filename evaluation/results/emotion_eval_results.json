@@ -1,0 +1,454 @@
+{
+  "dataset": "evaluation\\datasets\\emotion_gold.json",
+  "sample_count": 560,
+  "labels": [
+    "joy",
+    "sadness",
+    "fear",
+    "anger",
+    "surprise",
+    "disgust",
+    "trust",
+    "anticipation"
+  ],
+  "models": {
+    "prima_affect": {
+      "accuracy": 0.869643,
+      "macro_precision": 0.885432,
+      "macro_recall": 0.869643,
+      "macro_f1": 0.87011,
+      "per_label": {
+        "joy": {
+          "precision": 0.756757,
+          "recall": 0.8,
+          "f1": 0.777778,
+          "support": 70
+        },
+        "sadness": {
+          "precision": 0.885714,
+          "recall": 0.885714,
+          "f1": 0.885714,
+          "support": 70
+        },
+        "fear": {
+          "precision": 0.958904,
+          "recall": 1.0,
+          "f1": 0.979021,
+          "support": 70
+        },
+        "anger": {
+          "precision": 1.0,
+          "recall": 0.785714,
+          "f1": 0.88,
+          "support": 70
+        },
+        "surprise": {
+          "precision": 0.935484,
+          "recall": 0.828571,
+          "f1": 0.878788,
+          "support": 70
+        },
+        "disgust": {
+          "precision": 0.971429,
+          "recall": 0.971429,
+          "f1": 0.971429,
+          "support": 70
+        },
+        "trust": {
+          "precision": 0.686275,
+          "recall": 1.0,
+          "f1": 0.813953,
+          "support": 70
+        },
+        "anticipation": {
+          "precision": 0.888889,
+          "recall": 0.685714,
+          "f1": 0.774194,
+          "support": 70
+        }
+      },
+      "confusion_matrix": {
+        "joy": {
+          "joy": 56,
+          "sadness": 7,
+          "fear": 2,
+          "anger": 0,
+          "surprise": 2,
+          "disgust": 0,
+          "trust": 3,
+          "anticipation": 0
+        },
+        "sadness": {
+          "joy": 7,
+          "sadness": 62,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 1,
+          "anticipation": 0
+        },
+        "fear": {
+          "joy": 0,
+          "sadness": 0,
+          "fear": 70,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "anger": {
+          "joy": 4,
+          "sadness": 1,
+          "fear": 0,
+          "anger": 55,
+          "surprise": 2,
+          "disgust": 2,
+          "trust": 6,
+          "anticipation": 0
+        },
+        "surprise": {
+          "joy": 0,
+          "sadness": 0,
+          "fear": 1,
+          "anger": 0,
+          "surprise": 58,
+          "disgust": 0,
+          "trust": 5,
+          "anticipation": 6
+        },
+        "disgust": {
+          "joy": 0,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 68,
+          "trust": 2,
+          "anticipation": 0
+        },
+        "trust": {
+          "joy": 0,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 70,
+          "anticipation": 0
+        },
+        "anticipation": {
+          "joy": 7,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 15,
+          "anticipation": 48
+        }
+      },
+      "sample_count": 560,
+      "meets_success_criteria": true
+    },
+    "distilbert_emotion": {
+      "accuracy": 0.7125,
+      "macro_precision": 0.912879,
+      "macro_recall": 0.7125,
+      "macro_f1": 0.757443,
+      "per_label": {
+        "joy": {
+          "precision": 0.30303,
+          "recall": 1.0,
+          "f1": 0.465116,
+          "support": 70
+        },
+        "sadness": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        },
+        "fear": {
+          "precision": 1.0,
+          "recall": 0.7,
+          "f1": 0.823529,
+          "support": 70
+        },
+        "anger": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        },
+        "surprise": {
+          "precision": 1.0,
+          "recall": 0.7,
+          "f1": 0.823529,
+          "support": 70
+        },
+        "disgust": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        },
+        "trust": {
+          "precision": 1.0,
+          "recall": 0.9,
+          "f1": 0.947368,
+          "support": 70
+        },
+        "anticipation": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        }
+      },
+      "confusion_matrix": {
+        "joy": {
+          "joy": 70,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "sadness": {
+          "joy": 28,
+          "sadness": 42,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "fear": {
+          "joy": 21,
+          "sadness": 0,
+          "fear": 49,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "anger": {
+          "joy": 28,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 42,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "surprise": {
+          "joy": 21,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 49,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "disgust": {
+          "joy": 28,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 42,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "trust": {
+          "joy": 7,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 63,
+          "anticipation": 0
+        },
+        "anticipation": {
+          "joy": 28,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 42
+        }
+      },
+      "sample_count": 560,
+      "meets_success_criteria": false,
+      "metadata": {
+        "model_name": "bhadresh-savani/distilbert-base-uncased-emotion",
+        "local_transformer_available": false,
+        "fallback": "distilbert_emotion_keyword_baseline"
+      }
+    },
+    "goemotions_baseline": {
+      "accuracy": 0.525,
+      "macro_precision": 0.901042,
+      "macro_recall": 0.525,
+      "macro_f1": 0.584083,
+      "per_label": {
+        "joy": {
+          "precision": 0.208333,
+          "recall": 1.0,
+          "f1": 0.344828,
+          "support": 70
+        },
+        "sadness": {
+          "precision": 1.0,
+          "recall": 0.3,
+          "f1": 0.461538,
+          "support": 70
+        },
+        "fear": {
+          "precision": 1.0,
+          "recall": 0.4,
+          "f1": 0.571429,
+          "support": 70
+        },
+        "anger": {
+          "precision": 1.0,
+          "recall": 0.3,
+          "f1": 0.461538,
+          "support": 70
+        },
+        "surprise": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.666667,
+          "support": 70
+        },
+        "disgust": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        },
+        "trust": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 70
+        },
+        "anticipation": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.666667,
+          "support": 70
+        }
+      },
+      "confusion_matrix": {
+        "joy": {
+          "joy": 70,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "sadness": {
+          "joy": 49,
+          "sadness": 21,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "fear": {
+          "joy": 42,
+          "sadness": 0,
+          "fear": 28,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "anger": {
+          "joy": 49,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 21,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "surprise": {
+          "joy": 35,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 35,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "disgust": {
+          "joy": 28,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 42,
+          "trust": 0,
+          "anticipation": 0
+        },
+        "trust": {
+          "joy": 28,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 42,
+          "anticipation": 0
+        },
+        "anticipation": {
+          "joy": 35,
+          "sadness": 0,
+          "fear": 0,
+          "anger": 0,
+          "surprise": 0,
+          "disgust": 0,
+          "trust": 0,
+          "anticipation": 35
+        }
+      },
+      "sample_count": 560,
+      "meets_success_criteria": false,
+      "metadata": {
+        "model_name": "SamLowe/roberta-base-go_emotions",
+        "local_transformer_available": false,
+        "fallback": "goemotions_keyword_baseline"
+      }
+    }
+  },
+  "success_criteria": {
+    "accuracy": 0.75,
+    "macro_f1": 0.7
+  },
+  "primary_model": "prima_affect",
+  "accuracy": 0.869643,
+  "macro_f1": 0.87011,
+  "meets_success_criteria": true
+}
