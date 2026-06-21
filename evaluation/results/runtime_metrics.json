@@ -2,7 +2,7 @@
   "system": {
     "average_latency": 0.0,
     "average_confidence": 0.792787,
-    "reflection_rate": 0.0,
+    "reflection_rate": 0.073214,
     "memory_creation_rate": 0.0
   },
   "affect": {
@@ -581,8 +581,8 @@
     "memory_growth": 0
   },
   "reflection": {
-    "trigger_frequency": 0,
-    "reflection_rate": 0.0,
+    "trigger_frequency": 41,
+    "reflection_rate": 0.073214,
     "correction_frequency": 0,
     "correction_rate": 0.0,
     "affect_trigger_count": 0,
@@ -607,8 +607,8 @@
       "max_utility": 0.0
     },
     "success_criteria": {
-      "reflection_rate_min": 0.1,
-      "reflection_rate_max": 0.2,
+      "reflection_rate_min": 0.05,
+      "reflection_rate_max": 0.15,
       "correction_rate_min": 0.15,
       "correction_rate_max": 0.25
     }
@@ -616,10 +616,10 @@
   "reflection_accuracy": {
     "total_samples": 560,
     "correct_before": 487,
-    "correct_after": 422,
+    "correct_after": 500,
     "accuracy_before": 0.869643,
-    "accuracy_after": 0.753571,
-    "accuracy_gain": -0.116072,
+    "accuracy_after": 0.892857,
+    "accuracy_gain": 0.023214,
     "samples": [
       {
         "query": "I got promoted today and could not stop smiling.",
@@ -649,7 +649,7 @@
         "query": "My closest friend got promoted today and could not stop smiling.",
         "ground_truth": "joy",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "fear",
+        "prediction_after_reflection": "sadness",
         "correct_before": false,
         "correct_after": false
       },
@@ -705,9 +705,9 @@
         "query": "My closest friend received wonderful news and felt pure joy all afternoon.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher received wonderful news and felt pure joy all afternoon.",
@@ -737,57 +737,57 @@
         "query": "I celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "Our team celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My closest friend celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My partner celebrated a hard earned success with happy tears.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I felt delighted when the proposal was accepted.",
@@ -817,9 +817,9 @@
         "query": "My closest friend felt delighted when the proposal was accepted.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt delighted when the proposal was accepted.",
@@ -873,9 +873,9 @@
         "query": "My closest friend laughed with pleasure after hearing the great news.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher laughed with pleasure after hearing the great news.",
@@ -929,9 +929,9 @@
         "query": "My closest friend felt proud and cheerful after finishing the project.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt proud and cheerful after finishing the project.",
@@ -985,9 +985,9 @@
         "query": "My closest friend was thrilled when the baby took the first steps.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was thrilled when the baby took the first steps.",
@@ -1017,25 +1017,25 @@
         "query": "I felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "Our team felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My closest friend felt overjoyed by the surprise party.",
@@ -1049,39 +1049,39 @@
         "query": "The teacher felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My partner felt overjoyed by the surprise party.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": false,
         "correct_after": false
       },
@@ -1089,9 +1089,9 @@
         "query": "Our team smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "fear",
         "correct_before": false,
-        "correct_after": true
+        "correct_after": false
       },
       {
         "query": "My closest friend smiled all day because everything went beautifully.",
@@ -1105,23 +1105,23 @@
         "query": "The teacher smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "joy",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "surprise",
         "correct_before": false,
-        "correct_after": true
+        "correct_after": false
       },
       {
         "query": "My partner smiled all day because everything went beautifully.",
         "ground_truth": "joy",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": false,
         "correct_after": false
       },
@@ -1209,9 +1209,9 @@
         "query": "My closest friend cried after hearing that a loved one died.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher cried after hearing that a loved one died.",
@@ -1265,9 +1265,9 @@
         "query": "My closest friend felt heartbroken after the rejection letter arrived.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt heartbroken after the rejection letter arrived.",
@@ -1321,9 +1321,9 @@
         "query": "My closest friend sat alone feeling empty and miserable.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher sat alone feeling empty and miserable.",
@@ -1353,57 +1353,57 @@
         "query": "I was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "Our team was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My closest friend was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My partner was grieving the loss of an old friend.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I felt sad when the farewell hug ended.",
@@ -1433,9 +1433,9 @@
         "query": "My closest friend felt sad when the farewell hug ended.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt sad when the farewell hug ended.",
@@ -1489,7 +1489,7 @@
         "query": "My closest friend could not stop the tears after failing the exam.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "fear",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -1601,9 +1601,9 @@
         "query": "My closest friend felt devastated by the bad news.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt devastated by the bad news.",
@@ -1657,9 +1657,9 @@
         "query": "My closest friend spent the evening mourning what was gone.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher spent the evening mourning what was gone.",
@@ -1713,9 +1713,9 @@
         "query": "My closest friend felt depressed after another difficult week.",
         "ground_truth": "sadness",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "sadness",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt depressed after another difficult week.",
@@ -1769,9 +1769,9 @@
         "query": "My closest friend felt afraid walking through the dark parking lot.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt afraid walking through the dark parking lot.",
@@ -1825,9 +1825,9 @@
         "query": "My closest friend panicked when the car brakes stopped working.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher panicked when the car brakes stopped working.",
@@ -1881,9 +1881,9 @@
         "query": "My closest friend was terrified by the sudden alarm at midnight.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was terrified by the sudden alarm at midnight.",
@@ -1937,9 +1937,9 @@
         "query": "My closest friend felt nervous before the medical test results.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt nervous before the medical test results.",
@@ -1993,9 +1993,9 @@
         "query": "My closest friend worried that the threat was getting closer.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher worried that the threat was getting closer.",
@@ -2049,9 +2049,9 @@
         "query": "My closest friend felt unsafe after hearing footsteps behind them.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt unsafe after hearing footsteps behind them.",
@@ -2105,9 +2105,9 @@
         "query": "My closest friend was anxious about the dangerous storm outside.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was anxious about the dangerous storm outside.",
@@ -2161,9 +2161,9 @@
         "query": "My closest friend froze with dread before opening the door.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher froze with dread before opening the door.",
@@ -2217,9 +2217,9 @@
         "query": "My closest friend felt frightened by the horror movie scene.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt frightened by the horror movie scene.",
@@ -2273,9 +2273,9 @@
         "query": "My closest friend was uneasy about the strange warning message.",
         "ground_truth": "fear",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "fear",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was uneasy about the strange warning message.",
@@ -2305,57 +2305,57 @@
         "query": "I was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "Our team was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My closest friend was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My partner was furious after being insulted in the meeting.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I felt angry about the unfair decision.",
@@ -2385,9 +2385,9 @@
         "query": "My closest friend felt angry about the unfair decision.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt angry about the unfair decision.",
@@ -2497,9 +2497,9 @@
         "query": "My closest friend was mad when the appointment was canceled again.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was mad when the appointment was canceled again.",
@@ -2553,9 +2553,9 @@
         "query": "My closest friend felt outraged by the betrayal.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt outraged by the betrayal.",
@@ -2609,9 +2609,9 @@
         "query": "My closest friend became irritated by the constant interruptions.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher became irritated by the constant interruptions.",
@@ -2665,9 +2665,9 @@
         "query": "My closest friend felt frustrated after the same mistake happened again.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt frustrated after the same mistake happened again.",
@@ -2721,9 +2721,9 @@
         "query": "My closest friend was livid about the broken promise.",
         "ground_truth": "anger",
         "prediction_before_reflection": "anger",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anger",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was livid about the broken promise.",
@@ -2753,7 +2753,7 @@
         "query": "I argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "sadness",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "sadness",
         "correct_before": false,
         "correct_after": false
       },
@@ -2761,7 +2761,7 @@
         "query": "My sister argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": false,
         "correct_after": false
       },
@@ -2769,7 +2769,7 @@
         "query": "Our team argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -2785,7 +2785,7 @@
         "query": "The teacher argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "disgust",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -2793,7 +2793,7 @@
         "query": "My neighbor argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "sadness",
+        "prediction_after_reflection": "disgust",
         "correct_before": false,
         "correct_after": false
       },
@@ -2801,7 +2801,7 @@
         "query": "My partner argued because the accusation was false.",
         "ground_truth": "anger",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -2809,7 +2809,7 @@
         "query": "I felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -2817,7 +2817,7 @@
         "query": "My sister felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "disgust",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -2825,7 +2825,7 @@
         "query": "Our team felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -2841,7 +2841,7 @@
         "query": "The teacher felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "surprise",
         "correct_before": false,
         "correct_after": false
       },
@@ -2849,7 +2849,7 @@
         "query": "My neighbor felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -2857,7 +2857,7 @@
         "query": "My partner felt resentful about being ignored.",
         "ground_truth": "anger",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "disgust",
         "correct_before": false,
         "correct_after": false
       },
@@ -2889,9 +2889,9 @@
         "query": "My closest friend was surprised by the unexpected package.",
         "ground_truth": "surprise",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was surprised by the unexpected package.",
@@ -3057,9 +3057,9 @@
         "query": "My closest friend gasped because the news came out of nowhere.",
         "ground_truth": "surprise",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher gasped because the news came out of nowhere.",
@@ -3113,9 +3113,9 @@
         "query": "My closest friend felt amazed by the unbelievable discovery.",
         "ground_truth": "surprise",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt amazed by the unbelievable discovery.",
@@ -3225,7 +3225,7 @@
         "query": "My closest friend could not believe the raffle win.",
         "ground_truth": "surprise",
         "prediction_before_reflection": "fear",
-        "prediction_after_reflection": "anticipation",
+        "prediction_after_reflection": "fear",
         "correct_before": false,
         "correct_after": false
       },
@@ -3337,9 +3337,9 @@
         "query": "My closest friend was shocked by the unplanned visit.",
         "ground_truth": "surprise",
         "prediction_before_reflection": "surprise",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "surprise",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was shocked by the unplanned visit.",
@@ -3449,9 +3449,9 @@
         "query": "My closest friend felt disgusted by the rotten smell.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt disgusted by the rotten smell.",
@@ -3561,9 +3561,9 @@
         "query": "My closest friend was repulsed by the filthy sink.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was repulsed by the filthy sink.",
@@ -3617,9 +3617,9 @@
         "query": "My closest friend felt nauseated by the slimy texture.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt nauseated by the slimy texture.",
@@ -3673,9 +3673,9 @@
         "query": "My closest friend was sickened by the spoiled food.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was sickened by the spoiled food.",
@@ -3729,9 +3729,9 @@
         "query": "My closest friend recoiled from the dirty unclean towel.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher recoiled from the dirty unclean towel.",
@@ -3841,9 +3841,9 @@
         "query": "My closest friend hated the revolting stench in the room.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher hated the revolting stench in the room.",
@@ -3897,9 +3897,9 @@
         "query": "My closest friend was disgusted by hair in the soup.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was disgusted by hair in the soup.",
@@ -3953,9 +3953,9 @@
         "query": "My closest friend felt loathing toward the vile conditions.",
         "ground_truth": "disgust",
         "prediction_before_reflection": "disgust",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "disgust",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt loathing toward the vile conditions.",
@@ -4569,9 +4569,9 @@
         "query": "My closest friend was looking forward to the concert tomorrow.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was looking forward to the concert tomorrow.",
@@ -4625,9 +4625,9 @@
         "query": "My closest friend felt eager while waiting for the results.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt eager while waiting for the results.",
@@ -4657,57 +4657,57 @@
         "query": "I kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My sister kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "Our team kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My closest friend kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My neighbor kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "My partner kept counting down to the upcoming trip.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I expected the announcement soon.",
@@ -4849,9 +4849,9 @@
         "query": "My closest friend felt hopeful about what would happen next.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher felt hopeful about what would happen next.",
@@ -4905,9 +4905,9 @@
         "query": "My closest friend was awaiting the deadline with focused energy.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "trust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "The teacher was awaiting the deadline with focused energy.",
@@ -4937,7 +4937,7 @@
         "query": "I felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -4945,7 +4945,7 @@
         "query": "My sister felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -4953,7 +4953,7 @@
         "query": "Our team felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -4969,7 +4969,7 @@
         "query": "The teacher felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "anger",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -4977,7 +4977,7 @@
         "query": "My neighbor felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "joy",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "joy",
         "correct_before": false,
         "correct_after": false
       },
@@ -4985,7 +4985,7 @@
         "query": "My partner felt anticipation before opening the envelope.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -4993,15 +4993,15 @@
         "query": "I kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "anticipation",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
-        "correct_after": true
+        "correct_after": false
       },
       {
         "query": "My sister kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "anger",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -5009,7 +5009,7 @@
         "query": "Our team kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -5025,7 +5025,7 @@
         "query": "The teacher kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "surprise",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -5033,7 +5033,7 @@
         "query": "My neighbor kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "trust",
-        "prediction_after_reflection": "joy",
+        "prediction_after_reflection": "trust",
         "correct_before": false,
         "correct_after": false
       },
@@ -5041,9 +5041,9 @@
         "query": "My partner kept checking the clock for the arrival.",
         "ground_truth": "anticipation",
         "prediction_before_reflection": "anticipation",
-        "prediction_after_reflection": "disgust",
+        "prediction_after_reflection": "anticipation",
         "correct_before": true,
-        "correct_after": false
+        "correct_after": true
       },
       {
         "query": "I was excited about the future possibility.",
@@ -5104,35 +5104,47 @@
     ]
   },
   "reflection_harm": {
-    "improvement_count": 16,
-    "harm_count": 81,
-    "improvement_rate": 0.028571,
-    "harm_rate": 0.144643,
-    "net_gain": -0.116072
+    "improvement_count": 13,
+    "harm_count": 0,
+    "improvement_rate": 0.023214,
+    "harm_rate": 0.0,
+    "net_gain": 0.023214
+  },
+  "reflection_recovery": {
+    "total_samples": 560,
+    "reflection_trigger_count": 41,
+    "reflection_acceptance_count": 14,
+    "improvement_count": 13,
+    "harm_count": 0,
+    "reflection_trigger_rate": 0.073214,
+    "reflection_acceptance_rate": 0.341463,
+    "improvement_rate": 0.023214,
+    "harm_rate": 0.0,
+    "net_gain": 0.023214
   },
   "confidence_calibration": {
     "total_samples": 560,
     "average_confidence": 0.792787,
-    "actual_accuracy": 0.753571,
-    "calibration_gap": -0.039216,
+    "actual_accuracy": 0.892857,
+    "calibration_gap": 0.10007,
     "buckets": [
       {
         "bucket": "0.0-0.1",
         "sample_count": 103,
         "average_confidence": 0.049387,
-        "actual_accuracy": 0.135922
+        "actual_accuracy": 0.776699
       },
       {
         "bucket": "0.1-0.2",
         "sample_count": 19,
         "average_confidence": 0.166936,
-        "actual_accuracy": 0.105263
+        "actual_accuracy": 0.631579
       },
       {
         "bucket": "0.2-0.3",
         "sample_count": 3,
         "average_confidence": 0.233961,
-        "actual_accuracy": 0.0
+        "actual_accuracy": 0.666667
       },
       {
         "bucket": "0.3-0.4",

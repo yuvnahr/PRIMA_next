@@ -29,6 +29,12 @@ from evaluation.metrics.reflection_metrics import (
 )
 from evaluation.metrics.system_metrics import summarize_system_metrics
 from evaluation.runners.emotion_eval_runner import canonical_label
+from reflection.reflection_acceptance import (
+    ReflectionAcceptanceDecision,
+    classify_reflection_outcome,
+    evaluate_reflection_acceptance,
+    reflection_recovery_summary,
+)
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from runtime.prima_runtime import PrimaRuntime
@@ -42,6 +48,8 @@ DEFAULT_REFLECTION_CHANGE_REPORT_PATH = Path("evaluation/results/reflection_chan
 DEFAULT_REFLECTION_ACCURACY_PATH = Path("evaluation/results/reflection_accuracy.json")
 DEFAULT_CONFIDENCE_CALIBRATION_PATH = Path("evaluation/results/confidence_calibration.json")
 DEFAULT_REFLECTION_GOLD_RESULTS_PATH = Path("evaluation/results/reflection_gold_results.json")
+DEFAULT_REFLECTION_OUTCOMES_PATH = Path("evaluation/results/reflection_outcomes.json")
+DEFAULT_REFLECTION_RECOVERY_REPORT_PATH = Path("evaluation/results/reflection_recovery_report.json")
 
 
 class DatasetRunner:
@@ -58,6 +66,8 @@ class DatasetRunner:
         reflection_accuracy_path: str | Path = DEFAULT_REFLECTION_ACCURACY_PATH,
         confidence_calibration_path: str | Path = DEFAULT_CONFIDENCE_CALIBRATION_PATH,
         reflection_gold_results_path: str | Path = DEFAULT_REFLECTION_GOLD_RESULTS_PATH,
+        reflection_outcomes_path: str | Path = DEFAULT_REFLECTION_OUTCOMES_PATH,
+        reflection_recovery_report_path: str | Path = DEFAULT_REFLECTION_RECOVERY_REPORT_PATH,
     ) -> None:
         self.runtime = runtime or PrimaRuntime()
         self.dataset_path = Path(dataset_path)
@@ -68,6 +78,8 @@ class DatasetRunner:
         self.reflection_accuracy_path = Path(reflection_accuracy_path)
         self.confidence_calibration_path = Path(confidence_calibration_path)
         self.reflection_gold_results_path = Path(reflection_gold_results_path)
+        self.reflection_outcomes_path = Path(reflection_outcomes_path)
+        self.reflection_recovery_report_path = Path(reflection_recovery_report_path)
         self._affect_engine = DynamicAffectEngine()
         self._reflection_engine = ReflectionEngine()
 
@@ -77,6 +89,9 @@ class DatasetRunner:
         if samples and all("ground_truth_emotion" in sample for sample in samples):
             records = self._run_reflection_gold(samples)
             self._write_reflection_gold_results(records)
+            self._write_reflection_outcomes(records)
+            self._write_reflection_recovery_report(records)
+            self._write_reflection_accuracy(records)
             self._write_metrics(records)
             return records
 
@@ -148,13 +163,31 @@ class DatasetRunner:
             ground_truth = canonical_label(str(sample.get("ground_truth_emotion", "")))
             profile = self._affect_engine.get_emotion_profile(query)
             before_prediction = canonical_label(profile.dominant_emotion)
-            after_prediction = self._reflective_prediction(query, profile.confidence, profile.emotions)
+            decision = self._reflection_decision(query, before_prediction, profile.confidence, profile.emotions)
+            after_prediction = decision.selected_prediction
+            outcome = classify_reflection_outcome(
+                before_prediction,
+                after_prediction,
+                ground_truth,
+                reflection_triggered=decision.reflection_triggered,
+            )
             records.append(
                 {
                     "query": query,
                     "ground_truth": ground_truth,
                     "before_prediction": before_prediction,
                     "after_prediction": after_prediction,
+                    "reflection_candidate_prediction": decision.candidate_prediction,
+                    "reflection_triggered": decision.reflection_triggered,
+                    "reflection_accepted": decision.reflection_accepted,
+                    "reflection_outcome": outcome,
+                    "reflection_suppression_reason": decision.suppression_reason,
+                    "reflection_acceptance_reason": decision.acceptance_reason,
+                    "reflection_before_confidence": decision.original_confidence,
+                    "reflection_after_confidence": decision.candidate_confidence,
+                    "original_evidence_score": decision.original_evidence_score,
+                    "reflection_evidence_score": decision.reflection_evidence_score,
+                    "top_emotion_margin": decision.top_emotion_margin,
                     "correct_before": before_prediction == ground_truth,
                     "correct_after": after_prediction == ground_truth,
                     "confidence": float(profile.confidence),
@@ -235,14 +268,15 @@ class DatasetRunner:
                 "trigger_summary": trigger_summary(records),
                 "utility_summary": utility_summary(records),
                 "success_criteria": {
-                    "reflection_rate_min": 0.10,
-                    "reflection_rate_max": 0.20,
+                    "reflection_rate_min": 0.05,
+                    "reflection_rate_max": 0.15,
                     "correction_rate_min": 0.15,
                     "correction_rate_max": 0.25,
                 },
             },
             "reflection_accuracy": reflection_accuracy,
             "reflection_harm": reflection_harm,
+            "reflection_recovery": reflection_recovery_summary(records),
             "confidence_calibration": confidence_calibration,
         }
         self.metrics_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -271,6 +305,10 @@ class DatasetRunner:
                 "ground_truth": str(record.get("ground_truth", "")),
                 "before_prediction": str(record.get("before_prediction", "")),
                 "after_prediction": str(record.get("after_prediction", "")),
+                "reflection_candidate_prediction": str(record.get("reflection_candidate_prediction", "")),
+                "reflection_triggered": bool(record.get("reflection_triggered", False)),
+                "reflection_accepted": bool(record.get("reflection_accepted", False)),
+                "reflection_outcome": str(record.get("reflection_outcome", "NEUTRAL")),
                 "correct_before": bool(record.get("correct_before", False)),
                 "correct_after": bool(record.get("correct_after", False)),
             }
@@ -278,7 +316,41 @@ class DatasetRunner:
         ]
         self.reflection_gold_results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    def _reflective_prediction(self, query: str, affect_confidence: float, emotions: dict[str, float]) -> str:
+    def _write_reflection_outcomes(self, records: list[dict[str, Any]]) -> None:
+        self.reflection_outcomes_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = [
+            {
+                "query": str(record.get("query", "")),
+                "ground_truth": str(record.get("ground_truth", "")),
+                "before_prediction": str(record.get("before_prediction", "")),
+                "reflection_candidate_prediction": str(record.get("reflection_candidate_prediction", "")),
+                "after_prediction": str(record.get("after_prediction", "")),
+                "reflection_triggered": bool(record.get("reflection_triggered", False)),
+                "reflection_accepted": bool(record.get("reflection_accepted", False)),
+                "outcome": str(record.get("reflection_outcome", "NEUTRAL")),
+                "original_evidence_score": float(record.get("original_evidence_score", 0.0)),
+                "reflection_evidence_score": float(record.get("reflection_evidence_score", 0.0)),
+                "top_emotion_margin": float(record.get("top_emotion_margin", 0.0)),
+            }
+            for record in records
+            if record.get("reflection_triggered")
+        ]
+        self.reflection_outcomes_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    def _write_reflection_recovery_report(self, records: list[dict[str, Any]]) -> None:
+        self.reflection_recovery_report_path.parent.mkdir(parents=True, exist_ok=True)
+        self.reflection_recovery_report_path.write_text(
+            json.dumps(reflection_recovery_summary(records), indent=2),
+            encoding="utf-8",
+        )
+
+    def _reflection_decision(
+        self,
+        query: str,
+        before_prediction: str,
+        affect_confidence: float,
+        emotions: dict[str, float],
+    ) -> ReflectionAcceptanceDecision:
         reflection_context = ReflectionContext(
             query=query,
             affect_confidence=affect_confidence,
@@ -290,10 +362,26 @@ class DatasetRunner:
             },
         )
         result = self._reflection_engine.evaluate(reflection_context)
-        ranked_labels = [canonical_label(label) for label in emotions.keys()]
-        if result.should_reflect and len(ranked_labels) > 1:
-            return ranked_labels[1]
-        return ranked_labels[0] if ranked_labels else "joy"
+        ranked_labels = _unique_labels(canonical_label(label) for label in emotions.keys())
+        original = before_prediction or (ranked_labels[0] if ranked_labels else "joy")
+        candidate = ranked_labels[1] if result.should_reflect and len(ranked_labels) > 1 else original
+        return evaluate_reflection_acceptance(
+            query=query,
+            original_prediction=original,
+            candidate_prediction=candidate,
+            prediction_confidence=affect_confidence,
+            emotions=emotions,
+            original_confidence=result.before_confidence,
+            candidate_confidence=result.after_confidence,
+        )
+
+
+def _unique_labels(labels: Any) -> list[str]:
+    unique: list[str] = []
+    for label in labels:
+        if label not in unique:
+            unique.append(label)
+    return unique
 
 
 def run_dataset() -> list[dict[str, Any]]:

@@ -156,8 +156,6 @@ class ReflectionEngine:
         affect_confidence = self._affect_support(context)
         retrieval_confidence = self._retrieval_support(context.retrieval_confidence)
         affect_uncertainty = 1.0 - affect_confidence
-        retrieval_uncertainty = 1.0 - retrieval_confidence
-        contradiction_score = self._contradiction_score(context, signals, failure_type)
         low_affect_threshold = float(context.failure_metadata.get("affect_threshold", 0.30))
         low_confidence_threshold = float(context.failure_metadata.get("threshold", 0.30))
         audit_sample = bool(context.failure_metadata.get("audit_sample", False))
