@@ -10,11 +10,16 @@ try:
 except Exception:
     requests = None  # type: ignore
 
+from typing import Any
+
+# default then attempt to load real settings provider
+def get_settings() -> Any:
+    return None
 try:
-    from config.settings import get_settings
+    from config import settings as _settings
+    get_settings = _settings.get_settings
 except Exception:
-    def get_settings():
-        return None
+    pass
 
 
 def check_health() -> dict[str, str]:

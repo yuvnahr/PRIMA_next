@@ -145,7 +145,9 @@ class ActionController:
         result = await self.action_executor.execute(action_context)
         payload = result.to_dict()
         payload["execution_result"] = result
-        payload["plan"] = context.plan.to_dict() if hasattr(context.plan, "to_dict") else context.plan
+        payload["plan"] = (
+            context.plan.to_dict() if (context.plan is not None and hasattr(context.plan, "to_dict")) else context.plan
+        )
         return payload
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import Iterable, Mapping, Sequence
+from typing import Any, cast
 from dataclasses import dataclass
 
 import numpy as np
@@ -243,7 +244,7 @@ def resolve_modifiers_and_negations(tokens: Sequence[str], scores: Mapping[str, 
 
 def _stable_embedding(text: str, dimensions: int = 64) -> np.ndarray:
     digest = hashlib.sha256(text.encode("utf-8")).digest()
-    values = []
+    values: list[float] = []
     while len(values) < dimensions:
         for byte in digest:
             values.append((byte / 127.5) - 1.0)
@@ -286,7 +287,7 @@ class LegacyAffectClassifier:
     @classmethod
     def from_legacy_dataframe(
         cls,
-        df: object,
+        df: Any,
         cache_size: int = 512,
         prefer_faiss: bool = False,
     ) -> LegacyAffectClassifier:
@@ -296,12 +297,12 @@ class LegacyAffectClassifier:
         `token`, `fourteen_label`, and `embedding`.
         """
         entries: list[LexiconEntry] = []
-        for _, row in df.iterrows():  # type: ignore[attr-defined]
+        for _, row in cast(Any, df).iterrows():
             entries.append(
                 LexiconEntry(
                     token=str(row["token"]),
                     label=str(row["fourteen_label"]),
-                    embedding=np.array(row["embedding"], dtype="float32"),
+                        embedding=np.array(row["embedding"], dtype="float32"),
                 )
             )
         return cls(entries=entries, cache_size=cache_size, prefer_faiss=prefer_faiss)
@@ -337,7 +338,7 @@ class LegacyAffectClassifier:
         resolved = resolve_modifiers_and_negations(tokenize(text), scores) if modifier_detection else scores
         return EmotionProfile.from_scores(resolved or scores, tuple(keywords))
 
-    def _classify_embedding(self, embedding: Sequence[float], top_k: int = 50) -> tuple[dict[str, float], list[str]]:
+    def _classify_embedding(self, embedding: Sequence[float] | np.ndarray, top_k: int = 50) -> tuple[dict[str, float], list[str]]:
         query = np.array(embedding, dtype="float32")
         norm = np.linalg.norm(query)
         if norm > 0:
@@ -378,25 +379,57 @@ def legacy_build_profile(text: str) -> list[object]:
     return _DEFAULT_CLASSIFIER.legacy_build_profile(text)
 
 
-def build_vocab_matrix(df: object) -> np.ndarray:
+def build_vocab_matrix(df: Any) -> np.ndarray:
     """Legacy-compatible normalized vocabulary matrix builder."""
-    matrix = np.array(df["embedding"].tolist(), dtype="float32")  # type: ignore[index, attr-defined]
-    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    matrix: np.ndarray = np.asarray(
+        df["embedding"].tolist(),
+        dtype=np.float32,
+    )
+
+    norms: np.ndarray = np.linalg.norm(
+        matrix,
+        axis=1,
+        keepdims=True,
+    )
+
     norms = np.where(norms == 0, 1e-9, norms)
-    return matrix / norms
+
+    result: np.ndarray = matrix / norms
+    return result
 
 
-def mean_pooling(model_output: object, attention_mask: object) -> object:
-    """Legacy mean-pooling helper for transformer outputs."""
-    token_embeddings = model_output[0]  # type: ignore[index]
-    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    return (token_embeddings * input_mask_expanded).sum(1) / input_mask_expanded.sum(1).clamp(min=1e-9)
+def mean_pooling(model_output: Any, attention_mask: Any) -> np.ndarray:
+    """Legacy mean-pooling helper for transformer outputs.
+
+    Returns a numpy ndarray regardless of whether the model returns a torch
+    tensor or a numpy array.
+    """
+    token_embeddings = model_output[0]
+    # attempt to operate on torch tensors if available, otherwise fall back to numpy
+    try:
+        # torch path
+        input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+        pooled = (token_embeddings * input_mask_expanded).sum(1) / input_mask_expanded.sum(1).clamp(min=1e-9)
+        # convert to numpy and ensure the expression is typed as ndarray
+        pooled_arr: np.ndarray
+
+        if hasattr(pooled, "cpu"):
+            pooled_arr = np.asarray(pooled.cpu().numpy(), dtype=np.float32)
+        else:
+            pooled_arr = np.asarray(pooled, dtype=np.float32)
+
+        return pooled_arr
+    except Exception:
+        # numpy-path (or other array-likes)
+        input_mask_expanded = np.expand_dims(attention_mask, -1) * np.ones_like(token_embeddings)
+        pooled = (token_embeddings * input_mask_expanded).sum(1) / np.maximum(input_mask_expanded.sum(1), 1e-9)
+        return cast(np.ndarray, np.asarray(pooled))
 
 
-def get_mean_pooling_emb(sentences: list[str], tokenizer: object, model: object) -> list[list[float]]:
+def get_mean_pooling_emb(sentences: list[str], tokenizer: Any, model: Any) -> list[list[float]]:
     """Encode sentences using an injected tokenizer/model pair."""
-    device = next(model.parameters()).device  # type: ignore[attr-defined]
-    encoded_input = tokenizer(  # type: ignore[operator]
+    device = next(model.parameters()).device
+    encoded_input = tokenizer(
         sentences,
         padding=True,
         truncation=True,
@@ -406,8 +439,8 @@ def get_mean_pooling_emb(sentences: list[str], tokenizer: object, model: object)
     import torch
 
     with torch.no_grad():
-        model_output = model(**encoded_input)  # type: ignore[operator]
-    return mean_pooling(model_output, encoded_input["attention_mask"]).tolist()  # type: ignore[index, union-attr]
+        model_output = model(**encoded_input)
+    return cast(list[list[float]], mean_pooling(model_output, encoded_input["attention_mask"]).tolist())
 
 
 def build_profile(

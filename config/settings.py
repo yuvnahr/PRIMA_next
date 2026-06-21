@@ -5,16 +5,25 @@ singleton Settings object. By default values are read from environment
 variables; sensitive values (API keys) should not be checked into source.
 """
 
+from typing import Any, Type, cast
+
+# Use a runtime variable holding the base settings class. This avoids
+# reassigning a class name which mypy flags as a redefinition.
+BaseSettingsCls: Type[Any] = type("_FallbackBaseSettings", (), {})
+
 try:
-    from pydantic_settings import BaseSettings
+    from pydantic_settings import BaseSettings as _PS_BaseSettings
+    BaseSettingsCls = cast(Type[Any], _PS_BaseSettings)
 except Exception:  # pragma: no cover - fall back to pydantic if pydantic-settings isn't installed
     try:
-        from pydantic import BaseSettings
+        from pydantic import BaseSettings as _PD_BaseSettings
+        BaseSettingsCls = cast(Type[Any], _PD_BaseSettings)
     except Exception:
-        BaseSettings = object  # type: ignore
+        # keep the fallback class
+        pass
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettingsCls):
     default_provider: str = "openai"
     default_model: str = "gpt-4o"
     openai_api_key: str | None = None

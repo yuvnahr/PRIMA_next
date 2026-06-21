@@ -49,7 +49,7 @@ def stable_embedding(text: str, dimensions: int = 64) -> list[float]:
     norm = np.linalg.norm(vector)
     if norm:
         vector = vector / norm
-    return vector.tolist()
+    return [float(v) for v in vector.tolist()]
 
 
 def tokenize(text: str) -> list[str]:

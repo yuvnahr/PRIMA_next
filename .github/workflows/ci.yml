@@ -106,4 +106,4 @@ jobs:
             -r events \
             -r llm \
             -r security \
-            -ll
+            -iii

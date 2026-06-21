@@ -4,6 +4,8 @@ This file provides `init_tracing()` to configure the tracer and `get_tracer()`
 to obtain a tracer for instrumentation.
 """
 
+from typing import Any, Literal
+
 try:
     from opentelemetry import trace as _trace
     from opentelemetry.sdk.trace import TracerProvider
@@ -22,15 +24,15 @@ def init_tracing(service_name: str = "prima-service") -> None:
     _trace.set_tracer_provider(provider)
 
 
-def get_tracer(name: str | None = None):
+def get_tracer(name: str | None = None) -> Any:
     if not _OTEL_AVAILABLE:
         class _Noop:
-            def start_as_current_span(self, *args, **kwargs):
+            def start_as_current_span(self, *args: Any, **kwargs: Any) -> Any:
                 class _Ctx:
-                    def __enter__(self):
+                    def __enter__(self) -> Any:
                         return None
 
-                    def __exit__(self, exc_type, exc, tb):
+                    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> Literal[False]:
                         return False
 
                 return _Ctx()

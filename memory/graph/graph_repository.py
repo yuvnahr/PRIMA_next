@@ -31,7 +31,8 @@ class GraphRepository:
     def get_neighbors(self, node_id: str) -> list[tuple[GraphNode, GraphEdge]]:
         neighbors = []
         for neighbor_id in self._neighbors.get(node_id, set()):
-            edge = self.edges[tuple(sorted((node_id, neighbor_id)))]
+            a, b = sorted((node_id, neighbor_id))
+            edge = self.edges[(a, b)]
             node = self.nodes[neighbor_id]
             neighbors.append((node, edge))
         return sorted(neighbors, key=lambda item: item[1].weight, reverse=True)
@@ -84,8 +85,8 @@ class ChromaGraphRepository(GraphRepository):
         super().__init__()
         import chromadb
 
-        self.client = chromadb.PersistentClient(path=path)
-        self.collection = self.client.get_or_create_collection(
+        self.client: Any = chromadb.PersistentClient(path=path)
+        self.collection: Any = self.client.get_or_create_collection(
             name="graph_index",
             metadata={"hnsw:space": "cosine"},
         )

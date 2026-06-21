@@ -132,11 +132,16 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(context.affect_update)
         self.assertIsNotNone(context.retrieval_response)
         self.assertIsInstance(context.plan, Plan)
+        from typing import cast
+
         self.assertIsNotNone(context.reflection_result)
         self.assertIsNotNone(context.action_result)
         self.assertIsNotNone(context.output)
-        self.assertFalse(context.action_result["requires_external_tool"])
-        self.assertEqual(context.action_result["plan"]["plan_id"], context.plan.plan_id)
+        action_result = cast(dict[str, object], context.action_result)
+        plan_obj = cast(Plan, context.plan)
+        self.assertFalse(cast(bool, action_result["requires_external_tool"]))
+        plan_dict = cast(dict[str, object], action_result["plan"])
+        self.assertEqual(plan_dict["plan_id"], plan_obj.plan_id)
 
 
 if __name__ == "__main__":

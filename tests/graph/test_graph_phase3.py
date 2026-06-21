@@ -3,6 +3,8 @@ import unittest
 from memory.graph.graph_builder import GraphBuilder
 from memory.graph.graph_reasoning_engine import GraphReasoningEngine
 from memory.graph.graph_repository import GraphRepository
+from memory.graph.graph_node import GraphNode
+from typing import cast
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
@@ -25,6 +27,8 @@ class GraphPhase3Test(unittest.TestCase):
         node_b = graph.find_by_memory_id(note_b.id)
         self.assertIsNotNone(node_a)
         self.assertIsNotNone(node_b)
+        node_a = cast(GraphNode, node_a)
+        node_b = cast(GraphNode, node_b)
         self.assertTrue(reasoning.path_search(node_a.id, node_b.id))
         self.assertTrue(reasoning.detect_communities())
 

@@ -95,9 +95,17 @@ class UncertaintyEstimator:
         confidence = _float_attr(value, "confidence", default=None)
         if confidence is None:
             return None
-        ambiguity = _float_attr(value, "ambiguity_score", default=1.0 - confidence)
+        # ensure defaults are computed with concrete floats
+        default_ambiguity = 1.0 - confidence
+        ambiguity = _float_attr(value, "ambiguity_score", default=default_ambiguity)
+        if ambiguity is None:
+            ambiguity = default_ambiguity
         coverage = _float_attr(value, "coverage_score", default=confidence)
+        if coverage is None:
+            coverage = confidence
         quality = _float_attr(value, "retrieval_quality_score", default=confidence)
+        if quality is None:
+            quality = confidence
         uncertainty = clamp01((1.0 - confidence) * 0.45 + ambiguity * 0.35 + (1.0 - coverage) * 0.2)
         return ConfidenceSignal(
             source=ConfidenceSource.RETRIEVAL,
@@ -121,9 +129,17 @@ class UncertaintyEstimator:
         if confidence is None:
             return None
         evidence = _float_attr(value, "evidence_strength", default=confidence)
+        if evidence is None:
+            evidence = confidence
         relevance = _float_attr(value, "reflection_relevance", default=confidence)
+        if relevance is None:
+            relevance = confidence
         retrieval_support = _float_attr(value, "retrieval_support", default=confidence)
+        if retrieval_support is None:
+            retrieval_support = confidence
         state_support = _float_attr(value, "state_support", default=confidence)
+        if state_support is None:
+            state_support = confidence
         support_gap = 1.0 - ((evidence + relevance + retrieval_support + state_support) / 4.0)
         uncertainty = clamp01((1.0 - confidence) * 0.6 + support_gap * 0.4)
         return ConfidenceSignal(
@@ -150,7 +166,11 @@ class UncertaintyEstimator:
         if confidence is None:
             return None
         dissonance = _float_attr(value, "dissonance_score", default=0.0)
+        if dissonance is None:
+            dissonance = 0.0
         salience = _float_attr(value, "salience_score", default=0.0)
+        if salience is None:
+            salience = 0.0
         volatility = _float_from_mapping(getattr(value, "evolution", {}), "volatility", default=0.0)
         uncertainty = clamp01((1.0 - confidence) * 0.45 + dissonance * 0.35 + volatility * 0.15 + salience * 0.05)
         trend = ConfidenceTrend.DEGRADING if dissonance >= 0.6 or volatility >= 0.6 else ConfidenceTrend.STABLE
@@ -183,8 +203,13 @@ class UncertaintyEstimator:
         if confidence is None:
             return None
 
-        uncertainty = _float_attr(evaluation, "uncertainty", default=1.0 - confidence)
+        default_uncertainty = 1.0 - confidence
+        uncertainty = _float_attr(evaluation, "uncertainty", default=default_uncertainty)
+        if uncertainty is None:
+            uncertainty = default_uncertainty
         risk = _float_attr(evaluation, "risk_score", default=uncertainty)
+        if risk is None:
+            risk = uncertainty
         should_replan = bool(getattr(evaluation, "should_replan", False))
         if should_replan:
             uncertainty = clamp01(uncertainty + 0.2)

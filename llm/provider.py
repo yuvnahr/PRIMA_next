@@ -9,21 +9,27 @@ from __future__ import annotations
 
 import os
 from abc import ABC, abstractmethod
-
-try:
-    import requests
-except Exception:  # pragma: no cover - requests may not be installed in some environments
-    requests = None
+from typing import Any
 
 from .llm_types import LLMRequest, LLMResponse
 from .response_parser import parse_generic_response, parse_openai_response
 
+# Safe defaults for optional external modules
+requests: Any = None
 try:
-    # lazy import of config if available
-    from config.settings import get_settings
+    import requests as _requests_module
+    requests = _requests_module
+except Exception:
+    requests = None
+
+# default then attempt to load real settings provider
+def get_settings() -> Any:
+    return None
+try:
+    from config import settings as _settings
+    get_settings = _settings.get_settings
 except Exception:  # pragma: no cover - config may be added separately
-    def get_settings():
-        return None
+    pass
 
 
 class ProviderError(RuntimeError):
@@ -35,7 +41,7 @@ class Provider(ABC):
 
     name: str = "generic"
 
-    def __init__(self, settings=None):
+    def __init__(self, settings: Any | None = None) -> None:
         self.settings = settings or get_settings()
 
     @abstractmethod
@@ -134,7 +140,7 @@ class LocalProvider(OllamaProvider):
 
 
 class ProviderFactory:
-    _map = {
+    _map: dict[str, type[Provider]] = {
         "openai": OpenAIProvider,
         "anthropic": AnthropicProvider,
         "ollama": OllamaProvider,
@@ -142,7 +148,7 @@ class ProviderFactory:
     }
 
     @classmethod
-    def get_provider(cls, name: str, settings=None) -> Provider:
+    def get_provider(cls, name: str, settings: Any | None = None) -> Provider:
         name = (name or "").lower()
         provider_cls = cls._map.get(name)
         if not provider_cls:
