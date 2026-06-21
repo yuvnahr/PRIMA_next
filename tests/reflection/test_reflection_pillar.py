@@ -7,6 +7,7 @@ from reflection.adaptive_reflection_pipeline import AdaptiveReflectionPipeline
 from reflection.failure_classifier import FailureClassifier
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
+from reflection.reflection_engine import ReflectionTriggerWeights
 from reflection.reflection_repository import ReflectionRepository
 from reflection.reflection_signal import ReflectionSignal
 from reflection.reflection_types import FailureType, ReflectionSignalType
@@ -68,6 +69,34 @@ class ReflectionPillarTest(unittest.TestCase):
         self.assertTrue(any(signal.signal_type == ReflectionSignalType.EMOTIONAL_DISSONANCE for signal in result.signals))
         self.assertEqual(len(memory_repository.list()), 1)
         self.assertEqual(result.state_updates["last_failure_type"], FailureType.HALLUCINATION_RISK.value)
+
+    def test_affect_uncertainty_can_trigger_reflection_without_retrieval_pressure(self) -> None:
+        engine = ReflectionEngine()
+        context = ReflectionContext(
+            query="Why did the model hesitate?",
+            affect_confidence=0.08,
+            retrieval_confidence=RetrievalConfidence(0.92, 0.92, 0.92, 0.92),
+            failure_metadata={"reason": "routine workflow reflection checkpoint", "severity": 0.1},
+        )
+
+        result = engine.evaluate(context)
+
+        self.assertTrue(result.should_reflect)
+        self.assertGreaterEqual(result.trigger_score, engine.trigger_threshold)
+        self.assertTrue(any(reason.get("reason") == "affect_uncertainty" and reason.get("triggered") for reason in result.trigger_reasons))
+
+    def test_custom_trigger_weights_are_configurable(self) -> None:
+        engine = ReflectionEngine(trigger_weights=ReflectionTriggerWeights(affect_weight=0.5, retrieval_weight=0.4, contradiction_weight=0.1))
+        context = ReflectionContext(
+            query="Why did the model hesitate?",
+            affect_confidence=0.2,
+            retrieval_confidence=RetrievalConfidence(0.9, 0.9, 0.9, 0.9),
+            failure_metadata={"reason": "routine workflow reflection checkpoint", "severity": 0.1},
+        )
+
+        score = engine.compute_trigger_score(context, ())
+
+        self.assertAlmostEqual(score, 0.44, places=6)
 
     def test_rule_extraction_and_repository(self) -> None:
         repository = ReflectionRepository()

@@ -115,6 +115,8 @@ class PrimaRuntime:
         workflow_errors = tuple(str(error) for error in execution_context.workflow_state.errors)
         return RuntimeResult(
             final_response=str(output.get("text") or execution_context.user_input),
+            prediction_before_reflection=str(output.get("text") or execution_context.user_input),
+            prediction_after_reflection=str(output.get("text") or execution_context.user_input),
             affect_state=(affect_update.profile.to_dict() if (affect_update is not None and hasattr(affect_update, "profile") and hasattr(affect_update.profile, "to_dict")) else {}),
             retrieved_memories=tuple(getattr(retrieval_response, "results", ())),
             memory_notes_created=created_notes,

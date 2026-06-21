@@ -124,6 +124,11 @@ class ReflectionController:
             query=context.user_input,
             retrieved_memories=retrieved_memories,
             retrieval_confidence=retrieval_confidence,
+            affect_confidence=(
+                float(getattr(getattr(context.affect_update, "profile", None), "confidence", 0.5))
+                if context.affect_update is not None
+                else None
+            ),
             cognitive_state=context.cognitive_state,
             emotional_state=context.cognitive_state.emotional_state,
             reflection_history=reflection_history,

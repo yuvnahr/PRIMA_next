@@ -17,6 +17,8 @@ class RuntimeResult:
     reflection_triggered: bool
     confidence_score: float
     latency_ms: float
+    prediction_before_reflection: str = ""
+    prediction_after_reflection: str = ""
     errors: tuple[str, ...] = field(default_factory=tuple)
     reflection_reasons: tuple[dict[str, Any], ...] = field(default_factory=tuple)
     reflection_before_confidence: float = 0.0
@@ -28,6 +30,8 @@ class RuntimeResult:
         """Serialize the runtime result into JSON-friendly values."""
         return {
             "final_response": self.final_response,
+            "prediction_before_reflection": self.prediction_before_reflection,
+            "prediction_after_reflection": self.prediction_after_reflection,
             "affect_state": dict(self.affect_state),
             "retrieved_memories": [
                 item.note.to_metadata() if hasattr(item, "note") and hasattr(item.note, "to_metadata") else str(item)

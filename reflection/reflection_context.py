@@ -17,6 +17,7 @@ class ReflectionContext:
     query: str
     retrieved_memories: tuple[Any, ...] = ()
     retrieval_confidence: RetrievalConfidence | None = None
+    affect_confidence: float | None = None
     cognitive_state: CognitiveState | None = None
     emotional_state: EmotionalState | None = None
     reflection_history: tuple[str, ...] = ()
