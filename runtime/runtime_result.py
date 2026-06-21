@@ -25,6 +25,7 @@ class RuntimeResult:
     reflection_after_confidence: float = 0.0
     reflection_utility_score: float = 0.0
     correction_count: int = 0
+    memory_admission: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the runtime result into JSON-friendly values."""
@@ -47,6 +48,7 @@ class RuntimeResult:
             "reflection_after_confidence": self.reflection_after_confidence,
             "reflection_utility_score": self.reflection_utility_score,
             "correction_count": self.correction_count,
+            "memory_admission": dict(self.memory_admission),
             "confidence_score": self.confidence_score,
             "latency_ms": self.latency_ms,
             "errors": list(self.errors),

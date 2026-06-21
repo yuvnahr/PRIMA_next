@@ -13,6 +13,7 @@ from evaluation.metrics.confidence_calibration import (
     print_confidence_calibration_report,
 )
 from evaluation.metrics.memory_metrics import memory_growth, retrieval_hit_counts
+from evaluation.metrics.memory_formation import memory_formation_summary, memory_quality_comparison
 from evaluation.metrics.reflection_accuracy import print_reflection_accuracy_report, reflection_accuracy_summary
 from evaluation.metrics.reflection_harm import reflection_harm_summary
 from evaluation.metrics.reflection_metrics import (
@@ -50,6 +51,9 @@ DEFAULT_CONFIDENCE_CALIBRATION_PATH = Path("evaluation/results/confidence_calibr
 DEFAULT_REFLECTION_GOLD_RESULTS_PATH = Path("evaluation/results/reflection_gold_results.json")
 DEFAULT_REFLECTION_OUTCOMES_PATH = Path("evaluation/results/reflection_outcomes.json")
 DEFAULT_REFLECTION_RECOVERY_REPORT_PATH = Path("evaluation/results/reflection_recovery_report.json")
+DEFAULT_MEMORY_ADMISSION_LOG_PATH = Path("evaluation/results/memory_admission_log.json")
+DEFAULT_MEMORY_FORMATION_REPORT_PATH = Path("evaluation/results/memory_formation_report.json")
+DEFAULT_MEMORY_QUALITY_COMPARISON_PATH = Path("evaluation/results/memory_quality_comparison.json")
 
 
 class DatasetRunner:
@@ -68,6 +72,9 @@ class DatasetRunner:
         reflection_gold_results_path: str | Path = DEFAULT_REFLECTION_GOLD_RESULTS_PATH,
         reflection_outcomes_path: str | Path = DEFAULT_REFLECTION_OUTCOMES_PATH,
         reflection_recovery_report_path: str | Path = DEFAULT_REFLECTION_RECOVERY_REPORT_PATH,
+        memory_admission_log_path: str | Path = DEFAULT_MEMORY_ADMISSION_LOG_PATH,
+        memory_formation_report_path: str | Path = DEFAULT_MEMORY_FORMATION_REPORT_PATH,
+        memory_quality_comparison_path: str | Path = DEFAULT_MEMORY_QUALITY_COMPARISON_PATH,
     ) -> None:
         self.runtime = runtime or PrimaRuntime()
         self.dataset_path = Path(dataset_path)
@@ -80,6 +87,9 @@ class DatasetRunner:
         self.reflection_gold_results_path = Path(reflection_gold_results_path)
         self.reflection_outcomes_path = Path(reflection_outcomes_path)
         self.reflection_recovery_report_path = Path(reflection_recovery_report_path)
+        self.memory_admission_log_path = Path(memory_admission_log_path)
+        self.memory_formation_report_path = Path(memory_formation_report_path)
+        self.memory_quality_comparison_path = Path(memory_quality_comparison_path)
         self._affect_engine = DynamicAffectEngine()
         self._reflection_engine = ReflectionEngine()
 
@@ -101,6 +111,7 @@ class DatasetRunner:
             try:
                 result = self.runtime.process(query)
                 affect_state = result.affect_state
+                admission = result.memory_admission
                 record = {
                     "query": query,
                     "emotion": str(affect_state.get("dominant_emotion", "neutral")),
@@ -114,6 +125,14 @@ class DatasetRunner:
                     "reflection_utility_score": result.reflection_utility_score,
                     "correction_count": result.correction_count,
                     "memory_created": len(result.memory_notes_created) > 0,
+                    "memory_importance_novelty": float(admission.get("novelty", 0.0)),
+                    "memory_importance_salience": float(admission.get("emotion", 0.0)),
+                    "memory_importance_relevance": float(admission.get("relevance", 0.0)),
+                    "memory_importance_recurrence": float(admission.get("recurrence", 0.0)),
+                    "memory_importance_reflection": float(admission.get("reflection", 0.0)),
+                    "memory_importance_total": float(admission.get("total_score", 0.0)),
+                    "memory_importance_threshold": float(admission.get("threshold", 0.55)),
+                    "memory_admission_reason": str(admission.get("reason", "")),
                     "retrieval_count": len(result.retrieved_memories),
                     "latency_ms": result.latency_ms,
                     "valence": float(affect_state.get("valence", 0.0)),
@@ -153,6 +172,9 @@ class DatasetRunner:
         self._write_reflection_change_report(records)
         self._write_reflection_accuracy(records)
         self._write_confidence_calibration(records)
+        self._write_memory_admission_log(records)
+        self._write_memory_formation_report(records)
+        self._write_memory_quality_comparison(records)
         self._write_metrics(records)
         return records
 
@@ -255,6 +277,7 @@ class DatasetRunner:
             "memory": {
                 "retrieval_hit_counts": retrieval_hit_counts(records),
                 "memory_growth": memory_growth(records),
+                "formation": memory_formation_summary(records),
             },
             "reflection": {
                 "trigger_frequency": trigger_frequency(records),
@@ -294,6 +317,37 @@ class DatasetRunner:
         self.confidence_calibration_path.parent.mkdir(parents=True, exist_ok=True)
         self.confidence_calibration_path.write_text(
             json.dumps(confidence_calibration_summary(records), indent=2),
+            encoding="utf-8",
+        )
+
+    def _write_memory_admission_log(self, records: list[dict[str, Any]]) -> None:
+        self.memory_admission_log_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = [
+            {
+                "query": str(record.get("query", "")),
+                "novelty": float(record.get("memory_importance_novelty", 0.0)),
+                "emotion": float(record.get("memory_importance_salience", 0.0)),
+                "relevance": float(record.get("memory_importance_relevance", 0.0)),
+                "recurrence": float(record.get("memory_importance_recurrence", 0.0)),
+                "reflection": float(record.get("memory_importance_reflection", 0.0)),
+                "total_score": float(record.get("memory_importance_total", 0.0)),
+                "stored": bool(record.get("memory_created", False)),
+            }
+            for record in records
+        ]
+        self.memory_admission_log_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    def _write_memory_formation_report(self, records: list[dict[str, Any]]) -> None:
+        self.memory_formation_report_path.parent.mkdir(parents=True, exist_ok=True)
+        self.memory_formation_report_path.write_text(
+            json.dumps(memory_formation_summary(records), indent=2),
+            encoding="utf-8",
+        )
+
+    def _write_memory_quality_comparison(self, records: list[dict[str, Any]]) -> None:
+        self.memory_quality_comparison_path.parent.mkdir(parents=True, exist_ok=True)
+        self.memory_quality_comparison_path.write_text(
+            json.dumps(memory_quality_comparison(records), indent=2),
             encoding="utf-8",
         )
 

@@ -1,0 +1,11 @@
+{
+  "total_interactions": 100,
+  "stored_memories": 20,
+  "rejected_memories": 80,
+  "memory_creation_rate": 0.2,
+  "memory_rejection_rate": 0.8,
+  "average_importance_score": 0.504839,
+  "average_novelty": 0.823549,
+  "average_salience": 0.429786,
+  "importance_retention_correlation": 0.721195
+}

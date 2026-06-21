@@ -1,96 +1,802 @@
 [
   {
-    "query": "Who was Milhouse named after?",
-    "reflection_triggered": true,
-    "reasons": [
-      {
-        "reason": "low_confidence",
-        "confidence": 0.0,
-        "threshold": 0.3,
-        "triggered": true,
-        "audit_sample": false
-      },
-      {
-        "reason": "tool_failure",
-        "confidence": 0.6525,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "contradiction",
-        "confidence": 0.6525,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "hallucination",
-        "confidence": 0.6525,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "constraint_violation",
-        "confidence": 0.6525,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "retrieval_ambiguity",
-        "confidence": 0.6525,
-        "threshold": 0.52,
-        "triggered": true
-      }
-    ],
+    "query": "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
+    "before_prediction": "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
+    "after_prediction": "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
     "before_confidence": 0.2275,
     "after_confidence": 0.5975,
-    "utility_score": 0.37,
-    "correction_count": 1
+    "changed": false
   },
   {
-    "query": "Who was Milhouse named after?",
-    "reflection_triggered": false,
-    "reasons": [
-      {
-        "reason": "low_confidence",
-        "confidence": 0.6875,
-        "threshold": 0.3,
-        "triggered": false,
-        "audit_sample": false
-      },
-      {
-        "reason": "tool_failure",
-        "confidence": 0.183125,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "contradiction",
-        "confidence": 0.183125,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "hallucination",
-        "confidence": 0.183125,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "constraint_violation",
-        "confidence": 0.183125,
-        "threshold": 0.52,
-        "triggered": false
-      },
-      {
-        "reason": "retrieval_ambiguity",
-        "confidence": 0.183125,
-        "threshold": 0.52,
-        "triggered": false
-      }
-    ],
-    "before_confidence": 0.674375,
-    "after_confidence": 0.674375,
-    "utility_score": 0.0,
-    "correction_count": 0
+    "query": "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+    "before_prediction": "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+    "after_prediction": "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+    "before_confidence": 0.346846,
+    "after_confidence": 0.691708,
+    "changed": false
+  },
+  {
+    "query": "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+    "before_prediction": "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+    "after_prediction": "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+    "before_confidence": 0.396761,
+    "after_confidence": 0.396761,
+    "changed": false
+  },
+  {
+    "query": "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+    "before_prediction": "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+    "after_prediction": "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+    "before_confidence": 0.358283,
+    "after_confidence": 0.358283,
+    "changed": false
+  },
+  {
+    "query": "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+    "before_prediction": "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+    "after_prediction": "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+    "before_confidence": 0.475227,
+    "after_confidence": 0.788001,
+    "changed": false
+  },
+  {
+    "query": "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+    "before_prediction": "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+    "after_prediction": "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+    "before_confidence": 0.394141,
+    "after_confidence": 0.835955,
+    "changed": false
+  },
+  {
+    "query": "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+    "before_prediction": "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+    "after_prediction": "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+    "before_confidence": 0.483969,
+    "after_confidence": 0.856685,
+    "changed": false
+  },
+  {
+    "query": "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+    "before_prediction": "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+    "after_prediction": "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+    "before_confidence": 0.430763,
+    "after_confidence": 0.844407,
+    "changed": false
+  },
+  {
+    "query": "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+    "before_prediction": "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+    "after_prediction": "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+    "before_confidence": 0.451543,
+    "after_confidence": 0.849202,
+    "changed": false
+  },
+  {
+    "query": "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+    "before_prediction": "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+    "after_prediction": "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+    "before_confidence": 0.422993,
+    "after_confidence": 0.842614,
+    "changed": false
+  },
+  {
+    "query": "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+    "before_prediction": "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+    "after_prediction": "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+    "before_confidence": 0.471781,
+    "after_confidence": 0.853873,
+    "changed": false
+  },
+  {
+    "query": "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+    "before_prediction": "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+    "after_prediction": "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+    "before_confidence": 0.444292,
+    "after_confidence": 0.847529,
+    "changed": false
+  },
+  {
+    "query": "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+    "before_prediction": "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+    "after_prediction": "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+    "before_confidence": 0.466552,
+    "after_confidence": 0.852666,
+    "changed": false
+  },
+  {
+    "query": "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+    "before_prediction": "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+    "after_prediction": "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+    "before_confidence": 0.496588,
+    "after_confidence": 0.496588,
+    "changed": false
+  },
+  {
+    "query": "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+    "before_prediction": "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+    "after_prediction": "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+    "before_confidence": 0.500287,
+    "after_confidence": 0.860451,
+    "changed": false
+  },
+  {
+    "query": "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+    "before_prediction": "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+    "after_prediction": "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+    "before_confidence": 0.476526,
+    "after_confidence": 0.854968,
+    "changed": false
+  },
+  {
+    "query": "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn't arrived yet.",
+    "before_prediction": "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn't arrived yet.",
+    "after_prediction": "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn't arrived yet.",
+    "before_confidence": 0.521381,
+    "after_confidence": 0.865319,
+    "changed": false
+  },
+  {
+    "query": "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+    "before_prediction": "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+    "after_prediction": "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+    "before_confidence": 0.482039,
+    "after_confidence": 0.85624,
+    "changed": false
+  },
+  {
+    "query": "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+    "before_prediction": "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+    "after_prediction": "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+    "before_confidence": 0.52072,
+    "after_confidence": 0.865166,
+    "changed": false
+  },
+  {
+    "query": "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+    "before_prediction": "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+    "after_prediction": "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+    "before_confidence": 0.481985,
+    "after_confidence": 0.856227,
+    "changed": false
+  },
+  {
+    "query": "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+    "before_prediction": "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+    "after_prediction": "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+    "before_confidence": 0.475533,
+    "after_confidence": 0.854738,
+    "changed": false
+  },
+  {
+    "query": "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+    "before_prediction": "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+    "after_prediction": "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+    "before_confidence": 0.497912,
+    "after_confidence": 0.859903,
+    "changed": false
+  },
+  {
+    "query": "Trying to coordinate my left hand's finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+    "before_prediction": "Trying to coordinate my left hand's finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+    "after_prediction": "Trying to coordinate my left hand's finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+    "before_confidence": 0.501349,
+    "after_confidence": 0.860696,
+    "changed": false
+  },
+  {
+    "query": "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+    "before_prediction": "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+    "after_prediction": "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+    "before_confidence": 0.496401,
+    "after_confidence": 0.859554,
+    "changed": false
+  },
+  {
+    "query": "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+    "before_prediction": "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+    "after_prediction": "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+    "before_confidence": 0.530728,
+    "after_confidence": 0.867476,
+    "changed": false
+  },
+  {
+    "query": "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+    "before_prediction": "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+    "after_prediction": "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+    "before_confidence": 0.510709,
+    "after_confidence": 0.510709,
+    "changed": false
+  },
+  {
+    "query": "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+    "before_prediction": "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+    "after_prediction": "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+    "before_confidence": 0.509241,
+    "after_confidence": 0.862517,
+    "changed": false
+  },
+  {
+    "query": "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+    "before_prediction": "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+    "after_prediction": "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+    "before_confidence": 0.481975,
+    "after_confidence": 0.856225,
+    "changed": false
+  },
+  {
+    "query": "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+    "before_prediction": "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+    "after_prediction": "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+    "before_confidence": 0.485917,
+    "after_confidence": 0.857135,
+    "changed": false
+  },
+  {
+    "query": "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+    "before_prediction": "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+    "after_prediction": "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+    "before_confidence": 0.488539,
+    "after_confidence": 0.85774,
+    "changed": false
+  },
+  {
+    "query": "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+    "before_prediction": "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+    "after_prediction": "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+    "before_confidence": 0.498901,
+    "after_confidence": 0.860131,
+    "changed": false
+  },
+  {
+    "query": "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+    "before_prediction": "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+    "after_prediction": "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+    "before_confidence": 0.514235,
+    "after_confidence": 0.86367,
+    "changed": false
+  },
+  {
+    "query": "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+    "before_prediction": "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+    "after_prediction": "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+    "before_confidence": 0.509962,
+    "after_confidence": 0.862684,
+    "changed": false
+  },
+  {
+    "query": "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+    "before_prediction": "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+    "after_prediction": "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+    "before_confidence": 0.507465,
+    "after_confidence": 0.507465,
+    "changed": false
+  },
+  {
+    "query": "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+    "before_prediction": "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+    "after_prediction": "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+    "before_confidence": 0.50036,
+    "after_confidence": 0.860468,
+    "changed": false
+  },
+  {
+    "query": "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+    "before_prediction": "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+    "after_prediction": "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+    "before_confidence": 0.481859,
+    "after_confidence": 0.481859,
+    "changed": false
+  },
+  {
+    "query": "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+    "before_prediction": "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+    "after_prediction": "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+    "before_confidence": 0.476892,
+    "after_confidence": 0.855052,
+    "changed": false
+  },
+  {
+    "query": "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+    "before_prediction": "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+    "after_prediction": "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+    "before_confidence": 0.490408,
+    "after_confidence": 0.858171,
+    "changed": false
+  },
+  {
+    "query": "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+    "before_prediction": "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+    "after_prediction": "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+    "before_confidence": 0.494463,
+    "after_confidence": 0.859107,
+    "changed": false
+  },
+  {
+    "query": "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+    "before_prediction": "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+    "after_prediction": "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+    "before_confidence": 0.473108,
+    "after_confidence": 0.473108,
+    "changed": false
+  },
+  {
+    "query": "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+    "before_prediction": "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+    "after_prediction": "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+    "before_confidence": 0.474646,
+    "after_confidence": 0.474646,
+    "changed": false
+  },
+  {
+    "query": "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+    "before_prediction": "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+    "after_prediction": "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+    "before_confidence": 0.48152,
+    "after_confidence": 0.85612,
+    "changed": false
+  },
+  {
+    "query": "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+    "before_prediction": "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+    "after_prediction": "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+    "before_confidence": 0.510668,
+    "after_confidence": 0.862846,
+    "changed": false
+  },
+  {
+    "query": "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+    "before_prediction": "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+    "after_prediction": "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+    "before_confidence": 0.454916,
+    "after_confidence": 0.454916,
+    "changed": false
+  },
+  {
+    "query": "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+    "before_prediction": "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+    "after_prediction": "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+    "before_confidence": 0.484687,
+    "after_confidence": 0.856851,
+    "changed": false
+  },
+  {
+    "query": "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+    "before_prediction": "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+    "after_prediction": "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+    "before_confidence": 0.496735,
+    "after_confidence": 0.859631,
+    "changed": false
+  },
+  {
+    "query": "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+    "before_prediction": "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+    "after_prediction": "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+    "before_confidence": 0.451667,
+    "after_confidence": 0.849231,
+    "changed": false
+  },
+  {
+    "query": "I had to aggressively apologize for my neighbor's loud lawnmower echoing through my microphone during a high-stakes client call.",
+    "before_prediction": "I had to aggressively apologize for my neighbor's loud lawnmower echoing through my microphone during a high-stakes client call.",
+    "after_prediction": "I had to aggressively apologize for my neighbor's loud lawnmower echoing through my microphone during a high-stakes client call.",
+    "before_confidence": 0.451554,
+    "after_confidence": 0.849205,
+    "changed": false
+  },
+  {
+    "query": "Closing my laptop screen at exactly five o'clock feels like a triumphant mental boundary that allows me to finally decompress.",
+    "before_prediction": "Closing my laptop screen at exactly five o'clock feels like a triumphant mental boundary that allows me to finally decompress.",
+    "after_prediction": "Closing my laptop screen at exactly five o'clock feels like a triumphant mental boundary that allows me to finally decompress.",
+    "before_confidence": 0.480474,
+    "after_confidence": 0.855879,
+    "changed": false
+  },
+  {
+    "query": "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+    "before_prediction": "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+    "after_prediction": "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+    "before_confidence": 0.475759,
+    "after_confidence": 0.854791,
+    "changed": false
+  },
+  {
+    "query": "I sprinted through the rain only to see the subway doors close right in my face today.",
+    "before_prediction": "I sprinted through the rain only to see the subway doors close right in my face today.",
+    "after_prediction": "I sprinted through the rain only to see the subway doors close right in my face today.",
+    "before_confidence": 0.485393,
+    "after_confidence": 0.857014,
+    "changed": false
+  },
+  {
+    "query": "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+    "before_prediction": "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+    "after_prediction": "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+    "before_confidence": 0.467676,
+    "after_confidence": 0.467676,
+    "changed": false
+  },
+  {
+    "query": "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+    "before_prediction": "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+    "after_prediction": "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+    "before_confidence": 0.486616,
+    "after_confidence": 0.857296,
+    "changed": false
+  },
+  {
+    "query": "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+    "before_prediction": "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+    "after_prediction": "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+    "before_confidence": 0.468959,
+    "after_confidence": 0.853221,
+    "changed": false
+  },
+  {
+    "query": "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+    "before_prediction": "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+    "after_prediction": "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+    "before_confidence": 0.482258,
+    "after_confidence": 0.85629,
+    "changed": false
+  },
+  {
+    "query": "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+    "before_prediction": "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+    "after_prediction": "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+    "before_confidence": 0.454044,
+    "after_confidence": 0.849779,
+    "changed": false
+  },
+  {
+    "query": "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+    "before_prediction": "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+    "after_prediction": "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+    "before_confidence": 0.456126,
+    "after_confidence": 0.85026,
+    "changed": false
+  },
+  {
+    "query": "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+    "before_prediction": "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+    "after_prediction": "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+    "before_confidence": 0.484263,
+    "after_confidence": 0.856753,
+    "changed": false
+  },
+  {
+    "query": "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+    "before_prediction": "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+    "after_prediction": "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+    "before_confidence": 0.490798,
+    "after_confidence": 0.858261,
+    "changed": false
+  },
+  {
+    "query": "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+    "before_prediction": "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+    "after_prediction": "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+    "before_confidence": 0.454013,
+    "after_confidence": 0.849772,
+    "changed": false
+  },
+  {
+    "query": "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+    "before_prediction": "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+    "after_prediction": "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+    "before_confidence": 0.456656,
+    "after_confidence": 0.850382,
+    "changed": false
+  },
+  {
+    "query": "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+    "before_prediction": "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+    "after_prediction": "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+    "before_confidence": 0.482569,
+    "after_confidence": 0.856362,
+    "changed": false
+  },
+  {
+    "query": "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+    "before_prediction": "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+    "after_prediction": "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+    "before_confidence": 0.495052,
+    "after_confidence": 0.495052,
+    "changed": false
+  },
+  {
+    "query": "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+    "before_prediction": "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+    "after_prediction": "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+    "before_confidence": 0.479966,
+    "after_confidence": 0.855761,
+    "changed": false
+  },
+  {
+    "query": "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+    "before_prediction": "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+    "after_prediction": "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+    "before_confidence": 0.482257,
+    "after_confidence": 0.85629,
+    "changed": false
+  },
+  {
+    "query": "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+    "before_prediction": "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+    "after_prediction": "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+    "before_confidence": 0.454927,
+    "after_confidence": 0.849983,
+    "changed": false
+  },
+  {
+    "query": "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+    "before_prediction": "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+    "after_prediction": "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+    "before_confidence": 0.453265,
+    "after_confidence": 0.8496,
+    "changed": false
+  },
+  {
+    "query": "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+    "before_prediction": "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+    "after_prediction": "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+    "before_confidence": 0.483102,
+    "after_confidence": 0.856485,
+    "changed": false
+  },
+  {
+    "query": "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+    "before_prediction": "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+    "after_prediction": "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+    "before_confidence": 0.478752,
+    "after_confidence": 0.855481,
+    "changed": false
+  },
+  {
+    "query": "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+    "before_prediction": "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+    "after_prediction": "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+    "before_confidence": 0.480498,
+    "after_confidence": 0.855884,
+    "changed": false
+  },
+  {
+    "query": "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+    "before_prediction": "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+    "after_prediction": "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+    "before_confidence": 0.484271,
+    "after_confidence": 0.856755,
+    "changed": false
+  },
+  {
+    "query": "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+    "before_prediction": "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+    "after_prediction": "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+    "before_confidence": 0.484134,
+    "after_confidence": 0.856723,
+    "changed": false
+  },
+  {
+    "query": "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+    "before_prediction": "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+    "after_prediction": "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+    "before_confidence": 0.458905,
+    "after_confidence": 0.458905,
+    "changed": false
+  },
+  {
+    "query": "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+    "before_prediction": "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+    "after_prediction": "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+    "before_confidence": 0.443625,
+    "after_confidence": 0.847375,
+    "changed": false
+  },
+  {
+    "query": "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+    "before_prediction": "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+    "after_prediction": "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+    "before_confidence": 0.449486,
+    "after_confidence": 0.449486,
+    "changed": false
+  },
+  {
+    "query": "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+    "before_prediction": "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+    "after_prediction": "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+    "before_confidence": 0.467479,
+    "after_confidence": 0.85288,
+    "changed": false
+  },
+  {
+    "query": "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+    "before_prediction": "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+    "after_prediction": "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+    "before_confidence": 0.456442,
+    "after_confidence": 0.850333,
+    "changed": false
+  },
+  {
+    "query": "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+    "before_prediction": "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+    "after_prediction": "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+    "before_confidence": 0.454254,
+    "after_confidence": 0.454254,
+    "changed": false
+  },
+  {
+    "query": "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+    "before_prediction": "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+    "after_prediction": "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+    "before_confidence": 0.465113,
+    "after_confidence": 0.465113,
+    "changed": false
+  },
+  {
+    "query": "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+    "before_prediction": "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+    "after_prediction": "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+    "before_confidence": 0.459701,
+    "after_confidence": 0.851085,
+    "changed": false
+  },
+  {
+    "query": "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+    "before_prediction": "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+    "after_prediction": "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+    "before_confidence": 0.458895,
+    "after_confidence": 0.458895,
+    "changed": false
+  },
+  {
+    "query": "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+    "before_prediction": "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+    "after_prediction": "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+    "before_confidence": 0.457081,
+    "after_confidence": 0.85048,
+    "changed": false
+  },
+  {
+    "query": "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+    "before_prediction": "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+    "after_prediction": "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+    "before_confidence": 0.453035,
+    "after_confidence": 0.849547,
+    "changed": false
+  },
+  {
+    "query": "Convincing everyone to park three blocks away so she wouldn't recognize their cars took a lot of careful coordination.",
+    "before_prediction": "Convincing everyone to park three blocks away so she wouldn't recognize their cars took a lot of careful coordination.",
+    "after_prediction": "Convincing everyone to park three blocks away so she wouldn't recognize their cars took a lot of careful coordination.",
+    "before_confidence": 0.465061,
+    "after_confidence": 0.852322,
+    "changed": false
+  },
+  {
+    "query": "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+    "before_prediction": "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+    "after_prediction": "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+    "before_confidence": 0.467744,
+    "after_confidence": 0.852941,
+    "changed": false
+  },
+  {
+    "query": "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+    "before_prediction": "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+    "after_prediction": "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+    "before_confidence": 0.484614,
+    "after_confidence": 0.856834,
+    "changed": false
+  },
+  {
+    "query": "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+    "before_prediction": "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+    "after_prediction": "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+    "before_confidence": 0.478072,
+    "after_confidence": 0.478072,
+    "changed": false
+  },
+  {
+    "query": "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+    "before_prediction": "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+    "after_prediction": "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+    "before_confidence": 0.480646,
+    "after_confidence": 0.855918,
+    "changed": false
+  },
+  {
+    "query": "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+    "before_prediction": "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+    "after_prediction": "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+    "before_confidence": 0.456578,
+    "after_confidence": 0.456578,
+    "changed": false
+  },
+  {
+    "query": "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+    "before_prediction": "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+    "after_prediction": "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+    "before_confidence": 0.454213,
+    "after_confidence": 0.454213,
+    "changed": false
+  },
+  {
+    "query": "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+    "before_prediction": "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+    "after_prediction": "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+    "before_confidence": 0.45445,
+    "after_confidence": 0.849873,
+    "changed": false
+  },
+  {
+    "query": "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+    "before_prediction": "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+    "after_prediction": "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+    "before_confidence": 0.465988,
+    "after_confidence": 0.852536,
+    "changed": false
+  },
+  {
+    "query": "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+    "before_prediction": "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+    "after_prediction": "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+    "before_confidence": 0.47046,
+    "after_confidence": 0.47046,
+    "changed": false
+  },
+  {
+    "query": "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+    "before_prediction": "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+    "after_prediction": "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+    "before_confidence": 0.456044,
+    "after_confidence": 0.850241,
+    "changed": false
+  },
+  {
+    "query": "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+    "before_prediction": "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+    "after_prediction": "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+    "before_confidence": 0.463473,
+    "after_confidence": 0.851955,
+    "changed": false
+  },
+  {
+    "query": "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+    "before_prediction": "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+    "after_prediction": "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+    "before_confidence": 0.453583,
+    "after_confidence": 0.849673,
+    "changed": false
+  },
+  {
+    "query": "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+    "before_prediction": "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+    "after_prediction": "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+    "before_confidence": 0.453367,
+    "after_confidence": 0.849623,
+    "changed": false
+  },
+  {
+    "query": "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+    "before_prediction": "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+    "after_prediction": "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+    "before_confidence": 0.467805,
+    "after_confidence": 0.852955,
+    "changed": false
+  },
+  {
+    "query": "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+    "before_prediction": "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+    "after_prediction": "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+    "before_confidence": 0.465544,
+    "after_confidence": 0.465544,
+    "changed": false
+  },
+  {
+    "query": "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+    "before_prediction": "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+    "after_prediction": "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+    "before_confidence": 0.46658,
+    "after_confidence": 0.852672,
+    "changed": false
   }
 ]

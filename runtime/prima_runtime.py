@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 from affect.affect_engine import DynamicAffectEngine
+from memory.maintenance.memory_importance import MemoryImportanceEngine
+from memory.maintenance.importance_types import MemoryAdmissionDecision
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
@@ -36,6 +38,7 @@ class PrimaRuntime:
         self.memory_repository = memory_repository or InMemoryMemoryRepository()
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
+        self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=RetrievalController(self.memory_repository),
@@ -61,14 +64,15 @@ class PrimaRuntime:
 
         try:
             execution_context = await self.workflow.run(user_input, execution_context)
-            created_notes = self._persist_turn_memory(user_input, execution_context)
+            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context)
         except Exception as exc:
             errors.append(str(exc))
             execution_context.workflow_state.errors.append(str(exc))
             created_notes = ()
+            admission_decision = None
 
         latency_ms = round((time.perf_counter() - start) * 1000, 3)
-        result = self._build_result(execution_context, created_notes, latency_ms, tuple(errors))
+        result = self._build_result(execution_context, created_notes, latency_ms, tuple(errors), admission_decision)
         metrics = self.metrics_from_result(result, execution_context)
         self._update_runtime_context(runtime_context, execution_context, result)
         self._log_turn(user_input, result, metrics)
@@ -88,7 +92,18 @@ class PrimaRuntime:
             planning_success=plan is not None and plan_status not in {"failed", None},
         )
 
-    def _persist_turn_memory(self, user_input: str, execution_context: ExecutionContext) -> tuple[MemoryNote, ...]:
+    def _persist_turn_memory(
+        self,
+        user_input: str,
+        execution_context: ExecutionContext,
+    ) -> tuple[tuple[MemoryNote, ...], MemoryAdmissionDecision]:
+        admission_decision = self.memory_importance_engine.decide(
+            user_input,
+            affect_update=execution_context.affect_update,
+            reflection_result=execution_context.reflection_result,
+        )
+        if not admission_decision.stored:
+            return (), admission_decision
         affect_update = execution_context.affect_update
         note = MemoryNote.create(
             content=user_input,
@@ -98,7 +113,7 @@ class PrimaRuntime:
             state_snapshot=getattr(execution_context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
         )
-        return (self.memory_repository.add(note),)
+        return (self.memory_repository.add(note),), admission_decision
 
     def _build_result(
         self,
@@ -106,6 +121,7 @@ class PrimaRuntime:
         created_notes: tuple[MemoryNote, ...],
         latency_ms: float,
         errors: tuple[str, ...],
+        admission_decision: MemoryAdmissionDecision | None = None,
     ) -> RuntimeResult:
         affect_update = execution_context.affect_update
         retrieval_response = execution_context.retrieval_response
@@ -129,6 +145,7 @@ class PrimaRuntime:
             reflection_after_confidence=float(getattr(reflection_result, "after_confidence", 0.0) or 0.0),
             reflection_utility_score=float(getattr(reflection_result, "utility_score", 0.0) or 0.0),
             correction_count=1 if bool(getattr(reflection_result, "correction_applied", False)) else 0,
+            memory_admission=admission_decision.to_log_record() if admission_decision is not None else {},
         )
 
     def _confidence_score(self, execution_context: ExecutionContext) -> float:

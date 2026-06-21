@@ -1,0 +1,8 @@
+threshold: 0.55
+top_k: 5
+weights:
+  novelty: 0.35
+  emotional_salience: 0.25
+  user_relevance: 0.15
+  recurrence: 0.15
+  reflection: 0.10

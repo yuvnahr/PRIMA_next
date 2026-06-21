@@ -23,7 +23,8 @@ def test_runtime_updates_affect_retrieval_planning_and_memory() -> None:
 
     assert result.affect_state["dominant_emotion"]
     assert isinstance(result.retrieved_memories, tuple)
-    assert len(result.memory_notes_created) == 1
+    assert "total_score" in result.memory_admission
+    assert len(result.memory_notes_created) in {0, 1}
     assert result.confidence_score >= 0.0
 
 
