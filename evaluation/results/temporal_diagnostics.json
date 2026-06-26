@@ -1,0 +1,1813 @@
+{
+  "temporal_query_count": 30,
+  "temporal_metrics": {
+    "recall_at_1": 0.042778,
+    "recall_at_3": 0.049444,
+    "recall_at_5": 0.066111,
+    "mrr": 0.133333,
+    "ndcg_at_5": 0.07669,
+    "hit_rate": 0.133333,
+    "average_retrieval_latency": 0.0,
+    "average_retrieved_memory_count": 5.0
+  },
+  "ordering_failures": [
+    {
+      "query": "What recent Monday update mentioned tomato seedlings needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_061",
+        "sem_065",
+        "sem_064",
+        "sem_068",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_061",
+          "score": 0.4894641826871401,
+          "strategy_scores": {
+            "dense": 0.8630945512476009,
+            "sparse": 0.4,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.2309756212971411,
+          "strategy_scores": {
+            "dense": 0.8946761849917051,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.21157137005659532,
+          "strategy_scores": {
+            "dense": 0.7599381659686957,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.21064907249658565,
+          "strategy_scores": {
+            "dense": 0.9669466121700852,
+            "temporal": 0.2983870967742201,
+            "graph": 0.3576837099365088
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.17373266158409081,
+          "strategy_scores": {
+            "dense": 0.9485403245391026,
+            "temporal": 0.3145161290322543,
+            "graph": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent Saturday update mentioned orchid roots needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_066",
+        "sem_064",
+        "sem_072",
+        "sem_069",
+        "sem_068"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_066",
+          "score": 0.42580580332312207,
+          "strategy_scores": {
+            "dense": 0.8956946027993273,
+            "sparse": 0.4,
+            "temporal": 0.3145161290322296
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23684053352521095,
+          "strategy_scores": {
+            "dense": 0.9283992557594655,
+            "temporal": 0.9758064516129115
+          }
+        },
+        {
+          "memory_id": "sem_072",
+          "score": 0.195751566659042,
+          "strategy_scores": {
+            "dense": 0.9849331146226797,
+            "temporal": 0.2661290322580525,
+            "graph": 0.2139869623983479
+          }
+        },
+        {
+          "memory_id": "sem_069",
+          "score": 0.16896271228418175,
+          "strategy_scores": {
+            "dense": 0.9328696947977843,
+            "temporal": 0.29032258064514105
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.16839487506492395,
+          "strategy_scores": {
+            "dense": 0.9237077692500286,
+            "temporal": 0.2983870967741967
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent Sunday update mentioned lavender bed needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_067",
+        "sem_088",
+        "sem_079",
+        "sem_080",
+        "sem_062"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_067",
+          "score": 0.4184978401226319,
+          "strategy_scores": {
+            "dense": 0.8523511922154139,
+            "sparse": 0.4,
+            "temporal": 0.306451612903198
+          }
+        },
+        {
+          "memory_id": "sem_088",
+          "score": 0.3635976511528462,
+          "strategy_scores": {
+            "dense": 0.5992531582233168,
+            "sparse": 0.4,
+            "temporal": 0.1370967741934864
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.2709677419354836,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2096774193548362,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.15578091596436874,
+          "strategy_scores": {
+            "dense": 0.9041308376119385,
+            "temporal": 0.20161290322577988
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.18854972621453872,
+          "strategy_scores": {
+            "dense": 0.5957078521829623,
+            "temporal": 0.9919354838709437
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent early April update mentioned fern shelf needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_068",
+        "sem_070",
+        "sem_064",
+        "sem_085",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_068",
+          "score": 0.4255031078048607,
+          "strategy_scores": {
+            "dense": 0.9044293208496437,
+            "sparse": 0.4,
+            "temporal": 0.29838709677414166
+          }
+        },
+        {
+          "memory_id": "sem_070",
+          "score": 0.25267062966744075,
+          "strategy_scores": {
+            "dense": 0.9966153901490884,
+            "temporal": 0.2822580645161075,
+            "graph": 0.7495251469346674
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.24255551984780888,
+          "strategy_scores": {
+            "dense": 0.9664991645767862,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_085",
+          "score": 0.15980582879396346,
+          "strategy_scores": {
+            "dense": 0.9578453102393195,
+            "temporal": 0.1612903225806553
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.2268337181423866,
+          "strategy_scores": {
+            "dense": 0.8455581209492439,
+            "temporal": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent late May update mentioned pepper sprouts needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_069",
+        "sem_061",
+        "sem_086",
+        "sem_082",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_069",
+          "score": 0.29291831455477174,
+          "strategy_scores": {
+            "dense": 0.025907043268369095,
+            "sparse": 0.4,
+            "temporal": 0.2903225806451638
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.27644881396582377,
+          "strategy_scores": {
+            "dense": 0.9900319230473007,
+            "temporal": 1.0,
+            "graph": 0.2794402550872868
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.2643262989512255,
+          "strategy_scores": {
+            "dense": 0.9998649782127634,
+            "temporal": 0.153225806451599,
+            "graph": 0.9902397157415113
+          }
+        },
+        {
+          "memory_id": "sem_082",
+          "score": 0.2516138507265796,
+          "strategy_scores": {
+            "dense": 0.9977049348787121,
+            "temporal": 0.18548387096774574,
+            "graph": 0.8340972339799825
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.22767155190775124,
+          "strategy_scores": {
+            "dense": 0.8618963675570309,
+            "temporal": 0.9838709677419658
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent mid June update mentioned sweet pea vines needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_070",
+        "sem_089",
+        "sem_074",
+        "sem_062",
+        "sem_065"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_070",
+          "score": 0.42827026972514676,
+          "strategy_scores": {
+            "dense": 0.9336297551569066,
+            "sparse": 0.4,
+            "temporal": 0.2822580645161075
+          }
+        },
+        {
+          "memory_id": "sem_089",
+          "score": 0.25217487360420754,
+          "strategy_scores": {
+            "dense": 0.9968307822903371,
+            "temporal": 0.12903225806450855,
+            "graph": 0.8974703045420614
+          }
+        },
+        {
+          "memory_id": "sem_074",
+          "score": 0.2489227512550401,
+          "strategy_scores": {
+            "dense": 0.9922966288779632,
+            "temporal": 0.24999999999996078,
+            "graph": 0.7507825692334954
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.2341618228692671,
+          "strategy_scores": {
+            "dense": 0.8997884965478181,
+            "temporal": 0.9919354838709437
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23387433933960533,
+          "strategy_scores": {
+            "dense": 0.9140009719414667,
+            "temporal": 0.9677419354838532
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent first frost week update mentioned cucumber vines needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_071",
+        "sem_080",
+        "sem_062",
+        "sem_064",
+        "sem_073"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_071",
+          "score": 0.4257472412425465,
+          "strategy_scores": {
+            "dense": 0.9221859093589042,
+            "sparse": 0.4,
+            "temporal": 0.27419354838710813
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.26267957474862297,
+          "strategy_scores": {
+            "dense": 0.9985094036156008,
+            "temporal": 0.2016129032258425,
+            "graph": 0.9274187388369859
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24611300867095887,
+          "strategy_scores": {
+            "dense": 0.9794630685590963,
+            "temporal": 0.9919354838709443,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23286937286043763,
+          "strategy_scores": {
+            "dense": 0.9019248513276955,
+            "temporal": 0.975806451612833
+          }
+        },
+        {
+          "memory_id": "sem_073",
+          "score": 0.23559321089990587,
+          "strategy_scores": {
+            "dense": 0.9919882397801412,
+            "temporal": 0.25806451612899683,
+            "graph": 0.6098852331998501
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent monsoon morning update mentioned mint cuttings needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "2"
+      ],
+      "retrieved_memory_ids": [
+        "sem_072",
+        "sem_064",
+        "sem_079",
+        "sem_084",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_072",
+          "score": 0.3216279504584055,
+          "strategy_scores": {
+            "dense": 0.23343364821732077,
+            "sparse": 0.4,
+            "temporal": 0.2661290322580734
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.3284702381314614,
+          "strategy_scores": {
+            "dense": 0.9961895536123547,
+            "temporal": 0.9758064516129096,
+            "graph": 0.8146115992831726
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.15678884727735903,
+          "strategy_scores": {
+            "dense": 0.9054740356125027,
+            "temporal": 0.2096774193548362
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.26693548387096333,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.16935483870963314,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24621286130900974,
+          "strategy_scores": {
+            "dense": 0.9747524087267316,
+            "temporal": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent winter evening update mentioned dahlia tubers needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "3"
+      ],
+      "retrieved_memory_ids": [
+        "sem_073",
+        "sem_068",
+        "sem_063",
+        "sem_065",
+        "sem_062"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_073",
+          "score": 0.42620028567233237,
+          "strategy_scores": {
+            "dense": 0.935958893729499,
+            "sparse": 0.4,
+            "temporal": 0.25806451612907527
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.2788584303600681,
+          "strategy_scores": {
+            "dense": 0.9997889928257824,
+            "temporal": 0.2983870967741967,
+            "graph": 0.9905137175878108
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.2698612272210742,
+          "strategy_scores": {
+            "dense": 0.9830971422694582,
+            "temporal": 0.9838709677418886,
+            "graph": 0.24009559106466574
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23970967853611025,
+          "strategy_scores": {
+            "dense": 0.9529032332514977,
+            "temporal": 0.9677419354838558
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.23071690039454174,
+          "strategy_scores": {
+            "dense": 0.8768223467163153,
+            "temporal": 0.9919354838709443
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent spring equinox update mentioned aloe pups needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "4"
+      ],
+      "retrieved_memory_ids": [
+        "sem_074",
+        "sem_078",
+        "sem_084",
+        "sem_065",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_074",
+          "score": 0.43073536671119805,
+          "strategy_scores": {
+            "dense": 0.9715691114079608,
+            "sparse": 0.4,
+            "temporal": 0.2500000000000392,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.2717741935483893,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.21774193548389248,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.2429703098717343,
+          "strategy_scores": {
+            "dense": 0.9934651744261753,
+            "temporal": 0.16935483870971157,
+            "graph": 0.7701504983683686
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.2393816506949019,
+          "strategy_scores": {
+            "dense": 0.9507163809767247,
+            "temporal": 0.9677419354839317
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23449980117839436,
+          "strategy_scores": {
+            "dense": 0.9127943734473561,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent harvest day update mentioned jasmine trellis needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "5"
+      ],
+      "retrieved_memory_ids": [
+        "sem_075",
+        "sem_072",
+        "sem_076",
+        "sem_086",
+        "sem_083"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_075",
+          "score": 0.3455567589504827,
+          "strategy_scores": {
+            "dense": 0.4090880704225626,
+            "sparse": 0.4,
+            "temporal": 0.24193548387098293
+          }
+        },
+        {
+          "memory_id": "sem_072",
+          "score": 0.27661290322580734,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2661290322580734,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_076",
+          "score": 0.17017130800518165,
+          "strategy_scores": {
+            "dense": 0.9785614082065933,
+            "temporal": 0.23387096774192662
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.16112346177173545,
+          "strategy_scores": {
+            "dense": 0.9720058741771704,
+            "temporal": 0.153225806451599
+          }
+        },
+        {
+          "memory_id": "sem_083",
+          "score": 0.23871714058827687,
+          "strategy_scores": {
+            "dense": 0.9946682437325183,
+            "temporal": 0.17741935483868942,
+            "graph": 0.7177496854453019
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent repotting day update mentioned thyme patch needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_076",
+        "sem_063",
+        "sem_088",
+        "sem_065",
+        "sem_079"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_076",
+          "score": 0.4279996813979449,
+          "strategy_scores": {
+            "dense": 0.9640838974916819,
+            "sparse": 0.4,
+            "temporal": 0.23387096774192662
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.3203048861120642,
+          "strategy_scores": {
+            "dense": 0.9968848718855476,
+            "temporal": 0.9838709677419658,
+            "graph": 0.7238505855503549
+          }
+        },
+        {
+          "memory_id": "sem_088",
+          "score": 0.26370967741935647,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.13709677419356484,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23505057832946713,
+          "strategy_scores": {
+            "dense": 0.921842565207212,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.20135713567556845,
+          "strategy_scores": {
+            "dense": 0.9922781735657035,
+            "temporal": 0.2096774193548362,
+            "graph": 0.31547667705229326
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent market weekend update mentioned marigold border needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_077",
+        "sem_082",
+        "sem_069",
+        "sem_078",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_077",
+          "score": 0.28700268115284033,
+          "strategy_scores": {
+            "dense": 0.029480239943688438,
+            "sparse": 0.4,
+            "temporal": 0.22580645161287033
+          }
+        },
+        {
+          "memory_id": "sem_082",
+          "score": 0.22682753347944076,
+          "strategy_scores": {
+            "dense": 0.9944228676646949,
+            "temporal": 0.18548387096774574,
+            "graph": 0.5911571623296193
+          }
+        },
+        {
+          "memory_id": "sem_069",
+          "score": 0.17018180472933142,
+          "strategy_scores": {
+            "dense": 0.9409969777654338,
+            "temporal": 0.2903225806451638
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.16908932136794563,
+          "strategy_scores": {
+            "dense": 0.982100852130376,
+            "temporal": 0.21774193548389248
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.1649042372213367,
+          "strategy_scores": {
+            "dense": 0.889684162120742,
+            "temporal": 0.3145161290322543
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent inspection night update mentioned fig sapling needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_078",
+        "sem_063",
+        "sem_065",
+        "sem_064",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_078",
+          "score": 0.2921606232299754,
+          "strategy_scores": {
+            "dense": 0.06924286454390743,
+            "sparse": 0.4,
+            "temporal": 0.21774193548389248
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.27116488859191473,
+          "strategy_scores": {
+            "dense": 0.9772903666926395,
+            "temporal": 0.9838709677419658,
+            "graph": 0.2618423681382221
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23357897314954612,
+          "strategy_scores": {
+            "dense": 0.9120318640077385,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.22444610071660598,
+          "strategy_scores": {
+            "dense": 0.8457697037021003,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.17238369939806156,
+          "strategy_scores": {
+            "dense": 0.9395472432989076,
+            "temporal": 0.3145161290322543
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent watering morning update mentioned parsley tray needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_079",
+        "sem_157",
+        "sem_061",
+        "sem_062",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_079",
+          "score": 0.2861197807510389,
+          "strategy_scores": {
+            "dense": 0.03434692543703518,
+            "sparse": 0.4,
+            "temporal": 0.2096774193548362
+          }
+        },
+        {
+          "memory_id": "sem_157",
+          "score": 0.538478089867767,
+          "strategy_scores": {
+            "dense": 0.9998631716540317,
+            "sparse": 0.4,
+            "temporal": 0.2903225806451638,
+            "graph": 0.9946635605514584
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24475447082397356,
+          "strategy_scores": {
+            "dense": 0.965029805493157,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.22735368687765134,
+          "strategy_scores": {
+            "dense": 0.8544009232703799,
+            "temporal": 0.9919354838709437
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.22412645467213355,
+          "strategy_scores": {
+            "dense": 0.8436387300722841,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent mulch afternoon update mentioned cosmos bed needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_080",
+        "sem_061",
+        "sem_062",
+        "sem_071",
+        "sem_065"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_080",
+          "score": 0.40445051727276415,
+          "strategy_scores": {
+            "dense": 0.8285948463345741,
+            "sparse": 0.4,
+            "temporal": 0.20161290322577988
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.35,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 1.0,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24104186038974162,
+          "strategy_scores": {
+            "dense": 0.9456554133509293,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_071",
+          "score": 0.2464230894802185,
+          "strategy_scores": {
+            "dense": 0.9884472478850629,
+            "temporal": 0.27419354838712967,
+            "graph": 0.7073664745874608
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23751007122800394,
+          "strategy_scores": {
+            "dense": 0.9382391845307907,
+            "temporal": 0.9677419354838532
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent stormy dawn update mentioned sage planter needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_081",
+        "sem_062",
+        "sem_065",
+        "sem_064",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_081",
+          "score": 0.409820603470582,
+          "strategy_scores": {
+            "dense": 0.8697717650727311,
+            "sparse": 0.4,
+            "temporal": 0.1935483870967236
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.33894538996034856,
+          "strategy_scores": {
+            "dense": 0.9984276726967017,
+            "temporal": 0.9919354838709437,
+            "graph": 0.8998769066874893
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.29176708609736257,
+          "strategy_scores": {
+            "dense": 0.9915605152341341,
+            "temporal": 0.9677419354838532,
+            "graph": 0.4625881526385713
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.2518183803229504,
+          "strategy_scores": {
+            "dense": 0.9853076409086302,
+            "temporal": 0.9758064516129096,
+            "graph": 0.06441589025364906
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24467607983214437,
+          "strategy_scores": {
+            "dense": 0.9645071988809625,
+            "temporal": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent sunny noon update mentioned ivy wall needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "2"
+      ],
+      "retrieved_memory_ids": [
+        "sem_082",
+        "sem_061",
+        "sem_063",
+        "sem_081",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_082",
+          "score": 0.40825509780091557,
+          "strategy_scores": {
+            "dense": 0.864711404694273,
+            "sparse": 0.4,
+            "temporal": 0.18548387096774574
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.28711447682328967,
+          "strategy_scores": {
+            "dense": 0.9911986921729039,
+            "temporal": 1.0,
+            "graph": 0.384346729973541
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.2458653753190907,
+          "strategy_scores": {
+            "dense": 0.9831885236326796,
+            "temporal": 0.9838709677418874
+          }
+        },
+        {
+          "memory_id": "sem_081",
+          "score": 0.19558177948620536,
+          "strategy_scores": {
+            "dense": 0.9896748985971259,
+            "temporal": 0.1935483870967236,
+            "graph": 0.27775705986964117
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.18216478700286787,
+          "strategy_scores": {
+            "dense": 0.5638942789438461,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent cool dusk update mentioned zinnia row needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "3"
+      ],
+      "retrieved_memory_ids": [
+        "sem_083",
+        "sem_064",
+        "sem_062",
+        "sem_079",
+        "sem_074"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_083",
+          "score": 0.31795916094052334,
+          "strategy_scores": {
+            "dense": 0.268114836377653,
+            "sparse": 0.4,
+            "temporal": 0.17741935483875396
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.34758064516129117,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.9758064516129115,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.3128615572307404,
+          "strategy_scores": {
+            "dense": 0.9930795489047326,
+            "temporal": 0.9919354838709443,
+            "graph": 0.6470607650793607
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.2363043598114833,
+          "strategy_scores": {
+            "dense": 0.9933973824954044,
+            "temporal": 0.20967741935489817,
+            "graph": 0.6632701050168284
+          }
+        },
+        {
+          "memory_id": "sem_074",
+          "score": 0.24582944386563532,
+          "strategy_scores": {
+            "dense": 0.9944436459240321,
+            "temporal": 0.2500000000000196,
+            "graph": 0.7166289697702856
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent festival day update mentioned cilantro pot needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "4"
+      ],
+      "retrieved_memory_ids": [
+        "sem_084",
+        "sem_068",
+        "sem_062",
+        "sem_061",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_084",
+          "score": 0.42204538658925694,
+          "strategy_scores": {
+            "dense": 0.9673993514552475,
+            "sparse": 0.4,
+            "temporal": 0.16935483870969828
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.27983870967741964,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2983870967741967,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24316609261138836,
+          "strategy_scores": {
+            "dense": 0.9598169614952929,
+            "temporal": 0.9919354838709443
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.23569276846228174,
+          "strategy_scores": {
+            "dense": 0.9046184564152115,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.22934218977396503,
+          "strategy_scores": {
+            "dense": 0.8730339533318411,
+            "temporal": 0.9838709677418886
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent soil delivery day update mentioned pothos shelf needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "5"
+      ],
+      "retrieved_memory_ids": [
+        "sem_085",
+        "sem_086",
+        "sem_063",
+        "sem_062",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_085",
+          "score": 0.3163911367579578,
+          "strategy_scores": {
+            "dense": 0.26841402999928216,
+            "sparse": 0.4,
+            "temporal": 0.1612903225806553
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.24135870067415774,
+          "strategy_scores": {
+            "dense": 0.9929273587061538,
+            "temporal": 0.153225806451599,
+            "graph": 0.7709701622307477
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.26828142439915326,
+          "strategy_scores": {
+            "dense": 0.9763578065406512,
+            "temporal": 0.9838709677419658,
+            "graph": 0.23440656643858954
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24445039137012264,
+          "strategy_scores": {
+            "dense": 0.9683789532201363,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23530252962726111,
+          "strategy_scores": {
+            "dense": 0.9181458964398012,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent seed swap day update mentioned camellia shrub needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_086",
+        "sem_155",
+        "sem_085",
+        "sem_080",
+        "sem_078"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_086",
+          "score": 0.9153225806451666,
+          "strategy_scores": {
+            "dense": 1.0,
+            "sparse": 1.0,
+            "temporal": 0.1532258064516654,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.7307524042115519,
+          "strategy_scores": {
+            "dense": 0.3394246302275479,
+            "sparse": 1.0,
+            "temporal": 0.2983870967741967
+          }
+        },
+        {
+          "memory_id": "sem_085",
+          "score": 0.21908876532708207,
+          "strategy_scores": {
+            "dense": 0.9817910217281819,
+            "temporal": 0.16129032258064263,
+            "graph": 0.5569107980979053
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.2655225428148596,
+          "strategy_scores": {
+            "dense": 0.9982043713165885,
+            "temporal": 0.2016129032258425,
+            "graph": 0.9563059679478708
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.2638504966331696,
+          "strategy_scores": {
+            "dense": 0.9969327889832478,
+            "temporal": 0.21774193548387538,
+            "graph": 0.9253638473729491
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent pruning Friday update mentioned radish sprouts needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_087",
+        "sem_070",
+        "sem_061",
+        "sem_065",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_087",
+          "score": 0.27451612903225425,
+          "strategy_scores": {
+            "dense": 0.0,
+            "sparse": 0.4,
+            "temporal": 0.14516129032254269
+          }
+        },
+        {
+          "memory_id": "sem_070",
+          "score": 0.2503525642005934,
+          "strategy_scores": {
+            "dense": 0.9953131967066522,
+            "temporal": 0.2822580645161075,
+            "graph": 0.728297782429848
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24461697477945402,
+          "strategy_scores": {
+            "dense": 0.9641131651963601,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.13324212063215615,
+          "strategy_scores": {
+            "dense": 0.24311951389180553,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.2182996234230311,
+          "strategy_scores": {
+            "dense": 0.804793188411601,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent greenhouse Sunday update mentioned bean poles needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_088",
+        "sem_080",
+        "sem_073",
+        "sem_087",
+        "sem_068"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_088",
+          "score": 0.30534521044073354,
+          "strategy_scores": {
+            "dense": 0.21090355347585413,
+            "sparse": 0.4,
+            "temporal": 0.13709677419355407
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.2701612903225843,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2016129032258425,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_073",
+          "score": 0.2609112627990374,
+          "strategy_scores": {
+            "dense": 0.9970323551873387,
+            "temporal": 0.25806451612907527,
+            "graph": 0.8554995790802904
+          }
+        },
+        {
+          "memory_id": "sem_087",
+          "score": 0.2594382442986748,
+          "strategy_scores": {
+            "dense": 0.998988306997835,
+            "temporal": 0.14516129032260974,
+            "graph": 0.9507386921673857
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.25323389527870427,
+          "strategy_scores": {
+            "dense": 0.9946993864643968,
+            "temporal": 0.2983870967741967,
+            "graph": 0.741902776316251
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent rainy Tuesday update mentioned chive clump needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_089",
+        "sem_062",
+        "sem_067",
+        "sem_061",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_089",
+          "score": 0.31425567502165336,
+          "strategy_scores": {
+            "dense": 0.27568299476801644,
+            "sparse": 0.4,
+            "temporal": 0.12903225806450855
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.22330882540840502,
+          "strategy_scores": {
+            "dense": 0.8274351801420187,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_067",
+          "score": 0.2612845133887397,
+          "strategy_scores": {
+            "dense": 0.994907460897634,
+            "temporal": 0.306451612903198,
+            "graph": 0.8140323296377482
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24273280600467417,
+          "strategy_scores": {
+            "dense": 0.9515520400311611,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.24222704484596763,
+          "strategy_scores": {
+            "dense": 0.9589329871451402,
+            "temporal": 0.9838709677419658
+          }
+        }
+      ]
+    },
+    {
+      "query": "What recent summer solstice update mentioned begonia basket needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "9",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_090",
+        "sem_084",
+        "sem_063",
+        "sem_061",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_090",
+          "score": 0.4083003976185799,
+          "strategy_scores": {
+            "dense": 0.9080241561668978,
+            "sparse": 0.4,
+            "temporal": 0.12096774193545225
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.26693548387096333,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.16935483870963314,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.23963775052057779,
+          "strategy_scores": {
+            "dense": 0.9416710249758748,
+            "temporal": 0.9838709677419658
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.2394837024634201,
+          "strategy_scores": {
+            "dense": 0.929891349756134,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23702803280301082,
+          "strategy_scores": {
+            "dense": 0.9296492509447991,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ]
+    }
+  ]
+}

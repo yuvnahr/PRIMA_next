@@ -56,9 +56,26 @@ def classification_report(
             "support": sum(confusion.get(label, {}).values()),
         }
 
-    macro_precision = sum(metric["precision"] for metric in per_label.values()) / len(per_label) if per_label else 0.0
-    macro_recall = sum(metric["recall"] for metric in per_label.values()) / len(per_label) if per_label else 0.0
-    macro_f1 = sum(metric["f1"] for metric in per_label.values()) / len(per_label) if per_label else 0.0
+    scored_labels = [
+        label
+        for label, metric in per_label.items()
+        if metric["support"] > 0 or sum(row.get(label, 0) for row in confusion.values()) > 0
+    ]
+    macro_precision = (
+        sum(per_label[label]["precision"] for label in scored_labels) / len(scored_labels)
+        if scored_labels
+        else 0.0
+    )
+    macro_recall = (
+        sum(per_label[label]["recall"] for label in scored_labels) / len(scored_labels)
+        if scored_labels
+        else 0.0
+    )
+    macro_f1 = (
+        sum(per_label[label]["f1"] for label in scored_labels) / len(scored_labels)
+        if scored_labels
+        else 0.0
+    )
     return {
         "accuracy": round(correct / total, 6) if total else 0.0,
         "macro_precision": round(macro_precision, 6),

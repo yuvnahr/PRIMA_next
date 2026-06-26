@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import replace
 
 from memory.memory_repository import MemoryRepository
 from memory.retrieval.dense_strategy import DenseRetrievalStrategy
 from memory.retrieval.hybrid_fusion import HybridFusion
+from memory.retrieval.hybrid_fusion import HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_confidence import RetrievalConfidence, RetrievalConfidenceEstimator
 from memory.retrieval.retrieval_request import RetrievalRequest
@@ -30,6 +32,7 @@ class RetrievalController:
         fusion: HybridFusion | None = None,
         confidence_estimator: RetrievalConfidenceEstimator | None = None,
         reranker: Reranker | None = None,
+        candidate_pool_multiplier: int = 12,
     ) -> None:
         self.repository = repository
         self.strategies = strategies or [
@@ -37,18 +40,20 @@ class RetrievalController:
             SparseRetrievalStrategy(),
             TemporalRetrievalStrategy(),
         ]
-        self.fusion = fusion or HybridFusion()
+        self.fusion = fusion or HybridFusion(HybridFusionConfig.from_file())
         self.confidence_estimator = confidence_estimator or RetrievalConfidenceEstimator()
         self.reranker = reranker or Reranker()
+        self.candidate_pool_multiplier = max(1, candidate_pool_multiplier)
 
     def retrieve(self, request: RetrievalRequest) -> RetrievalResponse:
+        candidate_request = replace(request, top_k=max(request.top_k, request.top_k * self.candidate_pool_multiplier))
         by_strategy = {
-            strategy.name: strategy.retrieve(request, self.repository)
+            strategy.name: strategy.retrieve(candidate_request, self.repository)
             for strategy in self.strategies
         }
-        fused = self.fusion.fuse(by_strategy, top_k=request.top_k)
+        fused = self.fusion.fuse(by_strategy, top_k=candidate_request.top_k)
         fused = self._apply_state_filter(fused, request)
-        reranked = self.reranker.rerank(fused)[: request.top_k]
+        reranked = self.reranker.rerank(fused, request)[: request.top_k]
         confidence = self.confidence_estimator.estimate(reranked, request.top_k)
         return RetrievalResponse(results=tuple(reranked), confidence=confidence)
 

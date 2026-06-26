@@ -1,0 +1,5 @@
+dense_weight: 0.15
+sparse_weight: 0.65
+temporal_weight: 0.10
+graph_weight: 0.10
+candidate_pool_multiplier: 12

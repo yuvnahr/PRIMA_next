@@ -1,10 +1,10 @@
 {
-  "recall_at_1": 0.029352,
-  "recall_at_3": 0.063056,
-  "recall_at_5": 0.088889,
-  "mrr": 0.058704,
-  "ndcg_at_5": 0.066094,
-  "hit_rate": 0.088889,
-  "average_retrieval_latency": 2.722637,
+  "recall_at_1": 0.468241,
+  "recall_at_3": 0.630463,
+  "recall_at_5": 0.699907,
+  "mrr": 0.569259,
+  "ndcg_at_5": 0.595526,
+  "hit_rate": 0.711111,
+  "average_retrieval_latency": 8.098663,
   "average_retrieved_memory_count": 5.0
 }

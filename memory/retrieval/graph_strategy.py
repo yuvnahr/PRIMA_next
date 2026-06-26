@@ -9,18 +9,33 @@ from memory.retrieval.dense_strategy import DenseRetrievalStrategy
 from memory.retrieval.retrieval_request import RetrievalRequest
 from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_strategy import RetrievalStrategy
+from memory.retrieval.sparse_strategy import SparseRetrievalStrategy
 
 
 class GraphTraversalStrategy(RetrievalStrategy):
     name = "graph"
 
-    def __init__(self, graph_repository: GraphRepository, seed_strategy: DenseRetrievalStrategy | None = None) -> None:
+    def __init__(
+        self,
+        graph_repository: GraphRepository,
+        seed_strategy: DenseRetrievalStrategy | None = None,
+        sparse_seed_strategy: SparseRetrievalStrategy | None = None,
+    ) -> None:
         self.graph_repository = graph_repository
         self.seed_strategy = seed_strategy or DenseRetrievalStrategy()
+        self.sparse_seed_strategy = sparse_seed_strategy or SparseRetrievalStrategy()
         self.traversal = GraphTraversal(graph_repository)
 
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
-        seeds = self.seed_strategy.retrieve(request, repository)[: max(1, min(3, request.top_k))]
+        seed_limit = max(1, min(6, request.top_k))
+        seed_by_id = {}
+        for seed in self.seed_strategy.retrieve(request, repository)[:seed_limit]:
+            seed_by_id[seed.note.id] = seed
+        for seed in self.sparse_seed_strategy.retrieve(request, repository)[:seed_limit]:
+            existing = seed_by_id.get(seed.note.id)
+            if existing is None or seed.score > existing.score:
+                seed_by_id[seed.note.id] = seed
+        seeds = sorted(seed_by_id.values(), key=lambda item: item.score, reverse=True)[:seed_limit]
         note_scores: dict[str, RetrievalResult] = {}
         for seed in seeds:
             seed_node = self.graph_repository.find_by_memory_id(seed.note.id)

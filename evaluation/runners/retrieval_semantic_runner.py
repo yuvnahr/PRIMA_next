@@ -156,9 +156,13 @@ class SemanticRetrievalRunner:
 
     def _request(self, record: dict[str, Any]) -> RetrievalRequest:
         memory_type = MemoryType(str(record.get("memory_type", MemoryType.EPISODIC.value)))
+        if str(record.get("category", "")) in {"graph", "multihop"}:
+            memory_types = tuple(MemoryType)
+        else:
+            memory_types = (memory_type,)
         return RetrievalRequest(
             query=str(record["query"]),
-            memory_types=(memory_type,),
+            memory_types=memory_types,
             top_k=self.top_k,
         )
 

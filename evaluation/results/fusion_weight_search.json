@@ -1,0 +1,110 @@
+{
+  "best_weights": {
+    "dense": 0.15,
+    "sparse": 0.65,
+    "temporal": 0.1,
+    "graph": 0.1
+  },
+  "best_metrics": {
+    "recall_at_1": 0.690463,
+    "recall_at_3": 0.708241,
+    "recall_at_5": 0.711019,
+    "mrr": 0.713889,
+    "ndcg_at_5": 0.70663,
+    "hit_rate": 0.722222,
+    "average_retrieval_latency": 0.0,
+    "average_retrieved_memory_count": 5.0
+  },
+  "search_results": [
+    {
+      "weights": {
+        "dense": 0.4,
+        "sparse": 0.3,
+        "temporal": 0.15,
+        "graph": 0.15
+      },
+      "metrics": {
+        "recall_at_1": 0.279352,
+        "recall_at_3": 0.474907,
+        "recall_at_5": 0.544352,
+        "mrr": 0.393704,
+        "ndcg_at_5": 0.424999,
+        "hit_rate": 0.555556,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 5.0
+      }
+    },
+    {
+      "weights": {
+        "dense": 0.2,
+        "sparse": 0.55,
+        "temporal": 0.15,
+        "graph": 0.1
+      },
+      "metrics": {
+        "recall_at_1": 0.623796,
+        "recall_at_3": 0.677685,
+        "recall_at_5": 0.705463,
+        "mrr": 0.66963,
+        "ndcg_at_5": 0.672914,
+        "hit_rate": 0.716667,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 5.0
+      }
+    },
+    {
+      "weights": {
+        "dense": 0.15,
+        "sparse": 0.65,
+        "temporal": 0.1,
+        "graph": 0.1
+      },
+      "metrics": {
+        "recall_at_1": 0.690463,
+        "recall_at_3": 0.708241,
+        "recall_at_5": 0.711019,
+        "mrr": 0.713889,
+        "ndcg_at_5": 0.70663,
+        "hit_rate": 0.722222,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 5.0
+      }
+    },
+    {
+      "weights": {
+        "dense": 0.2,
+        "sparse": 0.35,
+        "temporal": 0.3,
+        "graph": 0.15
+      },
+      "metrics": {
+        "recall_at_1": 0.446019,
+        "recall_at_3": 0.594352,
+        "recall_at_5": 0.640093,
+        "mrr": 0.533241,
+        "ndcg_at_5": 0.556735,
+        "hit_rate": 0.644444,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 5.0
+      }
+    },
+    {
+      "weights": {
+        "dense": 0.15,
+        "sparse": 0.35,
+        "temporal": 0.1,
+        "graph": 0.4
+      },
+      "metrics": {
+        "recall_at_1": 0.348796,
+        "recall_at_3": 0.586019,
+        "recall_at_5": 0.627685,
+        "mrr": 0.473056,
+        "ndcg_at_5": 0.506601,
+        "hit_rate": 0.638889,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 5.0
+      }
+    }
+  ]
+}
