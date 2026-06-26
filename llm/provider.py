@@ -11,8 +11,8 @@ import os
 from abc import ABC, abstractmethod
 from typing import Any
 
-from .llm_types import LLMRequest, LLMResponse
-from .response_parser import parse_generic_response, parse_openai_response
+from llm.llm_types import LLMRequest, LLMResponse
+from llm.response_parser import parse_generic_response, parse_openai_response
 
 # Safe defaults for optional external modules
 requests: Any = None

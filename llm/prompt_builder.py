@@ -5,7 +5,7 @@ This module ensures inputs are sanitized before being composed into prompts.
 from collections.abc import Mapping
 from typing import Any
 
-from .llm_types import LLMRequest
+from llm.llm_types import LLMRequest
 
 try:
     # import local sanitizer (kept internal to repo)

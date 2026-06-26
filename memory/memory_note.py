@@ -14,11 +14,11 @@ from typing import Any
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 from memory.memory_context import StateSnapshot
 from memory.memory_lineage import MemoryLineage
 from memory.memory_types import MemoryLevel, MemoryType
+
+logger = logging.getLogger(__name__)
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
 GENERIC_NOUNS = {

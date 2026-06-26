@@ -7,7 +7,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from evaluation.metrics.retrieval_metrics import summarize_retrieval_metrics
 from memory.graph.graph_edge import GraphEdge
@@ -167,7 +167,7 @@ class SemanticRetrievalRunner:
         )
 
     def _load_gold(self) -> list[dict[str, Any]]:
-        records = json.loads(self.gold_path.read_text(encoding="utf-8-sig"))
+        records = cast(list[dict[str, Any]], json.loads(self.gold_path.read_text(encoding="utf-8-sig")))
         if not 150 <= len(records) <= 250:
             raise ValueError("retrieval_gold_v2.json must contain 150-250 records.")
         required_categories = {"preference", "identity", "temporal", "emotional", "multihop", "graph"}

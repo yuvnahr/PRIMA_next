@@ -6,7 +6,7 @@ import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from evaluation.metrics.retrieval_metrics import summarize_retrieval_metrics
 from memory.graph.graph_builder import GraphBuilder
@@ -128,7 +128,7 @@ class RetrievalBenchmarkRunner:
         return traces
 
     def _load_gold(self) -> list[dict[str, Any]]:
-        records = json.loads(self.gold_path.read_text(encoding="utf-8-sig"))
+        records = cast(list[dict[str, Any]], json.loads(self.gold_path.read_text(encoding="utf-8-sig")))
         if len(records) < 100:
             raise ValueError("retrieval_gold.json must contain at least 100 records.")
         for record in records:

@@ -8,9 +8,9 @@ from typing import Protocol
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 from affect.emotion_profile import EmotionProfile
+
+logger = logging.getLogger(__name__)
 
 
 class EmotionClassifier(Protocol):

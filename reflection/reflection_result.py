@@ -34,7 +34,11 @@ class ReflectionResult:
             "should_reflect": self.should_reflect,
             "trigger_score": self.trigger_score,
             "signals": [signal.to_dict() for signal in self.signals],
-            "reflection_memory": self.reflection_memory.to_dict() if hasattr(self.reflection_memory, "to_dict") else None,
+            "reflection_memory": (
+                self.reflection_memory.to_dict()
+                if self.reflection_memory is not None and hasattr(self.reflection_memory, "to_dict")
+                else None
+            ),
             "rules": [rule.to_dict() if hasattr(rule, "to_dict") else str(rule) for rule in self.rules],
             "confidence": asdict(self.confidence),
             "state_updates": dict(self.state_updates),

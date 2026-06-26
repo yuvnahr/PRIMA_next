@@ -1,2 +1,10 @@
-[bandit]
-exclude = .git,.pytest_cache,.ruff_cache,.mypy_cache,__pycache__,venv,.venv,tests
+baseline: null
+exclude_dirs:
+  - .git
+  - .pytest_cache
+  - .ruff_cache
+  - .mypy_cache
+  - __pycache__
+  - venv
+  - .venv
+  - tests

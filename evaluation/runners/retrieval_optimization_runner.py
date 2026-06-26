@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import json
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 from evaluation.metrics.retrieval_metrics import (
-    ndcg_at_k,
-    recall_at_k,
-    reciprocal_rank,
     summarize_retrieval_metrics,
 )
 from evaluation.runners.retrieval_semantic_runner import SemanticRetrievalConfiguration, SemanticRetrievalRunner
@@ -20,7 +17,6 @@ from memory.memory_note import stable_embedding
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
-from memory.retrieval.retrieval_request import RetrievalRequest
 from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_router import RetrievalRouter
 
