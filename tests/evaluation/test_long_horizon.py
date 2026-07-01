@@ -16,7 +16,6 @@ from evaluation.runners.long_horizon_runner import (
     _check_preference_retrieved,
     _get_dominant_emotion,
 )
-from evaluation.synthetic.user_generator import UserGenerator
 
 
 # ---------------------------------------------------------------------------
@@ -87,13 +86,13 @@ def test_retrieval_stability_equal_distribution() -> None:
         {"turn_index": t, "retrieval_count": 3}
         for t in range(30)
     ]
-    result = retrieval_stability(records)  # type: ignore[arg-type]
+    result = retrieval_stability(records)
     # All thirds have equal retrieval → degradation ratio ~1.0
     assert abs(result["degradation_ratio"] - 1.0) < 0.1
 
 
 def test_retrieval_stability_empty() -> None:
-    result = retrieval_stability([])  # type: ignore[arg-type]
+    result = retrieval_stability([])
     assert result["degradation_ratio"] == 1.0
 
 
@@ -103,7 +102,7 @@ def test_reflection_stability_no_reflection() -> None:
          "reflection_utility_score": 0.0}
         for t in range(20)
     ]
-    result = reflection_stability(records)  # type: ignore[arg-type]
+    result = reflection_stability(records)
     assert result["reflection_frequency"] == 0.0
     assert result["correction_frequency"] == 0.0
 
@@ -114,7 +113,7 @@ def test_reflection_stability_all_reflection() -> None:
          "reflection_utility_score": 0.5}
         for t in range(20)
     ]
-    result = reflection_stability(records)  # type: ignore[arg-type]
+    result = reflection_stability(records)
     assert abs(result["reflection_frequency"] - 1.0) < 1e-6
     assert abs(result["correction_frequency"] - 1.0) < 1e-6
     assert abs(result["mean_utility"] - 0.5) < 1e-6
@@ -131,7 +130,7 @@ def test_emotion_continuity_all_match() -> None:
         {"retrieved_emotion": "joy", "expected_emotion": "joy"},
         {"retrieved_emotion": "trust", "expected_emotion": "trust"},
     ]
-    assert emotion_continuity_score(records) == 1.0  # type: ignore[arg-type]
+    assert emotion_continuity_score(records) == 1.0
 
 
 def test_fact_retention_curve_at_zero_turns() -> None:

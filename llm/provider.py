@@ -7,6 +7,7 @@ lightweight and explicit about where secrets are read from.
 """
 from __future__ import annotations
 
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Any
@@ -28,8 +29,10 @@ def get_settings() -> Any:
 try:
     from config import settings as _settings
     get_settings = _settings.get_settings
-except Exception:  # pragma: no cover - config may be added separately
-    pass
+except Exception as exc:  # pragma: no cover - config may be added separately
+    logging.getLogger(__name__).debug(
+        "config.settings unavailable; using default settings stub: %s", exc
+    )
 
 
 class ProviderError(RuntimeError):

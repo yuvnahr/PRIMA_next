@@ -7,11 +7,6 @@ from typing import Any
 
 from evaluation.synthetic.synthetic_user import ConversationTurn
 from evaluation.synthetic.user_profile import (
-    EmotionalProfile,
-    PersonalityTraits,
-    Preference,
-    Project,
-    Relationship,
     TemporalEvent,
     UserProfile,
 )

@@ -30,10 +30,10 @@ logger = logging.getLogger(__name__)
 DEFAULT_RESULTS_DIR = Path("evaluation/results")
 
 try:
-    import matplotlib
+    import matplotlib  # type: ignore[import-not-found]
 
     matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore[import-not-found]
 
     _MATPLOTLIB_AVAILABLE = True
 except ImportError:  # pragma: no cover

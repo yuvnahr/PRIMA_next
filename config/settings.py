@@ -5,6 +5,7 @@ singleton Settings object. By default values are read from environment
 variables; sensitive values (API keys) should not be checked into source.
 """
 
+import logging
 from typing import Any, Type, cast
 
 # Use a runtime variable holding the base settings class. This avoids
@@ -18,9 +19,11 @@ except Exception:  # pragma: no cover - fall back to pydantic if pydantic-settin
     try:
         from pydantic import BaseSettings as _PD_BaseSettings
         BaseSettingsCls = cast(Type[Any], _PD_BaseSettings)
-    except Exception:
+    except Exception as exc:
         # keep the fallback class
-        pass
+        logging.getLogger(__name__).debug(
+            "pydantic BaseSettings unavailable; using fallback settings class: %s", exc
+        )
 
 
 class Settings(BaseSettingsCls):
