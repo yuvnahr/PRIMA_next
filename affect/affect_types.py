@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from affect.emotion_profile import EmotionProfile
 from affect.pad_model import PADState
-from state.emotional_state import EmotionalState
+
+if TYPE_CHECKING:
+    from state.emotional_state import EmotionalState
 
 
 @dataclass(frozen=True, slots=True)

@@ -6,6 +6,7 @@ import hashlib
 import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Any, cast
 
 import numpy as np
 
@@ -18,6 +19,7 @@ TOKEN_RE = re.compile(r"[a-zA-Z']+")
 SCORE_LABELS = {
     "negative": 0,
     "positive": 0,
+    "neutral": 0,
     "uncertainty": 0,
     "litigious": 0,
     "model_strong": 0,
@@ -127,6 +129,21 @@ INTENSITY_MODIFIERS = {
     "not very": ("B_DECR", 0.7),
 }
 
+CANONICAL_EMOTION_ALIASES = {
+    "sad": "sadness",
+    "joy_ecstasy": "joy",
+    "amazement_surprise": "surprise",
+    "interest_vigilance": "surprise",
+    "disgust_loathing": "disgust",
+    "senerity": "trust",
+    "serenity": "trust",
+    "admire": "trust",
+    "acceptance": "trust",
+    "positive": "joy",
+    "negative": "sadness",
+}
+
+
 OPPOSITE_EMOTIONS = {
     "anticipation": "surprise",
     "anger": "joy",
@@ -155,24 +172,50 @@ OPPOSITE_EMOTIONS = {
 }
 
 FALLBACK_LEXICON = {
-    "anticipation": ["waiting", "tomorrow", "soon", "expect", "upcoming", "hopeful"],
-    "anger": ["angry", "mad", "furious", "annoying", "canceled", "delayed"],
-    "fear": ["scared", "nervous", "worried", "terrified", "anxious", "tests", "brakes"],
-    "sadness": ["sad", "failed", "passed away", "space", "rejected", "lonely"],
-    "trust": ["count", "reliable", "friend", "support", "safe", "back"],
-    "senerity": ["peace", "content", "okay", "calm", "fine", "let go"],
-    "joy": ["happy", "baby", "steps", "proposal", "accepted", "love"],
-    "joy_ecstasy": ["amazing", "dream", "thrilled", "ecstatic", "finished"],
-    "admire": ["talented", "dedication", "incredible", "overcame", "look up"],
-    "acceptance": ["terms", "made peace", "it is what it is", "unexpected"],
-    "surprise": ["won", "raffle", "found", "package", "promotion"],
-    "amazement_surprise": ["unbelievable", "shocking", "astonishing"],
+    "anticipation": [
+        "waiting", "tomorrow", "soon", "expect", "expecting", "upcoming", "hopeful", "looking forward",
+        "counting down", "planned", "preparing", "eager", "deadline", "awaiting",
+    ],
+    "anger": [
+        "angry", "mad", "furious", "rage", "outraged", "irritated", "frustrated", "annoying", "canceled",
+        "delayed", "insulted", "betrayed", "unfair", "yelled", "argument", "resent", "hostile", "livid",
+    ],
+    "fear": [
+        "afraid", "scared", "nervous", "worried", "terrified", "anxious", "panic", "panicked", "unsafe",
+        "threat", "danger", "dread", "horror", "frightened", "uneasy", "brakes", "tests", "alarm",
+    ],
+    "sadness": [
+        "sad", "grief", "grieving", "heartbroken", "miserable", "depressed", "failed", "passed away", "died",
+        "loss", "crying", "tears", "rejected", "lonely", "miss", "empty", "mourning", "devastated", "hurt",
+    ],
+    "trust": [
+        "trust", "trusted", "count on", "reliable", "friend", "support", "supported", "safe", "secure", "honest",
+        "loyal", "dependable", "comforted", "backed me up", "protected", "faith", "confidence", "reassured",
+    ],
+    "senerity": ["peace", "peaceful", "content", "okay", "calm", "fine", "relieved", "let go", "settled"],
+    "joy": [
+        "joy", "happy", "happiness", "pleasure", "delighted", "delight", "glad", "smiling", "celebrate",
+        "celebrated", "promoted", "promotion", "baby", "steps", "proposal", "accepted", "love", "proud",
+        "wonderful", "great news", "won", "success", "excited", "cheerful",
+    ],
+    "joy_ecstasy": ["amazing", "dream", "thrilled", "ecstatic", "finished", "fantastic", "overjoyed", "elated"],
+    "admire": ["talented", "dedication", "incredible", "overcame", "look up", "respect", "inspiring"],
+    "acceptance": ["terms", "made peace", "it is what it is"],
+    "surprise": [
+        "surprise", "surprised", "wonder", "wonderstruck", "awe", "amazed", "astonished", "unexpected", "suddenly",
+        "startled", "shocked", "raffle", "found", "package", "unplanned", "out of nowhere", "couldn't believe",
+    ],
+    "amazement_surprise": ["unbelievable", "shocking", "astonishing", "stunned"],
     "distraction": ["wandering", "replaying", "focus", "thinking", "staring"],
-    "boredom": ["bored", "nothing", "routine", "counting", "meeting"],
-    "disgust": ["mold", "hair", "dirty", "unclean", "gross"],
-    "disgust_loathing": ["cockroaches", "filthy", "loathing"],
-    "interest_vigilance": ["wonder", "interesting", "attention", "add up", "eye on"],
+    "boredom": ["bored", "nothing", "routine", "counting", "meeting", "tedious"],
+    "disgust": [
+        "disgust", "disgusted", "mold", "hair", "dirty", "unclean", "gross", "nauseated", "rotten", "filthy",
+        "repulsed", "sickened", "stench", "slimy", "spoiled",
+    ],
+    "disgust_loathing": ["cockroaches", "loathing", "revolting", "vile"],
+    "interest_vigilance": ["interesting", "attention", "add up", "eye on"],
 }
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -205,6 +248,17 @@ def normalize_scores(scores: Mapping[str, float]) -> dict[str, float]:
     if total <= 0:
         return {}
     return {key: round(value / total, 3) for key, value in scores.items() if value > 0}
+
+
+def canonicalize_scores(scores: Mapping[str, float]) -> dict[str, float]:
+    """Collapse legacy fine-grained labels into publication-facing emotion labels."""
+    canonical: dict[str, float] = {}
+    for label, score in scores.items():
+        mapped = CANONICAL_EMOTION_ALIASES.get(label, label)
+        canonical[mapped] = canonical.get(mapped, 0.0) + float(score)
+    return normalize_scores(canonical)
+
+
 
 
 def fix_score(current_score: float, direction: str, strength: float) -> float:
@@ -243,7 +297,7 @@ def resolve_modifiers_and_negations(tokens: Sequence[str], scores: Mapping[str, 
 
 def _stable_embedding(text: str, dimensions: int = 64) -> np.ndarray:
     digest = hashlib.sha256(text.encode("utf-8")).digest()
-    values = []
+    values: list[float] = []
     while len(values) < dimensions:
         for byte in digest:
             values.append((byte / 127.5) - 1.0)
@@ -286,7 +340,7 @@ class LegacyAffectClassifier:
     @classmethod
     def from_legacy_dataframe(
         cls,
-        df: object,
+        df: Any,
         cache_size: int = 512,
         prefer_faiss: bool = False,
     ) -> LegacyAffectClassifier:
@@ -296,12 +350,12 @@ class LegacyAffectClassifier:
         `token`, `fourteen_label`, and `embedding`.
         """
         entries: list[LexiconEntry] = []
-        for _, row in df.iterrows():  # type: ignore[attr-defined]
+        for _, row in cast(Any, df).iterrows():
             entries.append(
                 LexiconEntry(
                     token=str(row["token"]),
                     label=str(row["fourteen_label"]),
-                    embedding=np.array(row["embedding"], dtype="float32"),
+                        embedding=np.array(row["embedding"], dtype="float32"),
                 )
             )
         return cls(entries=entries, cache_size=cache_size, prefer_faiss=prefer_faiss)
@@ -316,8 +370,8 @@ class LegacyAffectClassifier:
         if not scores:
             scores, keywords = self._classify_by_similarity(text)
 
-        resolved_scores = resolve_modifiers_and_negations(tokens, scores)
-        profile = EmotionProfile.from_scores(resolved_scores or scores, emotional_keywords=tuple(keywords))
+        resolved_scores = canonicalize_scores(resolve_modifiers_and_negations(tokens, scores) or scores)
+        profile = EmotionProfile.from_scores(resolved_scores, emotional_keywords=tuple(keywords))
         self.cache.set(text, profile)
         return profile
 
@@ -335,9 +389,9 @@ class LegacyAffectClassifier:
         """Classify with an externally supplied sentence embedding."""
         scores, keywords = self._classify_embedding(embedding, top_k=top_k)
         resolved = resolve_modifiers_and_negations(tokenize(text), scores) if modifier_detection else scores
-        return EmotionProfile.from_scores(resolved or scores, tuple(keywords))
+        return EmotionProfile.from_scores(canonicalize_scores(resolved or scores), tuple(keywords))
 
-    def _classify_embedding(self, embedding: Sequence[float], top_k: int = 50) -> tuple[dict[str, float], list[str]]:
+    def _classify_embedding(self, embedding: Sequence[float] | np.ndarray, top_k: int = 50) -> tuple[dict[str, float], list[str]]:
         query = np.array(embedding, dtype="float32")
         norm = np.linalg.norm(query)
         if norm > 0:
@@ -378,25 +432,57 @@ def legacy_build_profile(text: str) -> list[object]:
     return _DEFAULT_CLASSIFIER.legacy_build_profile(text)
 
 
-def build_vocab_matrix(df: object) -> np.ndarray:
+def build_vocab_matrix(df: Any) -> np.ndarray:
     """Legacy-compatible normalized vocabulary matrix builder."""
-    matrix = np.array(df["embedding"].tolist(), dtype="float32")  # type: ignore[index, attr-defined]
-    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    matrix: np.ndarray = np.asarray(
+        df["embedding"].tolist(),
+        dtype=np.float32,
+    )
+
+    norms: np.ndarray = np.linalg.norm(
+        matrix,
+        axis=1,
+        keepdims=True,
+    )
+
     norms = np.where(norms == 0, 1e-9, norms)
-    return matrix / norms
+
+    result: np.ndarray = matrix / norms
+    return result
 
 
-def mean_pooling(model_output: object, attention_mask: object) -> object:
-    """Legacy mean-pooling helper for transformer outputs."""
-    token_embeddings = model_output[0]  # type: ignore[index]
-    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    return (token_embeddings * input_mask_expanded).sum(1) / input_mask_expanded.sum(1).clamp(min=1e-9)
+def mean_pooling(model_output: Any, attention_mask: Any) -> np.ndarray:
+    """Legacy mean-pooling helper for transformer outputs.
+
+    Returns a numpy ndarray regardless of whether the model returns a torch
+    tensor or a numpy array.
+    """
+    token_embeddings = model_output[0]
+    # attempt to operate on torch tensors if available, otherwise fall back to numpy
+    try:
+        # torch path
+        input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+        pooled = (token_embeddings * input_mask_expanded).sum(1) / input_mask_expanded.sum(1).clamp(min=1e-9)
+        # convert to numpy and ensure the expression is typed as ndarray
+        pooled_arr: np.ndarray
+
+        if hasattr(pooled, "cpu"):
+            pooled_arr = np.asarray(pooled.cpu().numpy(), dtype=np.float32)
+        else:
+            pooled_arr = np.asarray(pooled, dtype=np.float32)
+
+        return pooled_arr
+    except Exception:
+        # numpy-path (or other array-likes)
+        input_mask_expanded = np.expand_dims(attention_mask, -1) * np.ones_like(token_embeddings)
+        pooled = (token_embeddings * input_mask_expanded).sum(1) / np.maximum(input_mask_expanded.sum(1), 1e-9)
+        return cast(np.ndarray, np.asarray(pooled))
 
 
-def get_mean_pooling_emb(sentences: list[str], tokenizer: object, model: object) -> list[list[float]]:
+def get_mean_pooling_emb(sentences: list[str], tokenizer: Any, model: Any) -> list[list[float]]:
     """Encode sentences using an injected tokenizer/model pair."""
-    device = next(model.parameters()).device  # type: ignore[attr-defined]
-    encoded_input = tokenizer(  # type: ignore[operator]
+    device = next(model.parameters()).device
+    encoded_input = tokenizer(
         sentences,
         padding=True,
         truncation=True,
@@ -406,8 +492,8 @@ def get_mean_pooling_emb(sentences: list[str], tokenizer: object, model: object)
     import torch
 
     with torch.no_grad():
-        model_output = model(**encoded_input)  # type: ignore[operator]
-    return mean_pooling(model_output, encoded_input["attention_mask"]).tolist()  # type: ignore[index, union-attr]
+        model_output = model(**encoded_input)
+    return cast(list[list[float]], mean_pooling(model_output, encoded_input["attention_mask"]).tolist())
 
 
 def build_profile(

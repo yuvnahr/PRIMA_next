@@ -14,8 +14,9 @@ class PermissionPolicy:
     def is_allowed(self, tool_name: str) -> bool:
         return tool_name in self.allowed
 
-    def allow(self, tool_name: str):
+    def allow(self, tool_name: str) -> None:
         self.allowed.add(tool_name)
 
-    def revoke(self, tool_name: str):
+    def revoke(self, tool_name: str) -> None:
         self.allowed.discard(tool_name)
+    

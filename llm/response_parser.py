@@ -1,7 +1,7 @@
 """Parsers that convert provider-specific responses into LLMResponse."""
 from typing import Any
 
-from .llm_types import LLMResponse
+from llm.llm_types import LLMResponse
 
 
 def parse_openai_response(raw: Any) -> LLMResponse:

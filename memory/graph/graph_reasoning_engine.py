@@ -18,8 +18,8 @@ class GraphReasoningEngine:
 
     def detect_communities(self) -> list[set[str]]:
         try:
-            import networkx as nx
-            from networkx.algorithms.community import louvain_communities
+            import networkx as nx  # type: ignore[import-untyped]
+            from networkx.algorithms.community import louvain_communities  # type: ignore[import-untyped]
 
             graph = nx.Graph()
             for node_id in self.graph_repository.nodes:

@@ -1,0 +1,32 @@
+{
+  "dense_ranking": {
+    "recall_at_1": 0.401574,
+    "recall_at_3": 0.430463,
+    "recall_at_5": 0.431852,
+    "mrr": 0.430556,
+    "ndcg_at_5": 0.42416,
+    "hit_rate": 0.444444,
+    "average_retrieval_latency": 4.497044,
+    "average_retrieved_memory_count": 5.0
+  },
+  "hybrid_ranking": {
+    "recall_at_1": 0.021019,
+    "recall_at_3": 0.054074,
+    "recall_at_5": 0.111019,
+    "mrr": 0.060648,
+    "ndcg_at_5": 0.067463,
+    "hit_rate": 0.122222,
+    "average_retrieval_latency": 0.0,
+    "average_retrieved_memory_count": 5.0
+  },
+  "reranked_ranking": {
+    "recall_at_1": 0.623796,
+    "recall_at_3": 0.677685,
+    "recall_at_5": 0.705463,
+    "mrr": 0.66963,
+    "ndcg_at_5": 0.672914,
+    "hit_rate": 0.716667,
+    "average_retrieval_latency": 0.0,
+    "average_retrieved_memory_count": 5.0
+  }
+}

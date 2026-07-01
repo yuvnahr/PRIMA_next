@@ -1,0 +1,617 @@
+[
+  {
+    "query": "Which preference says I favor the propagation rack setup for raising fern shelf gently?",
+    "expected_memory_ids": [
+      "sem_008"
+    ],
+    "retrieved_memory_ids": [
+      "sem_003",
+      "sem_008",
+      "sem_002",
+      "sem_015",
+      "sem_005"
+    ],
+    "best_rank": 2,
+    "category": "preference"
+  },
+  {
+    "query": "Which preference says I favor the herb ladder setup for raising cosmos bed gently?",
+    "expected_memory_ids": [
+      "sem_020"
+    ],
+    "retrieved_memory_ids": [
+      "sem_006",
+      "sem_020",
+      "sem_004",
+      "sem_160",
+      "sem_008"
+    ],
+    "best_rank": 2,
+    "category": "preference"
+  },
+  {
+    "query": "Which preference says I favor the back fence setup for raising sage planter gently?",
+    "expected_memory_ids": [
+      "sem_021"
+    ],
+    "retrieved_memory_ids": [
+      "sem_003",
+      "sem_021",
+      "sem_007",
+      "sem_051",
+      "sem_028"
+    ],
+    "best_rank": 2,
+    "category": "preference"
+  },
+  {
+    "query": "Which preference says I favor the south window setup for raising cilantro pot gently?",
+    "expected_memory_ids": [
+      "sem_024"
+    ],
+    "retrieved_memory_ids": [
+      "sem_004",
+      "sem_024",
+      "sem_054",
+      "sem_168",
+      "sem_002"
+    ],
+    "best_rank": 2,
+    "category": "preference"
+  },
+  {
+    "query": "Which preference says I favor the lattice arch setup for raising radish sprouts gently?",
+    "expected_memory_ids": [
+      "sem_027"
+    ],
+    "retrieved_memory_ids": [
+      "sem_174",
+      "sem_001",
+      "sem_027",
+      "sem_003",
+      "sem_028"
+    ],
+    "best_rank": 3,
+    "category": "preference"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of tomato seedlings at the ",
+    "expected_memory_ids": [
+      "sem_031"
+    ],
+    "retrieved_memory_ids": [
+      "sem_034",
+      "sem_031",
+      "sem_039",
+      "sem_057",
+      "sem_046"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of monstera leaves at the ",
+    "expected_memory_ids": [
+      "sem_032"
+    ],
+    "retrieved_memory_ids": [
+      "sem_035",
+      "sem_044",
+      "sem_032",
+      "sem_050",
+      "sem_046"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of rose bushes at the ",
+    "expected_memory_ids": [
+      "sem_033"
+    ],
+    "retrieved_memory_ids": [
+      "sem_040",
+      "sem_033",
+      "sem_055",
+      "sem_051",
+      "sem_045"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of sweet pea vines at the ",
+    "expected_memory_ids": [
+      "sem_040"
+    ],
+    "retrieved_memory_ids": [
+      "sem_035",
+      "sem_057",
+      "sem_040",
+      "sem_038",
+      "sem_042"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of cucumber vines at the ",
+    "expected_memory_ids": [
+      "sem_041"
+    ],
+    "retrieved_memory_ids": [
+      "sem_038",
+      "sem_041",
+      "sem_031",
+      "sem_053",
+      "sem_057"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of mint cuttings at the ",
+    "expected_memory_ids": [
+      "sem_042"
+    ],
+    "retrieved_memory_ids": [
+      "sem_053",
+      "sem_042",
+      "sem_035",
+      "sem_032",
+      "sem_044"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of aloe pups at the ",
+    "expected_memory_ids": [
+      "sem_044"
+    ],
+    "retrieved_memory_ids": [
+      "sem_050",
+      "sem_053",
+      "sem_044",
+      "sem_032",
+      "sem_037"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of marigold border at the ",
+    "expected_memory_ids": [
+      "sem_047"
+    ],
+    "retrieved_memory_ids": [
+      "sem_034",
+      "sem_055",
+      "sem_047",
+      "sem_054",
+      "sem_033"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of fig sapling at the ",
+    "expected_memory_ids": [
+      "sem_048"
+    ],
+    "retrieved_memory_ids": [
+      "sem_040",
+      "sem_033",
+      "sem_048",
+      "sem_032",
+      "sem_038"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of cosmos bed at the ",
+    "expected_memory_ids": [
+      "sem_050"
+    ],
+    "retrieved_memory_ids": [
+      "sem_059",
+      "sem_031",
+      "sem_039",
+      "sem_050",
+      "sem_040"
+    ],
+    "best_rank": 4,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of zinnia row at the ",
+    "expected_memory_ids": [
+      "sem_053"
+    ],
+    "retrieved_memory_ids": [
+      "sem_045",
+      "sem_166",
+      "sem_053",
+      "sem_036",
+      "sem_050"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of cilantro pot at the ",
+    "expected_memory_ids": [
+      "sem_054"
+    ],
+    "retrieved_memory_ids": [
+      "sem_046",
+      "sem_051",
+      "sem_054",
+      "sem_058",
+      "sem_044"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of pothos shelf at the ",
+    "expected_memory_ids": [
+      "sem_055"
+    ],
+    "retrieved_memory_ids": [
+      "sem_051",
+      "sem_055",
+      "sem_043",
+      "sem_056",
+      "sem_057"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of radish sprouts at the ",
+    "expected_memory_ids": [
+      "sem_057"
+    ],
+    "retrieved_memory_ids": [
+      "sem_039",
+      "sem_057",
+      "sem_036",
+      "sem_031",
+      "sem_044"
+    ],
+    "best_rank": 2,
+    "category": "identity"
+  },
+  {
+    "query": "Which identity fact makes me the caretaker of chive clump at the ",
+    "expected_memory_ids": [
+      "sem_059"
+    ],
+    "retrieved_memory_ids": [
+      "sem_033",
+      "sem_060",
+      "sem_059",
+      "sem_037",
+      "sem_038"
+    ],
+    "best_rank": 3,
+    "category": "identity"
+  },
+  {
+    "query": "Which emotional memory says cucumber vines made me feel curious during care?",
+    "expected_memory_ids": [
+      "sem_101"
+    ],
+    "retrieved_memory_ids": [
+      "sem_094",
+      "sem_095",
+      "sem_093",
+      "sem_101",
+      "sem_100"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says mint cuttings made me feel confident during care?",
+    "expected_memory_ids": [
+      "sem_102"
+    ],
+    "retrieved_memory_ids": [
+      "sem_092",
+      "sem_091",
+      "sem_094",
+      "sem_102",
+      "sem_096"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says dahlia tubers made me feel startled during care?",
+    "expected_memory_ids": [
+      "sem_103"
+    ],
+    "retrieved_memory_ids": [
+      "sem_096",
+      "sem_094",
+      "sem_092",
+      "sem_103",
+      "sem_101"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says jasmine trellis made me feel grateful during care?",
+    "expected_memory_ids": [
+      "sem_105"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_092",
+      "sem_096",
+      "sem_094",
+      "sem_105"
+    ],
+    "best_rank": 5,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says thyme patch made me feel tense during care?",
+    "expected_memory_ids": [
+      "sem_106"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_106",
+      "sem_095",
+      "sem_092",
+      "sem_101"
+    ],
+    "best_rank": 2,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says marigold border made me feel optimistic during care?",
+    "expected_memory_ids": [
+      "sem_107"
+    ],
+    "retrieved_memory_ids": [
+      "sem_094",
+      "sem_092",
+      "sem_095",
+      "sem_107",
+      "sem_097"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says cosmos bed made me feel energized during care?",
+    "expected_memory_ids": [
+      "sem_110"
+    ],
+    "retrieved_memory_ids": [
+      "sem_091",
+      "sem_094",
+      "sem_092",
+      "sem_097",
+      "sem_110"
+    ],
+    "best_rank": 5,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says sage planter made me feel uncertain during care?",
+    "expected_memory_ids": [
+      "sem_111"
+    ],
+    "retrieved_memory_ids": [
+      "sem_093",
+      "sem_094",
+      "sem_091",
+      "sem_095",
+      "sem_111"
+    ],
+    "best_rank": 5,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says zinnia row made me feel alert during care?",
+    "expected_memory_ids": [
+      "sem_113"
+    ],
+    "retrieved_memory_ids": [
+      "sem_093",
+      "sem_095",
+      "sem_096",
+      "sem_091",
+      "sem_113"
+    ],
+    "best_rank": 5,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says cilantro pot made me feel satisfied during care?",
+    "expected_memory_ids": [
+      "sem_114"
+    ],
+    "retrieved_memory_ids": [
+      "sem_092",
+      "sem_096",
+      "sem_114",
+      "sem_091",
+      "sem_094"
+    ],
+    "best_rank": 3,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says radish sprouts made me feel overwhelmed during care?",
+    "expected_memory_ids": [
+      "sem_117"
+    ],
+    "retrieved_memory_ids": [
+      "sem_092",
+      "sem_094",
+      "sem_099",
+      "sem_117",
+      "sem_096"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which emotional memory says chive clump made me feel joyful during care?",
+    "expected_memory_ids": [
+      "sem_119"
+    ],
+    "retrieved_memory_ids": [
+      "sem_093",
+      "sem_096",
+      "sem_094",
+      "sem_119",
+      "sem_097"
+    ],
+    "best_rank": 4,
+    "category": "emotional"
+  },
+  {
+    "query": "Which follow-up decision connects the earlier rain barrel corner clue about lavender bed?",
+    "expected_memory_ids": [
+      "sem_134"
+    ],
+    "retrieved_memory_ids": [
+      "sem_132",
+      "sem_134",
+      "sem_148",
+      "sem_146",
+      "sem_150"
+    ],
+    "best_rank": 2,
+    "category": "multihop"
+  },
+  {
+    "query": "Which follow-up decision connects the earlier propagation rack clue about fern shelf?",
+    "expected_memory_ids": [
+      "sem_136"
+    ],
+    "retrieved_memory_ids": [
+      "sem_128",
+      "sem_136",
+      "sem_132",
+      "sem_146",
+      "sem_122"
+    ],
+    "best_rank": 2,
+    "category": "multihop"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says ivy wall changed because the cold frame observation for ivy wall?",
+    "expected_memory_ids": [
+      "sem_164"
+    ],
+    "retrieved_memory_ids": [
+      "sem_162",
+      "sem_164",
+      "sem_156",
+      "sem_180",
+      "sem_166"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says zinnia row changed because the clay saucer observation for zinnia row?",
+    "expected_memory_ids": [
+      "sem_166"
+    ],
+    "retrieved_memory_ids": [
+      "sem_152",
+      "sem_156",
+      "sem_166",
+      "sem_174",
+      "sem_154"
+    ],
+    "best_rank": 3,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says pothos shelf changed because the mulch bin observation for pothos shelf?",
+    "expected_memory_ids": [
+      "sem_170"
+    ],
+    "retrieved_memory_ids": [
+      "sem_160",
+      "sem_170",
+      "sem_154",
+      "sem_178",
+      "sem_152"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says radish sprouts changed because the lattice arch observation for radish sprouts?",
+    "expected_memory_ids": [
+      "sem_174"
+    ],
+    "retrieved_memory_ids": [
+      "sem_162",
+      "sem_174",
+      "sem_178",
+      "sem_152",
+      "sem_154"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says bean poles changed because the drip line observation for bean poles?",
+    "expected_memory_ids": [
+      "sem_176"
+    ],
+    "retrieved_memory_ids": [
+      "sem_154",
+      "sem_176",
+      "sem_152",
+      "sem_156",
+      "sem_158"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  },
+  {
+    "query": "Which connected explanation belongs with the connected explanation says chive clump changed because the potting mat observation for chive clump?",
+    "expected_memory_ids": [
+      "sem_178"
+    ],
+    "retrieved_memory_ids": [
+      "sem_154",
+      "sem_158",
+      "sem_156",
+      "sem_178",
+      "sem_176"
+    ],
+    "best_rank": 4,
+    "category": "graph"
+  },
+  {
+    "query": "Which graph-linked explanation sits beside the garden journal observation about begonia basket?",
+    "expected_memory_ids": [
+      "sem_180"
+    ],
+    "retrieved_memory_ids": [
+      "sem_179",
+      "sem_180",
+      "sem_151",
+      "sem_157",
+      "sem_155"
+    ],
+    "best_rank": 2,
+    "category": "graph"
+  }
+]

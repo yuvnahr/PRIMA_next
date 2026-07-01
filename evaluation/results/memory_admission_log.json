@@ -1,0 +1,22 @@
+[
+  {
+    "query": "Who was Milhouse named after?",
+    "novelty": 1.0,
+    "emotion": 0.30023,
+    "relevance": 0.0,
+    "recurrence": 0.0,
+    "reflection": 1.0,
+    "total_score": 0.525057,
+    "stored": false
+  },
+  {
+    "query": "Who was Milhouse named after?",
+    "novelty": 1.0,
+    "emotion": 0.30023,
+    "relevance": 0.0,
+    "recurrence": 0.0,
+    "reflection": 1.0,
+    "total_score": 0.525057,
+    "stored": false
+  }
+]

@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Protocol
 
 import numpy as np
-from chromadb import logger
 
 from affect.emotion_profile import EmotionProfile
+
+logger = logging.getLogger(__name__)
 
 
 class EmotionClassifier(Protocol):

@@ -35,7 +35,7 @@ class ExecutionStepResult:
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the step result into plain Python values."""
-        tool_payload = self.tool_result.to_dict() if hasattr(self.tool_result, "to_dict") else self.tool_result
+        tool_payload = (self.tool_result.to_dict() if (self.tool_result is not None and hasattr(self.tool_result, "to_dict")) else self.tool_result)
         return {
             "action_id": self.action_id,
             "status": self.status.value,

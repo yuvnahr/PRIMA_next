@@ -1,0 +1,12 @@
+{
+  "total_samples": 560,
+  "reflection_trigger_count": 41,
+  "reflection_acceptance_count": 14,
+  "improvement_count": 13,
+  "harm_count": 0,
+  "reflection_trigger_rate": 0.073214,
+  "reflection_acceptance_rate": 0.341463,
+  "improvement_rate": 0.023214,
+  "harm_rate": 0.0,
+  "net_gain": 0.023214
+}

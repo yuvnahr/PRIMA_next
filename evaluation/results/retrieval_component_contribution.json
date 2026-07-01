@@ -1,0 +1,40 @@
+{
+  "overall": {
+    "sparse_gain": 0.272222,
+    "temporal_gain": 0.006945,
+    "graph_gain": -0.011112,
+    "full_stack_gain": 0.268055
+  },
+  "by_category": {
+    "emotional": {
+      "sparse_gain": 0.0,
+      "temporal_gain": 0.0,
+      "graph_gain": -0.033333
+    },
+    "graph": {
+      "sparse_gain": 0.433334,
+      "temporal_gain": 0.033333,
+      "graph_gain": -0.033333
+    },
+    "identity": {
+      "sparse_gain": 0.366667,
+      "temporal_gain": 0.0,
+      "graph_gain": 0.0
+    },
+    "multihop": {
+      "sparse_gain": 0.4,
+      "temporal_gain": 0.0,
+      "graph_gain": 0.0
+    },
+    "preference": {
+      "sparse_gain": 0.433333,
+      "temporal_gain": 0.0,
+      "graph_gain": 0.0
+    },
+    "temporal": {
+      "sparse_gain": 0.0,
+      "temporal_gain": 0.008333,
+      "graph_gain": 0.0
+    }
+  }
+}

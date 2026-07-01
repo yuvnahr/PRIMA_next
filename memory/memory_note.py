@@ -3,19 +3,22 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
+import logging
 import re
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any
-from venv import logger
 
 import numpy as np
 
 from memory.memory_context import StateSnapshot
 from memory.memory_lineage import MemoryLineage
 from memory.memory_types import MemoryLevel, MemoryType
+
+logger = logging.getLogger(__name__)
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
 GENERIC_NOUNS = {
@@ -49,7 +52,7 @@ def stable_embedding(text: str, dimensions: int = 64) -> list[float]:
     norm = np.linalg.norm(vector)
     if norm:
         vector = vector / norm
-    return vector.tolist()
+    return [float(v) for v in vector.tolist()]
 
 
 def tokenize(text: str) -> list[str]:
@@ -59,6 +62,8 @@ def tokenize(text: str) -> list[str]:
 def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
     """Preserve A-MEM dominant context chain extraction without requiring spaCy."""
     try:
+        if importlib.util.find_spec("spacy") is None:
+            raise ImportError("spacy unavailable")
         import spacy
 
         try:
@@ -86,11 +91,8 @@ def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
             filtered_nouns = [noun for noun in nouns if noun not in chunk_words]
             return list(dict.fromkeys(chunks + filtered_nouns))[:top_k]
     except Exception as e:
-        logger.warning(
-            "Keyword extraction failed: %s",
-            e
-        )
-        return chunks[:top_k]
+        if not isinstance(e, ImportError):
+            logger.warning("Keyword extraction failed: %s", e)
 
     words = [word for word in tokenize(text) if len(word) > 2 and word not in GENERIC_NOUNS]
     bigrams = [f"{words[index]} {words[index + 1]}" for index in range(len(words) - 1)]

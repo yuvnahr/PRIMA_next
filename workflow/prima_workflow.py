@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -100,19 +101,34 @@ class ReflectionController:
         retrieved_memories = tuple(getattr(context.retrieval_response, "results", ()))
         affect_signals = tuple(getattr(context.affect_update, "reflection_signals", ())) if context.affect_update else ()
         failure_metadata = {
-            "reason": "workflow reflection checkpoint",
-            "severity": 0.4,
+            "reason": "routine workflow reflection checkpoint",
+            "severity": 0.15,
         }
-        if retrieval_confidence and retrieval_confidence.confidence < 0.4:
+        confidence_value = float(getattr(retrieval_confidence, "confidence", 0.5) if retrieval_confidence else 0.5)
+        audit_sample = self._audit_sample(context.user_input)
+        if retrieval_confidence and confidence_value < 0.30:
             failure_metadata = {
                 "reason": "low confidence retrieval with ambiguous memories",
-                "severity": 0.8,
+                "severity": 0.65,
+                "threshold": 0.30,
+            }
+        elif retrieval_confidence and confidence_value < 0.55 and audit_sample:
+            failure_metadata = {
+                "reason": "low confidence audit sample",
+                "severity": 0.85,
+                "threshold": 0.55,
+                "audit_sample": True,
             }
         reflection_history = tuple(context.metadata.get("reflection_history", ()))
         reflection_context = ReflectionContext(
             query=context.user_input,
             retrieved_memories=retrieved_memories,
             retrieval_confidence=retrieval_confidence,
+            affect_confidence=(
+                float(getattr(getattr(context.affect_update, "profile", None), "confidence", 0.5))
+                if context.affect_update is not None
+                else None
+            ),
             cognitive_state=context.cognitive_state,
             emotional_state=context.cognitive_state.emotional_state,
             reflection_history=reflection_history,
@@ -120,6 +136,10 @@ class ReflectionController:
             affect_signals=affect_signals,
         )
         return self.reflection_engine.evaluate(reflection_context)
+
+    def _audit_sample(self, text: str) -> bool:
+        digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        return int(digest[:8], 16) % 100 < 15
 
 
 @dataclass(slots=True)
@@ -145,7 +165,9 @@ class ActionController:
         result = await self.action_executor.execute(action_context)
         payload = result.to_dict()
         payload["execution_result"] = result
-        payload["plan"] = context.plan.to_dict() if hasattr(context.plan, "to_dict") else context.plan
+        payload["plan"] = (
+            context.plan.to_dict() if (context.plan is not None and hasattr(context.plan, "to_dict")) else context.plan
+        )
         return payload
 
 

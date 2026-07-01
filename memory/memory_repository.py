@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable
+from typing import Any, List
 
 import numpy as np
 
@@ -27,11 +28,11 @@ class MemoryRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def list(self, memory_type: MemoryType | None = None) -> list[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
         raise NotImplementedError
 
     @abstractmethod
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> list[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
         raise NotImplementedError
 
 
@@ -57,7 +58,7 @@ class InMemoryMemoryRepository(MemoryRepository):
                 return notes[note_id]
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> list[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
         if memory_type is not None:
             return list(self._notes[memory_type].values())
         notes: list[MemoryNote] = []
@@ -65,7 +66,7 @@ class InMemoryMemoryRepository(MemoryRepository):
             notes.extend(typed_notes.values())
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> list[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
         query = np.array(list(embedding), dtype="float32")
         query_norm = np.linalg.norm(query) or 1.0
         query = query / query_norm
@@ -84,8 +85,8 @@ class ChromaMemoryRepository(MemoryRepository):
     def __init__(self, path: str = "./memory_db") -> None:
         import chromadb
 
-        self.client = chromadb.PersistentClient(path=path)
-        self.collections = {
+        self.client: Any = chromadb.PersistentClient(path=path)
+        self.collections: dict[MemoryType, Any] = {
             memory_type: self.client.get_or_create_collection(
                 name=collection_name,
                 metadata={"hnsw:space": "cosine"},
@@ -94,7 +95,7 @@ class ChromaMemoryRepository(MemoryRepository):
         }
 
     def add(self, note: MemoryNote) -> MemoryNote:
-        collection = self.collections[note.memory_type]
+        collection: Any = self.collections[note.memory_type]
         collection.add(
             ids=[note.id],
             documents=[note.content],
@@ -104,7 +105,7 @@ class ChromaMemoryRepository(MemoryRepository):
         return note
 
     def update(self, note: MemoryNote) -> MemoryNote:
-        collection = self.collections[note.memory_type]
+        collection: Any = self.collections[note.memory_type]
         collection.upsert(
             ids=[note.id],
             documents=[note.content],
@@ -122,7 +123,7 @@ class ChromaMemoryRepository(MemoryRepository):
                 return self._from_chroma_result(result, 0)
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> list[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
         notes: list[MemoryNote] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
@@ -130,8 +131,8 @@ class ChromaMemoryRepository(MemoryRepository):
             notes.extend(self._from_chroma_result(result, index) for index in range(len(result["ids"])))
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> list[tuple[MemoryNote, float]]:
-        notes: list[tuple[MemoryNote, float]] = []
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+        notes: List[tuple[MemoryNote, float]] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
             result = self.collections[candidate_type].query(

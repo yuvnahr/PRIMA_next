@@ -1,0 +1,77 @@
+{
+  "identity_drift": {
+    "contradiction_rate": 0.0,
+    "stable_identity_percentage": 1.0
+  },
+  "preference_retention": 1.0,
+  "preference_overwrite": 0.046667,
+  "fact_retention": 1.0,
+  "emotion_continuity": 0.631854,
+  "reflection_utility": 0.837556,
+  "memory_evolution": 0.569284,
+  "memory_lifetime": {
+    "average_lifetime_turns": 87.248783,
+    "median_lifetime_turns": 95.0
+  },
+  "graph_growth": {
+    "average_nodes": 14.27,
+    "average_edges": 19.41
+  },
+  "retrieval_scaling": {
+    "checkpoints": [
+      {
+        "memory_count": 100,
+        "average_retrieval_latency_ms": 15.744556,
+        "retrieval_hit_rate_proxy": 0.97,
+        "sampled_users": 100
+      },
+      {
+        "memory_count": 250,
+        "average_retrieval_latency_ms": 18.666833,
+        "retrieval_hit_rate_proxy": 0.960051,
+        "sampled_users": 100
+      },
+      {
+        "memory_count": 500,
+        "average_retrieval_latency_ms": 21.491833,
+        "retrieval_hit_rate_proxy": 0.952526,
+        "sampled_users": 100
+      },
+      {
+        "memory_count": 1000,
+        "average_retrieval_latency_ms": 25.441833,
+        "retrieval_hit_rate_proxy": 0.945,
+        "sampled_users": 100
+      },
+      {
+        "memory_count": 2000,
+        "average_retrieval_latency_ms": 31.641833,
+        "retrieval_hit_rate_proxy": 0.937474,
+        "sampled_users": 100
+      }
+    ]
+  },
+  "failure_counts": {
+    "PREFERENCE_FAILURE": 286,
+    "EMOTION_FAILURE": 14,
+    "MEMORY_EVOLUTION_FAILURE": 7,
+    "REFLECTION_FAILURE": 737
+  },
+  "confidence_intervals": {
+    "identity_stability": {
+      "mean": 1.0,
+      "lower": 1.0,
+      "upper": 1.0
+    },
+    "emotion_continuity": {
+      "mean": 0.631854,
+      "lower": 0.625917,
+      "upper": 0.637792
+    },
+    "memory_evolution": {
+      "mean": 0.569284,
+      "lower": 0.560817,
+      "upper": 0.577752
+    }
+  }
+}

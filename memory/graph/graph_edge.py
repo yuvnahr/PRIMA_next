@@ -16,4 +16,5 @@ class GraphEdge:
 
     @property
     def key(self) -> tuple[str, str]:
-        return tuple(sorted((self.source_id, self.target_id)))
+        a, b = sorted((self.source_id, self.target_id))
+        return (a, b)

@@ -1,0 +1,1102 @@
+[
+    {
+        "query":  "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
+        "expected_memory_ids":  [
+                                    "mem_001"
+                                ],
+        "memory_id":  "mem_001",
+        "memory_text":  "I spent all morning mixing potting soil and carefully transferring my new tomato seedlings into larger ceramic pots.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+        "expected_memory_ids":  [
+                                    "mem_002"
+                                ],
+        "memory_id":  "mem_002",
+        "memory_text":  "My heart sank when I realized aphids had completely infested the underside of my beautiful monstera leaves overnight.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+        "expected_memory_ids":  [
+                                    "mem_003"
+                                ],
+        "memory_id":  "mem_003",
+        "memory_text":  "Waking up early to water the garden before the harsh afternoon sun hits has become my favorite peaceful morning ritual.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+        "expected_memory_ids":  [
+                                    "mem_004"
+                                ],
+        "memory_id":  "mem_004",
+        "memory_text":  "The first tiny green sprout finally breaking through the soil felt like a massive victory after weeks of waiting anxiously.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+        "expected_memory_ids":  [
+                                    "mem_005"
+                                ],
+        "memory_id":  "mem_005",
+        "memory_text":  "I accidentally overwatered my succulent, causing its lower leaves to turn dangerously yellow and mushy.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+        "expected_memory_ids":  [
+                                    "mem_006"
+                                ],
+        "memory_id":  "mem_006",
+        "memory_text":  "Trimming away the dead blooms from the rose bushes always feels so therapeutic and satisfying after a stressful work week.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+        "expected_memory_ids":  [
+                                    "mem_007"
+                                ],
+        "memory_id":  "mem_007",
+        "memory_text":  "The local nursery was so packed on Saturday that I had to navigate a literal maze of wheelbarrows and hanging ferns.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+        "expected_memory_ids":  [
+                                    "mem_008"
+                                ],
+        "memory_id":  "mem_008",
+        "memory_text":  "I built a makeshift trellis out of bamboo sticks to give my rapidly growing sweet pea vines something to climb.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+        "expected_memory_ids":  [
+                                    "mem_009"
+                                ],
+        "memory_id":  "mem_009",
+        "memory_text":  "Getting my hands completely covered in rich, damp earth makes me feel deeply connected to nature, even in the middle of the city.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+        "expected_memory_ids":  [
+                                    "mem_010"
+                                ],
+        "memory_id":  "mem_010",
+        "memory_text":  "Harvesting my very first handful of home-grown sweet basil made the entire kitchen smell like an Italian summer.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+        "expected_memory_ids":  [
+                                    "mem_011"
+                                ],
+        "memory_id":  "mem_011",
+        "memory_text":  "The living room is currently a total disaster zone, buried under a mountain of taped cardboard boxes and bubble wrap.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+        "expected_memory_ids":  [
+                                    "mem_012"
+                                ],
+        "memory_id":  "mem_012",
+        "memory_text":  "Trying to maneuver a massive, heavy velvet sofa up three narrow flights of stairs left us completely exhausted and breathless.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+        "expected_memory_ids":  [
+                                    "mem_013"
+                                ],
+        "memory_id":  "mem_013",
+        "memory_text":  "Unpacking the kitchen boxes feels like a never-ending game of Tetris, trying to find the perfect spot for every single mug.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+        "expected_memory_ids":  [
+                                    "mem_014"
+                                ],
+        "memory_id":  "mem_014",
+        "memory_text":  "I finally got the keys to my new apartment today, and walking into the empty, sunlit space felt absolutely surreal.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+        "expected_memory_ids":  [
+                                    "mem_015"
+                                ],
+        "memory_id":  "mem_015",
+        "memory_text":  "I spent three frustrating hours trying to assemble a simple wooden bookshelf, only to realize I put the bottom shelf on backward.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+        "expected_memory_ids":  [
+                                    "mem_016"
+                                ],
+        "memory_id":  "mem_016",
+        "memory_text":  "The first night in the new place always feels a bit eerie, listening to all the unfamiliar creaks and settling noises of the building.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn\u0027t arrived yet.",
+        "expected_memory_ids":  [
+                                    "mem_017"
+                                ],
+        "memory_id":  "mem_017",
+        "memory_text":  "We ended up sitting on the bare floor eating takeout pizza out of the box because the dining table hadn\u0027t arrived yet.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+        "expected_memory_ids":  [
+                                    "mem_018"
+                                ],
+        "memory_id":  "mem_018",
+        "memory_text":  "Hanging up my favorite colorful art prints on the blank white walls instantly made the unfamiliar space feel like home.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+        "expected_memory_ids":  [
+                                    "mem_019"
+                                ],
+        "memory_id":  "mem_019",
+        "memory_text":  "I accidentally dropped a fragile ceramic mixing bowl while unpacking, shattering it into a million pieces across the hardwood floor.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+        "expected_memory_ids":  [
+                                    "mem_020"
+                                ],
+        "memory_id":  "mem_020",
+        "memory_text":  "Meeting my new next-door neighbor was a lovely surprise; she immediately welcomed me to the building with a plate of warm cookies.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+        "expected_memory_ids":  [
+                                    "mem_021"
+                                ],
+        "memory_id":  "mem_021",
+        "memory_text":  "My fingertips are incredibly sore and calloused from spending hours trying to master the transition between the C and G chords.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+        "expected_memory_ids":  [
+                                    "mem_022"
+                                ],
+        "memory_id":  "mem_022",
+        "memory_text":  "The acoustic guitar finally arrived in the mail today, its polished wooden body looking absolutely beautiful under the lamp.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Trying to coordinate my left hand\u0027s finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+        "expected_memory_ids":  [
+                                    "mem_023"
+                                ],
+        "memory_id":  "mem_023",
+        "memory_text":  "Trying to coordinate my left hand\u0027s finger placement while maintaining a steady strumming pattern with my right is maddeningly difficult.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+        "expected_memory_ids":  [
+                                    "mem_024"
+                                ],
+        "memory_id":  "mem_024",
+        "memory_text":  "I practiced the same simple four-chord progression for an hour until my roommate begged me to play literally anything else.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+        "expected_memory_ids":  [
+                                    "mem_025"
+                                ],
+        "memory_id":  "mem_025",
+        "memory_text":  "Slowing down the online video tutorial to half-speed was the only way I could decipher the complex fingerpicking technique.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+        "expected_memory_ids":  [
+                                    "mem_026"
+                                ],
+        "memory_id":  "mem_026",
+        "memory_text":  "When I finally played a full verse of my favorite song without making a single mistake, I cheered out loud in my empty room.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+        "expected_memory_ids":  [
+                                    "mem_027"
+                                ],
+        "memory_id":  "mem_027",
+        "memory_text":  "Tuning the guitar is a terrifying process because I always feel like the high E string is going to snap right in my face.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+        "expected_memory_ids":  [
+                                    "mem_028"
+                                ],
+        "memory_id":  "mem_028",
+        "memory_text":  "My rhythm is completely off, making every single upbeat pop song sound like a slow, tragic funeral march.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+        "expected_memory_ids":  [
+                                    "mem_029"
+                                ],
+        "memory_id":  "mem_029",
+        "memory_text":  "Watching professional guitarists make it look so effortless makes me realize just how many thousands of hours of practice it takes.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+        "expected_memory_ids":  [
+                                    "mem_030"
+                                ],
+        "memory_id":  "mem_030",
+        "memory_text":  "The rich, warm resonance of the guitar strings vibrating against my chest is one of the most comforting feelings in the world.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+        "expected_memory_ids":  [
+                                    "mem_031"
+                                ],
+        "memory_id":  "mem_031",
+        "memory_text":  "The bass from the massive stage speakers was so incredibly powerful that I could feel the vibrations echoing directly in my chest.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+        "expected_memory_ids":  [
+                                    "mem_032"
+                                ],
+        "memory_id":  "mem_032",
+        "memory_text":  "We stood in the pouring rain for two hours, but the moment the headliner walked on stage, nobody cared about being soaked.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+        "expected_memory_ids":  [
+                                    "mem_033"
+                                ],
+        "memory_id":  "mem_033",
+        "memory_text":  "Losing my friends in the massive, surging festival crowd sent me into a brief moment of absolute panic before I found them by the food trucks.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+        "expected_memory_ids":  [
+                                    "mem_034"
+                                ],
+        "memory_id":  "mem_034",
+        "memory_text":  "Singing the lyrics at the top of my lungs along with twenty thousand other ecstatic fans gave me chills all over my arms.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+        "expected_memory_ids":  [
+                                    "mem_035"
+                                ],
+        "memory_id":  "mem_035",
+        "memory_text":  "The outdoor venue was a literal mud pit by midnight, completely ruining my favorite pair of white canvas sneakers.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+        "expected_memory_ids":  [
+                                    "mem_036"
+                                ],
+        "memory_id":  "mem_036",
+        "memory_text":  "Waiting in a massive forty-minute line just to buy an overpriced bottle of lukewarm water was the absolute worst part of the night.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+        "expected_memory_ids":  [
+                                    "mem_037"
+                                ],
+        "memory_id":  "mem_037",
+        "memory_text":  "The lead guitarist played an absolutely mind-blowing five-minute solo while the entire stadium was illuminated by thousands of phone lights.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+        "expected_memory_ids":  [
+                                    "mem_038"
+                                ],
+        "memory_id":  "mem_038",
+        "memory_text":  "My voice is completely gone today, and my legs are incredibly stiff from jumping up and down for four straight hours.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+        "expected_memory_ids":  [
+                                    "mem_039"
+                                ],
+        "memory_id":  "mem_039",
+        "memory_text":  "Buying the tickets six months in advance felt like a huge gamble, but seeing this performance live made every penny worth it.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+        "expected_memory_ids":  [
+                                    "mem_040"
+                                ],
+        "memory_id":  "mem_040",
+        "memory_text":  "Walking back to the subway station surrounded by a sea of happy, buzzing people was the perfect ending to an unforgettable night.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+        "expected_memory_ids":  [
+                                    "mem_041"
+                                ],
+        "memory_id":  "mem_041",
+        "memory_text":  "I accidentally left my microphone unmuted during the company-wide meeting, treating forty coworkers to the sound of my cat loudly meowing.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+        "expected_memory_ids":  [
+                                    "mem_042"
+                                ],
+        "memory_id":  "mem_042",
+        "memory_text":  "The Wi-Fi router decided to completely cut out right as I was about to share my screen for a crucial project presentation.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+        "expected_memory_ids":  [
+                                    "mem_043"
+                                ],
+        "memory_id":  "mem_043",
+        "memory_text":  "Spending the entire day working in my softest sweatpants is easily the greatest perk of this remote setup.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+        "expected_memory_ids":  [
+                                    "mem_044"
+                                ],
+        "memory_id":  "mem_044",
+        "memory_text":  "Staring at a glowing screen for eight consecutive hours without any face-to-face interaction left me feeling incredibly drained and isolated.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+        "expected_memory_ids":  [
+                                    "mem_045"
+                                ],
+        "memory_id":  "mem_045",
+        "memory_text":  "I set up a small standing desk right by the window so I could at least watch the clouds move while responding to endless emails.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+        "expected_memory_ids":  [
+                                    "mem_046"
+                                ],
+        "memory_id":  "mem_046",
+        "memory_text":  "The line dividing my personal life and my professional life has become completely blurred since my living room became my office.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+        "expected_memory_ids":  [
+                                    "mem_047"
+                                ],
+        "memory_id":  "mem_047",
+        "memory_text":  "Taking a quick ten-minute break to stretch and make a fresh cup of loose-leaf tea keeps me sane during frantic afternoons.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I had to aggressively apologize for my neighbor\u0027s loud lawnmower echoing through my microphone during a high-stakes client call.",
+        "expected_memory_ids":  [
+                                    "mem_048"
+                                ],
+        "memory_id":  "mem_048",
+        "memory_text":  "I had to aggressively apologize for my neighbor\u0027s loud lawnmower echoing through my microphone during a high-stakes client call.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Closing my laptop screen at exactly five o\u0027clock feels like a triumphant mental boundary that allows me to finally decompress.",
+        "expected_memory_ids":  [
+                                    "mem_049"
+                                ],
+        "memory_id":  "mem_049",
+        "memory_text":  "Closing my laptop screen at exactly five o\u0027clock feels like a triumphant mental boundary that allows me to finally decompress.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+        "expected_memory_ids":  [
+                                    "mem_050"
+                                ],
+        "memory_id":  "mem_050",
+        "memory_text":  "My dog has figured out the exact sound of the Zoom disconnect chime and immediately runs over to demand his evening walk.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I sprinted through the rain only to see the subway doors close right in my face today.",
+        "expected_memory_ids":  [
+                                    "mem_051"
+                                ],
+        "memory_id":  "mem_051",
+        "memory_text":  "I sprinted through the rain only to see the subway doors close right in my face today.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+        "expected_memory_ids":  [
+                                    "mem_052"
+                                ],
+        "memory_id":  "mem_052",
+        "memory_text":  "Traffic was backed up for miles on the highway, making me completely late for my morning meeting.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+        "expected_memory_ids":  [
+                                    "mem_053"
+                                ],
+        "memory_id":  "mem_053",
+        "memory_text":  "My umbrella flipped inside out from the strong wind while I was rushing to catch the bus.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+        "expected_memory_ids":  [
+                                    "mem_054"
+                                ],
+        "memory_id":  "mem_054",
+        "memory_text":  "I accidentally dropped my transit pass in a puddle while trying to scan it at the station turnstile.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+        "expected_memory_ids":  [
+                                    "mem_055"
+                                ],
+        "memory_id":  "mem_055",
+        "memory_text":  "The train stalled underground for twenty minutes without any clear announcements, making everyone extremely anxious and frustrated.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+        "expected_memory_ids":  [
+                                    "mem_056"
+                                ],
+        "memory_id":  "mem_056",
+        "memory_text":  "I spilled hot coffee down my white shirt when the bus driver suddenly slammed on the brakes.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+        "expected_memory_ids":  [
+                                    "mem_057"
+                                ],
+        "memory_id":  "mem_057",
+        "memory_text":  "Dodging slow walkers on the crowded sidewalk felt like an intense obstacle course during the morning rush hour.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+        "expected_memory_ids":  [
+                                    "mem_058"
+                                ],
+        "memory_id":  "mem_058",
+        "memory_text":  "The delay on the red line meant I had to awkwardly sneak into the office thirty minutes late.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+        "expected_memory_ids":  [
+                                    "mem_059"
+                                ],
+        "memory_id":  "mem_059",
+        "memory_text":  "I grabbed the wrong train going in the opposite direction because I was too distracted by my phone.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+        "expected_memory_ids":  [
+                                    "mem_060"
+                                ],
+        "memory_id":  "mem_060",
+        "memory_text":  "Heavy sudden snowfall completely paralyzed the city grid, turning my usual twenty-minute commute into a two-hour ordeal.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+        "expected_memory_ids":  [
+                                    "mem_061"
+                                ],
+        "memory_id":  "mem_061",
+        "memory_text":  "My first attempt at a sourdough starter ended up smelling like old socks instead of fresh yeast.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+        "expected_memory_ids":  [
+                                    "mem_062"
+                                ],
+        "memory_id":  "mem_062",
+        "memory_text":  "The dough was incredibly sticky, making it impossible to knead without getting my hands completely covered in flour.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+        "expected_memory_ids":  [
+                                    "mem_063"
+                                ],
+        "memory_id":  "mem_063",
+        "memory_text":  "I watched the dough rise overnight, feeling amazed at how the wild yeast created such beautiful air bubbles.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+        "expected_memory_ids":  [
+                                    "mem_064"
+                                ],
+        "memory_id":  "mem_064",
+        "memory_text":  "Shaping the loaf was much harder than the online tutorial made it look, resulting in a lopsided oval.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+        "expected_memory_ids":  [
+                                    "mem_065"
+                                ],
+        "memory_id":  "mem_065",
+        "memory_text":  "The kitchen smelled absolutely divine when I finally pulled that crusty, golden-brown loaf out of the hot oven.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+        "expected_memory_ids":  [
+                                    "mem_066"
+                                ],
+        "memory_id":  "mem_066",
+        "memory_text":  "When I cut into the bread, the crumb was perfectly open and airy, making all the effort worthwhile.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+        "expected_memory_ids":  [
+                                    "mem_067"
+                                ],
+        "memory_id":  "mem_067",
+        "memory_text":  "I accidentally forgot to add salt to the recipe, which made the final baked bread taste incredibly bland.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+        "expected_memory_ids":  [
+                                    "mem_068"
+                                ],
+        "memory_id":  "mem_068",
+        "memory_text":  "Scoring the top of the dough with a razor blade allowed it to expand beautifully during the bake.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+        "expected_memory_ids":  [
+                                    "mem_069"
+                                ],
+        "memory_id":  "mem_069",
+        "memory_text":  "Nurturing the starter every single day feels a lot like taking care of a very demanding little pet.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+        "expected_memory_ids":  [
+                                    "mem_070"
+                                ],
+        "memory_id":  "mem_070",
+        "memory_text":  "The satisfying crunch of the thick crust followed by the soft interior is the best part of baking.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+        "expected_memory_ids":  [
+                                    "mem_071"
+                                ],
+        "memory_id":  "mem_071",
+        "memory_text":  "We brought the little golden retriever mix home from the shelter, and she immediately fell asleep on my lap.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+        "expected_memory_ids":  [
+                                    "mem_072"
+                                ],
+        "memory_id":  "mem_072",
+        "memory_text":  "The puppy chewed through my favorite pair of running shoes when I left them unattended in the hallway.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+        "expected_memory_ids":  [
+                                    "mem_073"
+                                ],
+        "memory_id":  "mem_073",
+        "memory_text":  "Potty training is proving to be a massive challenge, with several unexpected puddles appearing on the living room rug.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+        "expected_memory_ids":  [
+                                    "mem_074"
+                                ],
+        "memory_id":  "mem_074",
+        "memory_text":  "Watching her clumsily chase her own tail for ten straight minutes was the funniest thing I saw all week.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+        "expected_memory_ids":  [
+                                    "mem_075"
+                                ],
+        "memory_id":  "mem_075",
+        "memory_text":  "She gets incredibly excited and does zoomies around the coffee table whenever I pull out the bag of treats.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+        "expected_memory_ids":  [
+                                    "mem_076"
+                                ],
+        "memory_id":  "mem_076",
+        "memory_text":  "The tiny dog barked fiercely at her own reflection in the hallway mirror, clearly confused by the other puppy.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+        "expected_memory_ids":  [
+                                    "mem_077"
+                                ],
+        "memory_id":  "mem_077",
+        "memory_text":  "Crate training at night involves a lot of pathetic whining that completely breaks my heart into tiny little pieces.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+        "expected_memory_ids":  [
+                                    "mem_078"
+                                ],
+        "memory_id":  "mem_078",
+        "memory_text":  "We went for her first walk around the neighborhood, but she was terrified of the noisy garbage truck passing.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+        "expected_memory_ids":  [
+                                    "mem_079"
+                                ],
+        "memory_id":  "mem_079",
+        "memory_text":  "Her soft ears and innocent puppy dog eyes make it absolutely impossible to stay mad at her for long.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+        "expected_memory_ids":  [
+                                    "mem_080"
+                                ],
+        "memory_id":  "mem_080",
+        "memory_text":  "I spent all afternoon throwing a small tennis ball, slowly teaching her how to properly play a game of fetch.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+        "expected_memory_ids":  [
+                                    "mem_081"
+                                ],
+        "memory_id":  "mem_081",
+        "memory_text":  "I secretly booked the back room of her favorite Italian restaurant for the massive surprise birthday celebration next weekend.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+        "expected_memory_ids":  [
+                                    "mem_082"
+                                ],
+        "memory_id":  "mem_082",
+        "memory_text":  "Managing the group chat without accidentally texting her the party details is causing me a tremendous amount of anxiety.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+        "expected_memory_ids":  [
+                                    "mem_083"
+                                ],
+        "memory_id":  "mem_083",
+        "memory_text":  "I ordered a custom chocolate cake with sparkler candles to make the big reveal feel extra special and festive.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Convincing everyone to park three blocks away so she wouldn\u0027t recognize their cars took a lot of careful coordination.",
+        "expected_memory_ids":  [
+                                    "mem_084"
+                                ],
+        "memory_id":  "mem_084",
+        "memory_text":  "Convincing everyone to park three blocks away so she wouldn\u0027t recognize their cars took a lot of careful coordination.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+        "expected_memory_ids":  [
+                                    "mem_085"
+                                ],
+        "memory_id":  "mem_085",
+        "memory_text":  "We spent three hours blowing up balloons and hanging colorful streamers across the ceiling of the rented banquet hall.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+        "expected_memory_ids":  [
+                                    "mem_086"
+                                ],
+        "memory_id":  "mem_086",
+        "memory_text":  "Trying to casually distract her at the mall while everyone arrived at the venue was surprisingly difficult and stressful.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+        "expected_memory_ids":  [
+                                    "mem_087"
+                                ],
+        "memory_id":  "mem_087",
+        "memory_text":  "When she walked through the doors and everyone yelled surprise, the shocked expression on her face was absolutely priceless.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+        "expected_memory_ids":  [
+                                    "mem_088"
+                                ],
+        "memory_id":  "mem_088",
+        "memory_text":  "Wrapping all the presents and hiding them in the trunk of my car required some serious stealth and planning.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+        "expected_memory_ids":  [
+                                    "mem_089"
+                                ],
+        "memory_id":  "mem_089",
+        "memory_text":  "The curated playlist had all her favorite throwback songs, which got everyone dancing immediately after the dinner was finished.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+        "expected_memory_ids":  [
+                                    "mem_090"
+                                ],
+        "memory_id":  "mem_090",
+        "memory_text":  "Keeping a secret of this magnitude from my best friend for over a month was the hardest thing ever.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+        "expected_memory_ids":  [
+                                    "mem_091"
+                                ],
+        "memory_id":  "mem_091",
+        "memory_text":  "The steep incline during the first three miles of the rocky trail made my leg muscles burn with exhaustion.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+        "expected_memory_ids":  [
+                                    "mem_092"
+                                ],
+        "memory_id":  "mem_092",
+        "memory_text":  "We reached the summit just in time to watch the sunrise paint the surrounding clouds in stunning pink hues.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+        "expected_memory_ids":  [
+                                    "mem_093"
+                                ],
+        "memory_id":  "mem_093",
+        "memory_text":  "Navigating the narrow ridge line required intense focus and careful foot placement to avoid slipping on the loose gravel.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+        "expected_memory_ids":  [
+                                    "mem_094"
+                                ],
+        "memory_id":  "mem_094",
+        "memory_text":  "The crisp mountain air felt incredibly refreshing in my lungs after spending the whole month trapped inside the city.",
+        "memory_type":  "episodic",
+        "category":  "projects",
+        "manually_verified":  true
+    },
+    {
+        "query":  "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+        "expected_memory_ids":  [
+                                    "mem_095"
+                                ],
+        "memory_id":  "mem_095",
+        "memory_text":  "We spotted a massive bald eagle circling high above the pine trees as we sat down to eat lunch.",
+        "memory_type":  "working",
+        "category":  "goals",
+        "manually_verified":  true
+    },
+    {
+        "query":  "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+        "expected_memory_ids":  [
+                                    "mem_096"
+                                ],
+        "memory_id":  "mem_096",
+        "memory_text":  "My hiking boots got completely soaked when I misjudged the distance trying to cross a fast-flowing, icy alpine stream.",
+        "memory_type":  "episodic",
+        "category":  "emotional_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+        "expected_memory_ids":  [
+                                    "mem_097"
+                                ],
+        "memory_id":  "mem_097",
+        "memory_text":  "The panoramic view from the top overlooking the vast, green valley below was definitely worth the grueling uphill climb.",
+        "memory_type":  "episodic",
+        "category":  "episodic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+        "expected_memory_ids":  [
+                                    "mem_098"
+                                ],
+        "memory_id":  "mem_098",
+        "memory_text":  "I drank almost three liters of water during the descent because the afternoon sun became surprisingly hot and relentless.",
+        "memory_type":  "semantic",
+        "category":  "semantic_memories",
+        "manually_verified":  true
+    },
+    {
+        "query":  "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+        "expected_memory_ids":  [
+                                    "mem_099"
+                                ],
+        "memory_id":  "mem_099",
+        "memory_text":  "The silence of the deep forest, broken only by chirping birds, provided a profound sense of peace and isolation.",
+        "memory_type":  "semantic",
+        "category":  "preferences",
+        "manually_verified":  true
+    },
+    {
+        "query":  "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+        "expected_memory_ids":  [
+                                    "mem_100"
+                                ],
+        "memory_id":  "mem_100",
+        "memory_text":  "Sitting by the campfire after a long day of trekking made the freeze-dried dinner taste like a gourmet meal.",
+        "memory_type":  "episodic",
+        "category":  "personal_facts",
+        "manually_verified":  true
+    }
+]

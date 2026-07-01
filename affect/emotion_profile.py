@@ -44,7 +44,13 @@ class EmotionProfile:
         emotional_keywords: tuple[str, ...] = (),
         confidence: float | None = None,
     ) -> EmotionProfile:
-        dominant = max(scores, key=scores.get) if scores else "neutral"
+        if scores:
+            def _key_fn(k: str) -> float:
+                return float(scores.get(k, 0.0))
+
+            dominant = max(scores.keys(), key=_key_fn)
+        else:
+            dominant = "neutral"
         computed_confidence = confidence if confidence is not None else profile_confidence(scores)
         valence, arousal, dominance = scores_to_pad(scores)
         return cls(

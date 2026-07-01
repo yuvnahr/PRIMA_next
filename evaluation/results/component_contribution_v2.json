@@ -1,0 +1,50 @@
+{
+  "metrics": {
+    "dense_baseline": {
+      "recall_at_1": 0.401574,
+      "recall_at_3": 0.430463,
+      "recall_at_5": 0.431852,
+      "mrr": 0.430556,
+      "ndcg_at_5": 0.42416,
+      "hit_rate": 0.444444,
+      "average_retrieval_latency": 4.955378,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_plus_sparse": {
+      "recall_at_1": 0.690463,
+      "recall_at_3": 0.702685,
+      "recall_at_5": 0.704074,
+      "mrr": 0.711111,
+      "ndcg_at_5": 0.702286,
+      "hit_rate": 0.716667,
+      "average_retrieval_latency": 5.114749,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_plus_sparse_plus_temporal": {
+      "recall_at_1": 0.668241,
+      "recall_at_3": 0.705463,
+      "recall_at_5": 0.711019,
+      "mrr": 0.701111,
+      "ndcg_at_5": 0.697999,
+      "hit_rate": 0.722222,
+      "average_retrieval_latency": 6.513266,
+      "average_retrieved_memory_count": 5.0
+    },
+    "final_retrieval_stack": {
+      "recall_at_1": 0.690463,
+      "recall_at_3": 0.708241,
+      "recall_at_5": 0.711019,
+      "mrr": 0.713889,
+      "ndcg_at_5": 0.70663,
+      "hit_rate": 0.722222,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 5.0
+    }
+  },
+  "gains": {
+    "sparse_gain": 0.272222,
+    "temporal_gain": 0.006945,
+    "graph_gain": 0.0,
+    "total_gain": 0.279167
+  }
+}

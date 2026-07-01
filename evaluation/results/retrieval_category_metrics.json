@@ -1,0 +1,62 @@
+{
+  "emotional": {
+    "recall_at_1": 0.566667,
+    "recall_at_3": 0.633333,
+    "recall_at_5": 0.966667,
+    "mrr": 0.671111,
+    "ndcg_at_5": 0.74208,
+    "hit_rate": 0.966667,
+    "average_retrieval_latency": 4.402967,
+    "average_retrieved_memory_count": 5.0
+  },
+  "graph": {
+    "recall_at_1": 0.333333,
+    "recall_at_3": 0.533333,
+    "recall_at_5": 0.566667,
+    "mrr": 0.436111,
+    "ndcg_at_5": 0.469511,
+    "hit_rate": 0.566667,
+    "average_retrieval_latency": 10.541703,
+    "average_retrieved_memory_count": 5.0
+  },
+  "identity": {
+    "recall_at_1": 0.5,
+    "recall_at_3": 0.966667,
+    "recall_at_5": 1.0,
+    "mrr": 0.697222,
+    "ndcg_at_5": 0.773875,
+    "hit_rate": 1.0,
+    "average_retrieval_latency": 8.033333,
+    "average_retrieved_memory_count": 5.0
+  },
+  "multihop": {
+    "recall_at_1": 0.533333,
+    "recall_at_3": 0.6,
+    "recall_at_5": 0.6,
+    "mrr": 0.566667,
+    "ndcg_at_5": 0.575395,
+    "hit_rate": 0.6,
+    "average_retrieval_latency": 11.45521,
+    "average_retrieved_memory_count": 5.0
+  },
+  "preference": {
+    "recall_at_1": 0.833333,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "mrr": 0.911111,
+    "ndcg_at_5": 0.934124,
+    "hit_rate": 1.0,
+    "average_retrieval_latency": 6.40031,
+    "average_retrieved_memory_count": 5.0
+  },
+  "temporal": {
+    "recall_at_1": 0.042778,
+    "recall_at_3": 0.049444,
+    "recall_at_5": 0.066111,
+    "mrr": 0.133333,
+    "ndcg_at_5": 0.07817,
+    "hit_rate": 0.133333,
+    "average_retrieval_latency": 7.758457,
+    "average_retrieved_memory_count": 5.0
+  }
+}

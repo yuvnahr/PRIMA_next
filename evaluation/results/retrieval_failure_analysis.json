@@ -1,0 +1,3260 @@
+{
+  "total_failures": 50,
+  "cluster_counts": {
+    "Wrong temporal ordering": 26,
+    "Graph traversal failure": 24
+  },
+  "failures": [
+    {
+      "query": "What recent Monday update mentioned tomato seedlings needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_061",
+        "sem_065",
+        "sem_064",
+        "sem_068",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_061",
+          "score": 0.4894641826871401,
+          "strategy_scores": {
+            "dense": 0.8630945512476009,
+            "sparse": 0.4,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.2309756212971411,
+          "strategy_scores": {
+            "dense": 0.8946761849917051,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.21157137005659532,
+          "strategy_scores": {
+            "dense": 0.7599381659686957,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.21064907249658565,
+          "strategy_scores": {
+            "dense": 0.9669466121700852,
+            "temporal": 0.2983870967742201,
+            "graph": 0.3576837099365088
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.17373266158409081,
+          "strategy_scores": {
+            "dense": 0.9485403245391026,
+            "temporal": 0.3145161290322543,
+            "graph": 0.0
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent Saturday update mentioned orchid roots needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_066",
+        "sem_064",
+        "sem_072",
+        "sem_069",
+        "sem_068"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_066",
+          "score": 0.42580580332312207,
+          "strategy_scores": {
+            "dense": 0.8956946027993273,
+            "sparse": 0.4,
+            "temporal": 0.3145161290322296
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23684053352521095,
+          "strategy_scores": {
+            "dense": 0.9283992557594655,
+            "temporal": 0.9758064516129115
+          }
+        },
+        {
+          "memory_id": "sem_072",
+          "score": 0.195751566659042,
+          "strategy_scores": {
+            "dense": 0.9849331146226797,
+            "temporal": 0.2661290322580525,
+            "graph": 0.2139869623983479
+          }
+        },
+        {
+          "memory_id": "sem_069",
+          "score": 0.16896271228418175,
+          "strategy_scores": {
+            "dense": 0.9328696947977843,
+            "temporal": 0.29032258064514105
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.16839487506492395,
+          "strategy_scores": {
+            "dense": 0.9237077692500286,
+            "temporal": 0.2983870967741967
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent Sunday update mentioned lavender bed needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_067",
+        "sem_088",
+        "sem_079",
+        "sem_080",
+        "sem_062"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_067",
+          "score": 0.4184978401226319,
+          "strategy_scores": {
+            "dense": 0.8523511922154139,
+            "sparse": 0.4,
+            "temporal": 0.306451612903198
+          }
+        },
+        {
+          "memory_id": "sem_088",
+          "score": 0.3635976511528462,
+          "strategy_scores": {
+            "dense": 0.5992531582233168,
+            "sparse": 0.4,
+            "temporal": 0.1370967741934864
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.2709677419354836,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2096774193548362,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.15578091596436874,
+          "strategy_scores": {
+            "dense": 0.9041308376119385,
+            "temporal": 0.20161290322577988
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.18854972621453872,
+          "strategy_scores": {
+            "dense": 0.5957078521829623,
+            "temporal": 0.9919354838709437
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent early April update mentioned fern shelf needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_068",
+        "sem_070",
+        "sem_064",
+        "sem_085",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_068",
+          "score": 0.4255031078048607,
+          "strategy_scores": {
+            "dense": 0.9044293208496437,
+            "sparse": 0.4,
+            "temporal": 0.29838709677414166
+          }
+        },
+        {
+          "memory_id": "sem_070",
+          "score": 0.25267062966744075,
+          "strategy_scores": {
+            "dense": 0.9966153901490884,
+            "temporal": 0.2822580645161075,
+            "graph": 0.7495251469346674
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.24255551984780888,
+          "strategy_scores": {
+            "dense": 0.9664991645767862,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_085",
+          "score": 0.15980582879396346,
+          "strategy_scores": {
+            "dense": 0.9578453102393195,
+            "temporal": 0.1612903225806553
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.2268337181423866,
+          "strategy_scores": {
+            "dense": 0.8455581209492439,
+            "temporal": 1.0
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent late May update mentioned pepper sprouts needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "6",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_069",
+        "sem_061",
+        "sem_086",
+        "sem_082",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_069",
+          "score": 0.29291831455477174,
+          "strategy_scores": {
+            "dense": 0.025907043268369095,
+            "sparse": 0.4,
+            "temporal": 0.2903225806451638
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.27644881396582377,
+          "strategy_scores": {
+            "dense": 0.9900319230473007,
+            "temporal": 1.0,
+            "graph": 0.2794402550872868
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.2643262989512255,
+          "strategy_scores": {
+            "dense": 0.9998649782127634,
+            "temporal": 0.153225806451599,
+            "graph": 0.9902397157415113
+          }
+        },
+        {
+          "memory_id": "sem_082",
+          "score": 0.2516138507265796,
+          "strategy_scores": {
+            "dense": 0.9977049348787121,
+            "temporal": 0.18548387096774574,
+            "graph": 0.8340972339799825
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.22767155190775124,
+          "strategy_scores": {
+            "dense": 0.8618963675570309,
+            "temporal": 0.9838709677419658
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent mid June update mentioned sweet pea vines needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_070",
+        "sem_089",
+        "sem_074",
+        "sem_062",
+        "sem_065"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_070",
+          "score": 0.42827026972514676,
+          "strategy_scores": {
+            "dense": 0.9336297551569066,
+            "sparse": 0.4,
+            "temporal": 0.2822580645161075
+          }
+        },
+        {
+          "memory_id": "sem_089",
+          "score": 0.25217487360420754,
+          "strategy_scores": {
+            "dense": 0.9968307822903371,
+            "temporal": 0.12903225806450855,
+            "graph": 0.8974703045420614
+          }
+        },
+        {
+          "memory_id": "sem_074",
+          "score": 0.2489227512550401,
+          "strategy_scores": {
+            "dense": 0.9922966288779632,
+            "temporal": 0.24999999999996078,
+            "graph": 0.7507825692334954
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.2341618228692671,
+          "strategy_scores": {
+            "dense": 0.8997884965478181,
+            "temporal": 0.9919354838709437
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23387433933960533,
+          "strategy_scores": {
+            "dense": 0.9140009719414667,
+            "temporal": 0.9677419354838532
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent first frost week update mentioned cucumber vines needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_071",
+        "sem_080",
+        "sem_062",
+        "sem_064",
+        "sem_073"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_071",
+          "score": 0.4257472412425465,
+          "strategy_scores": {
+            "dense": 0.9221859093589042,
+            "sparse": 0.4,
+            "temporal": 0.27419354838710813
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.26267957474862297,
+          "strategy_scores": {
+            "dense": 0.9985094036156008,
+            "temporal": 0.2016129032258425,
+            "graph": 0.9274187388369859
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24611300867095887,
+          "strategy_scores": {
+            "dense": 0.9794630685590963,
+            "temporal": 0.9919354838709443,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23286937286043763,
+          "strategy_scores": {
+            "dense": 0.9019248513276955,
+            "temporal": 0.975806451612833
+          }
+        },
+        {
+          "memory_id": "sem_073",
+          "score": 0.23559321089990587,
+          "strategy_scores": {
+            "dense": 0.9919882397801412,
+            "temporal": 0.25806451612899683,
+            "graph": 0.6098852331998501
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent monsoon morning update mentioned mint cuttings needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "2"
+      ],
+      "retrieved_memory_ids": [
+        "sem_072",
+        "sem_064",
+        "sem_079",
+        "sem_084",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_072",
+          "score": 0.3216279504584055,
+          "strategy_scores": {
+            "dense": 0.23343364821732077,
+            "sparse": 0.4,
+            "temporal": 0.2661290322580734
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.3284702381314614,
+          "strategy_scores": {
+            "dense": 0.9961895536123547,
+            "temporal": 0.9758064516129096,
+            "graph": 0.8146115992831726
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.15678884727735903,
+          "strategy_scores": {
+            "dense": 0.9054740356125027,
+            "temporal": 0.2096774193548362
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.26693548387096333,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.16935483870963314,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24621286130900974,
+          "strategy_scores": {
+            "dense": 0.9747524087267316,
+            "temporal": 1.0
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent winter evening update mentioned dahlia tubers needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "3"
+      ],
+      "retrieved_memory_ids": [
+        "sem_073",
+        "sem_068",
+        "sem_063",
+        "sem_065",
+        "sem_062"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_073",
+          "score": 0.42620028567233237,
+          "strategy_scores": {
+            "dense": 0.935958893729499,
+            "sparse": 0.4,
+            "temporal": 0.25806451612907527
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.2788584303600681,
+          "strategy_scores": {
+            "dense": 0.9997889928257824,
+            "temporal": 0.2983870967741967,
+            "graph": 0.9905137175878108
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.2698612272210742,
+          "strategy_scores": {
+            "dense": 0.9830971422694582,
+            "temporal": 0.9838709677418886,
+            "graph": 0.24009559106466574
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23970967853611025,
+          "strategy_scores": {
+            "dense": 0.9529032332514977,
+            "temporal": 0.9677419354838558
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.23071690039454174,
+          "strategy_scores": {
+            "dense": 0.8768223467163153,
+            "temporal": 0.9919354838709443
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent spring equinox update mentioned aloe pups needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "4"
+      ],
+      "retrieved_memory_ids": [
+        "sem_074",
+        "sem_078",
+        "sem_084",
+        "sem_065",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_074",
+          "score": 0.43073536671119805,
+          "strategy_scores": {
+            "dense": 0.9715691114079608,
+            "sparse": 0.4,
+            "temporal": 0.2500000000000392,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.2717741935483893,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.21774193548389248,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.2429703098717343,
+          "strategy_scores": {
+            "dense": 0.9934651744261753,
+            "temporal": 0.16935483870971157,
+            "graph": 0.7701504983683686
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.2393816506949019,
+          "strategy_scores": {
+            "dense": 0.9507163809767247,
+            "temporal": 0.9677419354839317
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23449980117839436,
+          "strategy_scores": {
+            "dense": 0.9127943734473561,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent harvest day update mentioned jasmine trellis needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "5"
+      ],
+      "retrieved_memory_ids": [
+        "sem_075",
+        "sem_072",
+        "sem_076",
+        "sem_086",
+        "sem_083"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_075",
+          "score": 0.3455567589504827,
+          "strategy_scores": {
+            "dense": 0.4090880704225626,
+            "sparse": 0.4,
+            "temporal": 0.24193548387098293
+          }
+        },
+        {
+          "memory_id": "sem_072",
+          "score": 0.27661290322580734,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2661290322580734,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_076",
+          "score": 0.17017130800518165,
+          "strategy_scores": {
+            "dense": 0.9785614082065933,
+            "temporal": 0.23387096774192662
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.16112346177173545,
+          "strategy_scores": {
+            "dense": 0.9720058741771704,
+            "temporal": 0.153225806451599
+          }
+        },
+        {
+          "memory_id": "sem_083",
+          "score": 0.23871714058827687,
+          "strategy_scores": {
+            "dense": 0.9946682437325183,
+            "temporal": 0.17741935483868942,
+            "graph": 0.7177496854453019
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent repotting day update mentioned thyme patch needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_076",
+        "sem_063",
+        "sem_088",
+        "sem_065",
+        "sem_079"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_076",
+          "score": 0.4279996813979449,
+          "strategy_scores": {
+            "dense": 0.9640838974916819,
+            "sparse": 0.4,
+            "temporal": 0.23387096774192662
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.3203048861120642,
+          "strategy_scores": {
+            "dense": 0.9968848718855476,
+            "temporal": 0.9838709677419658,
+            "graph": 0.7238505855503549
+          }
+        },
+        {
+          "memory_id": "sem_088",
+          "score": 0.26370967741935647,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.13709677419356484,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23505057832946713,
+          "strategy_scores": {
+            "dense": 0.921842565207212,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.20135713567556845,
+          "strategy_scores": {
+            "dense": 0.9922781735657035,
+            "temporal": 0.2096774193548362,
+            "graph": 0.31547667705229326
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent market weekend update mentioned marigold border needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_077",
+        "sem_082",
+        "sem_069",
+        "sem_078",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_077",
+          "score": 0.28700268115284033,
+          "strategy_scores": {
+            "dense": 0.029480239943688438,
+            "sparse": 0.4,
+            "temporal": 0.22580645161287033
+          }
+        },
+        {
+          "memory_id": "sem_082",
+          "score": 0.22682753347944076,
+          "strategy_scores": {
+            "dense": 0.9944228676646949,
+            "temporal": 0.18548387096774574,
+            "graph": 0.5911571623296193
+          }
+        },
+        {
+          "memory_id": "sem_069",
+          "score": 0.17018180472933142,
+          "strategy_scores": {
+            "dense": 0.9409969777654338,
+            "temporal": 0.2903225806451638
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.16908932136794563,
+          "strategy_scores": {
+            "dense": 0.982100852130376,
+            "temporal": 0.21774193548389248
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.1649042372213367,
+          "strategy_scores": {
+            "dense": 0.889684162120742,
+            "temporal": 0.3145161290322543
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent inspection night update mentioned fig sapling needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_078",
+        "sem_063",
+        "sem_065",
+        "sem_064",
+        "sem_066"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_078",
+          "score": 0.2921606232299754,
+          "strategy_scores": {
+            "dense": 0.06924286454390743,
+            "sparse": 0.4,
+            "temporal": 0.21774193548389248
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.27116488859191473,
+          "strategy_scores": {
+            "dense": 0.9772903666926395,
+            "temporal": 0.9838709677419658,
+            "graph": 0.2618423681382221
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23357897314954612,
+          "strategy_scores": {
+            "dense": 0.9120318640077385,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.22444610071660598,
+          "strategy_scores": {
+            "dense": 0.8457697037021003,
+            "temporal": 0.9758064516129096
+          }
+        },
+        {
+          "memory_id": "sem_066",
+          "score": 0.17238369939806156,
+          "strategy_scores": {
+            "dense": 0.9395472432989076,
+            "temporal": 0.3145161290322543
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent watering morning update mentioned parsley tray needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "7",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_079",
+        "sem_157",
+        "sem_061",
+        "sem_062",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_079",
+          "score": 0.2861197807510389,
+          "strategy_scores": {
+            "dense": 0.03434692543703518,
+            "sparse": 0.4,
+            "temporal": 0.2096774193548362
+          }
+        },
+        {
+          "memory_id": "sem_157",
+          "score": 0.538478089867767,
+          "strategy_scores": {
+            "dense": 0.9998631716540317,
+            "sparse": 0.4,
+            "temporal": 0.2903225806451638,
+            "graph": 0.9946635605514584
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24475447082397356,
+          "strategy_scores": {
+            "dense": 0.965029805493157,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.22735368687765134,
+          "strategy_scores": {
+            "dense": 0.8544009232703799,
+            "temporal": 0.9919354838709437
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.22412645467213355,
+          "strategy_scores": {
+            "dense": 0.8436387300722841,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent mulch afternoon update mentioned cosmos bed needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_080",
+        "sem_061",
+        "sem_062",
+        "sem_071",
+        "sem_065"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_080",
+          "score": 0.40445051727276415,
+          "strategy_scores": {
+            "dense": 0.8285948463345741,
+            "sparse": 0.4,
+            "temporal": 0.20161290322577988
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.35,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 1.0,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24104186038974162,
+          "strategy_scores": {
+            "dense": 0.9456554133509293,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_071",
+          "score": 0.2464230894802185,
+          "strategy_scores": {
+            "dense": 0.9884472478850629,
+            "temporal": 0.27419354838712967,
+            "graph": 0.7073664745874608
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.23751007122800394,
+          "strategy_scores": {
+            "dense": 0.9382391845307907,
+            "temporal": 0.9677419354838532
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent stormy dawn update mentioned sage planter needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "1"
+      ],
+      "retrieved_memory_ids": [
+        "sem_081",
+        "sem_062",
+        "sem_065",
+        "sem_064",
+        "sem_061"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_081",
+          "score": 0.409820603470582,
+          "strategy_scores": {
+            "dense": 0.8697717650727311,
+            "sparse": 0.4,
+            "temporal": 0.1935483870967236
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.33894538996034856,
+          "strategy_scores": {
+            "dense": 0.9984276726967017,
+            "temporal": 0.9919354838709437,
+            "graph": 0.8998769066874893
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.29176708609736257,
+          "strategy_scores": {
+            "dense": 0.9915605152341341,
+            "temporal": 0.9677419354838532,
+            "graph": 0.4625881526385713
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.2518183803229504,
+          "strategy_scores": {
+            "dense": 0.9853076409086302,
+            "temporal": 0.9758064516129096,
+            "graph": 0.06441589025364906
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24467607983214437,
+          "strategy_scores": {
+            "dense": 0.9645071988809625,
+            "temporal": 1.0
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent sunny noon update mentioned ivy wall needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "2"
+      ],
+      "retrieved_memory_ids": [
+        "sem_082",
+        "sem_061",
+        "sem_063",
+        "sem_081",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_082",
+          "score": 0.40825509780091557,
+          "strategy_scores": {
+            "dense": 0.864711404694273,
+            "sparse": 0.4,
+            "temporal": 0.18548387096774574
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.28711447682328967,
+          "strategy_scores": {
+            "dense": 0.9911986921729039,
+            "temporal": 1.0,
+            "graph": 0.384346729973541
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.2458653753190907,
+          "strategy_scores": {
+            "dense": 0.9831885236326796,
+            "temporal": 0.9838709677418874
+          }
+        },
+        {
+          "memory_id": "sem_081",
+          "score": 0.19558177948620536,
+          "strategy_scores": {
+            "dense": 0.9896748985971259,
+            "temporal": 0.1935483870967236,
+            "graph": 0.27775705986964117
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.18216478700286787,
+          "strategy_scores": {
+            "dense": 0.5638942789438461,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent cool dusk update mentioned zinnia row needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "3"
+      ],
+      "retrieved_memory_ids": [
+        "sem_083",
+        "sem_064",
+        "sem_062",
+        "sem_079",
+        "sem_074"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_083",
+          "score": 0.31795916094052334,
+          "strategy_scores": {
+            "dense": 0.268114836377653,
+            "sparse": 0.4,
+            "temporal": 0.17741935483875396
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.34758064516129117,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.9758064516129115,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.3128615572307404,
+          "strategy_scores": {
+            "dense": 0.9930795489047326,
+            "temporal": 0.9919354838709443,
+            "graph": 0.6470607650793607
+          }
+        },
+        {
+          "memory_id": "sem_079",
+          "score": 0.2363043598114833,
+          "strategy_scores": {
+            "dense": 0.9933973824954044,
+            "temporal": 0.20967741935489817,
+            "graph": 0.6632701050168284
+          }
+        },
+        {
+          "memory_id": "sem_074",
+          "score": 0.24582944386563532,
+          "strategy_scores": {
+            "dense": 0.9944436459240321,
+            "temporal": 0.2500000000000196,
+            "graph": 0.7166289697702856
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent festival day update mentioned cilantro pot needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "4"
+      ],
+      "retrieved_memory_ids": [
+        "sem_084",
+        "sem_068",
+        "sem_062",
+        "sem_061",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_084",
+          "score": 0.42204538658925694,
+          "strategy_scores": {
+            "dense": 0.9673993514552475,
+            "sparse": 0.4,
+            "temporal": 0.16935483870969828
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.27983870967741964,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2983870967741967,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24316609261138836,
+          "strategy_scores": {
+            "dense": 0.9598169614952929,
+            "temporal": 0.9919354838709443
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.23569276846228174,
+          "strategy_scores": {
+            "dense": 0.9046184564152115,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.22934218977396503,
+          "strategy_scores": {
+            "dense": 0.8730339533318411,
+            "temporal": 0.9838709677418886
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent soil delivery day update mentioned pothos shelf needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "5"
+      ],
+      "retrieved_memory_ids": [
+        "sem_085",
+        "sem_086",
+        "sem_063",
+        "sem_062",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_085",
+          "score": 0.3163911367579578,
+          "strategy_scores": {
+            "dense": 0.26841402999928216,
+            "sparse": 0.4,
+            "temporal": 0.1612903225806553
+          }
+        },
+        {
+          "memory_id": "sem_086",
+          "score": 0.24135870067415774,
+          "strategy_scores": {
+            "dense": 0.9929273587061538,
+            "temporal": 0.153225806451599,
+            "graph": 0.7709701622307477
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.26828142439915326,
+          "strategy_scores": {
+            "dense": 0.9763578065406512,
+            "temporal": 0.9838709677419658,
+            "graph": 0.23440656643858954
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.24445039137012264,
+          "strategy_scores": {
+            "dense": 0.9683789532201363,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23530252962726111,
+          "strategy_scores": {
+            "dense": 0.9181458964398012,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent seed swap day update mentioned camellia shrub needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "6"
+      ],
+      "retrieved_memory_ids": [
+        "sem_086",
+        "sem_155",
+        "sem_085",
+        "sem_080",
+        "sem_078"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_086",
+          "score": 0.9153225806451666,
+          "strategy_scores": {
+            "dense": 1.0,
+            "sparse": 1.0,
+            "temporal": 0.1532258064516654,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.7307524042115519,
+          "strategy_scores": {
+            "dense": 0.3394246302275479,
+            "sparse": 1.0,
+            "temporal": 0.2983870967741967
+          }
+        },
+        {
+          "memory_id": "sem_085",
+          "score": 0.21908876532708207,
+          "strategy_scores": {
+            "dense": 0.9817910217281819,
+            "temporal": 0.16129032258064263,
+            "graph": 0.5569107980979053
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.2655225428148596,
+          "strategy_scores": {
+            "dense": 0.9982043713165885,
+            "temporal": 0.2016129032258425,
+            "graph": 0.9563059679478708
+          }
+        },
+        {
+          "memory_id": "sem_078",
+          "score": 0.2638504966331696,
+          "strategy_scores": {
+            "dense": 0.9969327889832478,
+            "temporal": 0.21774193548387538,
+            "graph": 0.9253638473729491
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent pruning Friday update mentioned radish sprouts needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "7"
+      ],
+      "retrieved_memory_ids": [
+        "sem_087",
+        "sem_070",
+        "sem_061",
+        "sem_065",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_087",
+          "score": 0.27451612903225425,
+          "strategy_scores": {
+            "dense": 0.0,
+            "sparse": 0.4,
+            "temporal": 0.14516129032254269
+          }
+        },
+        {
+          "memory_id": "sem_070",
+          "score": 0.2503525642005934,
+          "strategy_scores": {
+            "dense": 0.9953131967066522,
+            "temporal": 0.2822580645161075,
+            "graph": 0.728297782429848
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24461697477945402,
+          "strategy_scores": {
+            "dense": 0.9641131651963601,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_065",
+          "score": 0.13324212063215615,
+          "strategy_scores": {
+            "dense": 0.24311951389180553,
+            "temporal": 0.9677419354838532
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.2182996234230311,
+          "strategy_scores": {
+            "dense": 0.804793188411601,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent greenhouse Sunday update mentioned bean poles needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "8"
+      ],
+      "retrieved_memory_ids": [
+        "sem_088",
+        "sem_080",
+        "sem_073",
+        "sem_087",
+        "sem_068"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_088",
+          "score": 0.30534521044073354,
+          "strategy_scores": {
+            "dense": 0.21090355347585413,
+            "sparse": 0.4,
+            "temporal": 0.13709677419355407
+          }
+        },
+        {
+          "memory_id": "sem_080",
+          "score": 0.2701612903225843,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.2016129032258425,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_073",
+          "score": 0.2609112627990374,
+          "strategy_scores": {
+            "dense": 0.9970323551873387,
+            "temporal": 0.25806451612907527,
+            "graph": 0.8554995790802904
+          }
+        },
+        {
+          "memory_id": "sem_087",
+          "score": 0.2594382442986748,
+          "strategy_scores": {
+            "dense": 0.998988306997835,
+            "temporal": 0.14516129032260974,
+            "graph": 0.9507386921673857
+          }
+        },
+        {
+          "memory_id": "sem_068",
+          "score": 0.25323389527870427,
+          "strategy_scores": {
+            "dense": 0.9946993864643968,
+            "temporal": 0.2983870967741967,
+            "graph": 0.741902776316251
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent rainy Tuesday update mentioned chive clump needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "8",
+        "9"
+      ],
+      "retrieved_memory_ids": [
+        "sem_089",
+        "sem_062",
+        "sem_067",
+        "sem_061",
+        "sem_063"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_089",
+          "score": 0.31425567502165336,
+          "strategy_scores": {
+            "dense": 0.27568299476801644,
+            "sparse": 0.4,
+            "temporal": 0.12903225806450855
+          }
+        },
+        {
+          "memory_id": "sem_062",
+          "score": 0.22330882540840502,
+          "strategy_scores": {
+            "dense": 0.8274351801420187,
+            "temporal": 0.9919354838710222
+          }
+        },
+        {
+          "memory_id": "sem_067",
+          "score": 0.2612845133887397,
+          "strategy_scores": {
+            "dense": 0.994907460897634,
+            "temporal": 0.306451612903198,
+            "graph": 0.8140323296377482
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.24273280600467417,
+          "strategy_scores": {
+            "dense": 0.9515520400311611,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.24222704484596763,
+          "strategy_scores": {
+            "dense": 0.9589329871451402,
+            "temporal": 0.9838709677419658
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "What recent summer solstice update mentioned begonia basket needing attention before watering?",
+      "expected_memory_ids": [
+        "s",
+        "e",
+        "m",
+        "_",
+        "0",
+        "9",
+        "0"
+      ],
+      "retrieved_memory_ids": [
+        "sem_090",
+        "sem_084",
+        "sem_063",
+        "sem_061",
+        "sem_064"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "temporal",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_090",
+          "score": 0.4083003976185799,
+          "strategy_scores": {
+            "dense": 0.9080241561668978,
+            "sparse": 0.4,
+            "temporal": 0.12096774193545225
+          }
+        },
+        {
+          "memory_id": "sem_084",
+          "score": 0.26693548387096333,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.16935483870963314,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_063",
+          "score": 0.23963775052057779,
+          "strategy_scores": {
+            "dense": 0.9416710249758748,
+            "temporal": 0.9838709677419658
+          }
+        },
+        {
+          "memory_id": "sem_061",
+          "score": 0.2394837024634201,
+          "strategy_scores": {
+            "dense": 0.929891349756134,
+            "temporal": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_064",
+          "score": 0.23702803280301082,
+          "strategy_scores": {
+            "dense": 0.9296492509447991,
+            "temporal": 0.9758064516129096
+          }
+        }
+      ],
+      "cluster": "Wrong temporal ordering"
+    },
+    {
+      "query": "Which second-step care decision followed the balcony garden clue for ",
+      "expected_memory_ids": [
+        "sem_122"
+      ],
+      "retrieved_memory_ids": [
+        "sem_136",
+        "sem_142",
+        "sem_134",
+        "sem_125",
+        "sem_123"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_136",
+          "score": 0.1762785019104737,
+          "strategy_scores": {
+            "dense": 0.9938091450517652,
+            "graph": 0.2720713015270893
+          }
+        },
+        {
+          "memory_id": "sem_142",
+          "score": 0.14859946419251496,
+          "strategy_scores": {
+            "dense": 0.9906630946167664
+          }
+        },
+        {
+          "memory_id": "sem_134",
+          "score": 0.14174096064333175,
+          "strategy_scores": {
+            "dense": 0.9449397376222117
+          }
+        },
+        {
+          "memory_id": "sem_125",
+          "score": 0.1386318131437104,
+          "strategy_scores": {
+            "dense": 0.924212087624736
+          }
+        },
+        {
+          "memory_id": "sem_123",
+          "score": 0.12108685646081555,
+          "strategy_scores": {
+            "dense": 0.8072457097387703
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the kitchen window clue for ",
+      "expected_memory_ids": [
+        "sem_124"
+      ],
+      "retrieved_memory_ids": [
+        "sem_148",
+        "sem_147",
+        "sem_032",
+        "sem_139",
+        "sem_121"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_148",
+          "score": 0.25,
+          "strategy_scores": {
+            "dense": 1.0,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_147",
+          "score": 0.23933725621912422,
+          "strategy_scores": {
+            "dense": 0.928915041460828,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_032",
+          "score": 0.22797950574675363,
+          "strategy_scores": {
+            "dense": 0.9881545931255319,
+            "graph": 0.7975631677792385
+          }
+        },
+        {
+          "memory_id": "sem_139",
+          "score": 0.14122288660774648,
+          "strategy_scores": {
+            "dense": 0.94148591071831,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_121",
+          "score": 0.02578200883081762,
+          "strategy_scores": {
+            "dense": 0.1718800588721175
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the community plot clue for ",
+      "expected_memory_ids": [
+        "sem_126"
+      ],
+      "retrieved_memory_ids": [
+        "sem_125",
+        "sem_145",
+        "sem_149",
+        "sem_147",
+        "sem_133"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_125",
+          "score": 0.12356813425408979,
+          "strategy_scores": {
+            "dense": 0.823787561693932
+          }
+        },
+        {
+          "memory_id": "sem_145",
+          "score": 0.13392069671407256,
+          "strategy_scores": {
+            "dense": 0.8928046447604838
+          }
+        },
+        {
+          "memory_id": "sem_149",
+          "score": 0.11950215462970226,
+          "strategy_scores": {
+            "dense": 0.7966810308646818
+          }
+        },
+        {
+          "memory_id": "sem_147",
+          "score": 0.11533426833849719,
+          "strategy_scores": {
+            "dense": 0.768895122256648
+          }
+        },
+        {
+          "memory_id": "sem_133",
+          "score": 0.10264087503587363,
+          "strategy_scores": {
+            "dense": 0.6842725002391575
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the greenhouse bench clue for ",
+      "expected_memory_ids": [
+        "sem_128"
+      ],
+      "retrieved_memory_ids": [
+        "sem_132",
+        "sem_127",
+        "sem_130",
+        "sem_122",
+        "sem_138"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_132",
+          "score": 0.20460309051440267,
+          "strategy_scores": {
+            "dense": 0.9879143231862328,
+            "graph": 0.5641594203646773
+          }
+        },
+        {
+          "memory_id": "sem_127",
+          "score": 0.09284202968507732,
+          "strategy_scores": {
+            "dense": 0.6189468645671822
+          }
+        },
+        {
+          "memory_id": "sem_130",
+          "score": 0.1353516744888414,
+          "strategy_scores": {
+            "dense": 0.902344496592276,
+            "temporal": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_122",
+          "score": 0.13095654604852627,
+          "strategy_scores": {
+            "dense": 0.8474026146824685,
+            "temporal": 0.038461538461560044
+          }
+        },
+        {
+          "memory_id": "sem_138",
+          "score": 0.10833019334745175,
+          "strategy_scores": {
+            "dense": 0.7222012889830117
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the ceramic planter clue for ",
+      "expected_memory_ids": [
+        "sem_130"
+      ],
+      "retrieved_memory_ids": [
+        "sem_122",
+        "sem_140",
+        "sem_111",
+        "sem_127",
+        "sem_125"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_122",
+          "score": 0.10388122526273595,
+          "strategy_scores": {
+            "dense": 0.6669004761105354,
+            "temporal": 0.03846153846155644
+          }
+        },
+        {
+          "memory_id": "sem_140",
+          "score": 0.09700920967893031,
+          "strategy_scores": {
+            "dense": 0.6467280645262021
+          }
+        },
+        {
+          "memory_id": "sem_111",
+          "score": 0.21863933171394145,
+          "strategy_scores": {
+            "dense": 0.9830436665075094,
+            "graph": 0.7118278173781504
+          }
+        },
+        {
+          "memory_id": "sem_127",
+          "score": 0.0688364866971156,
+          "strategy_scores": {
+            "dense": 0.458909911314104
+          }
+        },
+        {
+          "memory_id": "sem_125",
+          "score": 0.056538289546412566,
+          "strategy_scores": {
+            "dense": 0.3769219303094171
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the rain barrel corner clue for ",
+      "expected_memory_ids": [
+        "sem_134"
+      ],
+      "retrieved_memory_ids": [
+        "sem_146",
+        "sem_133",
+        "sem_132",
+        "sem_148",
+        "sem_141"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_146",
+          "score": 0.24468729360546326,
+          "strategy_scores": {
+            "dense": 0.9980478470197967,
+            "graph": 0.9498011655249378
+          }
+        },
+        {
+          "memory_id": "sem_133",
+          "score": 0.04623048522462168,
+          "strategy_scores": {
+            "dense": 0.3082032348308112
+          }
+        },
+        {
+          "memory_id": "sem_132",
+          "score": 0.13492257614533762,
+          "strategy_scores": {
+            "dense": 0.8994838409689174
+          }
+        },
+        {
+          "memory_id": "sem_148",
+          "score": 0.1350402175569455,
+          "strategy_scores": {
+            "dense": 0.9002681170463035
+          }
+        },
+        {
+          "memory_id": "sem_141",
+          "score": 0.14225433174197114,
+          "strategy_scores": {
+            "dense": 0.9483622116131409
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the propagation rack clue for ",
+      "expected_memory_ids": [
+        "sem_136"
+      ],
+      "retrieved_memory_ids": [
+        "sem_150",
+        "sem_135",
+        "sem_148",
+        "sem_144",
+        "sem_132"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_150",
+          "score": 0.13669687773986625,
+          "strategy_scores": {
+            "dense": 0.9113125182657751,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_135",
+          "score": 0.058741830328244635,
+          "strategy_scores": {
+            "dense": 0.39161220218829756
+          }
+        },
+        {
+          "memory_id": "sem_148",
+          "score": 0.1266245365267236,
+          "strategy_scores": {
+            "dense": 0.844163576844824
+          }
+        },
+        {
+          "memory_id": "sem_144",
+          "score": 0.09433710258255151,
+          "strategy_scores": {
+            "dense": 0.6289140172170101
+          }
+        },
+        {
+          "memory_id": "sem_132",
+          "score": 0.058976611553748906,
+          "strategy_scores": {
+            "dense": 0.39317741035832604
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the sunny patio clue for ",
+      "expected_memory_ids": [
+        "sem_138"
+      ],
+      "retrieved_memory_ids": [
+        "sem_124",
+        "sem_140",
+        "sem_126",
+        "sem_131",
+        "sem_143"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_124",
+          "score": 0.13485066433001258,
+          "strategy_scores": {
+            "dense": 0.8797736596359879,
+            "temporal": 0.028846153846143956
+          }
+        },
+        {
+          "memory_id": "sem_140",
+          "score": 0.1272127473671198,
+          "strategy_scores": {
+            "dense": 0.8480849824474653
+          }
+        },
+        {
+          "memory_id": "sem_126",
+          "score": 0.11512781674034206,
+          "strategy_scores": {
+            "dense": 0.7546982654483971,
+            "temporal": 0.01923076923082498
+          }
+        },
+        {
+          "memory_id": "sem_131",
+          "score": 0.13459611928174006,
+          "strategy_scores": {
+            "dense": 0.8973074618782672
+          }
+        },
+        {
+          "memory_id": "sem_143",
+          "score": 0.12423146410329289,
+          "strategy_scores": {
+            "dense": 0.8282097606886193
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the shade cloth corner clue for ",
+      "expected_memory_ids": [
+        "sem_142"
+      ],
+      "retrieved_memory_ids": [
+        "sem_133",
+        "sem_011",
+        "sem_125",
+        "sem_137",
+        "sem_147"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_133",
+          "score": 0.14141543500822568,
+          "strategy_scores": {
+            "dense": 0.9427695667215046
+          }
+        },
+        {
+          "memory_id": "sem_011",
+          "score": 0.14559758272066284,
+          "strategy_scores": {
+            "dense": 0.9706505514710856
+          }
+        },
+        {
+          "memory_id": "sem_125",
+          "score": 0.22633021662839653,
+          "strategy_scores": {
+            "dense": 0.9960814386995493,
+            "graph": 0.7691800082346415
+          }
+        },
+        {
+          "memory_id": "sem_137",
+          "score": 0.14359853449877502,
+          "strategy_scores": {
+            "dense": 0.9573235633251669
+          }
+        },
+        {
+          "memory_id": "sem_147",
+          "score": 0.13515455477143778,
+          "strategy_scores": {
+            "dense": 0.9010303651429186
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the tool shed shelf clue for ",
+      "expected_memory_ids": [
+        "sem_144"
+      ],
+      "retrieved_memory_ids": [
+        "sem_143",
+        "sem_148",
+        "sem_150",
+        "sem_132",
+        "sem_135"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_143",
+          "score": 0.06413340500803398,
+          "strategy_scores": {
+            "dense": 0.42755603338689324
+          }
+        },
+        {
+          "memory_id": "sem_148",
+          "score": 0.14643084487024838,
+          "strategy_scores": {
+            "dense": 0.9762056324683226,
+            "graph": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_150",
+          "score": 0.1331202321369836,
+          "strategy_scores": {
+            "dense": 0.8874682142465574
+          }
+        },
+        {
+          "memory_id": "sem_132",
+          "score": 0.12751535712681455,
+          "strategy_scores": {
+            "dense": 0.8501023808454303
+          }
+        },
+        {
+          "memory_id": "sem_135",
+          "score": 0.12131619750174218,
+          "strategy_scores": {
+            "dense": 0.8087746500116145
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the compost station clue for ",
+      "expected_memory_ids": [
+        "sem_146"
+      ],
+      "retrieved_memory_ids": [
+        "sem_130",
+        "sem_132",
+        "sem_139",
+        "sem_140",
+        "sem_043"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_130",
+          "score": 0.1425598828255444,
+          "strategy_scores": {
+            "dense": 0.9503992188369628,
+            "temporal": 0.0
+          }
+        },
+        {
+          "memory_id": "sem_132",
+          "score": 0.13629467827225566,
+          "strategy_scores": {
+            "dense": 0.9086311884817045
+          }
+        },
+        {
+          "memory_id": "sem_139",
+          "score": 0.18445798099221722,
+          "strategy_scores": {
+            "dense": 0.9816872644403472,
+            "graph": 0.37204891326165146
+          }
+        },
+        {
+          "memory_id": "sem_140",
+          "score": 0.03720489132616515,
+          "strategy_scores": {
+            "dense": 0.0,
+            "graph": 0.37204891326165146
+          }
+        },
+        {
+          "memory_id": "sem_043",
+          "score": 0.14458590539209257,
+          "strategy_scores": {
+            "dense": 0.9639060359472837
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which second-step care decision followed the north-facing sill clue for ",
+      "expected_memory_ids": [
+        "sem_148"
+      ],
+      "retrieved_memory_ids": [
+        "sem_122",
+        "sem_138",
+        "sem_134",
+        "sem_014",
+        "sem_137"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "multihop",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_122",
+          "score": 0.19527500172433945,
+          "strategy_scores": {
+            "dense": 0.9767598703506382,
+            "temporal": 0.038461538461560044,
+            "graph": 0.4491486732558775
+          }
+        },
+        {
+          "memory_id": "sem_138",
+          "score": 0.12403627066024084,
+          "strategy_scores": {
+            "dense": 0.8269084710682723
+          }
+        },
+        {
+          "memory_id": "sem_134",
+          "score": 0.12186207808226335,
+          "strategy_scores": {
+            "dense": 0.8124138538817557
+          }
+        },
+        {
+          "memory_id": "sem_014",
+          "score": 0.13827859246069588,
+          "strategy_scores": {
+            "dense": 0.9218572830713059
+          }
+        },
+        {
+          "memory_id": "sem_137",
+          "score": 0.1300620530009536,
+          "strategy_scores": {
+            "dense": 0.8670803533396907
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the gravel tray observation about thyme patch?",
+      "expected_memory_ids": [
+        "sem_152"
+      ],
+      "retrieved_memory_ids": [
+        "sem_161",
+        "sem_163",
+        "sem_171",
+        "sem_179",
+        "sem_167"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_161",
+          "score": 0.1520418188370457,
+          "strategy_scores": {
+            "dense": 0.923868535836758,
+            "temporal": 0.13461538461531988
+          }
+        },
+        {
+          "memory_id": "sem_163",
+          "score": 0.13992052448281295,
+          "strategy_scores": {
+            "dense": 0.8494701632187529,
+            "temporal": 0.125
+          }
+        },
+        {
+          "memory_id": "sem_171",
+          "score": 0.13959348319184217,
+          "strategy_scores": {
+            "dense": 0.8729309135866546,
+            "temporal": 0.08653846153843996
+          }
+        },
+        {
+          "memory_id": "sem_179",
+          "score": 0.1383305898431889,
+          "strategy_scores": {
+            "dense": 0.8901526502366728,
+            "temporal": 0.04807692307687991
+          }
+        },
+        {
+          "memory_id": "sem_167",
+          "score": 0.10653256689188685,
+          "strategy_scores": {
+            "dense": 0.6397042920997968,
+            "temporal": 0.10576923076917322
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the porch rail observation about marigold border?",
+      "expected_memory_ids": [
+        "sem_154"
+      ],
+      "retrieved_memory_ids": [
+        "sem_047",
+        "sem_159",
+        "sem_179",
+        "sem_169",
+        "sem_177"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_047",
+          "score": 0.14285122744744544,
+          "strategy_scores": {
+            "dense": 0.952341516316303
+          }
+        },
+        {
+          "memory_id": "sem_159",
+          "score": 0.18967752630437582,
+          "strategy_scores": {
+            "dense": 0.9848582298353145,
+            "temporal": 0.1442307692308133,
+            "graph": 0.275257149059973
+          }
+        },
+        {
+          "memory_id": "sem_179",
+          "score": 0.1509381542967751,
+          "strategy_scores": {
+            "dense": 0.974203079927188,
+            "temporal": 0.04807692307696893
+          }
+        },
+        {
+          "memory_id": "sem_169",
+          "score": 0.14545479565713115,
+          "strategy_scores": {
+            "dense": 0.9055960736116447,
+            "temporal": 0.09615384615384436
+          }
+        },
+        {
+          "memory_id": "sem_177",
+          "score": 0.12670820087845278,
+          "strategy_scores": {
+            "dense": 0.8062598007280977,
+            "temporal": 0.05769230769238143
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the watering table observation about parsley tray?",
+      "expected_memory_ids": [
+        "sem_158"
+      ],
+      "retrieved_memory_ids": [
+        "sem_171",
+        "sem_159",
+        "sem_161",
+        "sem_173",
+        "sem_175"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_171",
+          "score": 0.20008254443696843,
+          "strategy_scores": {
+            "dense": 0.9963565017504541,
+            "temporal": 0.08653846153843996,
+            "graph": 0.41975223020556335
+          }
+        },
+        {
+          "memory_id": "sem_159",
+          "score": 0.1586798312880291,
+          "strategy_scores": {
+            "dense": 0.9617116957663719,
+            "temporal": 0.14423076923073327
+          }
+        },
+        {
+          "memory_id": "sem_161",
+          "score": 0.14933831528578295,
+          "strategy_scores": {
+            "dense": 0.9058451788283399,
+            "temporal": 0.13461538461531988
+          }
+        },
+        {
+          "memory_id": "sem_173",
+          "score": 0.14813205441113672,
+          "strategy_scores": {
+            "dense": 0.9362649781255603,
+            "temporal": 0.07692307692302656
+          }
+        },
+        {
+          "memory_id": "sem_175",
+          "score": 0.14097635180532647,
+          "strategy_scores": {
+            "dense": 0.894970550497101,
+            "temporal": 0.06730769230761317
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the herb ladder observation about cosmos bed?",
+      "expected_memory_ids": [
+        "sem_160"
+      ],
+      "retrieved_memory_ids": [
+        "sem_159",
+        "sem_171",
+        "sem_155",
+        "sem_153",
+        "sem_173"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_159",
+          "score": 0.08887311122648892,
+          "strategy_scores": {
+            "dense": 0.4963335620227173,
+            "temporal": 0.1442307692308133
+          }
+        },
+        {
+          "memory_id": "sem_171",
+          "score": 0.2586538461538432,
+          "strategy_scores": {
+            "dense": 1.0,
+            "temporal": 0.08653846153843187,
+            "graph": 1.0
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.16153784397356116,
+          "strategy_scores": {
+            "dense": 0.967944600849378,
+            "temporal": 0.16346153846154476
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.1559486979883312,
+          "strategy_scores": {
+            "dense": 0.9242733712042366,
+            "temporal": 0.17307692307695724
+          }
+        },
+        {
+          "memory_id": "sem_173",
+          "score": 0.15043932048765835,
+          "strategy_scores": {
+            "dense": 0.9516467519689804,
+            "temporal": 0.07692307692311288
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the back fence observation about sage planter?",
+      "expected_memory_ids": [
+        "sem_162"
+      ],
+      "retrieved_memory_ids": [
+        "sem_051",
+        "sem_021",
+        "sem_153",
+        "sem_163",
+        "sem_167"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_051",
+          "score": 0.1464182378921318,
+          "strategy_scores": {
+            "dense": 0.9761215859475454
+          }
+        },
+        {
+          "memory_id": "sem_021",
+          "score": 0.13087158516726669,
+          "strategy_scores": {
+            "dense": 0.8724772344484446
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.15779664866246035,
+          "strategy_scores": {
+            "dense": 0.9365930423650977,
+            "temporal": 0.17307692307695724
+          }
+        },
+        {
+          "memory_id": "sem_163",
+          "score": 0.15464000327161548,
+          "strategy_scores": {
+            "dense": 0.9476000218107778,
+            "temporal": 0.12499999999998831
+          }
+        },
+        {
+          "memory_id": "sem_167",
+          "score": 0.14730201489883588,
+          "strategy_scores": {
+            "dense": 0.911500612146068,
+            "temporal": 0.10576923076925684
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the cold frame observation about ivy wall?",
+      "expected_memory_ids": [
+        "sem_164"
+      ],
+      "retrieved_memory_ids": [
+        "sem_163",
+        "sem_175",
+        "sem_171",
+        "sem_172",
+        "sem_153"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_163",
+          "score": 0.11737283305954696,
+          "strategy_scores": {
+            "dense": 0.6991522203969798,
+            "temporal": 0.125
+          }
+        },
+        {
+          "memory_id": "sem_175",
+          "score": 0.13133708280652867,
+          "strategy_scores": {
+            "dense": 0.83070875717172,
+            "temporal": 0.0673076923077067
+          }
+        },
+        {
+          "memory_id": "sem_171",
+          "score": 0.10630445377977014,
+          "strategy_scores": {
+            "temporal": 0.08653846153843996,
+            "graph": 0.9765060762592614
+          }
+        },
+        {
+          "memory_id": "sem_172",
+          "score": 0.2657306919830005,
+          "strategy_scores": {
+            "dense": 0.9987390239189667,
+            "temporal": 0.1826923076922933,
+            "graph": 0.9765060762592614
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.07607145877242219,
+          "strategy_scores": {
+            "dense": 0.39175844309822805,
+            "temporal": 0.1730769230768799
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the clay saucer observation about zinnia row?",
+      "expected_memory_ids": [
+        "sem_166"
+      ],
+      "retrieved_memory_ids": [
+        "sem_165",
+        "sem_163",
+        "sem_167",
+        "sem_153",
+        "sem_169"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_165",
+          "score": 0.13642918167624224,
+          "strategy_scores": {
+            "dense": 0.8326048009185573,
+            "temporal": 0.11538461538458661
+          }
+        },
+        {
+          "memory_id": "sem_163",
+          "score": 0.1516225578598298,
+          "strategy_scores": {
+            "dense": 0.9274837190655321,
+            "temporal": 0.125
+          }
+        },
+        {
+          "memory_id": "sem_167",
+          "score": 0.15131842947478671,
+          "strategy_scores": {
+            "dense": 0.6965336672271281,
+            "temporal": 0.10576923076926674,
+            "graph": 0.3626145631379084
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.14721449921285198,
+          "strategy_scores": {
+            "dense": 0.8660453793676977,
+            "temporal": 0.17307692307697342
+          }
+        },
+        {
+          "memory_id": "sem_169",
+          "score": 0.14108517694997902,
+          "strategy_scores": {
+            "dense": 0.8764652822306246,
+            "temporal": 0.09615384615385335
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the mulch bin observation about pothos shelf?",
+      "expected_memory_ids": [
+        "sem_170"
+      ],
+      "retrieved_memory_ids": [
+        "sem_169",
+        "sem_161",
+        "sem_175",
+        "sem_157",
+        "sem_155"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_169",
+          "score": 0.12967318958999738,
+          "strategy_scores": {
+            "dense": 0.8003853664974196,
+            "temporal": 0.09615384615384436
+          }
+        },
+        {
+          "memory_id": "sem_161",
+          "score": 0.1537966859565217,
+          "strategy_scores": {
+            "dense": 0.9355676499665442,
+            "temporal": 0.1346153846154008
+          }
+        },
+        {
+          "memory_id": "sem_175",
+          "score": 0.1472847496851671,
+          "strategy_scores": {
+            "dense": 0.9370265363626471,
+            "temporal": 0.0673076923077004
+          }
+        },
+        {
+          "memory_id": "sem_157",
+          "score": 0.13397535157454035,
+          "strategy_scores": {
+            "dense": 0.7906049079328475,
+            "temporal": 0.15384615384613226
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.05755095040338254,
+          "strategy_scores": {
+            "temporal": 0.16346153846154476,
+            "graph": 0.4120479655722805
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the patio crate observation about camellia shrub?",
+      "expected_memory_ids": [
+        "sem_172"
+      ],
+      "retrieved_memory_ids": [
+        "sem_171",
+        "sem_056",
+        "sem_159",
+        "sem_177",
+        "sem_155"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_171",
+          "score": 0.11298987355585689,
+          "strategy_scores": {
+            "dense": 0.6955735160134193,
+            "temporal": 0.08653846153843996
+          }
+        },
+        {
+          "memory_id": "sem_056",
+          "score": 0.14236419571959355,
+          "strategy_scores": {
+            "dense": 0.9490946381306237
+          }
+        },
+        {
+          "memory_id": "sem_159",
+          "score": 0.1572796333806585,
+          "strategy_scores": {
+            "dense": 0.952377043050568,
+            "temporal": 0.14423076923073327
+          }
+        },
+        {
+          "memory_id": "sem_177",
+          "score": 0.14877050289662017,
+          "strategy_scores": {
+            "dense": 0.9533418141826056,
+            "temporal": 0.057692307692293304
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.1403874272193719,
+          "strategy_scores": {
+            "dense": 0.8269418224881059,
+            "temporal": 0.16346153846156003
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the lattice arch observation about radish sprouts?",
+      "expected_memory_ids": [
+        "sem_174"
+      ],
+      "retrieved_memory_ids": [
+        "sem_173",
+        "sem_167",
+        "sem_151",
+        "sem_153",
+        "sem_155"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_173",
+          "score": 0.1504699698431495,
+          "strategy_scores": {
+            "dense": 0.9518510810056455,
+            "temporal": 0.07692307692302656
+          }
+        },
+        {
+          "memory_id": "sem_167",
+          "score": 0.13486188461096593,
+          "strategy_scores": {
+            "dense": 0.5607153667024432,
+            "temporal": 0.10576923076917322,
+            "graph": 0.4017765652868213
+          }
+        },
+        {
+          "memory_id": "sem_151",
+          "score": 0.12811263460572514,
+          "strategy_scores": {
+            "dense": 0.7322893589099722,
+            "temporal": 0.1826923076922933
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.1277912676599513,
+          "strategy_scores": {
+            "dense": 0.7365571690150888,
+            "temporal": 0.1730769230768799
+          }
+        },
+        {
+          "memory_id": "sem_155",
+          "score": 0.0739861903968811,
+          "strategy_scores": {
+            "dense": 0.38426691033822974,
+            "temporal": 0.16346153846146652
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the drip line observation about bean poles?",
+      "expected_memory_ids": [
+        "sem_176"
+      ],
+      "retrieved_memory_ids": [
+        "sem_165",
+        "sem_153",
+        "sem_161",
+        "sem_173",
+        "sem_169"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_165",
+          "score": 0.15501319383610648,
+          "strategy_scores": {
+            "dense": 0.9564982153176522,
+            "temporal": 0.11538461538458661
+          }
+        },
+        {
+          "memory_id": "sem_153",
+          "score": 0.15261807344526998,
+          "strategy_scores": {
+            "dense": 0.9020692075838799,
+            "temporal": 0.1730769230768799
+          }
+        },
+        {
+          "memory_id": "sem_161",
+          "score": 0.1401177191055465,
+          "strategy_scores": {
+            "dense": 0.8443745376267011,
+            "temporal": 0.1346153846154134
+          }
+        },
+        {
+          "memory_id": "sem_173",
+          "score": 0.1370148955263962,
+          "strategy_scores": {
+            "dense": 0.8621505855606236,
+            "temporal": 0.07692307692302656
+          }
+        },
+        {
+          "memory_id": "sem_169",
+          "score": 0.13312772276074078,
+          "strategy_scores": {
+            "dense": 0.823415587635703,
+            "temporal": 0.09615384615385335
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    },
+    {
+      "query": "Which graph-linked explanation sits beside the potting mat observation about chive clump?",
+      "expected_memory_ids": [
+        "sem_178"
+      ],
+      "retrieved_memory_ids": [
+        "sem_155",
+        "sem_157",
+        "sem_169",
+        "sem_165",
+        "sem_175"
+      ],
+      "rank_positions": [],
+      "hit": false,
+      "latency_ms": 0.0,
+      "retrieval_strategy": "weighted_full_stack",
+      "category": "graph",
+      "strategy_scores": [
+        {
+          "memory_id": "sem_155",
+          "score": 0.15788869701599115,
+          "strategy_scores": {
+            "dense": 0.9436169544655677,
+            "temporal": 0.16346153846156003
+          }
+        },
+        {
+          "memory_id": "sem_157",
+          "score": 0.1483528045175389,
+          "strategy_scores": {
+            "dense": 0.8864545942194949,
+            "temporal": 0.15384615384614667
+          }
+        },
+        {
+          "memory_id": "sem_169",
+          "score": 0.1427193997743004,
+          "strategy_scores": {
+            "dense": 0.8873601010594339,
+            "temporal": 0.09615384615385335
+          }
+        },
+        {
+          "memory_id": "sem_165",
+          "score": 0.14147929147882846,
+          "strategy_scores": {
+            "dense": 0.8662721996024654,
+            "temporal": 0.11538461538458661
+          }
+        },
+        {
+          "memory_id": "sem_175",
+          "score": 0.14007499059193096,
+          "strategy_scores": {
+            "dense": 0.8889614757410685,
+            "temporal": 0.0673076923077067
+          }
+        }
+      ],
+      "cluster": "Graph traversal failure"
+    }
+  ]
+}
