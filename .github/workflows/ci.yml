@@ -52,58 +52,13 @@ jobs:
             bandit
 
       - name: Run Pytest
-        run: |
-          pytest -v
+        run: pytest -v
 
       - name: Run Ruff
-        run: |
-          ruff check \
-            affect \
-            memory \
-            reflection \
-            state \
-            workflow \
-            planning \
-            uncertainty \
-            world \
-            action \
-            tools \
-            events \
-            llm \
-            security \
-            tests
+        run: ruff check .
 
       - name: Run MyPy
-        run: |
-          mypy \
-            affect \
-            memory \
-            reflection \
-            state \
-            workflow \
-            planning \
-            uncertainty \
-            world \
-            action \
-            tools \
-            events \
-            llm \
-            security
+        run: mypy .
 
       - name: Run Bandit
-        run: |
-          bandit \
-            -r affect \
-            -r memory \
-            -r reflection \
-            -r state \
-            -r workflow \
-            -r planning \
-            -r uncertainty \
-            -r world \
-            -r action \
-            -r tools \
-            -r events \
-            -r llm \
-            -r security \
-            -iii
+        run: bandit -c .bandit -r .
