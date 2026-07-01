@@ -3,13 +3,13 @@ name: PRIMA-NEXT CI
 on:
   push:
     branches:
-      - main
-      - develop
+      - master
+      - dev
       - feature/**
   pull_request:
     branches:
-      - main
-      - develop
+      - master
+      - dev
 
 permissions:
   contents: read
