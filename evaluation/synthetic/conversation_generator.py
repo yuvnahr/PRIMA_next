@@ -32,6 +32,11 @@ _EARLY_WEIGHTS = {
     "temporal_event_mention": 0.08,
     "correction": 0.03,
     "contradiction": 0.02,
+    "interruption": 0.02,
+    "topic_shift": 0.02,
+    "follow_up_reference": 0.01,
+    "indirect_reference": 0.01,
+    "resumed_topic": 0.00,
 }
 
 _LATE_WEIGHTS = {
@@ -45,6 +50,11 @@ _LATE_WEIGHTS = {
     "temporal_event_mention": 0.10,
     "correction": 0.07,
     "contradiction": 0.05,
+    "interruption": 0.05,
+    "topic_shift": 0.06,
+    "follow_up_reference": 0.08,
+    "indirect_reference": 0.06,
+    "resumed_topic": 0.05,
 }
 
 
@@ -182,6 +192,35 @@ _CONTRADICTION_TEMPLATES = [
 ]
 
 
+_NATURAL_THREAD_TEMPLATES = {
+    "interruption": [
+        "Before I forget, the thing with {person} changed how I am thinking about {project}.",
+        "Quick detour: that deadline made me rethink whether {tool} is still the right setup.",
+        "Hold on, there is another detail from this week that matters for {topic}.",
+    ],
+    "topic_shift": [
+        "Different topic for a second: {family_member} has been asking how {project} is going.",
+        "Switching gears, I booked travel to {travel_place} after the {topic} review wraps up.",
+        "On a personal note, {habit} has been helping more than I expected.",
+    ],
+    "follow_up_reference": [
+        "That earlier issue with {project} is still unresolved, but {person}'s suggestion helped.",
+        "Following up on the tool switch, I am faster in {tool} when the work involves {topic}.",
+        "The concern I mentioned before is less sharp now, mostly because {habit}.",
+    ],
+    "indirect_reference": [
+        "It is the same recurring problem from the paper work, just showing up in a new place.",
+        "That collaborator I mentioned earlier is now central to the {topic} plan.",
+        "The old workflow is becoming a bottleneck again, especially around {project}.",
+    ],
+    "resumed_topic": [
+        "Coming back to {project}, the next milestone depends on {topic}.",
+        "I want to return to what I said about {person}; the relationship matters more now.",
+        "Picking up the thread from last time, {tool} is still part of the decision.",
+    ],
+}
+
+
 # ---------------------------------------------------------------------------
 # Fill helpers
 # ---------------------------------------------------------------------------
@@ -224,6 +263,9 @@ def _build_context(profile: UserProfile, rng: random.Random, turn: int) -> dict[
         "contradicting_val": "",
         "old_pref": "",
         "new_pref": "",
+        "family_member": _pick(rng, profile.family) or "my family",
+        "travel_place": _pick(rng, profile.travel_history) or profile.location,
+        "habit": _pick(rng, profile.habits) or "keeping a weekly note",
     }
     return ctx
 
@@ -357,6 +399,11 @@ def generate_conversation(  # noqa: PLR0912, PLR0915
                 else:
                     utterance = "I'm not sure what I prefer anymore."
                 expected_emotion = "surprise"
+
+            elif turn_type in _NATURAL_THREAD_TEMPLATES:
+                template = _pick(rng, _NATURAL_THREAD_TEMPLATES[turn_type])
+                utterance = _fill(template, rng, ctx)
+                expected_emotion = profile.emotional_profile.emotion_at_turn(t)
 
             else:
                 utterance = f"I wanted to share an update about {ctx['topic']}."

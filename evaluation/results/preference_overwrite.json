@@ -1,0 +1,4502 @@
+{
+  "total_obsolete_preferences": 300,
+  "obsolete_preferences_forgotten_correctly": 14,
+  "overwrite_success_rate": 0.046667,
+  "records": [
+    {
+      "user_id": "user_0000",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 245,
+      "obsolete_mentions_after_grace_period": [
+        306,
+        329,
+        336,
+        339,
+        398,
+        412,
+        434,
+        448,
+        587,
+        589
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0000",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 449,
+      "obsolete_mentions_after_grace_period": [
+        460,
+        521,
+        587,
+        599
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0000",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 275,
+      "obsolete_mentions_after_grace_period": [
+        387,
+        524,
+        545,
+        589
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0001",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Emacs",
+      "superseded_at_turn": 500,
+      "obsolete_mentions_after_grace_period": [
+        611,
+        642
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0001",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 549,
+      "obsolete_mentions_after_grace_period": [
+        642,
+        655
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0001",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 275,
+      "obsolete_mentions_after_grace_period": [
+        391,
+        522,
+        569
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0002",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Emacs",
+      "superseded_at_turn": 222,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0002",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 528,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0002",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 347,
+      "obsolete_mentions_after_grace_period": [
+        416,
+        426,
+        455,
+        466,
+        537
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0003",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 71,
+      "obsolete_mentions_after_grace_period": [
+        86,
+        703
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0003",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Helix",
+      "superseded_at_turn": 370,
+      "obsolete_mentions_after_grace_period": [
+        458,
+        566,
+        575,
+        584,
+        610,
+        687
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0003",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 285,
+      "obsolete_mentions_after_grace_period": [
+        304,
+        339,
+        383,
+        490,
+        534,
+        558,
+        753
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0004",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 570,
+      "obsolete_mentions_after_grace_period": [
+        620,
+        803
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0004",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Zed",
+      "superseded_at_turn": 663,
+      "obsolete_mentions_after_grace_period": [
+        685,
+        760,
+        803,
+        838
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0004",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 408,
+      "obsolete_mentions_after_grace_period": [
+        510,
+        613,
+        653,
+        712,
+        736,
+        770,
+        856
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0005",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 184,
+      "obsolete_mentions_after_grace_period": [
+        229,
+        342,
+        371,
+        706,
+        853
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0005",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 805,
+      "obsolete_mentions_after_grace_period": [
+        832,
+        853,
+        862
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0005",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 516,
+      "obsolete_mentions_after_grace_period": [
+        583,
+        628,
+        641,
+        792,
+        811
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0006",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 110,
+      "obsolete_mentions_after_grace_period": [
+        507,
+        511,
+        529
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0006",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Neovim",
+      "superseded_at_turn": 170,
+      "obsolete_mentions_after_grace_period": [
+        371,
+        384,
+        416,
+        494,
+        511,
+        528,
+        529,
+        550
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0006",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 211,
+      "obsolete_mentions_after_grace_period": [
+        402,
+        425,
+        481,
+        498
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0007",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 149,
+      "obsolete_mentions_after_grace_period": [
+        220,
+        376,
+        403,
+        597
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0007",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Emacs",
+      "superseded_at_turn": 277,
+      "obsolete_mentions_after_grace_period": [
+        287,
+        359,
+        403,
+        483,
+        495,
+        566,
+        571,
+        589
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0007",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 413,
+      "obsolete_mentions_after_grace_period": [
+        439,
+        453,
+        470,
+        519,
+        628
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0008",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 21,
+      "obsolete_mentions_after_grace_period": [
+        49,
+        142,
+        176,
+        298,
+        340,
+        355,
+        523,
+        604,
+        621,
+        637
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0008",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "VSCode",
+      "superseded_at_turn": 562,
+      "obsolete_mentions_after_grace_period": [
+        604,
+        621,
+        700
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0008",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 476,
+      "obsolete_mentions_after_grace_period": [
+        648
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0009",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 197,
+      "obsolete_mentions_after_grace_period": [
+        240,
+        369
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0009",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 468,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0009",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 326,
+      "obsolete_mentions_after_grace_period": [
+        336
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0010",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "VSCode",
+      "superseded_at_turn": 206,
+      "obsolete_mentions_after_grace_period": [
+        399,
+        401,
+        404,
+        535,
+        572,
+        684
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0010",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 367,
+      "obsolete_mentions_after_grace_period": [
+        413,
+        434,
+        469,
+        505,
+        529,
+        535,
+        608,
+        655,
+        677,
+        684
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0010",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 444,
+      "obsolete_mentions_after_grace_period": [
+        625,
+        656,
+        690
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0011",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 646,
+      "obsolete_mentions_after_grace_period": [
+        729,
+        781
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0011",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 686,
+      "obsolete_mentions_after_grace_period": [
+        781
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0011",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 320,
+      "obsolete_mentions_after_grace_period": [
+        342,
+        350,
+        378,
+        436,
+        480,
+        538,
+        571,
+        601,
+        711,
+        721
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0012",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 89,
+      "obsolete_mentions_after_grace_period": [
+        251,
+        386,
+        438,
+        552
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0012",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 847,
+      "obsolete_mentions_after_grace_period": [
+        893,
+        912,
+        913
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0012",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 613,
+      "obsolete_mentions_after_grace_period": [
+        642,
+        717,
+        754,
+        756,
+        780,
+        784,
+        803,
+        905,
+        914,
+        917
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0013",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 295,
+      "obsolete_mentions_after_grace_period": [
+        319,
+        339,
+        340,
+        468,
+        503,
+        572,
+        612,
+        625,
+        681
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0013",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 344,
+      "obsolete_mentions_after_grace_period": [
+        391,
+        402,
+        582,
+        596
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0013",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 451,
+      "obsolete_mentions_after_grace_period": [
+        466,
+        489,
+        512,
+        553,
+        577,
+        586,
+        677
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0014",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Zed",
+      "superseded_at_turn": 250,
+      "obsolete_mentions_after_grace_period": [
+        270,
+        520,
+        675,
+        712,
+        794,
+        800
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0014",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 364,
+      "obsolete_mentions_after_grace_period": [
+        502,
+        517,
+        520,
+        529,
+        575,
+        577,
+        600,
+        602,
+        616,
+        633
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0014",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 487,
+      "obsolete_mentions_after_grace_period": [
+        517,
+        528,
+        552,
+        591,
+        623,
+        660,
+        781,
+        835
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0015",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 482,
+      "obsolete_mentions_after_grace_period": [
+        613,
+        614,
+        629,
+        631,
+        661,
+        682,
+        684,
+        692,
+        694,
+        752
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0015",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Emacs",
+      "superseded_at_turn": 592,
+      "obsolete_mentions_after_grace_period": [
+        613,
+        641,
+        811,
+        826,
+        837,
+        840
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0015",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 420,
+      "obsolete_mentions_after_grace_period": [
+        437,
+        442,
+        485,
+        511,
+        631,
+        752,
+        765
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0016",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 796,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0016",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 814,
+      "obsolete_mentions_after_grace_period": [
+        833,
+        852,
+        858
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0016",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 294,
+      "obsolete_mentions_after_grace_period": [
+        352,
+        376,
+        395,
+        417,
+        420,
+        488,
+        516,
+        522,
+        593,
+        667
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0017",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 210,
+      "obsolete_mentions_after_grace_period": [
+        249,
+        292,
+        369,
+        521
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0017",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 344,
+      "obsolete_mentions_after_grace_period": [
+        375,
+        384,
+        421,
+        470,
+        521,
+        542
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0017",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 308,
+      "obsolete_mentions_after_grace_period": [
+        392,
+        423,
+        454,
+        540
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0018",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 541,
+      "obsolete_mentions_after_grace_period": [
+        563,
+        652,
+        700,
+        713,
+        715,
+        809,
+        855,
+        870,
+        967
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0018",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 603,
+      "obsolete_mentions_after_grace_period": [
+        652,
+        700,
+        870,
+        923,
+        968
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0018",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 456,
+      "obsolete_mentions_after_grace_period": [
+        480,
+        543,
+        630,
+        715,
+        717,
+        762,
+        809,
+        858,
+        888
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0019",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Zed",
+      "superseded_at_turn": 331,
+      "obsolete_mentions_after_grace_period": [
+        406,
+        412,
+        489
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0019",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 543,
+      "obsolete_mentions_after_grace_period": [
+        558
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0019",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 265,
+      "obsolete_mentions_after_grace_period": [
+        292,
+        384,
+        451,
+        492,
+        545
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0020",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Zed",
+      "superseded_at_turn": 30,
+      "obsolete_mentions_after_grace_period": [
+        119,
+        246,
+        266,
+        549,
+        700,
+        718
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0020",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 335,
+      "obsolete_mentions_after_grace_period": [
+        347,
+        352,
+        356,
+        393,
+        436,
+        468,
+        505,
+        510,
+        549,
+        616
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0020",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 588,
+      "obsolete_mentions_after_grace_period": [
+        746,
+        767,
+        802,
+        868
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0021",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 318,
+      "obsolete_mentions_after_grace_period": [
+        514,
+        552,
+        626
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0021",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Helix",
+      "superseded_at_turn": 485,
+      "obsolete_mentions_after_grace_period": [
+        514,
+        552,
+        559,
+        626,
+        659,
+        688,
+        698,
+        706
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0021",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 472,
+      "obsolete_mentions_after_grace_period": [
+        627
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0022",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 78,
+      "obsolete_mentions_after_grace_period": [
+        148,
+        336,
+        374,
+        499,
+        589,
+        609,
+        624,
+        690,
+        802,
+        834
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0022",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 368,
+      "obsolete_mentions_after_grace_period": [
+        434,
+        528,
+        572,
+        589,
+        609,
+        625,
+        677,
+        690,
+        709,
+        767
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0022",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 539,
+      "obsolete_mentions_after_grace_period": [
+        736,
+        748,
+        799
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0023",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 260,
+      "obsolete_mentions_after_grace_period": [
+        287
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0023",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Zed",
+      "superseded_at_turn": 349,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0023",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 310,
+      "obsolete_mentions_after_grace_period": [
+        373,
+        403,
+        409,
+        426
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0024",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "VSCode",
+      "superseded_at_turn": 70,
+      "obsolete_mentions_after_grace_period": [
+        198,
+        207,
+        239,
+        255,
+        259,
+        268,
+        351,
+        394,
+        447,
+        482
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0024",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Helix",
+      "superseded_at_turn": 199,
+      "obsolete_mentions_after_grace_period": [
+        255,
+        259,
+        284,
+        351,
+        375,
+        437,
+        447
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0024",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 210,
+      "obsolete_mentions_after_grace_period": [
+        239,
+        478,
+        501
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0025",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "VSCode",
+      "superseded_at_turn": 91,
+      "obsolete_mentions_after_grace_period": [
+        159,
+        213,
+        285,
+        342,
+        356,
+        361,
+        420,
+        474,
+        481,
+        567
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0025",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 192,
+      "obsolete_mentions_after_grace_period": [
+        259,
+        285,
+        305,
+        361,
+        373,
+        420,
+        443,
+        482,
+        567,
+        583
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0025",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 493,
+      "obsolete_mentions_after_grace_period": [
+        610,
+        682,
+        782,
+        878,
+        986
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0026",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 324,
+      "obsolete_mentions_after_grace_period": [
+        448,
+        742,
+        810,
+        862
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0026",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 626,
+      "obsolete_mentions_after_grace_period": [
+        654,
+        736,
+        742,
+        801,
+        810,
+        862
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0026",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 530,
+      "obsolete_mentions_after_grace_period": [
+        625,
+        630,
+        631,
+        669,
+        683,
+        686,
+        706,
+        735,
+        823
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0027",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 172,
+      "obsolete_mentions_after_grace_period": [
+        423,
+        492
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0027",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Neovim",
+      "superseded_at_turn": 443,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0027",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 264,
+      "obsolete_mentions_after_grace_period": [
+        323
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0028",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Emacs",
+      "superseded_at_turn": 130,
+      "obsolete_mentions_after_grace_period": [
+        357,
+        383
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0028",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Zed",
+      "superseded_at_turn": 538,
+      "obsolete_mentions_after_grace_period": [
+        553,
+        558
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0028",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 303,
+      "obsolete_mentions_after_grace_period": [
+        329,
+        336,
+        516
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0029",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 180,
+      "obsolete_mentions_after_grace_period": [
+        269,
+        415,
+        485,
+        487,
+        488,
+        505,
+        596,
+        642,
+        706,
+        726
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0029",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Emacs",
+      "superseded_at_turn": 504,
+      "obsolete_mentions_after_grace_period": [
+        552,
+        596,
+        681,
+        764
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0029",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 522,
+      "obsolete_mentions_after_grace_period": [
+        542,
+        688
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0030",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 624,
+      "obsolete_mentions_after_grace_period": [
+        651,
+        712
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0030",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 774,
+      "obsolete_mentions_after_grace_period": [
+        796,
+        797,
+        798,
+        801
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0030",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 377,
+      "obsolete_mentions_after_grace_period": [
+        520,
+        522,
+        530,
+        551,
+        571,
+        573,
+        621,
+        626,
+        677,
+        700
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0031",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 578,
+      "obsolete_mentions_after_grace_period": [
+        674,
+        697
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0031",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 605,
+      "obsolete_mentions_after_grace_period": [
+        665,
+        697
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0031",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 432,
+      "obsolete_mentions_after_grace_period": [
+        448,
+        450,
+        666
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0032",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 186,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0032",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "VSCode",
+      "superseded_at_turn": 304,
+      "obsolete_mentions_after_grace_period": [
+        404,
+        480,
+        512
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0032",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 203,
+      "obsolete_mentions_after_grace_period": [
+        244,
+        292,
+        301,
+        418,
+        492
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0033",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Zed",
+      "superseded_at_turn": 385,
+      "obsolete_mentions_after_grace_period": [
+        486,
+        518,
+        632
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0033",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 529,
+      "obsolete_mentions_after_grace_period": [
+        613,
+        632,
+        726,
+        757
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0033",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 346,
+      "obsolete_mentions_after_grace_period": [
+        359,
+        496,
+        592,
+        707,
+        709,
+        718,
+        743
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0034",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Neovim",
+      "superseded_at_turn": 703,
+      "obsolete_mentions_after_grace_period": [
+        713,
+        774,
+        776,
+        931
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0034",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 809,
+      "obsolete_mentions_after_grace_period": [
+        820,
+        842,
+        883,
+        896
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0034",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 373,
+      "obsolete_mentions_after_grace_period": [
+        590,
+        617,
+        772,
+        814,
+        885,
+        906
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0035",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 257,
+      "obsolete_mentions_after_grace_period": [
+        417,
+        559,
+        607,
+        811,
+        855
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0035",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Zed",
+      "superseded_at_turn": 277,
+      "obsolete_mentions_after_grace_period": [
+        300,
+        396,
+        417,
+        431,
+        607,
+        634,
+        668,
+        721,
+        770,
+        855
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0035",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 397,
+      "obsolete_mentions_after_grace_period": [
+        531,
+        563,
+        738,
+        762,
+        780,
+        851
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0036",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 289,
+      "obsolete_mentions_after_grace_period": [
+        384,
+        565,
+        653
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0036",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Zed",
+      "superseded_at_turn": 682,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0036",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 484,
+      "obsolete_mentions_after_grace_period": [
+        596,
+        613,
+        814
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0037",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Neovim",
+      "superseded_at_turn": 64,
+      "obsolete_mentions_after_grace_period": [
+        77,
+        441,
+        532,
+        534,
+        566,
+        603,
+        612
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0037",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 119,
+      "obsolete_mentions_after_grace_period": [
+        179,
+        202,
+        230,
+        261,
+        363,
+        366,
+        566,
+        635
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0037",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 380,
+      "obsolete_mentions_after_grace_period": [
+        440,
+        441,
+        451,
+        480,
+        487,
+        523,
+        567,
+        612
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0038",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 442,
+      "obsolete_mentions_after_grace_period": [
+        473,
+        537
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0038",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Neovim",
+      "superseded_at_turn": 514,
+      "obsolete_mentions_after_grace_period": [
+        537,
+        558,
+        578,
+        612,
+        623,
+        626
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0038",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 370,
+      "obsolete_mentions_after_grace_period": [
+        388,
+        581
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0039",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 138,
+      "obsolete_mentions_after_grace_period": [
+        272,
+        414,
+        479,
+        485,
+        493,
+        494,
+        542,
+        554
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0039",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Neovim",
+      "superseded_at_turn": 503,
+      "obsolete_mentions_after_grace_period": [
+        541,
+        542,
+        599
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0039",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 357,
+      "obsolete_mentions_after_grace_period": [
+        433,
+        494,
+        518,
+        554
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0040",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 455,
+      "obsolete_mentions_after_grace_period": [
+        487,
+        506,
+        666,
+        681,
+        734
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0040",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 553,
+      "obsolete_mentions_after_grace_period": [
+        702,
+        734
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0040",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 480,
+      "obsolete_mentions_after_grace_period": [
+        600,
+        606,
+        637,
+        747,
+        765
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0041",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 116,
+      "obsolete_mentions_after_grace_period": [
+        241,
+        252,
+        297,
+        322,
+        416,
+        433,
+        482
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0041",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Neovim",
+      "superseded_at_turn": 209,
+      "obsolete_mentions_after_grace_period": [
+        237,
+        241,
+        252,
+        278,
+        284,
+        322,
+        384,
+        433
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0041",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 191,
+      "obsolete_mentions_after_grace_period": [
+        214,
+        309,
+        344,
+        347,
+        352,
+        368,
+        442
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0042",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 177,
+      "obsolete_mentions_after_grace_period": [
+        330,
+        341,
+        485,
+        532,
+        637,
+        648,
+        722
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0042",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Emacs",
+      "superseded_at_turn": 387,
+      "obsolete_mentions_after_grace_period": [
+        507,
+        532,
+        626,
+        637,
+        660,
+        684,
+        686
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0042",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 331,
+      "obsolete_mentions_after_grace_period": [
+        414,
+        481,
+        494,
+        568,
+        578,
+        655,
+        690,
+        702,
+        742,
+        749
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0043",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 120,
+      "obsolete_mentions_after_grace_period": [
+        597
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0043",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 126,
+      "obsolete_mentions_after_grace_period": [
+        152,
+        171,
+        185,
+        261,
+        282,
+        362,
+        427,
+        538,
+        564,
+        597
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0043",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 351,
+      "obsolete_mentions_after_grace_period": [
+        415,
+        481,
+        488
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0044",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 241,
+      "obsolete_mentions_after_grace_period": [
+        336
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0044",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 348,
+      "obsolete_mentions_after_grace_period": [
+        527
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0044",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 368,
+      "obsolete_mentions_after_grace_period": [
+        546,
+        549
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0045",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Neovim",
+      "superseded_at_turn": 31,
+      "obsolete_mentions_after_grace_period": [
+        117,
+        242,
+        256,
+        630,
+        656,
+        758,
+        789
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0045",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 533,
+      "obsolete_mentions_after_grace_period": [
+        656,
+        680,
+        796
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0045",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 469,
+      "obsolete_mentions_after_grace_period": [
+        491,
+        495,
+        528,
+        566,
+        602,
+        649,
+        669,
+        697,
+        725,
+        793
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0046",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Neovim",
+      "superseded_at_turn": 22,
+      "obsolete_mentions_after_grace_period": [
+        33,
+        107,
+        147,
+        242,
+        281,
+        409,
+        430,
+        471,
+        526,
+        533
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0046",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 232,
+      "obsolete_mentions_after_grace_period": [
+        251,
+        330,
+        343,
+        352,
+        380,
+        393,
+        415,
+        430,
+        499,
+        586
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0046",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 316,
+      "obsolete_mentions_after_grace_period": [
+        327,
+        346,
+        382,
+        400,
+        409,
+        437,
+        494,
+        497,
+        512,
+        526
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0047",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 73,
+      "obsolete_mentions_after_grace_period": [
+        165,
+        166,
+        179,
+        583,
+        620
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0047",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Zed",
+      "superseded_at_turn": 197,
+      "obsolete_mentions_after_grace_period": [
+        252,
+        275,
+        276,
+        301,
+        367,
+        487,
+        645,
+        733,
+        794,
+        860
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0047",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 423,
+      "obsolete_mentions_after_grace_period": [
+        447,
+        561,
+        565,
+        716,
+        761
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0048",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Zed",
+      "superseded_at_turn": 153,
+      "obsolete_mentions_after_grace_period": [
+        355,
+        490,
+        499,
+        527,
+        544,
+        554
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0048",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 461,
+      "obsolete_mentions_after_grace_period": [
+        527,
+        562,
+        565,
+        566,
+        571,
+        590
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0048",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 282,
+      "obsolete_mentions_after_grace_period": [
+        295,
+        339,
+        387,
+        409,
+        428
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0049",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 281,
+      "obsolete_mentions_after_grace_period": [
+        713
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0049",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 673,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0049",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 317,
+      "obsolete_mentions_after_grace_period": [
+        382,
+        385,
+        431,
+        463,
+        465,
+        515,
+        520,
+        600,
+        665,
+        701
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0050",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 109,
+      "obsolete_mentions_after_grace_period": [
+        383,
+        389,
+        421,
+        434,
+        462,
+        543,
+        557,
+        710
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0050",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Neovim",
+      "superseded_at_turn": 216,
+      "obsolete_mentions_after_grace_period": [
+        243,
+        341,
+        342,
+        402,
+        421,
+        540,
+        543,
+        557,
+        593,
+        596
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0050",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 341,
+      "obsolete_mentions_after_grace_period": [
+        378,
+        385,
+        406,
+        501,
+        560,
+        578,
+        610,
+        707,
+        783
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0051",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Helix",
+      "superseded_at_turn": 391,
+      "obsolete_mentions_after_grace_period": [
+        410,
+        631,
+        684,
+        698,
+        742
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0051",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Emacs",
+      "superseded_at_turn": 752,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0051",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 449,
+      "obsolete_mentions_after_grace_period": [
+        471,
+        474,
+        529,
+        549,
+        639,
+        774,
+        803,
+        809,
+        812
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0052",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 325,
+      "obsolete_mentions_after_grace_period": [
+        607
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0052",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 358,
+      "obsolete_mentions_after_grace_period": [
+        450,
+        483,
+        522,
+        607
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0052",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 275,
+      "obsolete_mentions_after_grace_period": [
+        318,
+        510,
+        560
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0053",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 52,
+      "obsolete_mentions_after_grace_period": [
+        296,
+        326,
+        414,
+        431
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0053",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 410,
+      "obsolete_mentions_after_grace_period": [
+        431,
+        435,
+        465,
+        495
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0053",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 239,
+      "obsolete_mentions_after_grace_period": [
+        339,
+        410
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0054",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Helix",
+      "superseded_at_turn": 156,
+      "obsolete_mentions_after_grace_period": [
+        173,
+        178
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0054",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 159,
+      "obsolete_mentions_after_grace_period": [
+        173,
+        178,
+        200,
+        232,
+        245,
+        341,
+        454
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0054",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 186,
+      "obsolete_mentions_after_grace_period": [
+        257,
+        299,
+        313,
+        316,
+        472,
+        508
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0055",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 481,
+      "obsolete_mentions_after_grace_period": [
+        567,
+        604,
+        746,
+        808,
+        836
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0055",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Helix",
+      "superseded_at_turn": 631,
+      "obsolete_mentions_after_grace_period": [
+        666,
+        713,
+        726,
+        746,
+        808,
+        836
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0055",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 532,
+      "obsolete_mentions_after_grace_period": [
+        563,
+        569,
+        616,
+        681,
+        754,
+        830,
+        843
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0056",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 463,
+      "obsolete_mentions_after_grace_period": [
+        657,
+        662,
+        668,
+        690,
+        819,
+        828
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0056",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 676,
+      "obsolete_mentions_after_grace_period": [
+        690,
+        745,
+        769
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0056",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 564,
+      "obsolete_mentions_after_grace_period": [
+        612,
+        613,
+        870,
+        879
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0057",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "VSCode",
+      "superseded_at_turn": 488,
+      "obsolete_mentions_after_grace_period": [
+        498,
+        510,
+        517,
+        611,
+        615,
+        672
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0057",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 659,
+      "obsolete_mentions_after_grace_period": [
+        709,
+        719,
+        764
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0057",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 386,
+      "obsolete_mentions_after_grace_period": [
+        510,
+        517,
+        527
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0058",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 118,
+      "obsolete_mentions_after_grace_period": [
+        792
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0058",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 549,
+      "obsolete_mentions_after_grace_period": [
+        586,
+        695,
+        792,
+        818,
+        839,
+        844,
+        849
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0058",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 356,
+      "obsolete_mentions_after_grace_period": [
+        602,
+        706,
+        795,
+        847
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0059",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 122,
+      "obsolete_mentions_after_grace_period": [
+        390,
+        528
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0059",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Neovim",
+      "superseded_at_turn": 545,
+      "obsolete_mentions_after_grace_period": [
+        571
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0059",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 304,
+      "obsolete_mentions_after_grace_period": [
+        329,
+        467,
+        548
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0060",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 442,
+      "obsolete_mentions_after_grace_period": [
+        567
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0060",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 461,
+      "obsolete_mentions_after_grace_period": [
+        558
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0060",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 202,
+      "obsolete_mentions_after_grace_period": [
+        229,
+        282,
+        334,
+        408,
+        493,
+        523,
+        567
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0061",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 153,
+      "obsolete_mentions_after_grace_period": [
+        248,
+        249,
+        456,
+        486,
+        560
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0061",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Neovim",
+      "superseded_at_turn": 319,
+      "obsolete_mentions_after_grace_period": [
+        372,
+        376,
+        395,
+        431,
+        486,
+        510,
+        537,
+        558,
+        560
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0061",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 258,
+      "obsolete_mentions_after_grace_period": [
+        363,
+        424,
+        451,
+        475
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0062",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Zed",
+      "superseded_at_turn": 187,
+      "obsolete_mentions_after_grace_period": [
+        392
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0062",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 190,
+      "obsolete_mentions_after_grace_period": [
+        306,
+        318,
+        337,
+        363,
+        372,
+        384,
+        405,
+        426,
+        454,
+        518
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0062",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 330,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0063",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 110,
+      "obsolete_mentions_after_grace_period": [
+        187,
+        201,
+        816,
+        880,
+        919
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0063",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "Helix",
+      "superseded_at_turn": 446,
+      "obsolete_mentions_after_grace_period": [
+        558,
+        610,
+        623,
+        758,
+        875,
+        880,
+        917
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0063",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 445,
+      "obsolete_mentions_after_grace_period": [
+        572,
+        648,
+        786,
+        798,
+        843,
+        881
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0064",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Zed",
+      "superseded_at_turn": 117,
+      "obsolete_mentions_after_grace_period": [
+        304,
+        306,
+        644,
+        650
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0064",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 376,
+      "obsolete_mentions_after_grace_period": [
+        410,
+        436,
+        470,
+        638,
+        643,
+        644,
+        650
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0064",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 239,
+      "obsolete_mentions_after_grace_period": [
+        325,
+        392,
+        410,
+        539,
+        638
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0065",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Neovim",
+      "superseded_at_turn": 24,
+      "obsolete_mentions_after_grace_period": [
+        530
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0065",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 588,
+      "obsolete_mentions_after_grace_period": [
+        630,
+        633,
+        778
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0065",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 347,
+      "obsolete_mentions_after_grace_period": [
+        371,
+        408,
+        479,
+        588,
+        678,
+        713,
+        784
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0066",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 34,
+      "obsolete_mentions_after_grace_period": [
+        225,
+        351,
+        434,
+        516,
+        693,
+        697,
+        708,
+        769,
+        900,
+        926
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0066",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 854,
+      "obsolete_mentions_after_grace_period": [
+        889,
+        900,
+        926,
+        937
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0066",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 626,
+      "obsolete_mentions_after_grace_period": [
+        667,
+        704,
+        717,
+        839,
+        930
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0067",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 125,
+      "obsolete_mentions_after_grace_period": [
+        169,
+        265,
+        302,
+        361,
+        413,
+        582,
+        591
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0067",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 715,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0067",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 296,
+      "obsolete_mentions_after_grace_period": [
+        409,
+        410,
+        452,
+        459,
+        503,
+        514,
+        573,
+        574,
+        595,
+        734
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0068",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 37,
+      "obsolete_mentions_after_grace_period": [
+        132,
+        139,
+        327
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0068",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 451,
+      "obsolete_mentions_after_grace_period": [
+        465
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0068",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 181,
+      "obsolete_mentions_after_grace_period": [
+        305,
+        324,
+        348,
+        410,
+        500
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0069",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 53,
+      "obsolete_mentions_after_grace_period": [
+        409,
+        597,
+        605,
+        739
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0069",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 217,
+      "obsolete_mentions_after_grace_period": [
+        233,
+        290,
+        342,
+        385,
+        409,
+        456,
+        472,
+        510,
+        597,
+        640
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0069",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 293,
+      "obsolete_mentions_after_grace_period": [
+        321,
+        330,
+        333,
+        431,
+        439,
+        467,
+        676,
+        693
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0070",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 23,
+      "obsolete_mentions_after_grace_period": [
+        71,
+        91,
+        105,
+        278,
+        293,
+        315,
+        362,
+        482,
+        664,
+        698
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0070",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 531,
+      "obsolete_mentions_after_grace_period": [
+        575,
+        673,
+        740
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0070",
+      "category": "architecture",
+      "obsolete_value": "microservices",
+      "new_value": "",
+      "superseded_at_turn": 479,
+      "obsolete_mentions_after_grace_period": [
+        557,
+        604,
+        645,
+        678,
+        698,
+        716,
+        717
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0071",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 386,
+      "obsolete_mentions_after_grace_period": [
+        429,
+        432,
+        436,
+        497
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0071",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 440,
+      "obsolete_mentions_after_grace_period": [
+        497,
+        642
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0071",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 256,
+      "obsolete_mentions_after_grace_period": [
+        266,
+        287,
+        337,
+        342,
+        378,
+        415,
+        425,
+        429,
+        508,
+        525
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0072",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 133,
+      "obsolete_mentions_after_grace_period": [
+        374,
+        419,
+        421,
+        507,
+        649,
+        704
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0072",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 570,
+      "obsolete_mentions_after_grace_period": [
+        621,
+        636,
+        653,
+        672,
+        689
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0072",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 465,
+      "obsolete_mentions_after_grace_period": [
+        477,
+        573,
+        577,
+        582,
+        639,
+        671
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0073",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 303,
+      "obsolete_mentions_after_grace_period": [
+        463,
+        590,
+        591
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0073",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 410,
+      "obsolete_mentions_after_grace_period": [
+        461,
+        485,
+        527,
+        591
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0073",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 357,
+      "obsolete_mentions_after_grace_period": [
+        402,
+        422,
+        462,
+        554,
+        566,
+        571
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0074",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 158,
+      "obsolete_mentions_after_grace_period": [
+        267,
+        297,
+        417,
+        505
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0074",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Zed",
+      "superseded_at_turn": 251,
+      "obsolete_mentions_after_grace_period": [
+        267,
+        297,
+        309,
+        492,
+        577
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0074",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 340,
+      "obsolete_mentions_after_grace_period": [
+        352,
+        398,
+        400,
+        527,
+        538,
+        559,
+        578
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0075",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Neovim",
+      "superseded_at_turn": 349,
+      "obsolete_mentions_after_grace_period": [
+        459,
+        568,
+        599
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0075",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 420,
+      "obsolete_mentions_after_grace_period": [
+        459,
+        568
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0075",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 367,
+      "obsolete_mentions_after_grace_period": [
+        455,
+        503,
+        515,
+        516
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0076",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 114,
+      "obsolete_mentions_after_grace_period": [
+        192,
+        209,
+        260,
+        261,
+        553,
+        605
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0076",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Helix",
+      "superseded_at_turn": 568,
+      "obsolete_mentions_after_grace_period": [
+        605
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0076",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 274,
+      "obsolete_mentions_after_grace_period": [
+        362,
+        480,
+        611
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0077",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 138,
+      "obsolete_mentions_after_grace_period": [
+        331,
+        336,
+        358,
+        430,
+        451,
+        584
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0077",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 587,
+      "obsolete_mentions_after_grace_period": [
+        710,
+        769
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0077",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 479,
+      "obsolete_mentions_after_grace_period": [
+        551,
+        698,
+        743
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0078",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Neovim",
+      "superseded_at_turn": 57,
+      "obsolete_mentions_after_grace_period": [
+        118,
+        398,
+        454,
+        600
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0078",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "VSCode",
+      "superseded_at_turn": 80,
+      "obsolete_mentions_after_grace_period": [
+        118,
+        152,
+        153,
+        264,
+        268,
+        324,
+        378,
+        398,
+        569,
+        637
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0078",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 364,
+      "obsolete_mentions_after_grace_period": [
+        502,
+        582,
+        653,
+        660,
+        690,
+        695
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0079",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "VSCode",
+      "superseded_at_turn": 208,
+      "obsolete_mentions_after_grace_period": [
+        277,
+        340,
+        472,
+        500
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0079",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Emacs",
+      "superseded_at_turn": 327,
+      "obsolete_mentions_after_grace_period": [
+        376,
+        377,
+        385,
+        500
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0079",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 292,
+      "obsolete_mentions_after_grace_period": [
+        380,
+        424,
+        450
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0080",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 406,
+      "obsolete_mentions_after_grace_period": [
+        526,
+        549,
+        729,
+        759
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0080",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "VSCode",
+      "superseded_at_turn": 525,
+      "obsolete_mentions_after_grace_period": [
+        729,
+        767
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0080",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 261,
+      "obsolete_mentions_after_grace_period": [
+        276,
+        344,
+        396,
+        561,
+        626
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0081",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 42,
+      "obsolete_mentions_after_grace_period": [
+        242,
+        472
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0081",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Neovim",
+      "superseded_at_turn": 458,
+      "obsolete_mentions_after_grace_period": [
+        611
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0081",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 367,
+      "obsolete_mentions_after_grace_period": [
+        428,
+        557,
+        581,
+        583,
+        592,
+        646,
+        651,
+        685,
+        686
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0082",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 206,
+      "obsolete_mentions_after_grace_period": [
+        535,
+        549,
+        603,
+        628,
+        632,
+        655,
+        683,
+        696,
+        731
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0082",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 275,
+      "obsolete_mentions_after_grace_period": [
+        356,
+        465,
+        482,
+        489,
+        549,
+        603,
+        632,
+        639,
+        643,
+        655
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0082",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 624,
+      "obsolete_mentions_after_grace_period": [
+        659,
+        700,
+        797,
+        877,
+        901,
+        919
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0083",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Emacs",
+      "superseded_at_turn": 123,
+      "obsolete_mentions_after_grace_period": [
+        215,
+        268,
+        515,
+        553,
+        598,
+        600,
+        640
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0083",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Helix",
+      "superseded_at_turn": 520,
+      "obsolete_mentions_after_grace_period": [
+        587,
+        597,
+        598,
+        717
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0083",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 392,
+      "obsolete_mentions_after_grace_period": [
+        592,
+        643,
+        790
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0084",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Zed",
+      "superseded_at_turn": 289,
+      "obsolete_mentions_after_grace_period": [
+        328,
+        450,
+        775,
+        831
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0084",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 411,
+      "obsolete_mentions_after_grace_period": [
+        449,
+        450,
+        460,
+        467,
+        471,
+        479,
+        491,
+        525,
+        615,
+        651
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0084",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 324,
+      "obsolete_mentions_after_grace_period": [
+        459,
+        460,
+        543,
+        566,
+        620,
+        625,
+        754,
+        821
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0085",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "VSCode",
+      "superseded_at_turn": 23,
+      "obsolete_mentions_after_grace_period": [
+        83,
+        284,
+        369,
+        733
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0085",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Zed",
+      "superseded_at_turn": 46,
+      "obsolete_mentions_after_grace_period": [
+        83,
+        191,
+        200,
+        225,
+        274,
+        285,
+        344,
+        374,
+        377,
+        393
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0085",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 470,
+      "obsolete_mentions_after_grace_period": [
+        607,
+        618,
+        638,
+        639,
+        679,
+        741,
+        783,
+        886
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0086",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 102,
+      "obsolete_mentions_after_grace_period": [
+        337
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0086",
+      "category": "editor",
+      "obsolete_value": "IntelliJ IDEA",
+      "new_value": "VSCode",
+      "superseded_at_turn": 184,
+      "obsolete_mentions_after_grace_period": [
+        239,
+        296,
+        382,
+        415
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0086",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 212,
+      "obsolete_mentions_after_grace_period": [
+        229,
+        298,
+        384,
+        504
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0087",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Neovim",
+      "superseded_at_turn": 71,
+      "obsolete_mentions_after_grace_period": [
+        284,
+        652,
+        744,
+        795,
+        810
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0087",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 287,
+      "obsolete_mentions_after_grace_period": [
+        341,
+        529,
+        545,
+        591,
+        744,
+        765,
+        795,
+        810
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0087",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 555,
+      "obsolete_mentions_after_grace_period": [
+        711
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0088",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 51,
+      "obsolete_mentions_after_grace_period": [
+        167,
+        261,
+        340,
+        482,
+        613,
+        615,
+        790,
+        807,
+        826,
+        827
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0088",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Emacs",
+      "superseded_at_turn": 480,
+      "obsolete_mentions_after_grace_period": [
+        497,
+        526,
+        561,
+        671,
+        674,
+        688,
+        803,
+        807,
+        826
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0088",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 404,
+      "obsolete_mentions_after_grace_period": [
+        466,
+        522,
+        761,
+        782
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0089",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Neovim",
+      "superseded_at_turn": 56,
+      "obsolete_mentions_after_grace_period": [
+        266,
+        306,
+        397,
+        448
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0089",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Emacs",
+      "superseded_at_turn": 419,
+      "obsolete_mentions_after_grace_period": [
+        448,
+        501,
+        520,
+        604,
+        622,
+        641,
+        689
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0089",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 285,
+      "obsolete_mentions_after_grace_period": [
+        330,
+        507,
+        576
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0090",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "VSCode",
+      "superseded_at_turn": 523,
+      "obsolete_mentions_after_grace_period": [
+        663,
+        707
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0090",
+      "category": "editor",
+      "obsolete_value": "VSCode",
+      "new_value": "Zed",
+      "superseded_at_turn": 617,
+      "obsolete_mentions_after_grace_period": [
+        722
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0090",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 617,
+      "obsolete_mentions_after_grace_period": [
+        671,
+        751,
+        754,
+        783
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0091",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "Neovim",
+      "superseded_at_turn": 367,
+      "obsolete_mentions_after_grace_period": [
+        481,
+        531,
+        534,
+        564,
+        568,
+        599,
+        634
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0091",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 671,
+      "obsolete_mentions_after_grace_period": [
+        733
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0091",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 345,
+      "obsolete_mentions_after_grace_period": [
+        490,
+        544,
+        575,
+        639,
+        652,
+        663
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0092",
+      "category": "editor",
+      "obsolete_value": "Neovim",
+      "new_value": "Helix",
+      "superseded_at_turn": 107,
+      "obsolete_mentions_after_grace_period": [
+        217,
+        345,
+        356,
+        477,
+        663
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0092",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 126,
+      "obsolete_mentions_after_grace_period": [
+        149,
+        179,
+        217,
+        315,
+        385,
+        391,
+        417,
+        430,
+        504,
+        532
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0092",
+      "category": "architecture",
+      "obsolete_value": "event-driven",
+      "new_value": "",
+      "superseded_at_turn": 488,
+      "obsolete_mentions_after_grace_period": [
+        546,
+        600,
+        617,
+        731
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0093",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Emacs",
+      "superseded_at_turn": 107,
+      "obsolete_mentions_after_grace_period": [
+        138,
+        158,
+        180,
+        186,
+        321,
+        352,
+        376,
+        382,
+        392,
+        501
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0093",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 115,
+      "obsolete_mentions_after_grace_period": [
+        145,
+        158,
+        186,
+        255,
+        321,
+        382,
+        492,
+        503,
+        535,
+        572
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0093",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 272,
+      "obsolete_mentions_after_grace_period": [
+        364,
+        384,
+        465,
+        483,
+        561,
+        598
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0094",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "Zed",
+      "superseded_at_turn": 194,
+      "obsolete_mentions_after_grace_period": [
+        519,
+        814,
+        838,
+        849
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0094",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 315,
+      "obsolete_mentions_after_grace_period": [
+        352,
+        380,
+        419,
+        438,
+        461,
+        508,
+        516,
+        519,
+        599,
+        631
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0094",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 518,
+      "obsolete_mentions_after_grace_period": [
+        551,
+        589,
+        625,
+        630,
+        656,
+        702,
+        726,
+        752,
+        850,
+        884
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0095",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 88,
+      "obsolete_mentions_after_grace_period": [
+        98,
+        194,
+        390,
+        398,
+        508
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0095",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 141,
+      "obsolete_mentions_after_grace_period": [
+        184,
+        194,
+        216,
+        218,
+        230,
+        318,
+        338,
+        346,
+        497
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0095",
+      "category": "architecture",
+      "obsolete_value": "monolith",
+      "new_value": "",
+      "superseded_at_turn": 320,
+      "obsolete_mentions_after_grace_period": [
+        330,
+        350,
+        407,
+        411,
+        433,
+        464,
+        490,
+        502
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0096",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 259,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0096",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 578,
+      "obsolete_mentions_after_grace_period": [
+        644,
+        678,
+        723,
+        757
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0096",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 325,
+      "obsolete_mentions_after_grace_period": [
+        449,
+        503,
+        509,
+        641,
+        649,
+        713,
+        762
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0097",
+      "category": "editor",
+      "obsolete_value": "Zed",
+      "new_value": "Helix",
+      "superseded_at_turn": 131,
+      "obsolete_mentions_after_grace_period": [
+        181,
+        328,
+        366,
+        661,
+        795,
+        837,
+        870
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0097",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 196,
+      "obsolete_mentions_after_grace_period": [
+        293,
+        421,
+        476,
+        491,
+        613,
+        676,
+        870
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0097",
+      "category": "architecture",
+      "obsolete_value": "CQRS",
+      "new_value": "",
+      "superseded_at_turn": 545,
+      "obsolete_mentions_after_grace_period": [
+        634,
+        795,
+        833,
+        881,
+        899,
+        901
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0098",
+      "category": "editor",
+      "obsolete_value": "Helix",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 648,
+      "obsolete_mentions_after_grace_period": [
+        839
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0098",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "IntelliJ IDEA",
+      "superseded_at_turn": 902,
+      "obsolete_mentions_after_grace_period": [],
+      "obsolete_preference_forgotten_correctly": true
+    },
+    {
+      "user_id": "user_0098",
+      "category": "architecture",
+      "obsolete_value": "hexagonal",
+      "new_value": "",
+      "superseded_at_turn": 351,
+      "obsolete_mentions_after_grace_period": [
+        487,
+        688,
+        769,
+        790,
+        915
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0099",
+      "category": "editor",
+      "obsolete_value": "Emacs",
+      "new_value": "PyCharm",
+      "superseded_at_turn": 92,
+      "obsolete_mentions_after_grace_period": [
+        355,
+        407,
+        412,
+        434,
+        633
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0099",
+      "category": "editor",
+      "obsolete_value": "PyCharm",
+      "new_value": "Zed",
+      "superseded_at_turn": 240,
+      "obsolete_mentions_after_grace_period": [
+        274,
+        347,
+        355,
+        378,
+        434,
+        615,
+        633
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    },
+    {
+      "user_id": "user_0099",
+      "category": "architecture",
+      "obsolete_value": "serverless",
+      "new_value": "",
+      "superseded_at_turn": 337,
+      "obsolete_mentions_after_grace_period": [
+        604
+      ],
+      "obsolete_preference_forgotten_correctly": false
+    }
+  ]
+}

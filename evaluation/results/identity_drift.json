@@ -1,0 +1,1768 @@
+{
+  "total_users": 100,
+  "contradiction_rate": 0.0,
+  "stable_identity_percentage": 1.0,
+  "identity_corrections": 0,
+  "identity_overwrite_events": 110,
+  "per_user": [
+    {
+      "user_id": "user_0000",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Stanford AI Lab and joined a new company.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 295,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 388,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0001",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 161,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Anthropic and joined a new company.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 537,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0002",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0003",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 11,
+          "turn": 384,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0004",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 14,
+          "turn": 463,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left TU Berlin and joined a new company.",
+          "event_type": "career",
+          "week": 21,
+          "turn": 706,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0005",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 10,
+          "turn": 343,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Meta AI and joined a new company.",
+          "event_type": "career",
+          "week": 23,
+          "turn": 788,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0006",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0007",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0008",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 197,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0009",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left TU Berlin and joined a new company.",
+          "event_type": "career",
+          "week": 7,
+          "turn": 235,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0010",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0011",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left MIT CSAIL and joined a new company.",
+          "event_type": "career",
+          "week": 21,
+          "turn": 703,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0012",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Stanford AI Lab and joined a new company.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 542,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 23,
+          "turn": 781,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0013",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Google Brain and joined a new company.",
+          "event_type": "career",
+          "week": 19,
+          "turn": 639,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0014",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 13,
+          "turn": 454,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0015",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 4,
+          "turn": 114,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 15,
+          "turn": 492,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0016",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 151,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 549,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0017",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0018",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 4,
+          "turn": 113,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 387,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0019",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0020",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 22,
+          "turn": 766,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0021",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left DeepMind and joined a new company.",
+          "event_type": "career",
+          "week": 17,
+          "turn": 583,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0022",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 13,
+          "turn": 447,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left University of Edinburgh and joined a new company.",
+          "event_type": "career",
+          "week": 22,
+          "turn": 768,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0023",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 8,
+          "turn": 275,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left DeepMind and joined a new company.",
+          "event_type": "career",
+          "week": 15,
+          "turn": 516,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0024",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Apple ML and joined a new company.",
+          "event_type": "career",
+          "week": 4,
+          "turn": 107,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 404,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0025",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 19,
+          "turn": 632,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 27,
+          "turn": 938,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0026",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 152,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0027",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0028",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 192,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0029",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 36,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left University of Edinburgh and joined a new company.",
+          "event_type": "career",
+          "week": 4,
+          "turn": 120,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0030",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0031",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0032",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Stanford AI Lab and joined a new company.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 295,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0033",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Apple ML and joined a new company.",
+          "event_type": "career",
+          "week": 3,
+          "turn": 74,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 311,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0034",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Anthropic and joined a new company.",
+          "event_type": "career",
+          "week": 18,
+          "turn": 619,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0035",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left University of Toronto and joined a new company.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 181,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 17,
+          "turn": 575,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0036",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0037",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Meta AI and joined a new company.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 391,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0038",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0039",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0040",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 19,
+          "turn": 632,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Anthropic and joined a new company.",
+          "event_type": "career",
+          "week": 19,
+          "turn": 662,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0041",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left MIT CSAIL and joined a new company.",
+          "event_type": "career",
+          "week": 10,
+          "turn": 345,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0042",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0043",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0044",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0045",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 4,
+          "turn": 119,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left University of Edinburgh and joined a new company.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 307,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0046",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0047",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 3,
+          "turn": 75,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0048",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0049",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 69,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Microsoft Research and joined a new company.",
+          "event_type": "career",
+          "week": 15,
+          "turn": 507,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0050",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 21,
+          "turn": 709,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0051",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 21,
+          "turn": 700,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Anthropic and joined a new company.",
+          "event_type": "career",
+          "week": 23,
+          "turn": 781,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0052",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 155,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0053",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0054",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0055",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0056",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 13,
+          "turn": 421,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Apple ML and joined a new company.",
+          "event_type": "career",
+          "week": 27,
+          "turn": 919,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0057",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0058",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left ETH Zurich AI Center and joined a new company.",
+          "event_type": "career",
+          "week": 10,
+          "turn": 343,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 23,
+          "turn": 789,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0059",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 387,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Amazon Science and joined a new company.",
+          "event_type": "career",
+          "week": 13,
+          "turn": 425,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0060",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0061",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 17,
+          "turn": 592,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0062",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 11,
+          "turn": 371,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0063",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Microsoft Research and joined a new company.",
+          "event_type": "career",
+          "week": 14,
+          "turn": 467,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 538,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0064",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left DeepMind and joined a new company.",
+          "event_type": "career",
+          "week": 8,
+          "turn": 261,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0065",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0066",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left OpenAI and joined a new company.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 161,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 26,
+          "turn": 880,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0067",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 158,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 542,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0068",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Microsoft Research and joined a new company.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 186,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0069",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 147,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 10,
+          "turn": 318,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0070",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 13,
+          "turn": 429,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 546,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0071",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Stanford AI Lab and joined a new company.",
+          "event_type": "career",
+          "week": 1,
+          "turn": 34,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0072",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 7,
+          "turn": 235,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0073",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0074",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left TU Berlin and joined a new company.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 39,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0075",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 183,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 15,
+          "turn": 522,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0076",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 11,
+          "turn": 376,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0077",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left MIT CSAIL and joined a new company.",
+          "event_type": "career",
+          "week": 1,
+          "turn": 34,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0078",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0079",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 148,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0080",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0081",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Oxford Future of Humanity Institute and joined a new company.",
+          "event_type": "career",
+          "week": 6,
+          "turn": 183,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 17,
+          "turn": 578,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0082",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Nvidia Research and joined a new company.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 41,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 3,
+          "turn": 87,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0083",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 280,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left TU Berlin and joined a new company.",
+          "event_type": "career",
+          "week": 10,
+          "turn": 321,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0084",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 7,
+          "turn": 240,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left University of Toronto and joined a new company.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 307,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0085",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left CMU School of Computer Science and joined a new company.",
+          "event_type": "career",
+          "week": 5,
+          "turn": 149,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 9,
+          "turn": 295,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0086",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Microsoft Research and joined a new company.",
+          "event_type": "career",
+          "week": 8,
+          "turn": 275,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 398,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0087",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 16,
+          "turn": 539,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Oxford Future of Humanity Institute and joined a new company.",
+          "event_type": "career",
+          "week": 18,
+          "turn": 605,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0088",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 17,
+          "turn": 591,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 18,
+          "turn": 623,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0089",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0090",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0091",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0092",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0093",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 3,
+          "turn": 79,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left Anthropic and joined a new company.",
+          "event_type": "career",
+          "week": 8,
+          "turn": 261,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0094",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left ETH Zurich AI Center and joined a new company.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 388,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 20,
+          "turn": 675,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0095",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 44,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 14,
+          "turn": 484,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0096",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left University of Edinburgh and joined a new company.",
+          "event_type": "career",
+          "week": 19,
+          "turn": 655,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0097",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 2,
+          "turn": 39,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Left IBM Research and joined a new company.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 391,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    },
+    {
+      "user_id": "user_0098",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": []
+    },
+    {
+      "user_id": "user_0099",
+      "stable_identity": true,
+      "contradictions": [],
+      "identity_corrections": [],
+      "identity_overwrite_events": [
+        {
+          "description": "Left Microsoft Research and joined a new company.",
+          "event_type": "career",
+          "week": 12,
+          "turn": 418,
+          "emotional_impact": "surprise",
+          "affects_preferences": [],
+          "affects_relationships": []
+        },
+        {
+          "description": "Promoted to senior engineer.",
+          "event_type": "career",
+          "week": 15,
+          "turn": 493,
+          "emotional_impact": "joy",
+          "affects_preferences": [],
+          "affects_relationships": []
+        }
+      ]
+    }
+  ]
+}

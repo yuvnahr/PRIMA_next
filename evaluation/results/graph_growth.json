@@ -1,0 +1,905 @@
+{
+  "total_users": 100,
+  "per_user": [
+    {
+      "user_id": "user_0000",
+      "nodes": 14,
+      "edges": 20,
+      "average_degree": 2.857143,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.10989
+    },
+    {
+      "user_id": "user_0001",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0002",
+      "nodes": 16,
+      "edges": 25,
+      "average_degree": 3.125,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.104167
+    },
+    {
+      "user_id": "user_0003",
+      "nodes": 16,
+      "edges": 24,
+      "average_degree": 3.0,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0004",
+      "nodes": 15,
+      "edges": 22,
+      "average_degree": 2.933333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.104762
+    },
+    {
+      "user_id": "user_0005",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0006",
+      "nodes": 14,
+      "edges": 22,
+      "average_degree": 3.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.120879
+    },
+    {
+      "user_id": "user_0007",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0008",
+      "nodes": 14,
+      "edges": 24,
+      "average_degree": 3.428571,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.131868
+    },
+    {
+      "user_id": "user_0009",
+      "nodes": 13,
+      "edges": 18,
+      "average_degree": 2.769231,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0010",
+      "nodes": 14,
+      "edges": 18,
+      "average_degree": 2.571429,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.098901
+    },
+    {
+      "user_id": "user_0011",
+      "nodes": 14,
+      "edges": 23,
+      "average_degree": 3.285714,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.126374
+    },
+    {
+      "user_id": "user_0012",
+      "nodes": 14,
+      "edges": 16,
+      "average_degree": 2.285714,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.087912
+    },
+    {
+      "user_id": "user_0013",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0014",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0015",
+      "nodes": 15,
+      "edges": 24,
+      "average_degree": 3.2,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.114286
+    },
+    {
+      "user_id": "user_0016",
+      "nodes": 15,
+      "edges": 21,
+      "average_degree": 2.8,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0017",
+      "nodes": 13,
+      "edges": 18,
+      "average_degree": 2.769231,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0018",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0019",
+      "nodes": 16,
+      "edges": 22,
+      "average_degree": 2.75,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.091667
+    },
+    {
+      "user_id": "user_0020",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0021",
+      "nodes": 16,
+      "edges": 19,
+      "average_degree": 2.375,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.079167
+    },
+    {
+      "user_id": "user_0022",
+      "nodes": 16,
+      "edges": 21,
+      "average_degree": 2.625,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.0875
+    },
+    {
+      "user_id": "user_0023",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0024",
+      "nodes": 12,
+      "edges": 17,
+      "average_degree": 2.833333,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.128788
+    },
+    {
+      "user_id": "user_0025",
+      "nodes": 12,
+      "edges": 16,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.121212
+    },
+    {
+      "user_id": "user_0026",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0027",
+      "nodes": 14,
+      "edges": 19,
+      "average_degree": 2.714286,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.104396
+    },
+    {
+      "user_id": "user_0028",
+      "nodes": 14,
+      "edges": 18,
+      "average_degree": 2.571429,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.098901
+    },
+    {
+      "user_id": "user_0029",
+      "nodes": 14,
+      "edges": 22,
+      "average_degree": 3.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.120879
+    },
+    {
+      "user_id": "user_0030",
+      "nodes": 16,
+      "edges": 22,
+      "average_degree": 2.75,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.091667
+    },
+    {
+      "user_id": "user_0031",
+      "nodes": 13,
+      "edges": 19,
+      "average_degree": 2.923077,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.121795
+    },
+    {
+      "user_id": "user_0032",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0033",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0034",
+      "nodes": 15,
+      "edges": 19,
+      "average_degree": 2.533333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.090476
+    },
+    {
+      "user_id": "user_0035",
+      "nodes": 14,
+      "edges": 20,
+      "average_degree": 2.857143,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.10989
+    },
+    {
+      "user_id": "user_0036",
+      "nodes": 14,
+      "edges": 19,
+      "average_degree": 2.714286,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.104396
+    },
+    {
+      "user_id": "user_0037",
+      "nodes": 17,
+      "edges": 26,
+      "average_degree": 3.058824,
+      "connected_components": 1,
+      "largest_component": 17,
+      "density": 0.095588
+    },
+    {
+      "user_id": "user_0038",
+      "nodes": 15,
+      "edges": 20,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.095238
+    },
+    {
+      "user_id": "user_0039",
+      "nodes": 16,
+      "edges": 20,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.083333
+    },
+    {
+      "user_id": "user_0040",
+      "nodes": 15,
+      "edges": 23,
+      "average_degree": 3.066667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.109524
+    },
+    {
+      "user_id": "user_0041",
+      "nodes": 14,
+      "edges": 17,
+      "average_degree": 2.428571,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.093407
+    },
+    {
+      "user_id": "user_0042",
+      "nodes": 15,
+      "edges": 19,
+      "average_degree": 2.533333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.090476
+    },
+    {
+      "user_id": "user_0043",
+      "nodes": 14,
+      "edges": 15,
+      "average_degree": 2.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.082418
+    },
+    {
+      "user_id": "user_0044",
+      "nodes": 16,
+      "edges": 22,
+      "average_degree": 2.75,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.091667
+    },
+    {
+      "user_id": "user_0045",
+      "nodes": 15,
+      "edges": 20,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.095238
+    },
+    {
+      "user_id": "user_0046",
+      "nodes": 16,
+      "edges": 22,
+      "average_degree": 2.75,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.091667
+    },
+    {
+      "user_id": "user_0047",
+      "nodes": 14,
+      "edges": 15,
+      "average_degree": 2.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.082418
+    },
+    {
+      "user_id": "user_0048",
+      "nodes": 13,
+      "edges": 15,
+      "average_degree": 2.307692,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.096154
+    },
+    {
+      "user_id": "user_0049",
+      "nodes": 14,
+      "edges": 24,
+      "average_degree": 3.428571,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.131868
+    },
+    {
+      "user_id": "user_0050",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0051",
+      "nodes": 14,
+      "edges": 22,
+      "average_degree": 3.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.120879
+    },
+    {
+      "user_id": "user_0052",
+      "nodes": 13,
+      "edges": 17,
+      "average_degree": 2.615385,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.108974
+    },
+    {
+      "user_id": "user_0053",
+      "nodes": 15,
+      "edges": 22,
+      "average_degree": 2.933333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.104762
+    },
+    {
+      "user_id": "user_0054",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0055",
+      "nodes": 14,
+      "edges": 19,
+      "average_degree": 2.714286,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.104396
+    },
+    {
+      "user_id": "user_0056",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0057",
+      "nodes": 13,
+      "edges": 17,
+      "average_degree": 2.615385,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.108974
+    },
+    {
+      "user_id": "user_0058",
+      "nodes": 14,
+      "edges": 19,
+      "average_degree": 2.714286,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.104396
+    },
+    {
+      "user_id": "user_0059",
+      "nodes": 15,
+      "edges": 21,
+      "average_degree": 2.8,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0060",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0061",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0062",
+      "nodes": 12,
+      "edges": 14,
+      "average_degree": 2.333333,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.106061
+    },
+    {
+      "user_id": "user_0063",
+      "nodes": 14,
+      "edges": 16,
+      "average_degree": 2.285714,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.087912
+    },
+    {
+      "user_id": "user_0064",
+      "nodes": 15,
+      "edges": 19,
+      "average_degree": 2.533333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.090476
+    },
+    {
+      "user_id": "user_0065",
+      "nodes": 15,
+      "edges": 20,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.095238
+    },
+    {
+      "user_id": "user_0066",
+      "nodes": 14,
+      "edges": 20,
+      "average_degree": 2.857143,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.10989
+    },
+    {
+      "user_id": "user_0067",
+      "nodes": 15,
+      "edges": 20,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.095238
+    },
+    {
+      "user_id": "user_0068",
+      "nodes": 14,
+      "edges": 18,
+      "average_degree": 2.571429,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.098901
+    },
+    {
+      "user_id": "user_0069",
+      "nodes": 17,
+      "edges": 24,
+      "average_degree": 2.823529,
+      "connected_components": 1,
+      "largest_component": 17,
+      "density": 0.088235
+    },
+    {
+      "user_id": "user_0070",
+      "nodes": 13,
+      "edges": 18,
+      "average_degree": 2.769231,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0071",
+      "nodes": 13,
+      "edges": 16,
+      "average_degree": 2.461538,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.102564
+    },
+    {
+      "user_id": "user_0072",
+      "nodes": 15,
+      "edges": 23,
+      "average_degree": 3.066667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.109524
+    },
+    {
+      "user_id": "user_0073",
+      "nodes": 14,
+      "edges": 21,
+      "average_degree": 3.0,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0074",
+      "nodes": 15,
+      "edges": 21,
+      "average_degree": 2.8,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0075",
+      "nodes": 13,
+      "edges": 17,
+      "average_degree": 2.615385,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.108974
+    },
+    {
+      "user_id": "user_0076",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0077",
+      "nodes": 15,
+      "edges": 16,
+      "average_degree": 2.133333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.07619
+    },
+    {
+      "user_id": "user_0078",
+      "nodes": 15,
+      "edges": 20,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.095238
+    },
+    {
+      "user_id": "user_0079",
+      "nodes": 13,
+      "edges": 18,
+      "average_degree": 2.769231,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0080",
+      "nodes": 15,
+      "edges": 19,
+      "average_degree": 2.533333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.090476
+    },
+    {
+      "user_id": "user_0081",
+      "nodes": 16,
+      "edges": 21,
+      "average_degree": 2.625,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.0875
+    },
+    {
+      "user_id": "user_0082",
+      "nodes": 14,
+      "edges": 20,
+      "average_degree": 2.857143,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.10989
+    },
+    {
+      "user_id": "user_0083",
+      "nodes": 14,
+      "edges": 22,
+      "average_degree": 3.142857,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.120879
+    },
+    {
+      "user_id": "user_0084",
+      "nodes": 12,
+      "edges": 15,
+      "average_degree": 2.5,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.113636
+    },
+    {
+      "user_id": "user_0085",
+      "nodes": 15,
+      "edges": 21,
+      "average_degree": 2.8,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0086",
+      "nodes": 15,
+      "edges": 24,
+      "average_degree": 3.2,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.114286
+    },
+    {
+      "user_id": "user_0087",
+      "nodes": 14,
+      "edges": 19,
+      "average_degree": 2.714286,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.104396
+    },
+    {
+      "user_id": "user_0088",
+      "nodes": 13,
+      "edges": 17,
+      "average_degree": 2.615385,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.108974
+    },
+    {
+      "user_id": "user_0089",
+      "nodes": 15,
+      "edges": 19,
+      "average_degree": 2.533333,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.090476
+    },
+    {
+      "user_id": "user_0090",
+      "nodes": 15,
+      "edges": 18,
+      "average_degree": 2.4,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.085714
+    },
+    {
+      "user_id": "user_0091",
+      "nodes": 16,
+      "edges": 22,
+      "average_degree": 2.75,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.091667
+    },
+    {
+      "user_id": "user_0092",
+      "nodes": 13,
+      "edges": 18,
+      "average_degree": 2.769231,
+      "connected_components": 1,
+      "largest_component": 13,
+      "density": 0.115385
+    },
+    {
+      "user_id": "user_0093",
+      "nodes": 15,
+      "edges": 17,
+      "average_degree": 2.266667,
+      "connected_components": 1,
+      "largest_component": 15,
+      "density": 0.080952
+    },
+    {
+      "user_id": "user_0094",
+      "nodes": 16,
+      "edges": 24,
+      "average_degree": 3.0,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.1
+    },
+    {
+      "user_id": "user_0095",
+      "nodes": 16,
+      "edges": 23,
+      "average_degree": 2.875,
+      "connected_components": 1,
+      "largest_component": 16,
+      "density": 0.095833
+    },
+    {
+      "user_id": "user_0096",
+      "nodes": 12,
+      "edges": 16,
+      "average_degree": 2.666667,
+      "connected_components": 1,
+      "largest_component": 12,
+      "density": 0.121212
+    },
+    {
+      "user_id": "user_0097",
+      "nodes": 17,
+      "edges": 24,
+      "average_degree": 2.823529,
+      "connected_components": 1,
+      "largest_component": 17,
+      "density": 0.088235
+    },
+    {
+      "user_id": "user_0098",
+      "nodes": 14,
+      "edges": 18,
+      "average_degree": 2.571429,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.098901
+    },
+    {
+      "user_id": "user_0099",
+      "nodes": 14,
+      "edges": 20,
+      "average_degree": 2.857143,
+      "connected_components": 1,
+      "largest_component": 14,
+      "density": 0.10989
+    }
+  ]
+}

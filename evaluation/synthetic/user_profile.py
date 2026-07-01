@@ -178,6 +178,21 @@ class UserProfile:
     emotional_profile: EmotionalProfile
     personality_traits: PersonalityTraits
     known_facts: dict[str, str]
+    research_area: str = ""
+    education: str = ""
+    interests: list[str] = field(default_factory=list)
+    family: list[str] = field(default_factory=list)
+    friends: list[str] = field(default_factory=list)
+    colleagues: list[str] = field(default_factory=list)
+    communication_style: str = ""
+    tech_stack: list[str] = field(default_factory=list)
+    travel_history: list[str] = field(default_factory=list)
+    health_context: list[str] = field(default_factory=list)
+    financial_goals: list[str] = field(default_factory=list)
+    relationship_timeline: list[dict[str, object]] = field(default_factory=list)
+    career_changes: list[dict[str, object]] = field(default_factory=list)
+    milestones: list[dict[str, object]] = field(default_factory=list)
+    habits: list[str] = field(default_factory=list)
 
     def active_preferences(self, at_turn: int) -> list[Preference]:
         """Return all preferences that are active at the given turn."""
@@ -208,4 +223,19 @@ class UserProfile:
             "emotional_profile": self.emotional_profile.to_dict(),
             "personality_traits": self.personality_traits.to_dict(),
             "known_facts": dict(self.known_facts),
+            "research_area": self.research_area,
+            "education": self.education,
+            "interests": list(self.interests),
+            "family": list(self.family),
+            "friends": list(self.friends),
+            "colleagues": list(self.colleagues),
+            "communication_style": self.communication_style,
+            "tech_stack": list(self.tech_stack),
+            "travel_history": list(self.travel_history),
+            "health_context": list(self.health_context),
+            "financial_goals": list(self.financial_goals),
+            "relationship_timeline": list(self.relationship_timeline),
+            "career_changes": list(self.career_changes),
+            "milestones": list(self.milestones),
+            "habits": list(self.habits),
         }

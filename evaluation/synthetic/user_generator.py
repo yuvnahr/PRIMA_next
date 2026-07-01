@@ -116,6 +116,54 @@ _RELATIONSHIP_TYPES = [
     "co-author", "friend", "advisor",
 ]
 
+_EDUCATION_BY_ROLE = {
+    "research": [
+        "MS in Machine Learning from University of Toronto",
+        "PhD coursework in Cognitive Science at CMU",
+        "MSc in Statistics from ETH Zurich",
+    ],
+    "engineering": [
+        "BS in Computer Science from Georgia Tech",
+        "MS in Software Engineering from TU Berlin",
+        "self-directed systems engineering background",
+    ],
+    "academic": [
+        "PhD track in Machine Learning",
+        "doctoral training in Human-Computer Interaction",
+        "MS in Computational Neuroscience",
+    ],
+}
+
+_COMMUNICATION_STYLES = [
+    "concise and evidence-first",
+    "reflective with careful caveats",
+    "warm, narrative, and context-heavy",
+    "direct with implementation details up front",
+    "question-driven and exploratory",
+]
+
+_HABITS = [
+    "writes a daily research log",
+    "blocks mornings for deep work",
+    "reviews notes every Friday",
+    "keeps a running decision journal",
+    "does weekly project retrospectives",
+    "uses calendar timeboxing",
+]
+
+_FINANCIAL_GOALS = [
+    "build a six-month emergency fund",
+    "save for a sabbatical year",
+    "pay down student loans",
+    "invest consistently in index funds",
+    "set aside money for family support",
+]
+
+_TRAVEL_PLACES = [
+    "Vancouver", "Lisbon", "Bangalore", "Copenhagen", "Seoul", "Dublin",
+    "Barcelona", "Melbourne", "Helsinki", "Taipei",
+]
+
 
 # ---------------------------------------------------------------------------
 # Builder
@@ -212,6 +260,88 @@ def _build_projects(rng: random.Random, topics: list[str]) -> list[Project]:
     return projects
 
 
+def _role_family(occupation: str) -> str:
+    occ = occupation.lower()
+    if any(term in occ for term in ("phd", "student", "science")):
+        return "academic"
+    if any(term in occ for term in ("research", "scientist", "informatic")):
+        return "research"
+    return "engineering"
+
+
+def _build_rich_profile_context(
+    rng: random.Random,
+    *,
+    occupation: str,
+    topics: list[str],
+    hobbies: list[str],
+    relationships: list[Relationship],
+    projects: list[Project],
+    total_turns: int,
+) -> dict[str, Any]:
+    """Create correlated life-history fields instead of independent random facts."""
+    role = _role_family(occupation)
+    research_area = topics[0] if topics else "human-centered AI"
+    colleagues = [r.person_name for r in relationships if r.relationship_type not in {"friend"}][:4]
+    friends = [r.person_name for r in relationships if r.relationship_type == "friend"][:3]
+    if not friends:
+        friends = rng.sample(_PERSON_NAMES, 2)
+
+    family_label = rng.choice(["sister", "brother", "parent", "partner", "cousin"])
+    family = [f"{rng.choice(_PERSON_NAMES)} ({family_label})"]
+    tech_stack = [rng.choice(_LANGUAGES), rng.choice(_EDITORS), rng.choice(_ARCHITECTURES)]
+    travel_history = rng.sample(_TRAVEL_PLACES, rng.randint(1, 3))
+    health_context = rng.sample(
+        [
+            "manages stress with running",
+            "protects sleep before deadlines",
+            "uses meditation after intense review cycles",
+            "takes short walks between coding blocks",
+        ],
+        2,
+    )
+    career_changes = [
+        {
+            "turn": max(1, total_turns // 4),
+            "from": "individual contributor",
+            "to": occupation,
+            "reason": f"wanted deeper work in {research_area}",
+        }
+    ]
+    milestones = [
+        {"turn": p.started_at_turn, "label": f"started {p.name}", "type": "project"}
+        for p in projects[:3]
+    ]
+    relationship_timeline = [
+        {
+            "turn": rel.met_at_turn,
+            "person": rel.person_name,
+            "relationship_type": rel.relationship_type,
+            "status": rel.status,
+            "context": rel.context,
+        }
+        for rel in relationships
+    ]
+
+    return {
+        "research_area": research_area,
+        "education": rng.choice(_EDUCATION_BY_ROLE[role]),
+        "interests": list(dict.fromkeys([*topics[:3], *hobbies[:2]])),
+        "family": family,
+        "friends": friends,
+        "colleagues": colleagues,
+        "communication_style": rng.choice(_COMMUNICATION_STYLES),
+        "tech_stack": tech_stack,
+        "travel_history": travel_history,
+        "health_context": health_context,
+        "financial_goals": rng.sample(_FINANCIAL_GOALS, 2),
+        "relationship_timeline": relationship_timeline,
+        "career_changes": career_changes,
+        "milestones": milestones,
+        "habits": rng.sample(_HABITS, 3),
+    }
+
+
 class UserGenerator:
     """Generate N deterministic synthetic users, each with a unique seed."""
 
@@ -253,11 +383,23 @@ class UserGenerator:
         preferences = _build_preferences(rng, total_turns)
         relationships = _build_relationships(rng, total_turns)
         projects = _build_projects(rng, topics)
+        rich_context = _build_rich_profile_context(
+            rng,
+            occupation=occupation,
+            topics=topics,
+            hobbies=hobbies,
+            relationships=relationships,
+            projects=projects,
+            total_turns=total_turns,
+        )
         known_facts: dict[str, str] = {
             "name": name,
             "occupation": occupation,
             "workplace": workplace,
             "location": location,
+            "research_area": str(rich_context["research_area"]),
+            "education": str(rich_context["education"]),
+            "communication_style": str(rich_context["communication_style"]),
         }
 
         # Personality — Big Five
@@ -308,6 +450,21 @@ class UserGenerator:
             emotional_profile=emotional_profile,
             personality_traits=traits,
             known_facts=known_facts,
+            research_area=str(rich_context["research_area"]),
+            education=str(rich_context["education"]),
+            interests=list(rich_context["interests"]),
+            family=list(rich_context["family"]),
+            friends=list(rich_context["friends"]),
+            colleagues=list(rich_context["colleagues"]),
+            communication_style=str(rich_context["communication_style"]),
+            tech_stack=list(rich_context["tech_stack"]),
+            travel_history=list(rich_context["travel_history"]),
+            health_context=list(rich_context["health_context"]),
+            financial_goals=list(rich_context["financial_goals"]),
+            relationship_timeline=list(rich_context["relationship_timeline"]),
+            career_changes=list(rich_context["career_changes"]),
+            milestones=list(rich_context["milestones"]),
+            habits=list(rich_context["habits"]),
         )
 
         # Generate conversation

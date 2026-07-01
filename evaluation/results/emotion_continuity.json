@@ -1,0 +1,9245 @@
+{
+  "total_users": 100,
+  "continuity": 0.631854,
+  "abrupt_jumps": 15,
+  "persistence": 0.970183,
+  "consistency": 0.631854,
+  "per_user": [
+    {
+      "user_id": "user_0000",
+      "continuity": 0.561889,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 30,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 69,
+          "emotion": "joy"
+        },
+        {
+          "turn": 122,
+          "emotion": "joy"
+        },
+        {
+          "turn": 146,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 164,
+          "emotion": "joy"
+        },
+        {
+          "turn": 189,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 206,
+          "emotion": "joy"
+        },
+        {
+          "turn": 235,
+          "emotion": "fear"
+        },
+        {
+          "turn": 259,
+          "emotion": "joy"
+        },
+        {
+          "turn": 274,
+          "emotion": "joy"
+        },
+        {
+          "turn": 295,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 340,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 388,
+          "emotion": "joy"
+        },
+        {
+          "turn": 417,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 439,
+          "emotion": "trust"
+        },
+        {
+          "turn": 456,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 492,
+          "emotion": "joy"
+        },
+        {
+          "turn": 541,
+          "emotion": "joy"
+        },
+        {
+          "turn": 563,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0001",
+      "continuity": 0.597907,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 45,
+          "emotion": "trust"
+        },
+        {
+          "turn": 85,
+          "emotion": "joy"
+        },
+        {
+          "turn": 111,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 161,
+          "emotion": "joy"
+        },
+        {
+          "turn": 194,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 226,
+          "emotion": "joy"
+        },
+        {
+          "turn": 273,
+          "emotion": "joy"
+        },
+        {
+          "turn": 313,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 349,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 388,
+          "emotion": "joy"
+        },
+        {
+          "turn": 437,
+          "emotion": "joy"
+        },
+        {
+          "turn": 462,
+          "emotion": "joy"
+        },
+        {
+          "turn": 510,
+          "emotion": "joy"
+        },
+        {
+          "turn": 537,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 576,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 622,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 644,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0002",
+      "continuity": 0.667877,
+      "abrupt_jumps": 0,
+      "persistence": 0.933333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 46,
+          "emotion": "joy"
+        },
+        {
+          "turn": 72,
+          "emotion": "joy"
+        },
+        {
+          "turn": 121,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 165,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 198,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 234,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 282,
+          "emotion": "trust"
+        },
+        {
+          "turn": 314,
+          "emotion": "fear"
+        },
+        {
+          "turn": 334,
+          "emotion": "trust"
+        },
+        {
+          "turn": 345,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 382,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 420,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 464,
+          "emotion": "joy"
+        },
+        {
+          "turn": 503,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 521,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0003",
+      "continuity": 0.64465,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 33,
+          "emotion": "joy"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 126,
+          "emotion": "joy"
+        },
+        {
+          "turn": 165,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 197,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 229,
+          "emotion": "trust"
+        },
+        {
+          "turn": 265,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 306,
+          "emotion": "joy"
+        },
+        {
+          "turn": 350,
+          "emotion": "joy"
+        },
+        {
+          "turn": 384,
+          "emotion": "joy"
+        },
+        {
+          "turn": 421,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 475,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 507,
+          "emotion": "joy"
+        },
+        {
+          "turn": 545,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 587,
+          "emotion": "trust"
+        },
+        {
+          "turn": 623,
+          "emotion": "joy"
+        },
+        {
+          "turn": 665,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 709,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0004",
+      "continuity": 0.621965,
+      "abrupt_jumps": 0,
+      "persistence": 0.958333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 30,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 86,
+          "emotion": "joy"
+        },
+        {
+          "turn": 109,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 129,
+          "emotion": "joy"
+        },
+        {
+          "turn": 156,
+          "emotion": "fear"
+        },
+        {
+          "turn": 179,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 193,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 225,
+          "emotion": "joy"
+        },
+        {
+          "turn": 276,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 317,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 356,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 387,
+          "emotion": "joy"
+        },
+        {
+          "turn": 433,
+          "emotion": "trust"
+        },
+        {
+          "turn": 463,
+          "emotion": "joy"
+        },
+        {
+          "turn": 515,
+          "emotion": "joy"
+        },
+        {
+          "turn": 543,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 560,
+          "emotion": "joy"
+        },
+        {
+          "turn": 586,
+          "emotion": "joy"
+        },
+        {
+          "turn": 623,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 660,
+          "emotion": "joy"
+        },
+        {
+          "turn": 706,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 749,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 784,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 826,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0005",
+      "continuity": 0.629124,
+      "abrupt_jumps": 0,
+      "persistence": 0.956522,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 35,
+          "emotion": "joy"
+        },
+        {
+          "turn": 82,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 125,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 152,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 197,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 219,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 227,
+          "emotion": "joy"
+        },
+        {
+          "turn": 264,
+          "emotion": "joy"
+        },
+        {
+          "turn": 319,
+          "emotion": "joy"
+        },
+        {
+          "turn": 343,
+          "emotion": "joy"
+        },
+        {
+          "turn": 395,
+          "emotion": "trust"
+        },
+        {
+          "turn": 436,
+          "emotion": "joy"
+        },
+        {
+          "turn": 475,
+          "emotion": "joy"
+        },
+        {
+          "turn": 513,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 537,
+          "emotion": "joy"
+        },
+        {
+          "turn": 586,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 620,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 672,
+          "emotion": "trust"
+        },
+        {
+          "turn": 699,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 718,
+          "emotion": "trust"
+        },
+        {
+          "turn": 737,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 788,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 820,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0006",
+      "continuity": 0.670886,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 39,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 71,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "trust"
+        },
+        {
+          "turn": 162,
+          "emotion": "joy"
+        },
+        {
+          "turn": 189,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 238,
+          "emotion": "joy"
+        },
+        {
+          "turn": 282,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 314,
+          "emotion": "joy"
+        },
+        {
+          "turn": 342,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 357,
+          "emotion": "joy"
+        },
+        {
+          "turn": 393,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 426,
+          "emotion": "trust"
+        },
+        {
+          "turn": 468,
+          "emotion": "trust"
+        },
+        {
+          "turn": 506,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0007",
+      "continuity": 0.554331,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 34,
+          "emotion": "joy"
+        },
+        {
+          "turn": 69,
+          "emotion": "trust"
+        },
+        {
+          "turn": 112,
+          "emotion": "joy"
+        },
+        {
+          "turn": 153,
+          "emotion": "joy"
+        },
+        {
+          "turn": 203,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 239,
+          "emotion": "joy"
+        },
+        {
+          "turn": 269,
+          "emotion": "joy"
+        },
+        {
+          "turn": 311,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 334,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 356,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 383,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 438,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 473,
+          "emotion": "trust"
+        },
+        {
+          "turn": 500,
+          "emotion": "joy"
+        },
+        {
+          "turn": 542,
+          "emotion": "joy"
+        },
+        {
+          "turn": 577,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0008",
+      "continuity": 0.624665,
+      "abrupt_jumps": 0,
+      "persistence": 0.952381,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 37,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 81,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 125,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 154,
+          "emotion": "joy"
+        },
+        {
+          "turn": 197,
+          "emotion": "joy"
+        },
+        {
+          "turn": 226,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 266,
+          "emotion": "joy"
+        },
+        {
+          "turn": 303,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 342,
+          "emotion": "joy"
+        },
+        {
+          "turn": 396,
+          "emotion": "trust"
+        },
+        {
+          "turn": 422,
+          "emotion": "fear"
+        },
+        {
+          "turn": 446,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 469,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 485,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 507,
+          "emotion": "joy"
+        },
+        {
+          "turn": 551,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 573,
+          "emotion": "joy"
+        },
+        {
+          "turn": 580,
+          "emotion": "joy"
+        },
+        {
+          "turn": 622,
+          "emotion": "trust"
+        },
+        {
+          "turn": 661,
+          "emotion": "joy"
+        },
+        {
+          "turn": 704,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0009",
+      "continuity": 0.701961,
+      "abrupt_jumps": 0,
+      "persistence": 0.923077,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 47,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 85,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 124,
+          "emotion": "trust"
+        },
+        {
+          "turn": 157,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 195,
+          "emotion": "joy"
+        },
+        {
+          "turn": 235,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 280,
+          "emotion": "trust"
+        },
+        {
+          "turn": 310,
+          "emotion": "joy"
+        },
+        {
+          "turn": 353,
+          "emotion": "joy"
+        },
+        {
+          "turn": 386,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 409,
+          "emotion": "trust"
+        },
+        {
+          "turn": 422,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 471,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0010",
+      "continuity": 0.59322,
+      "abrupt_jumps": 1,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 30,
+          "emotion": "joy"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 119,
+          "emotion": "trust"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 188,
+          "emotion": "joy"
+        },
+        {
+          "turn": 230,
+          "emotion": "joy"
+        },
+        {
+          "turn": 276,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 310,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 348,
+          "emotion": "joy"
+        },
+        {
+          "turn": 397,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 474,
+          "emotion": "joy"
+        },
+        {
+          "turn": 511,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 536,
+          "emotion": "joy"
+        },
+        {
+          "turn": 541,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 591,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 628,
+          "emotion": "joy"
+        },
+        {
+          "turn": 667,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0011",
+      "continuity": 0.671838,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 41,
+          "emotion": "trust"
+        },
+        {
+          "turn": 84,
+          "emotion": "trust"
+        },
+        {
+          "turn": 116,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 148,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 195,
+          "emotion": "joy"
+        },
+        {
+          "turn": 230,
+          "emotion": "joy"
+        },
+        {
+          "turn": 269,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 303,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 359,
+          "emotion": "joy"
+        },
+        {
+          "turn": 385,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 401,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 427,
+          "emotion": "joy"
+        },
+        {
+          "turn": 476,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 503,
+          "emotion": "joy"
+        },
+        {
+          "turn": 553,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 593,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 617,
+          "emotion": "joy"
+        },
+        {
+          "turn": 665,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 687,
+          "emotion": "trust"
+        },
+        {
+          "turn": 703,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 738,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 756,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 788,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0012",
+      "continuity": 0.656184,
+      "abrupt_jumps": 0,
+      "persistence": 0.961538,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 48,
+          "emotion": "fear"
+        },
+        {
+          "turn": 70,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 86,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 109,
+          "emotion": "joy"
+        },
+        {
+          "turn": 155,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 200,
+          "emotion": "joy"
+        },
+        {
+          "turn": 239,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 266,
+          "emotion": "trust"
+        },
+        {
+          "turn": 308,
+          "emotion": "joy"
+        },
+        {
+          "turn": 353,
+          "emotion": "joy"
+        },
+        {
+          "turn": 387,
+          "emotion": "trust"
+        },
+        {
+          "turn": 421,
+          "emotion": "joy"
+        },
+        {
+          "turn": 459,
+          "emotion": "joy"
+        },
+        {
+          "turn": 505,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 542,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 580,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 623,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 668,
+          "emotion": "joy"
+        },
+        {
+          "turn": 707,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 730,
+          "emotion": "trust"
+        },
+        {
+          "turn": 739,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 760,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 781,
+          "emotion": "joy"
+        },
+        {
+          "turn": 816,
+          "emotion": "joy"
+        },
+        {
+          "turn": 856,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 896,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0013",
+      "continuity": 0.625173,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 33,
+          "emotion": "joy"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 113,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 151,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 182,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 205,
+          "emotion": "trust"
+        },
+        {
+          "turn": 223,
+          "emotion": "trust"
+        },
+        {
+          "turn": 271,
+          "emotion": "joy"
+        },
+        {
+          "turn": 299,
+          "emotion": "trust"
+        },
+        {
+          "turn": 347,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 375,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 416,
+          "emotion": "joy"
+        },
+        {
+          "turn": 460,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 485,
+          "emotion": "trust"
+        },
+        {
+          "turn": 502,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 538,
+          "emotion": "joy"
+        },
+        {
+          "turn": 576,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 603,
+          "emotion": "joy"
+        },
+        {
+          "turn": 639,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 690,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 709,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0014",
+      "continuity": 0.586636,
+      "abrupt_jumps": 1,
+      "persistence": 0.92,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 29,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 52,
+          "emotion": "trust"
+        },
+        {
+          "turn": 69,
+          "emotion": "joy"
+        },
+        {
+          "turn": 112,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 161,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "joy"
+        },
+        {
+          "turn": 230,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 275,
+          "emotion": "joy"
+        },
+        {
+          "turn": 313,
+          "emotion": "trust"
+        },
+        {
+          "turn": 349,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 384,
+          "emotion": "trust"
+        },
+        {
+          "turn": 426,
+          "emotion": "trust"
+        },
+        {
+          "turn": 454,
+          "emotion": "joy"
+        },
+        {
+          "turn": 491,
+          "emotion": "joy"
+        },
+        {
+          "turn": 538,
+          "emotion": "joy"
+        },
+        {
+          "turn": 573,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 596,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 607,
+          "emotion": "joy"
+        },
+        {
+          "turn": 652,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 692,
+          "emotion": "joy"
+        },
+        {
+          "turn": 714,
+          "emotion": "joy"
+        },
+        {
+          "turn": 756,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 806,
+          "emotion": "fear"
+        },
+        {
+          "turn": 827,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 830,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0015",
+      "continuity": 0.641774,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 40,
+          "emotion": "trust"
+        },
+        {
+          "turn": 70,
+          "emotion": "joy"
+        },
+        {
+          "turn": 114,
+          "emotion": "joy"
+        },
+        {
+          "turn": 157,
+          "emotion": "joy"
+        },
+        {
+          "turn": 195,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 222,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 267,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 306,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 322,
+          "emotion": "trust"
+        },
+        {
+          "turn": 340,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 357,
+          "emotion": "trust"
+        },
+        {
+          "turn": 374,
+          "emotion": "joy"
+        },
+        {
+          "turn": 412,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 449,
+          "emotion": "trust"
+        },
+        {
+          "turn": 492,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 535,
+          "emotion": "fear"
+        },
+        {
+          "turn": 555,
+          "emotion": "trust"
+        },
+        {
+          "turn": 572,
+          "emotion": "joy"
+        },
+        {
+          "turn": 602,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 627,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 642,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 686,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 719,
+          "emotion": "joy"
+        },
+        {
+          "turn": 766,
+          "emotion": "joy"
+        },
+        {
+          "turn": 804,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0016",
+      "continuity": 0.63512,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 44,
+          "emotion": "joy"
+        },
+        {
+          "turn": 83,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 123,
+          "emotion": "joy"
+        },
+        {
+          "turn": 151,
+          "emotion": "joy"
+        },
+        {
+          "turn": 204,
+          "emotion": "joy"
+        },
+        {
+          "turn": 231,
+          "emotion": "trust"
+        },
+        {
+          "turn": 273,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 310,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 355,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 391,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 412,
+          "emotion": "trust"
+        },
+        {
+          "turn": 430,
+          "emotion": "joy"
+        },
+        {
+          "turn": 461,
+          "emotion": "joy"
+        },
+        {
+          "turn": 514,
+          "emotion": "joy"
+        },
+        {
+          "turn": 549,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 586,
+          "emotion": "joy"
+        },
+        {
+          "turn": 615,
+          "emotion": "trust"
+        },
+        {
+          "turn": 659,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 677,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 701,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 736,
+          "emotion": "joy"
+        },
+        {
+          "turn": 773,
+          "emotion": "joy"
+        },
+        {
+          "turn": 821,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0017",
+      "continuity": 0.657658,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 30,
+          "emotion": "joy"
+        },
+        {
+          "turn": 73,
+          "emotion": "joy"
+        },
+        {
+          "turn": 109,
+          "emotion": "joy"
+        },
+        {
+          "turn": 161,
+          "emotion": "joy"
+        },
+        {
+          "turn": 191,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 235,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 270,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 315,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 343,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 387,
+          "emotion": "trust"
+        },
+        {
+          "turn": 426,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 465,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 513,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0018",
+      "continuity": 0.643149,
+      "abrupt_jumps": 0,
+      "persistence": 0.964286,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 41,
+          "emotion": "joy"
+        },
+        {
+          "turn": 75,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 113,
+          "emotion": "joy"
+        },
+        {
+          "turn": 153,
+          "emotion": "joy"
+        },
+        {
+          "turn": 192,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 270,
+          "emotion": "joy"
+        },
+        {
+          "turn": 305,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 358,
+          "emotion": "fear"
+        },
+        {
+          "turn": 373,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 387,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 427,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 443,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 470,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 513,
+          "emotion": "trust"
+        },
+        {
+          "turn": 551,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 591,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 608,
+          "emotion": "joy"
+        },
+        {
+          "turn": 626,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 655,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 705,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 720,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 750,
+          "emotion": "joy"
+        },
+        {
+          "turn": 775,
+          "emotion": "joy"
+        },
+        {
+          "turn": 819,
+          "emotion": "joy"
+        },
+        {
+          "turn": 864,
+          "emotion": "trust"
+        },
+        {
+          "turn": 904,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 931,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0019",
+      "continuity": 0.645833,
+      "abrupt_jumps": 0,
+      "persistence": 0.9375,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 38,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 72,
+          "emotion": "fear"
+        },
+        {
+          "turn": 89,
+          "emotion": "trust"
+        },
+        {
+          "turn": 115,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 186,
+          "emotion": "joy"
+        },
+        {
+          "turn": 232,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 262,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 305,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 321,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 333,
+          "emotion": "joy"
+        },
+        {
+          "turn": 377,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 416,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 460,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 497,
+          "emotion": "trust"
+        },
+        {
+          "turn": 537,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0020",
+      "continuity": 0.633596,
+      "abrupt_jumps": 0,
+      "persistence": 0.961538,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 43,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 78,
+          "emotion": "joy"
+        },
+        {
+          "turn": 107,
+          "emotion": "joy"
+        },
+        {
+          "turn": 152,
+          "emotion": "joy"
+        },
+        {
+          "turn": 182,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 220,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 261,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 281,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 296,
+          "emotion": "trust"
+        },
+        {
+          "turn": 344,
+          "emotion": "joy"
+        },
+        {
+          "turn": 380,
+          "emotion": "joy"
+        },
+        {
+          "turn": 418,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 453,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 471,
+          "emotion": "trust"
+        },
+        {
+          "turn": 498,
+          "emotion": "trust"
+        },
+        {
+          "turn": 526,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 571,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 589,
+          "emotion": "trust"
+        },
+        {
+          "turn": 600,
+          "emotion": "joy"
+        },
+        {
+          "turn": 647,
+          "emotion": "joy"
+        },
+        {
+          "turn": 688,
+          "emotion": "joy"
+        },
+        {
+          "turn": 729,
+          "emotion": "fear"
+        },
+        {
+          "turn": 745,
+          "emotion": "joy"
+        },
+        {
+          "turn": 766,
+          "emotion": "joy"
+        },
+        {
+          "turn": 796,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 828,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0021",
+      "continuity": 0.617647,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 39,
+          "emotion": "joy"
+        },
+        {
+          "turn": 76,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 97,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 115,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 139,
+          "emotion": "joy"
+        },
+        {
+          "turn": 161,
+          "emotion": "joy"
+        },
+        {
+          "turn": 199,
+          "emotion": "joy"
+        },
+        {
+          "turn": 243,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 278,
+          "emotion": "joy"
+        },
+        {
+          "turn": 309,
+          "emotion": "joy"
+        },
+        {
+          "turn": 348,
+          "emotion": "joy"
+        },
+        {
+          "turn": 384,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 431,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 475,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 516,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 542,
+          "emotion": "joy"
+        },
+        {
+          "turn": 583,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 621,
+          "emotion": "trust"
+        },
+        {
+          "turn": 660,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0022",
+      "continuity": 0.643365,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 41,
+          "emotion": "joy"
+        },
+        {
+          "turn": 70,
+          "emotion": "joy"
+        },
+        {
+          "turn": 105,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 147,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 185,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 226,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 257,
+          "emotion": "joy"
+        },
+        {
+          "turn": 296,
+          "emotion": "joy"
+        },
+        {
+          "turn": 343,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 387,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 426,
+          "emotion": "trust"
+        },
+        {
+          "turn": 447,
+          "emotion": "joy"
+        },
+        {
+          "turn": 495,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 525,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 549,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 571,
+          "emotion": "joy"
+        },
+        {
+          "turn": 615,
+          "emotion": "trust"
+        },
+        {
+          "turn": 643,
+          "emotion": "joy"
+        },
+        {
+          "turn": 678,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 726,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 743,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 768,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 800,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0023",
+      "continuity": 0.543478,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 35,
+          "emotion": "joy"
+        },
+        {
+          "turn": 74,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 121,
+          "emotion": "joy"
+        },
+        {
+          "turn": 158,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 183,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 202,
+          "emotion": "joy"
+        },
+        {
+          "turn": 242,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 275,
+          "emotion": "joy"
+        },
+        {
+          "turn": 310,
+          "emotion": "joy"
+        },
+        {
+          "turn": 350,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 370,
+          "emotion": "trust"
+        },
+        {
+          "turn": 390,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 407,
+          "emotion": "joy"
+        },
+        {
+          "turn": 431,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 459,
+          "emotion": "joy"
+        },
+        {
+          "turn": 516,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0024",
+      "continuity": 0.637405,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 38,
+          "emotion": "joy"
+        },
+        {
+          "turn": 71,
+          "emotion": "trust"
+        },
+        {
+          "turn": 107,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 153,
+          "emotion": "trust"
+        },
+        {
+          "turn": 192,
+          "emotion": "joy"
+        },
+        {
+          "turn": 214,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 260,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 293,
+          "emotion": "joy"
+        },
+        {
+          "turn": 334,
+          "emotion": "joy"
+        },
+        {
+          "turn": 373,
+          "emotion": "joy"
+        },
+        {
+          "turn": 404,
+          "emotion": "joy"
+        },
+        {
+          "turn": 450,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 484,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0025",
+      "continuity": 0.586345,
+      "abrupt_jumps": 0,
+      "persistence": 0.961538,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 44,
+          "emotion": "joy"
+        },
+        {
+          "turn": 80,
+          "emotion": "joy"
+        },
+        {
+          "turn": 116,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 136,
+          "emotion": "joy"
+        },
+        {
+          "turn": 155,
+          "emotion": "trust"
+        },
+        {
+          "turn": 195,
+          "emotion": "joy"
+        },
+        {
+          "turn": 237,
+          "emotion": "joy"
+        },
+        {
+          "turn": 270,
+          "emotion": "trust"
+        },
+        {
+          "turn": 318,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 334,
+          "emotion": "trust"
+        },
+        {
+          "turn": 343,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 382,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 436,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 467,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 516,
+          "emotion": "joy"
+        },
+        {
+          "turn": 547,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 591,
+          "emotion": "joy"
+        },
+        {
+          "turn": 632,
+          "emotion": "joy"
+        },
+        {
+          "turn": 657,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 696,
+          "emotion": "joy"
+        },
+        {
+          "turn": 741,
+          "emotion": "trust"
+        },
+        {
+          "turn": 783,
+          "emotion": "joy"
+        },
+        {
+          "turn": 811,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 866,
+          "emotion": "joy"
+        },
+        {
+          "turn": 898,
+          "emotion": "joy"
+        },
+        {
+          "turn": 938,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0026",
+      "continuity": 0.644766,
+      "abrupt_jumps": 0,
+      "persistence": 0.96,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 47,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 69,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 126,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 152,
+          "emotion": "joy"
+        },
+        {
+          "turn": 186,
+          "emotion": "fear"
+        },
+        {
+          "turn": 206,
+          "emotion": "trust"
+        },
+        {
+          "turn": 238,
+          "emotion": "joy"
+        },
+        {
+          "turn": 271,
+          "emotion": "joy"
+        },
+        {
+          "turn": 310,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 328,
+          "emotion": "joy"
+        },
+        {
+          "turn": 353,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 396,
+          "emotion": "joy"
+        },
+        {
+          "turn": 426,
+          "emotion": "joy"
+        },
+        {
+          "turn": 473,
+          "emotion": "joy"
+        },
+        {
+          "turn": 514,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 550,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 576,
+          "emotion": "trust"
+        },
+        {
+          "turn": 627,
+          "emotion": "joy"
+        },
+        {
+          "turn": 657,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 707,
+          "emotion": "trust"
+        },
+        {
+          "turn": 741,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 777,
+          "emotion": "joy"
+        },
+        {
+          "turn": 820,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 845,
+          "emotion": "trust"
+        },
+        {
+          "turn": 854,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0027",
+      "continuity": 0.636542,
+      "abrupt_jumps": 0,
+      "persistence": 0.866667,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 45,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 66,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 75,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 110,
+          "emotion": "joy"
+        },
+        {
+          "turn": 154,
+          "emotion": "fear"
+        },
+        {
+          "turn": 179,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 188,
+          "emotion": "joy"
+        },
+        {
+          "turn": 228,
+          "emotion": "joy"
+        },
+        {
+          "turn": 266,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 307,
+          "emotion": "trust"
+        },
+        {
+          "turn": 355,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 370,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 391,
+          "emotion": "joy"
+        },
+        {
+          "turn": 423,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 466,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0028",
+      "continuity": 0.612056,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 40,
+          "emotion": "joy"
+        },
+        {
+          "turn": 71,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 108,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 125,
+          "emotion": "joy"
+        },
+        {
+          "turn": 147,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 166,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 192,
+          "emotion": "joy"
+        },
+        {
+          "turn": 233,
+          "emotion": "joy"
+        },
+        {
+          "turn": 269,
+          "emotion": "trust"
+        },
+        {
+          "turn": 304,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 334,
+          "emotion": "joy"
+        },
+        {
+          "turn": 383,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 415,
+          "emotion": "trust"
+        },
+        {
+          "turn": 461,
+          "emotion": "joy"
+        },
+        {
+          "turn": 503,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 528,
+          "emotion": "joy"
+        },
+        {
+          "turn": 572,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 612,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0029",
+      "continuity": 0.628571,
+      "abrupt_jumps": 0,
+      "persistence": 0.958333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 36,
+          "emotion": "joy"
+        },
+        {
+          "turn": 76,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 155,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 237,
+          "emotion": "joy"
+        },
+        {
+          "turn": 271,
+          "emotion": "joy"
+        },
+        {
+          "turn": 295,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 336,
+          "emotion": "trust"
+        },
+        {
+          "turn": 383,
+          "emotion": "joy"
+        },
+        {
+          "turn": 423,
+          "emotion": "joy"
+        },
+        {
+          "turn": 453,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 499,
+          "emotion": "fear"
+        },
+        {
+          "turn": 524,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 537,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 552,
+          "emotion": "joy"
+        },
+        {
+          "turn": 572,
+          "emotion": "trust"
+        },
+        {
+          "turn": 600,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 651,
+          "emotion": "joy"
+        },
+        {
+          "turn": 676,
+          "emotion": "joy"
+        },
+        {
+          "turn": 720,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 754,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 773,
+          "emotion": "joy"
+        },
+        {
+          "turn": 805,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0030",
+      "continuity": 0.669811,
+      "abrupt_jumps": 1,
+      "persistence": 0.913043,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 30,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 69,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 119,
+          "emotion": "joy"
+        },
+        {
+          "turn": 149,
+          "emotion": "joy"
+        },
+        {
+          "turn": 196,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 217,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 228,
+          "emotion": "joy"
+        },
+        {
+          "turn": 271,
+          "emotion": "trust"
+        },
+        {
+          "turn": 311,
+          "emotion": "joy"
+        },
+        {
+          "turn": 345,
+          "emotion": "joy"
+        },
+        {
+          "turn": 373,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 422,
+          "emotion": "fear"
+        },
+        {
+          "turn": 444,
+          "emotion": "joy"
+        },
+        {
+          "turn": 448,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 500,
+          "emotion": "joy"
+        },
+        {
+          "turn": 525,
+          "emotion": "joy"
+        },
+        {
+          "turn": 579,
+          "emotion": "joy"
+        },
+        {
+          "turn": 602,
+          "emotion": "trust"
+        },
+        {
+          "turn": 654,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 691,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 720,
+          "emotion": "joy"
+        },
+        {
+          "turn": 767,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 801,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0031",
+      "continuity": 0.618207,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 34,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 69,
+          "emotion": "joy"
+        },
+        {
+          "turn": 115,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 154,
+          "emotion": "trust"
+        },
+        {
+          "turn": 182,
+          "emotion": "trust"
+        },
+        {
+          "turn": 225,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 271,
+          "emotion": "joy"
+        },
+        {
+          "turn": 300,
+          "emotion": "joy"
+        },
+        {
+          "turn": 341,
+          "emotion": "joy"
+        },
+        {
+          "turn": 371,
+          "emotion": "joy"
+        },
+        {
+          "turn": 416,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 432,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 454,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 471,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 496,
+          "emotion": "joy"
+        },
+        {
+          "turn": 539,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 575,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 590,
+          "emotion": "joy"
+        },
+        {
+          "turn": 614,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 642,
+          "emotion": "joy"
+        },
+        {
+          "turn": 682,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0032",
+      "continuity": 0.590909,
+      "abrupt_jumps": 0,
+      "persistence": 0.933333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 40,
+          "emotion": "trust"
+        },
+        {
+          "turn": 66,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 111,
+          "emotion": "joy"
+        },
+        {
+          "turn": 147,
+          "emotion": "joy"
+        },
+        {
+          "turn": 192,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 227,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 259,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 295,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 340,
+          "emotion": "trust"
+        },
+        {
+          "turn": 374,
+          "emotion": "fear"
+        },
+        {
+          "turn": 399,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 408,
+          "emotion": "joy"
+        },
+        {
+          "turn": 444,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 464,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 488,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0033",
+      "continuity": 0.615942,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 34,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 52,
+          "emotion": "joy"
+        },
+        {
+          "turn": 74,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 125,
+          "emotion": "joy"
+        },
+        {
+          "turn": 165,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 195,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 270,
+          "emotion": "fear"
+        },
+        {
+          "turn": 289,
+          "emotion": "trust"
+        },
+        {
+          "turn": 311,
+          "emotion": "joy"
+        },
+        {
+          "turn": 346,
+          "emotion": "trust"
+        },
+        {
+          "turn": 392,
+          "emotion": "joy"
+        },
+        {
+          "turn": 423,
+          "emotion": "joy"
+        },
+        {
+          "turn": 472,
+          "emotion": "joy"
+        },
+        {
+          "turn": 513,
+          "emotion": "joy"
+        },
+        {
+          "turn": 542,
+          "emotion": "joy"
+        },
+        {
+          "turn": 594,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 625,
+          "emotion": "joy"
+        },
+        {
+          "turn": 662,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 700,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 749,
+          "emotion": "trust"
+        },
+        {
+          "turn": 786,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 801,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0034",
+      "continuity": 0.626068,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 41,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 57,
+          "emotion": "joy"
+        },
+        {
+          "turn": 79,
+          "emotion": "joy"
+        },
+        {
+          "turn": 121,
+          "emotion": "joy"
+        },
+        {
+          "turn": 163,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 200,
+          "emotion": "joy"
+        },
+        {
+          "turn": 231,
+          "emotion": "trust"
+        },
+        {
+          "turn": 279,
+          "emotion": "joy"
+        },
+        {
+          "turn": 312,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 354,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 389,
+          "emotion": "joy"
+        },
+        {
+          "turn": 429,
+          "emotion": "trust"
+        },
+        {
+          "turn": 469,
+          "emotion": "joy"
+        },
+        {
+          "turn": 510,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 544,
+          "emotion": "trust"
+        },
+        {
+          "turn": 586,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 619,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 660,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 699,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 740,
+          "emotion": "joy"
+        },
+        {
+          "turn": 789,
+          "emotion": "joy"
+        },
+        {
+          "turn": 812,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 864,
+          "emotion": "joy"
+        },
+        {
+          "turn": 902,
+          "emotion": "fear"
+        },
+        {
+          "turn": 921,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0035",
+      "continuity": 0.622599,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 46,
+          "emotion": "joy"
+        },
+        {
+          "turn": 67,
+          "emotion": "trust"
+        },
+        {
+          "turn": 122,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 142,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 181,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 221,
+          "emotion": "trust"
+        },
+        {
+          "turn": 262,
+          "emotion": "joy"
+        },
+        {
+          "turn": 297,
+          "emotion": "joy"
+        },
+        {
+          "turn": 335,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 360,
+          "emotion": "joy"
+        },
+        {
+          "turn": 382,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 416,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 459,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 476,
+          "emotion": "trust"
+        },
+        {
+          "turn": 501,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 526,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 575,
+          "emotion": "joy"
+        },
+        {
+          "turn": 614,
+          "emotion": "trust"
+        },
+        {
+          "turn": 639,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 677,
+          "emotion": "joy"
+        },
+        {
+          "turn": 725,
+          "emotion": "joy"
+        },
+        {
+          "turn": 768,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 805,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 832,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0036",
+      "continuity": 0.626829,
+      "abrupt_jumps": 0,
+      "persistence": 0.954545,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 40,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 79,
+          "emotion": "joy"
+        },
+        {
+          "turn": 126,
+          "emotion": "fear"
+        },
+        {
+          "turn": 150,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 162,
+          "emotion": "trust"
+        },
+        {
+          "turn": 198,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 240,
+          "emotion": "joy"
+        },
+        {
+          "turn": 271,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 316,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 356,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 382,
+          "emotion": "joy"
+        },
+        {
+          "turn": 424,
+          "emotion": "joy"
+        },
+        {
+          "turn": 470,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 490,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 512,
+          "emotion": "joy"
+        },
+        {
+          "turn": 547,
+          "emotion": "joy"
+        },
+        {
+          "turn": 587,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 623,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 663,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 699,
+          "emotion": "trust"
+        },
+        {
+          "turn": 744,
+          "emotion": "joy"
+        },
+        {
+          "turn": 784,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0037",
+      "continuity": 0.627543,
+      "abrupt_jumps": 2,
+      "persistence": 0.882353,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 32,
+          "emotion": "joy"
+        },
+        {
+          "turn": 85,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 103,
+          "emotion": "trust"
+        },
+        {
+          "turn": 108,
+          "emotion": "joy"
+        },
+        {
+          "turn": 157,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 190,
+          "emotion": "joy"
+        },
+        {
+          "turn": 237,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 275,
+          "emotion": "trust"
+        },
+        {
+          "turn": 316,
+          "emotion": "joy"
+        },
+        {
+          "turn": 347,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 391,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 434,
+          "emotion": "joy"
+        },
+        {
+          "turn": 473,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 496,
+          "emotion": "joy"
+        },
+        {
+          "turn": 500,
+          "emotion": "trust"
+        },
+        {
+          "turn": 549,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 583,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0038",
+      "continuity": 0.659341,
+      "abrupt_jumps": 0,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 41,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 115,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 139,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 164,
+          "emotion": "joy"
+        },
+        {
+          "turn": 204,
+          "emotion": "joy"
+        },
+        {
+          "turn": 241,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 268,
+          "emotion": "fear"
+        },
+        {
+          "turn": 284,
+          "emotion": "trust"
+        },
+        {
+          "turn": 315,
+          "emotion": "trust"
+        },
+        {
+          "turn": 348,
+          "emotion": "joy"
+        },
+        {
+          "turn": 397,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 437,
+          "emotion": "joy"
+        },
+        {
+          "turn": 471,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 490,
+          "emotion": "trust"
+        },
+        {
+          "turn": 502,
+          "emotion": "joy"
+        },
+        {
+          "turn": 551,
+          "emotion": "trust"
+        },
+        {
+          "turn": 586,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0039",
+      "continuity": 0.602254,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 43,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 80,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 121,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 147,
+          "emotion": "joy"
+        },
+        {
+          "turn": 190,
+          "emotion": "joy"
+        },
+        {
+          "turn": 232,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 266,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 288,
+          "emotion": "trust"
+        },
+        {
+          "turn": 307,
+          "emotion": "joy"
+        },
+        {
+          "turn": 345,
+          "emotion": "joy"
+        },
+        {
+          "turn": 383,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 457,
+          "emotion": "joy"
+        },
+        {
+          "turn": 492,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 534,
+          "emotion": "joy"
+        },
+        {
+          "turn": 577,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0040",
+      "continuity": 0.656642,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 40,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 75,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 124,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 162,
+          "emotion": "joy"
+        },
+        {
+          "turn": 190,
+          "emotion": "fear"
+        },
+        {
+          "turn": 209,
+          "emotion": "trust"
+        },
+        {
+          "turn": 228,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 246,
+          "emotion": "joy"
+        },
+        {
+          "turn": 268,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 303,
+          "emotion": "trust"
+        },
+        {
+          "turn": 347,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 384,
+          "emotion": "trust"
+        },
+        {
+          "turn": 423,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 466,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 502,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 517,
+          "emotion": "trust"
+        },
+        {
+          "turn": 552,
+          "emotion": "joy"
+        },
+        {
+          "turn": 587,
+          "emotion": "joy"
+        },
+        {
+          "turn": 632,
+          "emotion": "joy"
+        },
+        {
+          "turn": 662,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 693,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 745,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0041",
+      "continuity": 0.611881,
+      "abrupt_jumps": 0,
+      "persistence": 0.857143,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 41,
+          "emotion": "trust"
+        },
+        {
+          "turn": 67,
+          "emotion": "trust"
+        },
+        {
+          "turn": 119,
+          "emotion": "fear"
+        },
+        {
+          "turn": 137,
+          "emotion": "joy"
+        },
+        {
+          "turn": 149,
+          "emotion": "joy"
+        },
+        {
+          "turn": 185,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 236,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 263,
+          "emotion": "joy"
+        },
+        {
+          "turn": 311,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 335,
+          "emotion": "trust"
+        },
+        {
+          "turn": 345,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 389,
+          "emotion": "joy"
+        },
+        {
+          "turn": 412,
+          "emotion": "joy"
+        },
+        {
+          "turn": 460,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0042",
+      "continuity": 0.602394,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 42,
+          "emotion": "trust"
+        },
+        {
+          "turn": 75,
+          "emotion": "trust"
+        },
+        {
+          "turn": 120,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 147,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 167,
+          "emotion": "trust"
+        },
+        {
+          "turn": 198,
+          "emotion": "fear"
+        },
+        {
+          "turn": 221,
+          "emotion": "joy"
+        },
+        {
+          "turn": 242,
+          "emotion": "joy"
+        },
+        {
+          "turn": 281,
+          "emotion": "joy"
+        },
+        {
+          "turn": 318,
+          "emotion": "joy"
+        },
+        {
+          "turn": 359,
+          "emotion": "joy"
+        },
+        {
+          "turn": 386,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 408,
+          "emotion": "joy"
+        },
+        {
+          "turn": 426,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 449,
+          "emotion": "trust"
+        },
+        {
+          "turn": 464,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 503,
+          "emotion": "joy"
+        },
+        {
+          "turn": 552,
+          "emotion": "joy"
+        },
+        {
+          "turn": 594,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 628,
+          "emotion": "joy"
+        },
+        {
+          "turn": 664,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 697,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0043",
+      "continuity": 0.671053,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 40,
+          "emotion": "joy"
+        },
+        {
+          "turn": 78,
+          "emotion": "trust"
+        },
+        {
+          "turn": 117,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 149,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 189,
+          "emotion": "joy"
+        },
+        {
+          "turn": 229,
+          "emotion": "joy"
+        },
+        {
+          "turn": 263,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 305,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 334,
+          "emotion": "joy"
+        },
+        {
+          "turn": 380,
+          "emotion": "joy"
+        },
+        {
+          "turn": 413,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 452,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 473,
+          "emotion": "trust"
+        },
+        {
+          "turn": 496,
+          "emotion": "trust"
+        },
+        {
+          "turn": 536,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 576,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0044",
+      "continuity": 0.670608,
+      "abrupt_jumps": 0,
+      "persistence": 0.941176,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 42,
+          "emotion": "joy"
+        },
+        {
+          "turn": 73,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 121,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 149,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 165,
+          "emotion": "trust"
+        },
+        {
+          "turn": 197,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 230,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 274,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 306,
+          "emotion": "joy"
+        },
+        {
+          "turn": 358,
+          "emotion": "joy"
+        },
+        {
+          "turn": 381,
+          "emotion": "joy"
+        },
+        {
+          "turn": 436,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 453,
+          "emotion": "joy"
+        },
+        {
+          "turn": 465,
+          "emotion": "joy"
+        },
+        {
+          "turn": 501,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 518,
+          "emotion": "joy"
+        },
+        {
+          "turn": 552,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0045",
+      "continuity": 0.668203,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 47,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 73,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 119,
+          "emotion": "joy"
+        },
+        {
+          "turn": 153,
+          "emotion": "fear"
+        },
+        {
+          "turn": 168,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 201,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 232,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 265,
+          "emotion": "trust"
+        },
+        {
+          "turn": 307,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 348,
+          "emotion": "joy"
+        },
+        {
+          "turn": 394,
+          "emotion": "trust"
+        },
+        {
+          "turn": 430,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 471,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 488,
+          "emotion": "joy"
+        },
+        {
+          "turn": 515,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 546,
+          "emotion": "joy"
+        },
+        {
+          "turn": 578,
+          "emotion": "trust"
+        },
+        {
+          "turn": 624,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 666,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 698,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 722,
+          "emotion": "trust"
+        },
+        {
+          "turn": 749,
+          "emotion": "joy"
+        },
+        {
+          "turn": 782,
+          "emotion": "joy"
+        },
+        {
+          "turn": 820,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0046",
+      "continuity": 0.647436,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 48,
+          "emotion": "joy"
+        },
+        {
+          "turn": 78,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 125,
+          "emotion": "joy"
+        },
+        {
+          "turn": 148,
+          "emotion": "joy"
+        },
+        {
+          "turn": 196,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 232,
+          "emotion": "joy"
+        },
+        {
+          "turn": 278,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 307,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 350,
+          "emotion": "joy"
+        },
+        {
+          "turn": 399,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 436,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 466,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 484,
+          "emotion": "trust"
+        },
+        {
+          "turn": 506,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 545,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 593,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0047",
+      "continuity": 0.638792,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 47,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 75,
+          "emotion": "joy"
+        },
+        {
+          "turn": 126,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 156,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 187,
+          "emotion": "joy"
+        },
+        {
+          "turn": 242,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 266,
+          "emotion": "joy"
+        },
+        {
+          "turn": 305,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 325,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 349,
+          "emotion": "joy"
+        },
+        {
+          "turn": 399,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 422,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 444,
+          "emotion": "trust"
+        },
+        {
+          "turn": 463,
+          "emotion": "joy"
+        },
+        {
+          "turn": 516,
+          "emotion": "trust"
+        },
+        {
+          "turn": 549,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 594,
+          "emotion": "trust"
+        },
+        {
+          "turn": 615,
+          "emotion": "trust"
+        },
+        {
+          "turn": 657,
+          "emotion": "joy"
+        },
+        {
+          "turn": 710,
+          "emotion": "joy"
+        },
+        {
+          "turn": 737,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 776,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 793,
+          "emotion": "trust"
+        },
+        {
+          "turn": 826,
+          "emotion": "fear"
+        },
+        {
+          "turn": 851,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0048",
+      "continuity": 0.636667,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 45,
+          "emotion": "joy"
+        },
+        {
+          "turn": 76,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 142,
+          "emotion": "joy"
+        },
+        {
+          "turn": 193,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 217,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 263,
+          "emotion": "joy"
+        },
+        {
+          "turn": 291,
+          "emotion": "trust"
+        },
+        {
+          "turn": 326,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 371,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 390,
+          "emotion": "joy"
+        },
+        {
+          "turn": 408,
+          "emotion": "joy"
+        },
+        {
+          "turn": 452,
+          "emotion": "joy"
+        },
+        {
+          "turn": 489,
+          "emotion": "joy"
+        },
+        {
+          "turn": 515,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 559,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0049",
+      "continuity": 0.601583,
+      "abrupt_jumps": 1,
+      "persistence": 0.952381,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 35,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 54,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 69,
+          "emotion": "joy"
+        },
+        {
+          "turn": 112,
+          "emotion": "trust"
+        },
+        {
+          "turn": 151,
+          "emotion": "joy"
+        },
+        {
+          "turn": 201,
+          "emotion": "joy"
+        },
+        {
+          "turn": 231,
+          "emotion": "joy"
+        },
+        {
+          "turn": 264,
+          "emotion": "joy"
+        },
+        {
+          "turn": 306,
+          "emotion": "joy"
+        },
+        {
+          "turn": 351,
+          "emotion": "joy"
+        },
+        {
+          "turn": 381,
+          "emotion": "trust"
+        },
+        {
+          "turn": 438,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 469,
+          "emotion": "joy"
+        },
+        {
+          "turn": 507,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 543,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 560,
+          "emotion": "joy"
+        },
+        {
+          "turn": 578,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 616,
+          "emotion": "trust"
+        },
+        {
+          "turn": 671,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 693,
+          "emotion": "joy"
+        },
+        {
+          "turn": 696,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0050",
+      "continuity": 0.618321,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 34,
+          "emotion": "joy"
+        },
+        {
+          "turn": 86,
+          "emotion": "trust"
+        },
+        {
+          "turn": 112,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 150,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 187,
+          "emotion": "trust"
+        },
+        {
+          "turn": 238,
+          "emotion": "joy"
+        },
+        {
+          "turn": 277,
+          "emotion": "joy"
+        },
+        {
+          "turn": 320,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 349,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 398,
+          "emotion": "joy"
+        },
+        {
+          "turn": 433,
+          "emotion": "joy"
+        },
+        {
+          "turn": 471,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 504,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 552,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 584,
+          "emotion": "trust"
+        },
+        {
+          "turn": 625,
+          "emotion": "joy"
+        },
+        {
+          "turn": 655,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 673,
+          "emotion": "joy"
+        },
+        {
+          "turn": 709,
+          "emotion": "joy"
+        },
+        {
+          "turn": 746,
+          "emotion": "fear"
+        },
+        {
+          "turn": 770,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0051",
+      "continuity": 0.602906,
+      "abrupt_jumps": 0,
+      "persistence": 0.958333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 35,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 59,
+          "emotion": "joy"
+        },
+        {
+          "turn": 69,
+          "emotion": "fear"
+        },
+        {
+          "turn": 88,
+          "emotion": "trust"
+        },
+        {
+          "turn": 125,
+          "emotion": "joy"
+        },
+        {
+          "turn": 148,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 203,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "joy"
+        },
+        {
+          "turn": 267,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 286,
+          "emotion": "joy"
+        },
+        {
+          "turn": 319,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 353,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 372,
+          "emotion": "trust"
+        },
+        {
+          "turn": 398,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 423,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 462,
+          "emotion": "trust"
+        },
+        {
+          "turn": 506,
+          "emotion": "joy"
+        },
+        {
+          "turn": 544,
+          "emotion": "joy"
+        },
+        {
+          "turn": 592,
+          "emotion": "trust"
+        },
+        {
+          "turn": 617,
+          "emotion": "joy"
+        },
+        {
+          "turn": 659,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 700,
+          "emotion": "joy"
+        },
+        {
+          "turn": 745,
+          "emotion": "joy"
+        },
+        {
+          "turn": 781,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0052",
+      "continuity": 0.630048,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 36,
+          "emotion": "joy"
+        },
+        {
+          "turn": 84,
+          "emotion": "joy"
+        },
+        {
+          "turn": 119,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 155,
+          "emotion": "joy"
+        },
+        {
+          "turn": 190,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 223,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 261,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 296,
+          "emotion": "joy"
+        },
+        {
+          "turn": 335,
+          "emotion": "joy"
+        },
+        {
+          "turn": 383,
+          "emotion": "joy"
+        },
+        {
+          "turn": 411,
+          "emotion": "joy"
+        },
+        {
+          "turn": 449,
+          "emotion": "trust"
+        },
+        {
+          "turn": 500,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 531,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 579,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0053",
+      "continuity": 0.679181,
+      "abrupt_jumps": 1,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 37,
+          "emotion": "trust"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 142,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 158,
+          "emotion": "trust"
+        },
+        {
+          "turn": 203,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 271,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 320,
+          "emotion": "trust"
+        },
+        {
+          "turn": 348,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 399,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 418,
+          "emotion": "joy"
+        },
+        {
+          "turn": 438,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 457,
+          "emotion": "trust"
+        },
+        {
+          "turn": 462,
+          "emotion": "fear"
+        },
+        {
+          "turn": 483,
+          "emotion": "joy"
+        },
+        {
+          "turn": 509,
+          "emotion": "joy"
+        },
+        {
+          "turn": 543,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0054",
+      "continuity": 0.711832,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 37,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 81,
+          "emotion": "trust"
+        },
+        {
+          "turn": 107,
+          "emotion": "joy"
+        },
+        {
+          "turn": 157,
+          "emotion": "joy"
+        },
+        {
+          "turn": 189,
+          "emotion": "fear"
+        },
+        {
+          "turn": 206,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 225,
+          "emotion": "trust"
+        },
+        {
+          "turn": 254,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 303,
+          "emotion": "trust"
+        },
+        {
+          "turn": 326,
+          "emotion": "joy"
+        },
+        {
+          "turn": 375,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 407,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 451,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 475,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0055",
+      "continuity": 0.639344,
+      "abrupt_jumps": 0,
+      "persistence": 0.958333,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 31,
+          "emotion": "joy"
+        },
+        {
+          "turn": 77,
+          "emotion": "fear"
+        },
+        {
+          "turn": 101,
+          "emotion": "trust"
+        },
+        {
+          "turn": 114,
+          "emotion": "joy"
+        },
+        {
+          "turn": 154,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 233,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 258,
+          "emotion": "trust"
+        },
+        {
+          "turn": 306,
+          "emotion": "joy"
+        },
+        {
+          "turn": 333,
+          "emotion": "trust"
+        },
+        {
+          "turn": 388,
+          "emotion": "joy"
+        },
+        {
+          "turn": 414,
+          "emotion": "joy"
+        },
+        {
+          "turn": 449,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 486,
+          "emotion": "joy"
+        },
+        {
+          "turn": 539,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 562,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 585,
+          "emotion": "trust"
+        },
+        {
+          "turn": 607,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 622,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 644,
+          "emotion": "joy"
+        },
+        {
+          "turn": 685,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 719,
+          "emotion": "joy"
+        },
+        {
+          "turn": 763,
+          "emotion": "joy"
+        },
+        {
+          "turn": 796,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0056",
+      "continuity": 0.647,
+      "abrupt_jumps": 0,
+      "persistence": 0.965517,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 44,
+          "emotion": "trust"
+        },
+        {
+          "turn": 81,
+          "emotion": "joy"
+        },
+        {
+          "turn": 110,
+          "emotion": "fear"
+        },
+        {
+          "turn": 126,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 148,
+          "emotion": "joy"
+        },
+        {
+          "turn": 187,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 231,
+          "emotion": "trust"
+        },
+        {
+          "turn": 257,
+          "emotion": "joy"
+        },
+        {
+          "turn": 295,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 346,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 388,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 421,
+          "emotion": "joy"
+        },
+        {
+          "turn": 462,
+          "emotion": "joy"
+        },
+        {
+          "turn": 489,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 504,
+          "emotion": "trust"
+        },
+        {
+          "turn": 533,
+          "emotion": "joy"
+        },
+        {
+          "turn": 576,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 606,
+          "emotion": "joy"
+        },
+        {
+          "turn": 648,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 686,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 725,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 749,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 763,
+          "emotion": "joy"
+        },
+        {
+          "turn": 795,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 844,
+          "emotion": "trust"
+        },
+        {
+          "turn": 865,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 886,
+          "emotion": "trust"
+        },
+        {
+          "turn": 919,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 946,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0057",
+      "continuity": 0.650498,
+      "abrupt_jumps": 0,
+      "persistence": 0.95,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 37,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 87,
+          "emotion": "joy"
+        },
+        {
+          "turn": 126,
+          "emotion": "trust"
+        },
+        {
+          "turn": 159,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 194,
+          "emotion": "joy"
+        },
+        {
+          "turn": 243,
+          "emotion": "joy"
+        },
+        {
+          "turn": 281,
+          "emotion": "joy"
+        },
+        {
+          "turn": 310,
+          "emotion": "joy"
+        },
+        {
+          "turn": 354,
+          "emotion": "trust"
+        },
+        {
+          "turn": 399,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 447,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 486,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 505,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 512,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 553,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 608,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 644,
+          "emotion": "joy"
+        },
+        {
+          "turn": 686,
+          "emotion": "joy"
+        },
+        {
+          "turn": 715,
+          "emotion": "joy"
+        },
+        {
+          "turn": 762,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0058",
+      "continuity": 0.610609,
+      "abrupt_jumps": 1,
+      "persistence": 0.96,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 33,
+          "emotion": "joy"
+        },
+        {
+          "turn": 71,
+          "emotion": "joy"
+        },
+        {
+          "turn": 116,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 154,
+          "emotion": "joy"
+        },
+        {
+          "turn": 196,
+          "emotion": "trust"
+        },
+        {
+          "turn": 237,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 259,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 309,
+          "emotion": "joy"
+        },
+        {
+          "turn": 343,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 372,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 397,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 412,
+          "emotion": "joy"
+        },
+        {
+          "turn": 453,
+          "emotion": "joy"
+        },
+        {
+          "turn": 500,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 519,
+          "emotion": "joy"
+        },
+        {
+          "turn": 524,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 567,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 603,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 639,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 689,
+          "emotion": "trust"
+        },
+        {
+          "turn": 718,
+          "emotion": "fear"
+        },
+        {
+          "turn": 743,
+          "emotion": "joy"
+        },
+        {
+          "turn": 767,
+          "emotion": "joy"
+        },
+        {
+          "turn": 789,
+          "emotion": "joy"
+        },
+        {
+          "turn": 837,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0059",
+      "continuity": 0.609075,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 45,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 75,
+          "emotion": "trust"
+        },
+        {
+          "turn": 109,
+          "emotion": "joy"
+        },
+        {
+          "turn": 147,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 164,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 186,
+          "emotion": "joy"
+        },
+        {
+          "turn": 221,
+          "emotion": "trust"
+        },
+        {
+          "turn": 270,
+          "emotion": "joy"
+        },
+        {
+          "turn": 295,
+          "emotion": "joy"
+        },
+        {
+          "turn": 351,
+          "emotion": "joy"
+        },
+        {
+          "turn": 387,
+          "emotion": "joy"
+        },
+        {
+          "turn": 425,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 454,
+          "emotion": "fear"
+        },
+        {
+          "turn": 470,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 496,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 528,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0060",
+      "continuity": 0.61658,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 42,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 66,
+          "emotion": "joy"
+        },
+        {
+          "turn": 85,
+          "emotion": "joy"
+        },
+        {
+          "turn": 119,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 158,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 173,
+          "emotion": "joy"
+        },
+        {
+          "turn": 199,
+          "emotion": "joy"
+        },
+        {
+          "turn": 231,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 271,
+          "emotion": "joy"
+        },
+        {
+          "turn": 300,
+          "emotion": "joy"
+        },
+        {
+          "turn": 339,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 377,
+          "emotion": "fear"
+        },
+        {
+          "turn": 399,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 424,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 460,
+          "emotion": "joy"
+        },
+        {
+          "turn": 494,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 531,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0061",
+      "continuity": 0.628527,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 39,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 73,
+          "emotion": "joy"
+        },
+        {
+          "turn": 118,
+          "emotion": "joy"
+        },
+        {
+          "turn": 161,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 191,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 209,
+          "emotion": "trust"
+        },
+        {
+          "turn": 240,
+          "emotion": "joy"
+        },
+        {
+          "turn": 280,
+          "emotion": "joy"
+        },
+        {
+          "turn": 319,
+          "emotion": "joy"
+        },
+        {
+          "turn": 358,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 386,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 425,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 474,
+          "emotion": "joy"
+        },
+        {
+          "turn": 506,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 529,
+          "emotion": "trust"
+        },
+        {
+          "turn": 555,
+          "emotion": "joy"
+        },
+        {
+          "turn": 592,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0062",
+      "continuity": 0.688462,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 29,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 80,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 109,
+          "emotion": "trust"
+        },
+        {
+          "turn": 152,
+          "emotion": "joy"
+        },
+        {
+          "turn": 188,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 219,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 259,
+          "emotion": "joy"
+        },
+        {
+          "turn": 299,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 327,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 371,
+          "emotion": "joy"
+        },
+        {
+          "turn": 402,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 442,
+          "emotion": "fear"
+        },
+        {
+          "turn": 460,
+          "emotion": "trust"
+        },
+        {
+          "turn": 476,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0063",
+      "continuity": 0.629555,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 36,
+          "emotion": "joy"
+        },
+        {
+          "turn": 77,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 111,
+          "emotion": "joy"
+        },
+        {
+          "turn": 154,
+          "emotion": "trust"
+        },
+        {
+          "turn": 202,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 217,
+          "emotion": "joy"
+        },
+        {
+          "turn": 239,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 271,
+          "emotion": "trust"
+        },
+        {
+          "turn": 320,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 355,
+          "emotion": "joy"
+        },
+        {
+          "turn": 385,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 421,
+          "emotion": "joy"
+        },
+        {
+          "turn": 467,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 498,
+          "emotion": "joy"
+        },
+        {
+          "turn": 538,
+          "emotion": "joy"
+        },
+        {
+          "turn": 594,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 630,
+          "emotion": "joy"
+        },
+        {
+          "turn": 665,
+          "emotion": "trust"
+        },
+        {
+          "turn": 699,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 740,
+          "emotion": "joy"
+        },
+        {
+          "turn": 785,
+          "emotion": "joy"
+        },
+        {
+          "turn": 815,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 863,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 890,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 909,
+          "emotion": "joy"
+        },
+        {
+          "turn": 941,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0064",
+      "continuity": 0.632375,
+      "abrupt_jumps": 0,
+      "persistence": 0.947368,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 37,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 80,
+          "emotion": "joy"
+        },
+        {
+          "turn": 113,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 133,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 144,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 186,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 234,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 261,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 295,
+          "emotion": "fear"
+        },
+        {
+          "turn": 318,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 348,
+          "emotion": "trust"
+        },
+        {
+          "turn": 384,
+          "emotion": "trust"
+        },
+        {
+          "turn": 419,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 448,
+          "emotion": "joy"
+        },
+        {
+          "turn": 487,
+          "emotion": "joy"
+        },
+        {
+          "turn": 527,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 551,
+          "emotion": "joy"
+        },
+        {
+          "turn": 570,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 614,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0065",
+      "continuity": 0.628571,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 34,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 70,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 93,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 128,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 164,
+          "emotion": "trust"
+        },
+        {
+          "turn": 207,
+          "emotion": "joy"
+        },
+        {
+          "turn": 233,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 275,
+          "emotion": "joy"
+        },
+        {
+          "turn": 324,
+          "emotion": "joy"
+        },
+        {
+          "turn": 366,
+          "emotion": "joy"
+        },
+        {
+          "turn": 409,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 430,
+          "emotion": "joy"
+        },
+        {
+          "turn": 488,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 514,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 556,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 602,
+          "emotion": "joy"
+        },
+        {
+          "turn": 642,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 683,
+          "emotion": "joy"
+        },
+        {
+          "turn": 726,
+          "emotion": "joy"
+        },
+        {
+          "turn": 767,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0066",
+      "continuity": 0.641529,
+      "abrupt_jumps": 0,
+      "persistence": 0.96,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 34,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 76,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 94,
+          "emotion": "joy"
+        },
+        {
+          "turn": 106,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 161,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 184,
+          "emotion": "joy"
+        },
+        {
+          "turn": 222,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 272,
+          "emotion": "joy"
+        },
+        {
+          "turn": 308,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 334,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 388,
+          "emotion": "joy"
+        },
+        {
+          "turn": 414,
+          "emotion": "joy"
+        },
+        {
+          "turn": 457,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 487,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 525,
+          "emotion": "joy"
+        },
+        {
+          "turn": 578,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 605,
+          "emotion": "joy"
+        },
+        {
+          "turn": 649,
+          "emotion": "joy"
+        },
+        {
+          "turn": 681,
+          "emotion": "joy"
+        },
+        {
+          "turn": 713,
+          "emotion": "trust"
+        },
+        {
+          "turn": 759,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 798,
+          "emotion": "trust"
+        },
+        {
+          "turn": 832,
+          "emotion": "joy"
+        },
+        {
+          "turn": 880,
+          "emotion": "joy"
+        },
+        {
+          "turn": 904,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0067",
+      "continuity": 0.633952,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 48,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 73,
+          "emotion": "fear"
+        },
+        {
+          "turn": 92,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 112,
+          "emotion": "joy"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 193,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 235,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 276,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 320,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 354,
+          "emotion": "joy"
+        },
+        {
+          "turn": 381,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 432,
+          "emotion": "trust"
+        },
+        {
+          "turn": 476,
+          "emotion": "joy"
+        },
+        {
+          "turn": 509,
+          "emotion": "joy"
+        },
+        {
+          "turn": 542,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 592,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 611,
+          "emotion": "joy"
+        },
+        {
+          "turn": 630,
+          "emotion": "joy"
+        },
+        {
+          "turn": 657,
+          "emotion": "joy"
+        },
+        {
+          "turn": 709,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0068",
+      "continuity": 0.707753,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 35,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 81,
+          "emotion": "joy"
+        },
+        {
+          "turn": 112,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 146,
+          "emotion": "joy"
+        },
+        {
+          "turn": 186,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 237,
+          "emotion": "trust"
+        },
+        {
+          "turn": 261,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 304,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 342,
+          "emotion": "joy"
+        },
+        {
+          "turn": 371,
+          "emotion": "trust"
+        },
+        {
+          "turn": 414,
+          "emotion": "trust"
+        },
+        {
+          "turn": 456,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0069",
+      "continuity": 0.652759,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 38,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 81,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 103,
+          "emotion": "joy"
+        },
+        {
+          "turn": 118,
+          "emotion": "joy"
+        },
+        {
+          "turn": 147,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 190,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 240,
+          "emotion": "joy"
+        },
+        {
+          "turn": 268,
+          "emotion": "fear"
+        },
+        {
+          "turn": 288,
+          "emotion": "trust"
+        },
+        {
+          "turn": 318,
+          "emotion": "joy"
+        },
+        {
+          "turn": 352,
+          "emotion": "joy"
+        },
+        {
+          "turn": 399,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 465,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 508,
+          "emotion": "joy"
+        },
+        {
+          "turn": 544,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 584,
+          "emotion": "joy"
+        },
+        {
+          "turn": 622,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 655,
+          "emotion": "trust"
+        },
+        {
+          "turn": 699,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0070",
+      "continuity": 0.59919,
+      "abrupt_jumps": 1,
+      "persistence": 0.904762,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 44,
+          "emotion": "fear"
+        },
+        {
+          "turn": 69,
+          "emotion": "trust"
+        },
+        {
+          "turn": 75,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 114,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 130,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 164,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 203,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 237,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 267,
+          "emotion": "joy"
+        },
+        {
+          "turn": 317,
+          "emotion": "joy"
+        },
+        {
+          "turn": 356,
+          "emotion": "joy"
+        },
+        {
+          "turn": 391,
+          "emotion": "joy"
+        },
+        {
+          "turn": 429,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 477,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 515,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 546,
+          "emotion": "joy"
+        },
+        {
+          "turn": 585,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 610,
+          "emotion": "joy"
+        },
+        {
+          "turn": 620,
+          "emotion": "joy"
+        },
+        {
+          "turn": 654,
+          "emotion": "joy"
+        },
+        {
+          "turn": 707,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0071",
+      "continuity": 0.668182,
+      "abrupt_jumps": 1,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 34,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 81,
+          "emotion": "joy"
+        },
+        {
+          "turn": 106,
+          "emotion": "joy"
+        },
+        {
+          "turn": 151,
+          "emotion": "joy"
+        },
+        {
+          "turn": 193,
+          "emotion": "trust"
+        },
+        {
+          "turn": 232,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 263,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 279,
+          "emotion": "joy"
+        },
+        {
+          "turn": 299,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 339,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 383,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 403,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 409,
+          "emotion": "joy"
+        },
+        {
+          "turn": 453,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 497,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 539,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 570,
+          "emotion": "joy"
+        },
+        {
+          "turn": 604,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0072",
+      "continuity": 0.641587,
+      "abrupt_jumps": 1,
+      "persistence": 0.95,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 30,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 47,
+          "emotion": "joy"
+        },
+        {
+          "turn": 85,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 112,
+          "emotion": "joy"
+        },
+        {
+          "turn": 155,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 195,
+          "emotion": "joy"
+        },
+        {
+          "turn": 235,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 275,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 312,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 347,
+          "emotion": "joy"
+        },
+        {
+          "turn": 389,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 410,
+          "emotion": "joy"
+        },
+        {
+          "turn": 413,
+          "emotion": "trust"
+        },
+        {
+          "turn": 447,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 494,
+          "emotion": "joy"
+        },
+        {
+          "turn": 540,
+          "emotion": "trust"
+        },
+        {
+          "turn": 574,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 612,
+          "emotion": "joy"
+        },
+        {
+          "turn": 643,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 692,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0073",
+      "continuity": 0.570747,
+      "abrupt_jumps": 1,
+      "persistence": 0.947368,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 44,
+          "emotion": "joy"
+        },
+        {
+          "turn": 75,
+          "emotion": "joy"
+        },
+        {
+          "turn": 121,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 162,
+          "emotion": "joy"
+        },
+        {
+          "turn": 194,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 209,
+          "emotion": "joy"
+        },
+        {
+          "turn": 241,
+          "emotion": "joy"
+        },
+        {
+          "turn": 265,
+          "emotion": "trust"
+        },
+        {
+          "turn": 318,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 354,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 376,
+          "emotion": "joy"
+        },
+        {
+          "turn": 396,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 414,
+          "emotion": "joy"
+        },
+        {
+          "turn": 421,
+          "emotion": "fear"
+        },
+        {
+          "turn": 437,
+          "emotion": "trust"
+        },
+        {
+          "turn": 473,
+          "emotion": "joy"
+        },
+        {
+          "turn": 512,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 552,
+          "emotion": "joy"
+        },
+        {
+          "turn": 584,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0074",
+      "continuity": 0.636364,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 39,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 80,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "trust"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 198,
+          "emotion": "joy"
+        },
+        {
+          "turn": 229,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 275,
+          "emotion": "joy"
+        },
+        {
+          "turn": 312,
+          "emotion": "trust"
+        },
+        {
+          "turn": 350,
+          "emotion": "joy"
+        },
+        {
+          "turn": 395,
+          "emotion": "joy"
+        },
+        {
+          "turn": 430,
+          "emotion": "trust"
+        },
+        {
+          "turn": 469,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 503,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 549,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 566,
+          "emotion": "joy"
+        },
+        {
+          "turn": 590,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0075",
+      "continuity": 0.638017,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 37,
+          "emotion": "joy"
+        },
+        {
+          "turn": 66,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 111,
+          "emotion": "joy"
+        },
+        {
+          "turn": 140,
+          "emotion": "fear"
+        },
+        {
+          "turn": 163,
+          "emotion": "joy"
+        },
+        {
+          "turn": 183,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 219,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 266,
+          "emotion": "joy"
+        },
+        {
+          "turn": 289,
+          "emotion": "joy"
+        },
+        {
+          "turn": 333,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 377,
+          "emotion": "joy"
+        },
+        {
+          "turn": 416,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 434,
+          "emotion": "joy"
+        },
+        {
+          "turn": 449,
+          "emotion": "trust"
+        },
+        {
+          "turn": 488,
+          "emotion": "trust"
+        },
+        {
+          "turn": 522,
+          "emotion": "joy"
+        },
+        {
+          "turn": 553,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0076",
+      "continuity": 0.603976,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 31,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 78,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 112,
+          "emotion": "fear"
+        },
+        {
+          "turn": 130,
+          "emotion": "trust"
+        },
+        {
+          "turn": 155,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "joy"
+        },
+        {
+          "turn": 234,
+          "emotion": "trust"
+        },
+        {
+          "turn": 265,
+          "emotion": "joy"
+        },
+        {
+          "turn": 298,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 340,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 360,
+          "emotion": "joy"
+        },
+        {
+          "turn": 376,
+          "emotion": "joy"
+        },
+        {
+          "turn": 418,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 450,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 498,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 521,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 540,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 576,
+          "emotion": "joy"
+        },
+        {
+          "turn": 612,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0077",
+      "continuity": 0.646914,
+      "abrupt_jumps": 0,
+      "persistence": 0.956522,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 34,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 70,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 106,
+          "emotion": "joy"
+        },
+        {
+          "turn": 149,
+          "emotion": "trust"
+        },
+        {
+          "turn": 196,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 227,
+          "emotion": "joy"
+        },
+        {
+          "turn": 274,
+          "emotion": "joy"
+        },
+        {
+          "turn": 298,
+          "emotion": "joy"
+        },
+        {
+          "turn": 343,
+          "emotion": "trust"
+        },
+        {
+          "turn": 374,
+          "emotion": "joy"
+        },
+        {
+          "turn": 422,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 462,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 499,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 535,
+          "emotion": "fear"
+        },
+        {
+          "turn": 557,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 573,
+          "emotion": "trust"
+        },
+        {
+          "turn": 616,
+          "emotion": "joy"
+        },
+        {
+          "turn": 655,
+          "emotion": "joy"
+        },
+        {
+          "turn": 691,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 711,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 729,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 750,
+          "emotion": "joy"
+        },
+        {
+          "turn": 759,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0078",
+      "continuity": 0.59,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 29,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 79,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 121,
+          "emotion": "joy"
+        },
+        {
+          "turn": 158,
+          "emotion": "joy"
+        },
+        {
+          "turn": 186,
+          "emotion": "joy"
+        },
+        {
+          "turn": 232,
+          "emotion": "joy"
+        },
+        {
+          "turn": 274,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 304,
+          "emotion": "trust"
+        },
+        {
+          "turn": 338,
+          "emotion": "trust"
+        },
+        {
+          "turn": 387,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 425,
+          "emotion": "joy"
+        },
+        {
+          "turn": 465,
+          "emotion": "joy"
+        },
+        {
+          "turn": 500,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 534,
+          "emotion": "joy"
+        },
+        {
+          "turn": 566,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 589,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 604,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 648,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0079",
+      "continuity": 0.610619,
+      "abrupt_jumps": 1,
+      "persistence": 0.9375,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 38,
+          "emotion": "trust"
+        },
+        {
+          "turn": 67,
+          "emotion": "joy"
+        },
+        {
+          "turn": 108,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 148,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "fear"
+        },
+        {
+          "turn": 209,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 213,
+          "emotion": "joy"
+        },
+        {
+          "turn": 266,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 298,
+          "emotion": "joy"
+        },
+        {
+          "turn": 331,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 348,
+          "emotion": "trust"
+        },
+        {
+          "turn": 374,
+          "emotion": "joy"
+        },
+        {
+          "turn": 406,
+          "emotion": "joy"
+        },
+        {
+          "turn": 436,
+          "emotion": "joy"
+        },
+        {
+          "turn": 482,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 514,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0080",
+      "continuity": 0.673152,
+      "abrupt_jumps": 0,
+      "persistence": 0.909091,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 31,
+          "emotion": "joy"
+        },
+        {
+          "turn": 69,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 120,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 145,
+          "emotion": "joy"
+        },
+        {
+          "turn": 156,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 184,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "joy"
+        },
+        {
+          "turn": 266,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 303,
+          "emotion": "joy"
+        },
+        {
+          "turn": 340,
+          "emotion": "joy"
+        },
+        {
+          "turn": 372,
+          "emotion": "joy"
+        },
+        {
+          "turn": 416,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 458,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 480,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 500,
+          "emotion": "fear"
+        },
+        {
+          "turn": 517,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 530,
+          "emotion": "trust"
+        },
+        {
+          "turn": 566,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 616,
+          "emotion": "trust"
+        },
+        {
+          "turn": 639,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 688,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 718,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0081",
+      "continuity": 0.59157,
+      "abrupt_jumps": 0,
+      "persistence": 0.947368,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 44,
+          "emotion": "joy"
+        },
+        {
+          "turn": 81,
+          "emotion": "joy"
+        },
+        {
+          "turn": 108,
+          "emotion": "joy"
+        },
+        {
+          "turn": 154,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 183,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 235,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 270,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 296,
+          "emotion": "trust"
+        },
+        {
+          "turn": 337,
+          "emotion": "fear"
+        },
+        {
+          "turn": 362,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 372,
+          "emotion": "joy"
+        },
+        {
+          "turn": 422,
+          "emotion": "joy"
+        },
+        {
+          "turn": 456,
+          "emotion": "joy"
+        },
+        {
+          "turn": 489,
+          "emotion": "joy"
+        },
+        {
+          "turn": 523,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 544,
+          "emotion": "joy"
+        },
+        {
+          "turn": 578,
+          "emotion": "joy"
+        },
+        {
+          "turn": 611,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 645,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0082",
+      "continuity": 0.649899,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 41,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 87,
+          "emotion": "joy"
+        },
+        {
+          "turn": 119,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 161,
+          "emotion": "joy"
+        },
+        {
+          "turn": 201,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 220,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 240,
+          "emotion": "joy"
+        },
+        {
+          "turn": 276,
+          "emotion": "joy"
+        },
+        {
+          "turn": 316,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 343,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 386,
+          "emotion": "joy"
+        },
+        {
+          "turn": 433,
+          "emotion": "fear"
+        },
+        {
+          "turn": 456,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 477,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 504,
+          "emotion": "joy"
+        },
+        {
+          "turn": 547,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 593,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 616,
+          "emotion": "joy"
+        },
+        {
+          "turn": 665,
+          "emotion": "joy"
+        },
+        {
+          "turn": 701,
+          "emotion": "joy"
+        },
+        {
+          "turn": 739,
+          "emotion": "trust"
+        },
+        {
+          "turn": 773,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 819,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 839,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 857,
+          "emotion": "trust"
+        },
+        {
+          "turn": 905,
+          "emotion": "trust"
+        },
+        {
+          "turn": 935,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0083",
+      "continuity": 0.619168,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 37,
+          "emotion": "joy"
+        },
+        {
+          "turn": 85,
+          "emotion": "joy"
+        },
+        {
+          "turn": 114,
+          "emotion": "fear"
+        },
+        {
+          "turn": 131,
+          "emotion": "joy"
+        },
+        {
+          "turn": 156,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 171,
+          "emotion": "joy"
+        },
+        {
+          "turn": 189,
+          "emotion": "joy"
+        },
+        {
+          "turn": 242,
+          "emotion": "trust"
+        },
+        {
+          "turn": 280,
+          "emotion": "joy"
+        },
+        {
+          "turn": 321,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 346,
+          "emotion": "joy"
+        },
+        {
+          "turn": 389,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 470,
+          "emotion": "joy"
+        },
+        {
+          "turn": 498,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 552,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 584,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 609,
+          "emotion": "joy"
+        },
+        {
+          "turn": 632,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 658,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 695,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 720,
+          "emotion": "joy"
+        },
+        {
+          "turn": 748,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0084",
+      "continuity": 0.642344,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 40,
+          "emotion": "joy"
+        },
+        {
+          "turn": 72,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 119,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 163,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 203,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 240,
+          "emotion": "joy"
+        },
+        {
+          "turn": 280,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 307,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 357,
+          "emotion": "joy"
+        },
+        {
+          "turn": 387,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 408,
+          "emotion": "joy"
+        },
+        {
+          "turn": 431,
+          "emotion": "trust"
+        },
+        {
+          "turn": 472,
+          "emotion": "joy"
+        },
+        {
+          "turn": 510,
+          "emotion": "joy"
+        },
+        {
+          "turn": 554,
+          "emotion": "joy"
+        },
+        {
+          "turn": 593,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 619,
+          "emotion": "joy"
+        },
+        {
+          "turn": 658,
+          "emotion": "joy"
+        },
+        {
+          "turn": 694,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 717,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 747,
+          "emotion": "fear"
+        },
+        {
+          "turn": 769,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 786,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0085",
+      "continuity": 0.635575,
+      "abrupt_jumps": 0,
+      "persistence": 0.923077,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 29,
+          "emotion": "trust"
+        },
+        {
+          "turn": 84,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 112,
+          "emotion": "joy"
+        },
+        {
+          "turn": 149,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 189,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 230,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 249,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 271,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 295,
+          "emotion": "joy"
+        },
+        {
+          "turn": 333,
+          "emotion": "joy"
+        },
+        {
+          "turn": 386,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 413,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 436,
+          "emotion": "joy"
+        },
+        {
+          "turn": 447,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 497,
+          "emotion": "joy"
+        },
+        {
+          "turn": 536,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 557,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 564,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 612,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 640,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 686,
+          "emotion": "joy"
+        },
+        {
+          "turn": 723,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 763,
+          "emotion": "joy"
+        },
+        {
+          "turn": 806,
+          "emotion": "joy"
+        },
+        {
+          "turn": 828,
+          "emotion": "joy"
+        },
+        {
+          "turn": 882,
+          "emotion": "trust"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0086",
+      "continuity": 0.59144,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 31,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 83,
+          "emotion": "trust"
+        },
+        {
+          "turn": 116,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 153,
+          "emotion": "joy"
+        },
+        {
+          "turn": 202,
+          "emotion": "joy"
+        },
+        {
+          "turn": 226,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 242,
+          "emotion": "joy"
+        },
+        {
+          "turn": 275,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 304,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 324,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 344,
+          "emotion": "joy"
+        },
+        {
+          "turn": 398,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "fear"
+        },
+        {
+          "turn": 445,
+          "emotion": "joy"
+        },
+        {
+          "turn": 461,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0087",
+      "continuity": 0.627521,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 35,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 57,
+          "emotion": "joy"
+        },
+        {
+          "turn": 82,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 121,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 157,
+          "emotion": "trust"
+        },
+        {
+          "turn": 196,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 259,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 280,
+          "emotion": "joy"
+        },
+        {
+          "turn": 301,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 340,
+          "emotion": "joy"
+        },
+        {
+          "turn": 379,
+          "emotion": "trust"
+        },
+        {
+          "turn": 421,
+          "emotion": "joy"
+        },
+        {
+          "turn": 460,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 483,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 502,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 539,
+          "emotion": "joy"
+        },
+        {
+          "turn": 566,
+          "emotion": "joy"
+        },
+        {
+          "turn": 605,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 637,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 686,
+          "emotion": "joy"
+        },
+        {
+          "turn": 726,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 758,
+          "emotion": "joy"
+        },
+        {
+          "turn": 792,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0088",
+      "continuity": 0.649543,
+      "abrupt_jumps": 0,
+      "persistence": 0.92,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 48,
+          "emotion": "joy"
+        },
+        {
+          "turn": 84,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 107,
+          "emotion": "joy"
+        },
+        {
+          "turn": 112,
+          "emotion": "joy"
+        },
+        {
+          "turn": 154,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 196,
+          "emotion": "joy"
+        },
+        {
+          "turn": 235,
+          "emotion": "joy"
+        },
+        {
+          "turn": 278,
+          "emotion": "joy"
+        },
+        {
+          "turn": 318,
+          "emotion": "joy"
+        },
+        {
+          "turn": 347,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 389,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 436,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 457,
+          "emotion": "joy"
+        },
+        {
+          "turn": 470,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 506,
+          "emotion": "trust"
+        },
+        {
+          "turn": 540,
+          "emotion": "joy"
+        },
+        {
+          "turn": 591,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 623,
+          "emotion": "joy"
+        },
+        {
+          "turn": 654,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 669,
+          "emotion": "joy"
+        },
+        {
+          "turn": 702,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 740,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 789,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 818,
+          "emotion": "fear"
+        },
+        {
+          "turn": 834,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0089",
+      "continuity": 0.635971,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 34,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 82,
+          "emotion": "joy"
+        },
+        {
+          "turn": 109,
+          "emotion": "joy"
+        },
+        {
+          "turn": 147,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 187,
+          "emotion": "joy"
+        },
+        {
+          "turn": 228,
+          "emotion": "joy"
+        },
+        {
+          "turn": 267,
+          "emotion": "trust"
+        },
+        {
+          "turn": 305,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 340,
+          "emotion": "joy"
+        },
+        {
+          "turn": 388,
+          "emotion": "joy"
+        },
+        {
+          "turn": 422,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 458,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 485,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 527,
+          "emotion": "trust"
+        },
+        {
+          "turn": 567,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 615,
+          "emotion": "joy"
+        },
+        {
+          "turn": 637,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 657,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0090",
+      "continuity": 0.654584,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 35,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 91,
+          "emotion": "trust"
+        },
+        {
+          "turn": 134,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 176,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 222,
+          "emotion": "joy"
+        },
+        {
+          "turn": 281,
+          "emotion": "joy"
+        },
+        {
+          "turn": 329,
+          "emotion": "joy"
+        },
+        {
+          "turn": 361,
+          "emotion": "trust"
+        },
+        {
+          "turn": 408,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 462,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 507,
+          "emotion": "joy"
+        },
+        {
+          "turn": 544,
+          "emotion": "joy"
+        },
+        {
+          "turn": 596,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 652,
+          "emotion": "joy"
+        },
+        {
+          "turn": 683,
+          "emotion": "joy"
+        },
+        {
+          "turn": 733,
+          "emotion": "joy"
+        },
+        {
+          "turn": 777,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 797,
+          "emotion": "trust"
+        },
+        {
+          "turn": 826,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 865,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0091",
+      "continuity": 0.643243,
+      "abrupt_jumps": 0,
+      "persistence": 0.947368,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 38,
+          "emotion": "joy"
+        },
+        {
+          "turn": 70,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 119,
+          "emotion": "trust"
+        },
+        {
+          "turn": 154,
+          "emotion": "joy"
+        },
+        {
+          "turn": 195,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 234,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 261,
+          "emotion": "joy"
+        },
+        {
+          "turn": 300,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 324,
+          "emotion": "joy"
+        },
+        {
+          "turn": 337,
+          "emotion": "trust"
+        },
+        {
+          "turn": 376,
+          "emotion": "joy"
+        },
+        {
+          "turn": 427,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 459,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 497,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 525,
+          "emotion": "joy"
+        },
+        {
+          "turn": 569,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 608,
+          "emotion": "joy"
+        },
+        {
+          "turn": 644,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 691,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0092",
+      "continuity": 0.645081,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 33,
+          "emotion": "joy"
+        },
+        {
+          "turn": 86,
+          "emotion": "joy"
+        },
+        {
+          "turn": 121,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 161,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 192,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 233,
+          "emotion": "joy"
+        },
+        {
+          "turn": 288,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 326,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 365,
+          "emotion": "joy"
+        },
+        {
+          "turn": 395,
+          "emotion": "joy"
+        },
+        {
+          "turn": 447,
+          "emotion": "trust"
+        },
+        {
+          "turn": 473,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 510,
+          "emotion": "trust"
+        },
+        {
+          "turn": 562,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 595,
+          "emotion": "joy"
+        },
+        {
+          "turn": 636,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 652,
+          "emotion": "trust"
+        },
+        {
+          "turn": 676,
+          "emotion": "joy"
+        },
+        {
+          "turn": 728,
+          "emotion": "joy"
+        },
+        {
+          "turn": 750,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0093",
+      "continuity": 0.607306,
+      "abrupt_jumps": 0,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 40,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 79,
+          "emotion": "joy"
+        },
+        {
+          "turn": 105,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 149,
+          "emotion": "joy"
+        },
+        {
+          "turn": 184,
+          "emotion": "joy"
+        },
+        {
+          "turn": 234,
+          "emotion": "joy"
+        },
+        {
+          "turn": 261,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 313,
+          "emotion": "joy"
+        },
+        {
+          "turn": 334,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 353,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 374,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 420,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 445,
+          "emotion": "trust"
+        },
+        {
+          "turn": 457,
+          "emotion": "joy"
+        },
+        {
+          "turn": 494,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 539,
+          "emotion": "joy"
+        },
+        {
+          "turn": 578,
+          "emotion": "joy"
+        },
+        {
+          "turn": 615,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0094",
+      "continuity": 0.622768,
+      "abrupt_jumps": 0,
+      "persistence": 1.0,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 30,
+          "emotion": "trust"
+        },
+        {
+          "turn": 71,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 110,
+          "emotion": "joy"
+        },
+        {
+          "turn": 149,
+          "emotion": "joy"
+        },
+        {
+          "turn": 190,
+          "emotion": "joy"
+        },
+        {
+          "turn": 228,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 264,
+          "emotion": "joy"
+        },
+        {
+          "turn": 309,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 333,
+          "emotion": "joy"
+        },
+        {
+          "turn": 388,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 427,
+          "emotion": "trust"
+        },
+        {
+          "turn": 455,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 489,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 535,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 573,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 612,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 653,
+          "emotion": "joy"
+        },
+        {
+          "turn": 675,
+          "emotion": "joy"
+        },
+        {
+          "turn": 728,
+          "emotion": "joy"
+        },
+        {
+          "turn": 761,
+          "emotion": "trust"
+        },
+        {
+          "turn": 800,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 823,
+          "emotion": "joy"
+        },
+        {
+          "turn": 840,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0095",
+      "continuity": 0.605364,
+      "abrupt_jumps": 1,
+      "persistence": 0.875,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 44,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 77,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 113,
+          "emotion": "joy"
+        },
+        {
+          "turn": 150,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 172,
+          "emotion": "joy"
+        },
+        {
+          "turn": 190,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 213,
+          "emotion": "joy"
+        },
+        {
+          "turn": 213,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 254,
+          "emotion": "joy"
+        },
+        {
+          "turn": 297,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 322,
+          "emotion": "trust"
+        },
+        {
+          "turn": 328,
+          "emotion": "trust"
+        },
+        {
+          "turn": 372,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 412,
+          "emotion": "trust"
+        },
+        {
+          "turn": 436,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 484,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0096",
+      "continuity": 0.656479,
+      "abrupt_jumps": 0,
+      "persistence": 0.875,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "neutral"
+        },
+        {
+          "turn": 38,
+          "emotion": "joy"
+        },
+        {
+          "turn": 74,
+          "emotion": "joy"
+        },
+        {
+          "turn": 116,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 145,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 170,
+          "emotion": "joy"
+        },
+        {
+          "turn": 191,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 234,
+          "emotion": "joy"
+        },
+        {
+          "turn": 262,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 308,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 330,
+          "emotion": "trust"
+        },
+        {
+          "turn": 336,
+          "emotion": "trust"
+        },
+        {
+          "turn": 383,
+          "emotion": "joy"
+        },
+        {
+          "turn": 425,
+          "emotion": "trust"
+        },
+        {
+          "turn": 447,
+          "emotion": "joy"
+        },
+        {
+          "turn": 502,
+          "emotion": "fear"
+        },
+        {
+          "turn": 527,
+          "emotion": "trust"
+        },
+        {
+          "turn": 535,
+          "emotion": "joy"
+        },
+        {
+          "turn": 568,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 617,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 655,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 689,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 728,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 750,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 753,
+          "emotion": "anticipation"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0097",
+      "continuity": 0.655022,
+      "abrupt_jumps": 0,
+      "persistence": 0.96,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 39,
+          "emotion": "joy"
+        },
+        {
+          "turn": 71,
+          "emotion": "joy"
+        },
+        {
+          "turn": 124,
+          "emotion": "joy"
+        },
+        {
+          "turn": 150,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 204,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 236,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 256,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 271,
+          "emotion": "trust"
+        },
+        {
+          "turn": 303,
+          "emotion": "joy"
+        },
+        {
+          "turn": 345,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 391,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 425,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 468,
+          "emotion": "joy"
+        },
+        {
+          "turn": 502,
+          "emotion": "joy"
+        },
+        {
+          "turn": 537,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 587,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 607,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 618,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 636,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 655,
+          "emotion": "joy"
+        },
+        {
+          "turn": 704,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 750,
+          "emotion": "trust"
+        },
+        {
+          "turn": 789,
+          "emotion": "joy"
+        },
+        {
+          "turn": 810,
+          "emotion": "trust"
+        },
+        {
+          "turn": 854,
+          "emotion": "joy"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0098",
+      "continuity": 0.617044,
+      "abrupt_jumps": 0,
+      "persistence": 0.95,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "joy"
+        },
+        {
+          "turn": 53,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 77,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 85,
+          "emotion": "trust"
+        },
+        {
+          "turn": 128,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 185,
+          "emotion": "joy"
+        },
+        {
+          "turn": 225,
+          "emotion": "joy"
+        },
+        {
+          "turn": 287,
+          "emotion": "joy"
+        },
+        {
+          "turn": 329,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 360,
+          "emotion": "joy"
+        },
+        {
+          "turn": 414,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 460,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 513,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 544,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 599,
+          "emotion": "joy"
+        },
+        {
+          "turn": 642,
+          "emotion": "joy"
+        },
+        {
+          "turn": 684,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 735,
+          "emotion": "joy"
+        },
+        {
+          "turn": 775,
+          "emotion": "joy"
+        },
+        {
+          "turn": 836,
+          "emotion": "trust"
+        },
+        {
+          "turn": 868,
+          "emotion": "surprise"
+        }
+      ]
+    },
+    {
+      "user_id": "user_0099",
+      "continuity": 0.617518,
+      "abrupt_jumps": 1,
+      "persistence": 0.944444,
+      "trajectory": [
+        {
+          "turn": 0,
+          "emotion": "trust"
+        },
+        {
+          "turn": 35,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 77,
+          "emotion": "joy"
+        },
+        {
+          "turn": 108,
+          "emotion": "joy"
+        },
+        {
+          "turn": 156,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 183,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 224,
+          "emotion": "joy"
+        },
+        {
+          "turn": 272,
+          "emotion": "trust"
+        },
+        {
+          "turn": 308,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 340,
+          "emotion": "joy"
+        },
+        {
+          "turn": 378,
+          "emotion": "anticipation"
+        },
+        {
+          "turn": 418,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 464,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 493,
+          "emotion": "joy"
+        },
+        {
+          "turn": 533,
+          "emotion": "sadness"
+        },
+        {
+          "turn": 554,
+          "emotion": "trust"
+        },
+        {
+          "turn": 561,
+          "emotion": "joy"
+        },
+        {
+          "turn": 602,
+          "emotion": "surprise"
+        },
+        {
+          "turn": 637,
+          "emotion": "joy"
+        }
+      ]
+    }
+  ]
+}
