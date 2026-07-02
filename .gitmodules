@@ -1,0 +1,3 @@
+[submodule "benchmarks/locomo/external"]
+	path = benchmarks/locomo/external
+	url = https://github.com/snap-research/LoCoMo
