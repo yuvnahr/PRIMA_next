@@ -1,0 +1,13 @@
+{
+  "total_results": 1,
+  "answerable_results": 1,
+  "exact_match": 0.0,
+  "f1": 0.0,
+  "bleu": 0.0,
+  "rouge_l": 0.0,
+  "bertscore": 0.0,
+  "latency_ms": 19416.981,
+  "average_retrieved_memories": 5.0,
+  "reflection_rate": 0.0,
+  "memory_hits": 0.0
+}

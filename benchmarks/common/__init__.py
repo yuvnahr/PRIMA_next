@@ -1,8 +1,9 @@
 """Shared benchmark infrastructure."""
 
+from benchmarks.common.agent import BenchmarkAgent
 from benchmarks.common.interfaces import (
     AgentResponse,
-    AgentRuntime,
+    BenchmarkResult,
     BenchmarkDataset,
     BenchmarkEvaluator,
     BenchmarkRunner,
@@ -14,7 +15,8 @@ from benchmarks.common.interfaces import (
 
 __all__ = [
     "AgentResponse",
-    "AgentRuntime",
+    "BenchmarkAgent",
+    "BenchmarkResult",
     "BenchmarkDataset",
     "BenchmarkEvaluator",
     "BenchmarkRunner",

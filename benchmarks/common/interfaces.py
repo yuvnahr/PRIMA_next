@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Protocol, Sequence
+from typing import TYPE_CHECKING, Any, Iterable, Mapping, Sequence
+
+if TYPE_CHECKING:
+    from benchmarks.common.agent import BenchmarkAgent
 
 
 Metadata = dict[str, Any]
@@ -53,7 +56,7 @@ class AgentResponse:
 
 
 @dataclass(frozen=True)
-class RunnerResult:
+class BenchmarkResult:
     """A generic output record produced by a benchmark runner."""
 
     conversation_id: str
@@ -64,11 +67,7 @@ class RunnerResult:
     metadata: Metadata = field(default_factory=dict)
 
 
-class AgentRuntime(Protocol):
-    """Minimal protocol for any runtime that can answer benchmark prompts."""
-
-    def respond(self, conversation: Conversation, question: ConversationQuestion | None = None) -> AgentResponse:
-        """Return a response for a conversation, optionally scoped to a question."""
+RunnerResult = BenchmarkResult
 
 
 class BenchmarkDataset(ABC):
@@ -87,7 +86,7 @@ class BenchmarkRunner(ABC):
     """Interface for benchmark-agnostic runners."""
 
     @abstractmethod
-    def run(self, agent: AgentRuntime, conversations: Iterable[Conversation]) -> Sequence[RunnerResult]:
+    def run(self, agent: "BenchmarkAgent", conversations: Iterable[Conversation]) -> Sequence[BenchmarkResult]:
         """Run an agent over normalized benchmark conversations."""
 
 
@@ -95,5 +94,5 @@ class BenchmarkEvaluator(ABC):
     """Interface for benchmark evaluators."""
 
     @abstractmethod
-    def evaluate(self, results: Iterable[RunnerResult]) -> Mapping[str, Any]:
+    def evaluate(self, results: Iterable[BenchmarkResult]) -> Mapping[str, Any]:
         """Compute benchmark metrics from runner outputs."""

@@ -1,0 +1,18 @@
+[
+  {
+    "conversation_id": "conv-42",
+    "question_id": "0",
+    "question": "Is it likely that Nate has friends besides Joanna?",
+    "expected": "Yesteammates on hisvideo game team.",
+    "prediction": "Nate took a photo of an incredible sunset and later got his pet critters a new friend. The conversation occurred in July 2026 while Nate expressed trust in nature's beauty.",
+    "retrieved_memories": [
+      "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
+      "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
+      "mem_ba877890-3636-4958-994a-b084ba756266",
+      "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
+      "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af"
+    ],
+    "reflection_used": false,
+    "failure_type": "reasoning"
+  }
+]

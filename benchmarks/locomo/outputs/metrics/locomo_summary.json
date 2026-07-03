@@ -1,0 +1,16 @@
+{
+  "conversations": 1,
+  "questions": 1,
+  "em": 0.0,
+  "f1": 0.0,
+  "latency": 19416.981,
+  "average_retrieval": 5.0,
+  "reflection_percent": 0.0,
+  "memory_growth": null,
+  "memory_hits": 0.0,
+  "runtime_errors": 0,
+  "provider": "ollama",
+  "model": "qwen3.5:4b",
+  "git_commit": "bb693254417442993a0cb29f9612f03aec2b8c39",
+  "timestamp": "2026-07-03T14:04:57Z"
+}

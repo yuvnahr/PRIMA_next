@@ -1,0 +1,92 @@
+[
+  {
+    "conversation_id": "conv-42",
+    "question_id": "0",
+    "question": "Is it likely that Nate has friends besides Joanna?",
+    "retrieved_memory_ids": [
+      "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
+      "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
+      "mem_ba877890-3636-4958-994a-b084ba756266",
+      "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
+      "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af"
+    ],
+    "retrieved_memories": [
+      {
+        "id": "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
+        "text": "Nate: Sounds like a plan! Thanks for the invite Joanna!",
+        "timestamp": "2026-07-03T14:04:29.040800+00:00",
+        "importance_score": 0.149498,
+        "retrieval_score": 0.667595
+      },
+      {
+        "id": "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
+        "text": "Nate: That looks amazing, Joanna! I need to try baking that. What other treats do you like making?",
+        "timestamp": "2026-07-03T14:04:32.895896+00:00",
+        "importance_score": 0.642241,
+        "retrieval_score": 0.65
+      },
+      {
+        "id": "mem_ba877890-3636-4958-994a-b084ba756266",
+        "text": "Nate: That cake looks amazing, Joanna! How did you make it?",
+        "timestamp": "2026-07-03T14:04:32.923470+00:00",
+        "importance_score": 0.584286,
+        "retrieval_score": 0.674343
+      },
+      {
+        "id": "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
+        "text": "Nate: Wow, that sunset pic looks incredible! What inspired you to take that photo?",
+        "timestamp": "2026-07-03T14:04:37.642055+00:00",
+        "importance_score": 0.70922,
+        "retrieval_score": 0.717402
+      },
+      {
+        "id": "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af",
+        "text": "Nate: That sounds incredible! Nature truly has a way of reminding us to appreciate the beauty around us, and moments like those really stay with you. These critters also make me appreciate life's little joys. And guess what? I got them a new friend!",
+        "timestamp": "2026-07-03T14:04:37.697923+00:00",
+        "importance_score": 0.774005,
+        "retrieval_score": 0.754857
+      }
+    ],
+    "retrieval_scores": [
+      0.667595,
+      0.65,
+      0.674343,
+      0.717402,
+      0.754857
+    ],
+    "context_length": 716,
+    "llm_used": true,
+    "latency_ms": 19416.981,
+    "reflection_used": false,
+    "memory_ids_used": [
+      "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
+      "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
+      "mem_ba877890-3636-4958-994a-b084ba756266",
+      "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
+      "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af"
+    ],
+    "graph_links_traversed": [],
+    "importance_scores": [
+      0.149498,
+      0.642241,
+      0.584286,
+      0.70922,
+      0.774005
+    ],
+    "retrieval_confidence": 0.648514,
+    "provider": "ollama",
+    "model": "qwen3.5:4b",
+    "errors": [],
+    "generation_settings": {
+      "provider": "ollama",
+      "model": "qwen3.5:4b",
+      "temperature": 0.0,
+      "top_p": 0.8,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_predict": 64,
+      "context_tokens": 716,
+      "retrieved_memories": 5
+    }
+  }
+]
