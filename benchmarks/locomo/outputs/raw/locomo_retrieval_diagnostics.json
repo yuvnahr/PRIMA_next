@@ -1,92 +1,1261 @@
 [
   {
-    "conversation_id": "conv-42",
-    "question_id": "0",
-    "question": "Is it likely that Nate has friends besides Joanna?",
+    "conversation_id": "smoke-1",
+    "question_id": "q1",
+    "question": "Who is Joanna's friend from the robotics project?",
     "retrieved_memory_ids": [
-      "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
-      "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
-      "mem_ba877890-3636-4958-994a-b084ba756266",
-      "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
-      "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af"
+      "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+      "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c"
     ],
     "retrieved_memories": [
       {
-        "id": "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
-        "text": "Nate: Sounds like a plan! Thanks for the invite Joanna!",
-        "timestamp": "2026-07-03T14:04:29.040800+00:00",
-        "importance_score": 0.149498,
-        "retrieval_score": 0.667595
+        "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+        "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+        "timestamp": "2026-07-03T15:49:26.701879+00:00",
+        "importance_score": 0.55,
+        "retrieval_score": 0.651417
       },
       {
-        "id": "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
-        "text": "Nate: That looks amazing, Joanna! I need to try baking that. What other treats do you like making?",
-        "timestamp": "2026-07-03T14:04:32.895896+00:00",
-        "importance_score": 0.642241,
-        "retrieval_score": 0.65
-      },
-      {
-        "id": "mem_ba877890-3636-4958-994a-b084ba756266",
-        "text": "Nate: That cake looks amazing, Joanna! How did you make it?",
-        "timestamp": "2026-07-03T14:04:32.923470+00:00",
-        "importance_score": 0.584286,
-        "retrieval_score": 0.674343
-      },
-      {
-        "id": "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
-        "text": "Nate: Wow, that sunset pic looks incredible! What inspired you to take that photo?",
-        "timestamp": "2026-07-03T14:04:37.642055+00:00",
-        "importance_score": 0.70922,
-        "retrieval_score": 0.717402
-      },
-      {
-        "id": "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af",
-        "text": "Nate: That sounds incredible! Nature truly has a way of reminding us to appreciate the beauty around us, and moments like those really stay with you. These critters also make me appreciate life's little joys. And guess what? I got them a new friend!",
-        "timestamp": "2026-07-03T14:04:37.697923+00:00",
-        "importance_score": 0.774005,
-        "retrieval_score": 0.754857
+        "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+        "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+        "timestamp": "2026-07-03T15:49:26.708669+00:00",
+        "importance_score": 0.212405,
+        "retrieval_score": 0.239318
       }
     ],
     "retrieval_scores": [
-      0.667595,
-      0.65,
-      0.674343,
-      0.717402,
-      0.754857
+      0.651417,
+      0.239318
     ],
-    "context_length": 716,
-    "llm_used": true,
-    "latency_ms": 19416.981,
+    "context_length": 32,
+    "llm_used": false,
+    "latency_ms": 2062.897,
     "reflection_used": false,
     "memory_ids_used": [
-      "mem_4710875e-22f3-4f15-b559-258dba74e5f0",
-      "mem_40de6c3c-69ba-46a1-9f13-fa687c1fe083",
-      "mem_ba877890-3636-4958-994a-b084ba756266",
-      "mem_c5a3a28d-1006-4609-b332-08f24627ddf7",
-      "mem_9af3bad1-a9e2-4f28-aa25-1ef08585f9af"
+      "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+      "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c"
     ],
     "graph_links_traversed": [],
     "importance_scores": [
-      0.149498,
-      0.642241,
-      0.584286,
-      0.70922,
-      0.774005
+      0.55,
+      0.212405
     ],
-    "retrieval_confidence": 0.648514,
+    "retrieval_confidence": 0.490173,
+    "retrieval_confidence_components": {
+      "confidence": 0.490173,
+      "ambiguity_score": 0.5879,
+      "coverage_score": 0.4,
+      "retrieval_quality_score": 0.445368,
+      "lexical_overlap_score": 0.121212,
+      "entity_overlap_score": 1.0,
+      "temporal_agreement_score": 0.5,
+      "score_separation": 0.4121,
+      "reranker_score": 0.42685,
+      "dense_similarity_score": 0.5,
+      "sparse_similarity_score": 0.5,
+      "relation_overlap_score": 0.166667,
+      "candidate_agreement_score": 0.6
+    },
+    "retrieval_trace": {
+      "question": "Who is Joanna's friend from the robotics project?",
+      "expanded_query": {
+        "text": "Who is Joanna's friend from the robotics project? friends companion close friend classmate teammate coworker group member work task initiative research assignment relationship connected knows friend colleague family met identity profile occupation city country education organization",
+        "terms": [
+          "friends",
+          "companion",
+          "close friend",
+          "classmate",
+          "teammate",
+          "coworker",
+          "group member",
+          "work",
+          "task",
+          "initiative",
+          "research",
+          "assignment",
+          "relationship",
+          "connected",
+          "knows",
+          "friend",
+          "colleague",
+          "family",
+          "met",
+          "identity",
+          "profile",
+          "occupation",
+          "city",
+          "country",
+          "education",
+          "organization"
+        ],
+        "expansion_map": {
+          "friend": [
+            "friends",
+            "companion",
+            "close friend",
+            "classmate",
+            "teammate",
+            "coworker",
+            "group member"
+          ],
+          "project": [
+            "work",
+            "task",
+            "initiative",
+            "research",
+            "assignment"
+          ],
+          "intent:relationship": [
+            "relationship",
+            "connected",
+            "knows",
+            "friend",
+            "colleague",
+            "family",
+            "met"
+          ],
+          "intent:identity": [
+            "identity",
+            "profile",
+            "occupation",
+            "city",
+            "country",
+            "family",
+            "education",
+            "organization"
+          ]
+        }
+      },
+      "query_analysis": {
+        "entities": [
+          "Joanna"
+        ],
+        "relations": [
+          "friend",
+          "relationship"
+        ],
+        "temporal_expressions": [],
+        "preference_terms": [],
+        "identity_attributes": [
+          "project",
+          "identity"
+        ],
+        "keywords": [
+          "joanna's",
+          "friend",
+          "robotics",
+          "project"
+        ],
+        "intents": [
+          "relationship",
+          "identity"
+        ],
+        "events": [],
+        "temporal_constraints": [],
+        "aliases": {},
+        "pronouns": []
+      },
+      "entities": [
+        "Joanna"
+      ],
+      "relations": [
+        "friend",
+        "relationship"
+      ],
+      "intents": [
+        "relationship",
+        "identity"
+      ],
+      "events": [],
+      "temporal_constraints": [],
+      "temporal_expressions": [],
+      "preference_terms": [],
+      "identity_attributes": [
+        "project",
+        "identity"
+      ],
+      "dense_candidates": [
+        {
+          "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+          "score": 0.137353,
+          "strategy_scores": {
+            "dense": 0.137353
+          },
+          "timestamp": "2026-07-03T15:49:26.708669+00:00",
+          "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+          "explanation": {}
+        },
+        {
+          "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+          "score": 0.035817,
+          "strategy_scores": {
+            "dense": 0.035817
+          },
+          "timestamp": "2026-07-03T15:49:26.701879+00:00",
+          "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+          "explanation": {}
+        }
+      ],
+      "sparse_candidates": [
+        {
+          "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+          "score": 0.304429,
+          "strategy_scores": {
+            "sparse": 0.304429
+          },
+          "timestamp": "2026-07-03T15:49:26.701879+00:00",
+          "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 12,
+            "exact_overlap": 7,
+            "required_overlap": 0.090909,
+            "entity_overlap": 1.0
+          }
+        },
+        {
+          "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+          "score": 0.274359,
+          "strategy_scores": {
+            "sparse": 0.274359
+          },
+          "timestamp": "2026-07-03T15:49:26.708669+00:00",
+          "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 15,
+            "exact_overlap": 4,
+            "required_overlap": 0.0,
+            "entity_overlap": 1.0
+          }
+        }
+      ],
+      "hybrid_candidates": [
+        {
+          "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+          "score": 0.723,
+          "strategy_scores": {
+            "dense": 0.0,
+            "sparse": 1.0,
+            "semantic": 0.608333
+          },
+          "timestamp": "2026-07-03T15:49:26.701879+00:00",
+          "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 12,
+            "exact_overlap": 7,
+            "required_overlap": 0.090909,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.333333,
+              "intent": 0.5,
+              "temporal": 0.5
+            }
+          }
+        },
+        {
+          "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+          "score": 0.213,
+          "strategy_scores": {
+            "dense": 1.0,
+            "sparse": 0.0,
+            "semantic": 0.525
+          },
+          "timestamp": "2026-07-03T15:49:26.708669+00:00",
+          "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 15,
+            "exact_overlap": 4,
+            "required_overlap": 0.0,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.0,
+              "intent": 0.5,
+              "temporal": 0.5
+            }
+          }
+        }
+      ],
+      "reranked_candidates": [
+        {
+          "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+          "score": 0.651417,
+          "strategy_scores": {
+            "dense": 0.0,
+            "sparse": 1.0,
+            "semantic": 0.608333,
+            "reranker": 0.59285
+          },
+          "timestamp": "2026-07-03T15:49:26.701879+00:00",
+          "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 12,
+            "exact_overlap": 7,
+            "required_overlap": 0.090909,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.333333,
+              "intent": 0.5,
+              "temporal": 0.5
+            },
+            "reranker": {
+              "enabled": true,
+              "model": "lexical_fallback",
+              "score": 0.59285
+            }
+          }
+        },
+        {
+          "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+          "score": 0.239318,
+          "strategy_scores": {
+            "dense": 1.0,
+            "sparse": 0.0,
+            "semantic": 0.525,
+            "reranker": 0.26085
+          },
+          "timestamp": "2026-07-03T15:49:26.708669+00:00",
+          "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 15,
+            "exact_overlap": 4,
+            "required_overlap": 0.0,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.0,
+              "intent": 0.5,
+              "temporal": 0.5
+            },
+            "reranker": {
+              "enabled": true,
+              "model": "lexical_fallback",
+              "score": 0.26085
+            }
+          }
+        }
+      ],
+      "final_candidates": [
+        {
+          "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+          "score": 0.651417,
+          "strategy_scores": {
+            "dense": 0.0,
+            "sparse": 1.0,
+            "semantic": 0.608333,
+            "reranker": 0.59285
+          },
+          "timestamp": "2026-07-03T15:49:26.701879+00:00",
+          "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 12,
+            "exact_overlap": 7,
+            "required_overlap": 0.090909,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.333333,
+              "intent": 0.5,
+              "temporal": 0.5
+            },
+            "reranker": {
+              "enabled": true,
+              "model": "lexical_fallback",
+              "score": 0.59285
+            }
+          }
+        },
+        {
+          "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+          "score": 0.239318,
+          "strategy_scores": {
+            "dense": 1.0,
+            "sparse": 0.0,
+            "semantic": 0.525,
+            "reranker": 0.26085
+          },
+          "timestamp": "2026-07-03T15:49:26.708669+00:00",
+          "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+          "explanation": {
+            "query_terms": [
+              "who joanna's",
+              "joanna's friend",
+              "who",
+              "joanna's",
+              "friend",
+              "from",
+              "the",
+              "robotics",
+              "project",
+              "joanna",
+              "relationship",
+              "identity",
+              "friends",
+              "companion",
+              "close friend",
+              "classmate",
+              "teammate",
+              "coworker",
+              "group member",
+              "work",
+              "task",
+              "initiative",
+              "research",
+              "assignment",
+              "connected",
+              "knows",
+              "colleague",
+              "family",
+              "met",
+              "profile",
+              "occupation",
+              "city",
+              "country",
+              "education",
+              "organization",
+              "is",
+              "close",
+              "group",
+              "member"
+            ],
+            "required_terms": [
+              "colleague",
+              "coworker",
+              "family",
+              "friend",
+              "manager",
+              "mentor",
+              "neighbor",
+              "relationship",
+              "spouse",
+              "student",
+              "teammate"
+            ],
+            "overlap": 15,
+            "exact_overlap": 4,
+            "required_overlap": 0.0,
+            "entity_overlap": 1.0,
+            "semantic_boost": {
+              "entity": 1.0,
+              "relation": 0.0,
+              "intent": 0.5,
+              "temporal": 0.5
+            },
+            "reranker": {
+              "enabled": true,
+              "model": "lexical_fallback",
+              "score": 0.26085
+            }
+          }
+        }
+      ],
+      "retrieval_confidence": {
+        "confidence": 0.490173,
+        "ambiguity_score": 0.5879,
+        "coverage_score": 0.4,
+        "retrieval_quality_score": 0.445368,
+        "lexical_overlap_score": 0.121212,
+        "entity_overlap_score": 1.0,
+        "temporal_agreement_score": 0.5,
+        "score_separation": 0.4121,
+        "reranker_score": 0.42685,
+        "dense_similarity_score": 0.5,
+        "sparse_similarity_score": 0.5,
+        "relation_overlap_score": 0.166667,
+        "candidate_agreement_score": 0.6
+      }
+    },
+    "expanded_query": {
+      "text": "Who is Joanna's friend from the robotics project? friends companion close friend classmate teammate coworker group member work task initiative research assignment relationship connected knows friend colleague family met identity profile occupation city country education organization",
+      "terms": [
+        "friends",
+        "companion",
+        "close friend",
+        "classmate",
+        "teammate",
+        "coworker",
+        "group member",
+        "work",
+        "task",
+        "initiative",
+        "research",
+        "assignment",
+        "relationship",
+        "connected",
+        "knows",
+        "friend",
+        "colleague",
+        "family",
+        "met",
+        "identity",
+        "profile",
+        "occupation",
+        "city",
+        "country",
+        "education",
+        "organization"
+      ],
+      "expansion_map": {
+        "friend": [
+          "friends",
+          "companion",
+          "close friend",
+          "classmate",
+          "teammate",
+          "coworker",
+          "group member"
+        ],
+        "project": [
+          "work",
+          "task",
+          "initiative",
+          "research",
+          "assignment"
+        ],
+        "intent:relationship": [
+          "relationship",
+          "connected",
+          "knows",
+          "friend",
+          "colleague",
+          "family",
+          "met"
+        ],
+        "intent:identity": [
+          "identity",
+          "profile",
+          "occupation",
+          "city",
+          "country",
+          "family",
+          "education",
+          "organization"
+        ]
+      }
+    },
+    "entities": [
+      "Joanna"
+    ],
+    "relations": [
+      "friend",
+      "relationship"
+    ],
+    "temporal_constraints": [],
+    "dense_candidates": [
+      {
+        "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+        "score": 0.137353,
+        "strategy_scores": {
+          "dense": 0.137353
+        },
+        "timestamp": "2026-07-03T15:49:26.708669+00:00",
+        "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+        "explanation": {}
+      },
+      {
+        "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+        "score": 0.035817,
+        "strategy_scores": {
+          "dense": 0.035817
+        },
+        "timestamp": "2026-07-03T15:49:26.701879+00:00",
+        "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+        "explanation": {}
+      }
+    ],
+    "sparse_candidates": [
+      {
+        "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+        "score": 0.304429,
+        "strategy_scores": {
+          "sparse": 0.304429
+        },
+        "timestamp": "2026-07-03T15:49:26.701879+00:00",
+        "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+        "explanation": {
+          "query_terms": [
+            "who joanna's",
+            "joanna's friend",
+            "who",
+            "joanna's",
+            "friend",
+            "from",
+            "the",
+            "robotics",
+            "project",
+            "joanna",
+            "relationship",
+            "identity",
+            "friends",
+            "companion",
+            "close friend",
+            "classmate",
+            "teammate",
+            "coworker",
+            "group member",
+            "work",
+            "task",
+            "initiative",
+            "research",
+            "assignment",
+            "connected",
+            "knows",
+            "colleague",
+            "family",
+            "met",
+            "profile",
+            "occupation",
+            "city",
+            "country",
+            "education",
+            "organization",
+            "is",
+            "close",
+            "group",
+            "member"
+          ],
+          "required_terms": [
+            "colleague",
+            "coworker",
+            "family",
+            "friend",
+            "manager",
+            "mentor",
+            "neighbor",
+            "relationship",
+            "spouse",
+            "student",
+            "teammate"
+          ],
+          "overlap": 12,
+          "exact_overlap": 7,
+          "required_overlap": 0.090909,
+          "entity_overlap": 1.0
+        }
+      },
+      {
+        "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+        "score": 0.274359,
+        "strategy_scores": {
+          "sparse": 0.274359
+        },
+        "timestamp": "2026-07-03T15:49:26.708669+00:00",
+        "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+        "explanation": {
+          "query_terms": [
+            "who joanna's",
+            "joanna's friend",
+            "who",
+            "joanna's",
+            "friend",
+            "from",
+            "the",
+            "robotics",
+            "project",
+            "joanna",
+            "relationship",
+            "identity",
+            "friends",
+            "companion",
+            "close friend",
+            "classmate",
+            "teammate",
+            "coworker",
+            "group member",
+            "work",
+            "task",
+            "initiative",
+            "research",
+            "assignment",
+            "connected",
+            "knows",
+            "colleague",
+            "family",
+            "met",
+            "profile",
+            "occupation",
+            "city",
+            "country",
+            "education",
+            "organization",
+            "is",
+            "close",
+            "group",
+            "member"
+          ],
+          "required_terms": [
+            "colleague",
+            "coworker",
+            "family",
+            "friend",
+            "manager",
+            "mentor",
+            "neighbor",
+            "relationship",
+            "spouse",
+            "student",
+            "teammate"
+          ],
+          "overlap": 15,
+          "exact_overlap": 4,
+          "required_overlap": 0.0,
+          "entity_overlap": 1.0
+        }
+      }
+    ],
+    "reranked_candidates": [
+      {
+        "id": "mem_75b701ce-bdbd-40ed-8389-19af5460485b",
+        "score": 0.651417,
+        "strategy_scores": {
+          "dense": 0.0,
+          "sparse": 1.0,
+          "semantic": 0.608333,
+          "reranker": 0.59285
+        },
+        "timestamp": "2026-07-03T15:49:26.701879+00:00",
+        "text": "Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+        "explanation": {
+          "query_terms": [
+            "who joanna's",
+            "joanna's friend",
+            "who",
+            "joanna's",
+            "friend",
+            "from",
+            "the",
+            "robotics",
+            "project",
+            "joanna",
+            "relationship",
+            "identity",
+            "friends",
+            "companion",
+            "close friend",
+            "classmate",
+            "teammate",
+            "coworker",
+            "group member",
+            "work",
+            "task",
+            "initiative",
+            "research",
+            "assignment",
+            "connected",
+            "knows",
+            "colleague",
+            "family",
+            "met",
+            "profile",
+            "occupation",
+            "city",
+            "country",
+            "education",
+            "organization",
+            "is",
+            "close",
+            "group",
+            "member"
+          ],
+          "required_terms": [
+            "colleague",
+            "coworker",
+            "family",
+            "friend",
+            "manager",
+            "mentor",
+            "neighbor",
+            "relationship",
+            "spouse",
+            "student",
+            "teammate"
+          ],
+          "overlap": 12,
+          "exact_overlap": 7,
+          "required_overlap": 0.090909,
+          "entity_overlap": 1.0,
+          "semantic_boost": {
+            "entity": 1.0,
+            "relation": 0.333333,
+            "intent": 0.5,
+            "temporal": 0.5
+          },
+          "reranker": {
+            "enabled": true,
+            "model": "lexical_fallback",
+            "score": 0.59285
+          }
+        }
+      },
+      {
+        "id": "mem_a406353d-75b6-4fc0-b055-e2dde605fa7c",
+        "score": 0.239318,
+        "strategy_scores": {
+          "dense": 1.0,
+          "sparse": 0.0,
+          "semantic": 0.525,
+          "reranker": 0.26085
+        },
+        "timestamp": "2026-07-03T15:49:26.708669+00:00",
+        "text": "Nate: Joanna prefers tea and likes working on the robotics project.",
+        "explanation": {
+          "query_terms": [
+            "who joanna's",
+            "joanna's friend",
+            "who",
+            "joanna's",
+            "friend",
+            "from",
+            "the",
+            "robotics",
+            "project",
+            "joanna",
+            "relationship",
+            "identity",
+            "friends",
+            "companion",
+            "close friend",
+            "classmate",
+            "teammate",
+            "coworker",
+            "group member",
+            "work",
+            "task",
+            "initiative",
+            "research",
+            "assignment",
+            "connected",
+            "knows",
+            "colleague",
+            "family",
+            "met",
+            "profile",
+            "occupation",
+            "city",
+            "country",
+            "education",
+            "organization",
+            "is",
+            "close",
+            "group",
+            "member"
+          ],
+          "required_terms": [
+            "colleague",
+            "coworker",
+            "family",
+            "friend",
+            "manager",
+            "mentor",
+            "neighbor",
+            "relationship",
+            "spouse",
+            "student",
+            "teammate"
+          ],
+          "overlap": 15,
+          "exact_overlap": 4,
+          "required_overlap": 0.0,
+          "entity_overlap": 1.0,
+          "semantic_boost": {
+            "entity": 1.0,
+            "relation": 0.0,
+            "intent": 0.5,
+            "temporal": 0.5
+          },
+          "reranker": {
+            "enabled": true,
+            "model": "lexical_fallback",
+            "score": 0.26085
+          }
+        }
+      }
+    ],
+    "context_tokens": 32,
     "provider": "ollama",
-    "model": "qwen3.5:4b",
-    "errors": [],
-    "generation_settings": {
-      "provider": "ollama",
-      "model": "qwen3.5:4b",
-      "temperature": 0.0,
-      "top_p": 0.8,
-      "top_k": 40,
-      "repeat_penalty": 1.1,
-      "num_predict": 64,
-      "context_tokens": 716,
-      "retrieved_memories": 5
-    }
+    "model": "",
+    "errors": [
+      "Ollama request failed: HTTP request failed: 404 Client Error: Not Found for url: http://localhost:11434/api/generate - {\"error\":\"model 'gpt-4o' not found\"}"
+    ],
+    "failure_type": "generation_error"
   }
 ]

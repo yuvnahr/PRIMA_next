@@ -1,15 +1,15 @@
 {
-  "conversation_id": "conv-42",
+  "conversation_id": "smoke-1",
   "result_count": 1,
   "results": [
     {
-      "conversation_id": "conv-42",
-      "question_id": "0",
-      "prompt": "Is it likely that Nate has friends besides Joanna?",
-      "response_text": "Nate took a photo of an incredible sunset and later got his pet critters a new friend. The conversation occurred in July 2026 while Nate expressed trust in nature's beauty.",
-      "expected_answer": "Yesteammates on hisvideo game team.",
-      "category": "3",
-      "llm_used": true
+      "conversation_id": "smoke-1",
+      "question_id": "q1",
+      "prompt": "Who is Joanna's friend from the robotics project?",
+      "response_text": "Based on retrieved memory: Joanna: Nate is my friend from the robotics project and he drives a blue car.",
+      "expected_answer": "Nate",
+      "category": "relationship",
+      "llm_used": false
     }
   ]
 }

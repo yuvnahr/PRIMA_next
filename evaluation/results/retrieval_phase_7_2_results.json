@@ -1,0 +1,757 @@
+{
+  "dataset_path": "benchmarks\\locomo\\external\\data\\locomo10.json",
+  "dataset_available": true,
+  "dataset_note": "Full LoCoMo dataset used.",
+  "query_count": 1979,
+  "phase_4_2_baseline": {
+    "recall_at_1": 0.279352,
+    "recall_at_5": 0.544352,
+    "mrr": 0.393704,
+    "ndcg_at_5": 0.424999
+  },
+  "full_retrieval_v2": {
+    "recall_at_1": 0.161329,
+    "recall_at_5": 0.290107,
+    "mrr": 0.23127,
+    "ndcg_at_5": 0.235186,
+    "average_retrieval_latency": 29.621646,
+    "average_retrieved_memory_count": 5.0
+  },
+  "comparison": {
+    "recall_at_1_gain": -0.118023,
+    "recall_at_5_gain": -0.254245,
+    "mrr_gain": -0.162434,
+    "ndcg_at_5_gain": -0.189813
+  },
+  "ablation": {
+    "dense": {
+      "recall_at_1": 0.002026,
+      "recall_at_5": 0.005857,
+      "mrr": 0.005415,
+      "ndcg_at_5": 0.004688,
+      "average_retrieval_latency": 3.957278,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.002225,
+      "recall_at_5": 0.005731,
+      "mrr": 0.006097,
+      "ndcg_at_5": 0.004855,
+      "average_retrieval_latency": 5.78685,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.002225,
+      "recall_at_5": 0.005731,
+      "mrr": 0.006097,
+      "ndcg_at_5": 0.004855,
+      "average_retrieval_latency": 5.826928,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.128316,
+      "recall_at_5": 0.263286,
+      "mrr": 0.198147,
+      "ndcg_at_5": 0.204742,
+      "average_retrieval_latency": 41.883236,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.160824,
+      "recall_at_5": 0.289097,
+      "mrr": 0.230141,
+      "ndcg_at_5": 0.234005,
+      "average_retrieval_latency": 29.072811,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.161329,
+      "recall_at_5": 0.290107,
+      "mrr": 0.23127,
+      "ndcg_at_5": 0.235186,
+      "average_retrieval_latency": 29.621646,
+      "average_retrieved_memory_count": 5.0
+    }
+  },
+  "category_improvements": {
+    "identity": {
+      "dense": {
+        "recall_at_1": 0.001695,
+        "recall_at_5": 0.004227,
+        "mrr": 0.004788,
+        "ndcg_at_5": 0.003722,
+        "average_retrieval_latency": 3.988512,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.002028,
+        "recall_at_5": 0.004227,
+        "mrr": 0.006102,
+        "ndcg_at_5": 0.00413,
+        "average_retrieval_latency": 5.885968,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.002028,
+        "recall_at_5": 0.004227,
+        "mrr": 0.006102,
+        "ndcg_at_5": 0.00413,
+        "average_retrieval_latency": 5.789442,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.111182,
+        "recall_at_5": 0.236673,
+        "mrr": 0.179732,
+        "ndcg_at_5": 0.183587,
+        "average_retrieval_latency": 38.462637,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.144021,
+        "recall_at_5": 0.254608,
+        "mrr": 0.208531,
+        "ndcg_at_5": 0.208177,
+        "average_retrieval_latency": 26.895874,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.144021,
+        "recall_at_5": 0.254608,
+        "mrr": 0.208785,
+        "ndcg_at_5": 0.208383,
+        "average_retrieval_latency": 28.048611,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.250381,
+        "mrr_gain": 0.203997
+      }
+    },
+    "relationship": {
+      "dense": {
+        "recall_at_1": 0.004566,
+        "recall_at_5": 0.006849,
+        "mrr": 0.006088,
+        "ndcg_at_5": 0.005966,
+        "average_retrieval_latency": 4.064811,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.004566,
+        "recall_at_5": 0.006849,
+        "mrr": 0.006088,
+        "ndcg_at_5": 0.005966,
+        "average_retrieval_latency": 5.569301,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.004566,
+        "recall_at_5": 0.006849,
+        "mrr": 0.006088,
+        "ndcg_at_5": 0.005966,
+        "average_retrieval_latency": 5.682676,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.125761,
+        "recall_at_5": 0.294517,
+        "mrr": 0.216971,
+        "ndcg_at_5": 0.22087,
+        "average_retrieval_latency": 58.3588,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.152397,
+        "recall_at_5": 0.358444,
+        "mrr": 0.264688,
+        "ndcg_at_5": 0.27086,
+        "average_retrieval_latency": 37.451075,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.152397,
+        "recall_at_5": 0.36301,
+        "mrr": 0.268341,
+        "ndcg_at_5": 0.274855,
+        "average_retrieval_latency": 37.262293,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.356161,
+        "mrr_gain": 0.262253
+      }
+    },
+    "preference": {
+      "dense": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 3.952846,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 5.899285,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 5.778551,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.105634,
+        "recall_at_5": 0.303991,
+        "mrr": 0.186854,
+        "ndcg_at_5": 0.207643,
+        "average_retrieval_latency": 46.966508,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.133803,
+        "recall_at_5": 0.31338,
+        "mrr": 0.207512,
+        "ndcg_at_5": 0.226541,
+        "average_retrieval_latency": 32.804813,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.133803,
+        "recall_at_5": 0.31338,
+        "mrr": 0.207512,
+        "ndcg_at_5": 0.226541,
+        "average_retrieval_latency": 35.654834,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.31338,
+        "mrr_gain": 0.207512
+      }
+    },
+    "temporal": {
+      "dense": {
+        "recall_at_1": 0.002169,
+        "recall_at_5": 0.008315,
+        "mrr": 0.004953,
+        "ndcg_at_5": 0.00548,
+        "average_retrieval_latency": 3.845966,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.002169,
+        "recall_at_5": 0.008315,
+        "mrr": 0.004953,
+        "ndcg_at_5": 0.00548,
+        "average_retrieval_latency": 5.661966,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.002169,
+        "recall_at_5": 0.008315,
+        "mrr": 0.004953,
+        "ndcg_at_5": 0.00548,
+        "average_retrieval_latency": 5.997146,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.173897,
+        "recall_at_5": 0.313087,
+        "mrr": 0.232972,
+        "ndcg_at_5": 0.24946,
+        "average_retrieval_latency": 42.108617,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.211858,
+        "recall_at_5": 0.341829,
+        "mrr": 0.268872,
+        "ndcg_at_5": 0.283532,
+        "average_retrieval_latency": 29.947758,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.214027,
+        "recall_at_5": 0.343999,
+        "mrr": 0.271511,
+        "ndcg_at_5": 0.286323,
+        "average_retrieval_latency": 28.894452,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.335684,
+        "mrr_gain": 0.266558
+      }
+    },
+    "multi-hop": {
+      "dense": {
+        "recall_at_1": 0.00021,
+        "recall_at_5": 0.026463,
+        "mrr": 0.030208,
+        "ndcg_at_5": 0.021918,
+        "average_retrieval_latency": 3.774431,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.00021,
+        "recall_at_5": 0.021254,
+        "mrr": 0.026042,
+        "ndcg_at_5": 0.018772,
+        "average_retrieval_latency": 5.375883,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.00021,
+        "recall_at_5": 0.021254,
+        "mrr": 0.026042,
+        "ndcg_at_5": 0.018772,
+        "average_retrieval_latency": 5.843365,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.156944,
+        "recall_at_5": 0.236505,
+        "mrr": 0.247222,
+        "ndcg_at_5": 0.217445,
+        "average_retrieval_latency": 41.119569,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.162153,
+        "recall_at_5": 0.278172,
+        "mrr": 0.265278,
+        "ndcg_at_5": 0.236195,
+        "average_retrieval_latency": 30.439967,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.162153,
+        "recall_at_5": 0.278172,
+        "mrr": 0.263542,
+        "ndcg_at_5": 0.234751,
+        "average_retrieval_latency": 31.491625,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.251709,
+        "mrr_gain": 0.233334
+      }
+    }
+  },
+  "confidence_validation": {
+    "histogram": [
+      {
+        "bin_start": 0.0,
+        "bin_end": 0.1,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.1,
+        "bin_end": 0.2,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.2,
+        "bin_end": 0.3,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.3,
+        "bin_end": 0.4,
+        "count": 87,
+        "recall_at_5": 0.333333,
+        "mrr": 0.257663
+      },
+      {
+        "bin_start": 0.4,
+        "bin_end": 0.5,
+        "count": 1076,
+        "recall_at_5": 0.297128,
+        "mrr": 0.226533
+      },
+      {
+        "bin_start": 0.5,
+        "bin_end": 0.6,
+        "count": 776,
+        "recall_at_5": 0.277271,
+        "mrr": 0.236791
+      },
+      {
+        "bin_start": 0.6,
+        "bin_end": 0.7,
+        "count": 39,
+        "recall_at_5": 0.262821,
+        "mrr": 0.199145
+      },
+      {
+        "bin_start": 0.7,
+        "bin_end": 0.8,
+        "count": 1,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.8,
+        "bin_end": 0.9,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.9,
+        "bin_end": 1.0,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "curve": [
+      {
+        "bin_start": 0.0,
+        "bin_end": 0.1,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.1,
+        "bin_end": 0.2,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.2,
+        "bin_end": 0.3,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.3,
+        "bin_end": 0.4,
+        "count": 87,
+        "recall_at_5": 0.333333,
+        "mrr": 0.257663
+      },
+      {
+        "bin_start": 0.4,
+        "bin_end": 0.5,
+        "count": 1076,
+        "recall_at_5": 0.297128,
+        "mrr": 0.226533
+      },
+      {
+        "bin_start": 0.5,
+        "bin_end": 0.6,
+        "count": 776,
+        "recall_at_5": 0.277271,
+        "mrr": 0.236791
+      },
+      {
+        "bin_start": 0.6,
+        "bin_end": 0.7,
+        "count": 39,
+        "recall_at_5": 0.262821,
+        "mrr": 0.199145
+      },
+      {
+        "bin_start": 0.7,
+        "bin_end": 0.8,
+        "count": 1,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.8,
+        "bin_end": 0.9,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.9,
+        "bin_end": 1.0,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "confidence_vs_recall_at_5_correlation": -0.046117,
+    "confidence_vs_mrr_correlation": -0.011722
+  },
+  "context_statistics": {
+    "before_retrieval_v2": {
+      "average": 259.966145,
+      "median": 258.0,
+      "p95": 313.0
+    },
+    "after_retrieval_v2": {
+      "average": 225.085902,
+      "median": 228.0,
+      "p95": 295.0
+    },
+    "recall_at_5_before": 0.005857,
+    "recall_at_5_after": 0.290107,
+    "recall_at_5_delta": 0.28425
+  },
+  "failure_breakdown": {
+    "total_failures": 1335,
+    "counts": {
+      "temporal_failure": 295,
+      "entity_resolution_failure": 860,
+      "relation_failure": 130,
+      "preference_failure": 47,
+      "retrieval_miss": 3,
+      "context_truncation": 0,
+      "reranker_failure": 0,
+      "generation_failure": 0
+    },
+    "representative_examples": {
+      "temporal_failure": [
+        {
+          "query": "When did Caroline go to the LGBTQ support group?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D1:3"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D13:1",
+            "conv-26:D10:5",
+            "conv-26:D3:11",
+            "conv-26:D18:1",
+            "conv-26:D5:2"
+          ]
+        },
+        {
+          "query": "When did Melanie paint a sunrise?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D1:12"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D14:30",
+            "conv-26:D4:3",
+            "conv-26:D8:18",
+            "conv-26:D14:3",
+            "conv-26:D7:12"
+          ]
+        },
+        {
+          "query": "When did Melanie run a charity race?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D2:1"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D18:17",
+            "conv-26:D14:28",
+            "conv-26:D14:22",
+            "conv-26:D8:20",
+            "conv-26:D14:3"
+          ]
+        }
+      ],
+      "entity_resolution_failure": [
+        {
+          "query": "What fields would Caroline be likely to pursue in her educaton?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D1:9",
+            "conv-26:D1:11"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D4:14",
+            "conv-26:D16:16",
+            "conv-26:D17:13",
+            "conv-26:D17:7",
+            "conv-26:D14:21"
+          ]
+        },
+        {
+          "query": "What did Caroline research?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D2:8"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D10:15",
+            "conv-26:D13:1",
+            "conv-26:D1:4",
+            "conv-26:D4:13",
+            "conv-26:D10:13"
+          ]
+        },
+        {
+          "query": "What is Caroline's identity?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D1:5"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D3:3",
+            "conv-26:D10:15",
+            "conv-26:D3:4",
+            "conv-26:D3:10",
+            "conv-26:D4:3"
+          ]
+        }
+      ],
+      "relation_failure": [
+        {
+          "query": "What is Caroline's relationship status?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D3:13",
+            "conv-26:D2:14"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D8:13",
+            "conv-26:D12:11",
+            "conv-26:D5:2",
+            "conv-26:D4:1",
+            "conv-26:D6:16"
+          ]
+        },
+        {
+          "query": "How long has Caroline had her current group of friends for?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D3:13"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D3:11",
+            "conv-26:D12:1",
+            "conv-26:D6:11",
+            "conv-26:D17:1",
+            "conv-26:D16:5"
+          ]
+        },
+        {
+          "query": "What activities has Melanie done with her family?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D8:4",
+            "conv-26:D8:6",
+            "conv-26:D9:1",
+            "conv-26:D6:4",
+            "conv-26:D1:18",
+            "conv-26:D3:14"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D6:16",
+            "conv-26:D19:9",
+            "conv-26:D4:8",
+            "conv-26:D14:10",
+            "conv-26:D3:1"
+          ]
+        }
+      ],
+      "preference_failure": [
+        {
+          "query": "What was Melanie's favorite book from her childhood?",
+          "category": "preference",
+          "expected_memory_ids": [
+            "conv-26:D6:10"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D14:30",
+            "conv-26:D7:10",
+            "conv-26:D6:9",
+            "conv-26:D8:15",
+            "conv-26:D13:1"
+          ]
+        },
+        {
+          "query": "What is Gina's favorite style of dance?",
+          "category": "preference",
+          "expected_memory_ids": [
+            "conv-30:D1:9"
+          ],
+          "retrieved_memory_ids": [
+            "conv-30:D5:3",
+            "conv-30:D13:4",
+            "conv-30:D2:7",
+            "conv-30:D9:10",
+            "conv-30:D3:6"
+          ]
+        },
+        {
+          "query": "What is Jon's favorite style of dance?",
+          "category": "preference",
+          "expected_memory_ids": [
+            "conv-30:D1:8"
+          ],
+          "retrieved_memory_ids": [
+            "conv-30:D5:3",
+            "conv-30:D9:10",
+            "conv-30:D8:12",
+            "conv-30:D13:5",
+            "conv-30:D9:9"
+          ]
+        }
+      ],
+      "retrieval_miss": [
+        {
+          "query": "What did the posters at the poetry reading say?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D17:19"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D17:20",
+            "conv-26:D17:12",
+            "conv-26:D13:1",
+            "conv-26:D7:12",
+            "conv-26:D8:11"
+          ]
+        },
+        {
+          "query": "What do the dancers in the photo represent?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-30:D1:25"
+          ],
+          "retrieved_memory_ids": [
+            "conv-30:D9:3",
+            "conv-30:D13:4",
+            "conv-30:D11:3",
+            "conv-30:D13:5",
+            "conv-30:D1:24"
+          ]
+        },
+        {
+          "query": "What is the general sentiment about the upcoming grand opening?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-30:D15:18",
+            "conv-30:D15:19"
+          ],
+          "retrieved_memory_ids": [
+            "conv-30:D5:10",
+            "conv-30:D2:1",
+            "conv-30:D8:12",
+            "conv-30:D2:11",
+            "conv-30:D5:2"
+          ]
+        }
+      ],
+      "context_truncation": [],
+      "reranker_failure": [],
+      "generation_failure": []
+    }
+  }
+}

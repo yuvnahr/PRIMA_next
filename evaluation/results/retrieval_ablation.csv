@@ -1,0 +1,8 @@
+configuration,recall_at_1,recall_at_5,mrr,ndcg_at_5,average_retrieval_latency,average_retrieved_memory_count
+phase_4_2_baseline,0.279352,0.544352,0.393704,0.424999,,
+dense,0.002026,0.005857,0.005415,0.004688,3.957278,5.0
+dense_query_analysis,0.002225,0.005731,0.006097,0.004855,5.78685,5.0
+dense_expansion,0.002225,0.005731,0.006097,0.004855,5.826928,5.0
+dense_sparse,0.128316,0.263286,0.198147,0.204742,41.883236,5.0
+dense_sparse_reranker,0.160824,0.289097,0.230141,0.234005,29.072811,5.0
+full_retrieval_v2,0.161329,0.290107,0.23127,0.235186,29.621646,5.0

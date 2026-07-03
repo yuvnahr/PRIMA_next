@@ -1,4 +1,4 @@
-"""Integrated PRIMA-NEXT runtime."""
+﻿"""Integrated PRIMA-NEXT runtime."""
 
 from __future__ import annotations
 
@@ -359,13 +359,47 @@ class PrimaRuntime:
             "graph_links_traversed": list(answer_context.graph_links_traversed),
             "importance_scores": [memory.importance_score for memory in answer_context.memories],
             "retrieval_confidence": retrieval_response.confidence.confidence,
+            "retrieval_confidence_components": retrieval_response.confidence.to_dict(),
+            "retrieval_trace": dict(getattr(retrieval_response, "diagnostics", {})),
+            "expanded_query": dict(getattr(retrieval_response, "diagnostics", {}).get("expanded_query", {})),
+            "entities": list(getattr(retrieval_response, "diagnostics", {}).get("entities", [])),
+            "relations": list(getattr(retrieval_response, "diagnostics", {}).get("relations", [])),
+            "temporal_constraints": list(getattr(retrieval_response, "diagnostics", {}).get("temporal_constraints", [])),
+            "dense_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("dense_candidates", [])),
+            "sparse_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("sparse_candidates", [])),
+            "reranked_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("reranked_candidates", [])),
+            "context_tokens": answer_context.token_count,
             "provider": provider,
             "model": model,
             "errors": list(errors),
         }
+        diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
         if self._debug_inference_enabled():
             diagnostics["generation_settings"] = dict(inference_settings)
         return diagnostics
+
+
+    def _classify_answer_failure(self, diagnostics: dict[str, Any], errors: tuple[str, ...], llm_used: bool) -> str | None:
+        if errors:
+            return "generation_error"
+        retrieved = diagnostics.get("retrieved_memory_ids", [])
+        if not retrieved:
+            return "retrieval_miss"
+        trace = diagnostics.get("retrieval_trace", {})
+        entities = set(str(item).lower() for item in trace.get("entities", [])) if isinstance(trace, dict) else set()
+        temporal = trace.get("temporal_constraints", []) if isinstance(trace, dict) else []
+        confidence = diagnostics.get("retrieval_confidence_components", {})
+        if entities and float(confidence.get("entity_overlap_score", 0.0) or 0.0) <= 0.0:
+            return "entity_resolution_failure"
+        if temporal and float(confidence.get("temporal_agreement_score", 0.0) or 0.0) < 0.5:
+            return "temporal_failure"
+        if diagnostics.get("context_tokens", 0) >= int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600")):
+            return "context_truncation"
+        if float(diagnostics.get("retrieval_confidence", 0.0) or 0.0) < 0.35:
+            return "retrieval_partial"
+        if not llm_used:
+            return "generation_error"
+        return None
 
     def _log_answer(self, question: str, diagnostics: dict[str, Any]) -> None:
         payload = {
@@ -430,3 +464,5 @@ class PrimaRuntime:
             handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(handler)
         return logger
+
+

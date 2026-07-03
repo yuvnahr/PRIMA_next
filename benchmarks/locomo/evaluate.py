@@ -1,4 +1,4 @@
-"""LoCoMo metric computation over runner outputs."""
+﻿"""LoCoMo metric computation over runner outputs."""
 
 from __future__ import annotations
 
@@ -105,6 +105,8 @@ def write_locomo_artifacts(
         "single_result": raw_path / "single_conversation_benchmark_result.json",
         "metrics": metrics_path / "metrics.json",
         "summary": metrics_path / "locomo_summary.json",
+        "retrieval_stage_metrics": metrics_path / "retrieval_stage_metrics.json",
+        "retrieval_pipeline_trace": raw_path / "retrieval_pipeline_trace.json",
     }
     single_result = {
         "conversation_id": items[0].conversation_id if items else None,
@@ -127,18 +129,110 @@ def write_locomo_artifacts(
     paths["single_result"].write_text(json.dumps(single_result, indent=2), encoding="utf-8")
     paths["metrics"].write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     paths["summary"].write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    paths["retrieval_stage_metrics"].write_text(json.dumps(retrieval_stage_metrics(items), indent=2), encoding="utf-8")
+    paths["retrieval_pipeline_trace"].write_text(json.dumps(retrieval_pipeline_trace(items), indent=2), encoding="utf-8")
     return paths
 
+
+
+def retrieval_pipeline_trace(results: Iterable[RunnerResult]) -> list[dict[str, Any]]:
+    """Persist benchmark-visible retrieval traces without calling PRIMA internals."""
+
+    traces: list[dict[str, Any]] = []
+    for item in results:
+        diagnostics = dict(item.response.metadata.get("answer_diagnostics", {}))
+        trace = dict(diagnostics.get("retrieval_trace", {}))
+        traces.append(
+            {
+                "conversation_id": item.conversation_id,
+                "question_id": item.question_id,
+                "question": item.prompt,
+                "expanded_query": diagnostics.get("expanded_query") or trace.get("expanded_query"),
+                "entities": diagnostics.get("entities") or trace.get("entities", []),
+                "relations": diagnostics.get("relations") or trace.get("relations", []),
+                "temporal_constraints": diagnostics.get("temporal_constraints") or trace.get("temporal_constraints", []),
+                "dense_candidates": diagnostics.get("dense_candidates") or trace.get("dense_candidates", []),
+                "sparse_candidates": diagnostics.get("sparse_candidates") or trace.get("sparse_candidates", []),
+                "hybrid_candidates": trace.get("hybrid_candidates", []),
+                "reranked_candidates": diagnostics.get("reranked_candidates") or trace.get("reranked_candidates", []),
+                "retrieval_confidence": diagnostics.get("retrieval_confidence_components") or trace.get("retrieval_confidence", {}),
+                "context_tokens": diagnostics.get("context_tokens", diagnostics.get("context_length", 0)),
+                "failure_type": diagnostics.get("failure_type"),
+            }
+        )
+    return traces
+
+
+def retrieval_stage_metrics(results: Iterable[RunnerResult]) -> dict[str, Any]:
+    """Compute lightweight stage metrics from public response diagnostics."""
+
+    items = list(results)
+    answerable = [item for item in items if item.expected_answer]
+    return {
+        "dense_recall_at_30": mean(_stage_hit(item, "dense_candidates") for item in answerable),
+        "sparse_recall_at_30": mean(_stage_hit(item, "sparse_candidates") for item in answerable),
+        "hybrid_recall_at_30": mean(_stage_hit(item, "hybrid_candidates") for item in answerable),
+        "reranked_recall_at_5": mean(_stage_hit(item, "reranked_candidates", limit=5) for item in answerable),
+        "entity_recall": mean(_entity_recall(item) for item in items),
+        "temporal_recall": mean(_temporal_recall(item) for item in items),
+        "relationship_recall": mean(_relationship_recall(item) for item in items),
+        "average_context_tokens": mean(
+            float(item.response.metadata.get("answer_diagnostics", {}).get("context_tokens", 0.0) or 0.0)
+            for item in items
+        ),
+    }
+
+
+def _stage_hit(result: RunnerResult, stage: str, limit: int = 30) -> float:
+    expected_tokens = set(tokens(result.expected_answer or ""))
+    if not expected_tokens:
+        return 0.0
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    trace = dict(diagnostics.get("retrieval_trace", {}))
+    candidates = diagnostics.get(stage) or trace.get(stage, [])
+    context = " ".join(str(candidate.get("text", "")) for candidate in list(candidates)[:limit] if isinstance(candidate, dict))
+    return 1.0 if expected_tokens & set(tokens(context)) else 0.0
+
+
+def _entity_recall(result: RunnerResult) -> float:
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    entities = diagnostics.get("entities", [])
+    if not entities:
+        return 1.0
+    context = " ".join(str(item.get("text", "")) for item in diagnostics.get("retrieved_memories", ()))
+    lower_context = context.lower()
+    return sum(1 for entity in entities if str(entity).lower() in lower_context) / max(1, len(entities))
+
+
+def _temporal_recall(result: RunnerResult) -> float:
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    temporal = diagnostics.get("temporal_constraints", [])
+    if not temporal:
+        return 1.0
+    confidence = diagnostics.get("retrieval_confidence_components", {})
+    return float(confidence.get("temporal_agreement_score", 0.0) or 0.0)
+
+
+def _relationship_recall(result: RunnerResult) -> float:
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    relations = diagnostics.get("relations", [])
+    if not relations:
+        return 1.0
+    context = " ".join(str(item.get("text", "")) for item in diagnostics.get("retrieved_memories", ()))
+    context_tokens = set(tokens(context))
+    return sum(1 for relation in relations if str(relation).lower() in context_tokens) / max(1, len(relations))
 
 def failure_record(result: RunnerResult) -> dict[str, Any]:
     diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
     retrieved = diagnostics.get("retrieved_memory_ids", [])
-    if not retrieved:
-        failure_type = "retrieval"
-    elif diagnostics.get("llm_used"):
-        failure_type = "reasoning"
-    else:
-        failure_type = "generation"
+    failure_type = diagnostics.get("failure_type")
+    if not failure_type:
+        if not retrieved:
+            failure_type = "retrieval_miss"
+        elif diagnostics.get("llm_used"):
+            failure_type = "generation_error"
+        else:
+            failure_type = "retrieval_partial"
     return {
         "conversation_id": result.conversation_id,
         "question_id": result.question_id,
@@ -221,3 +315,4 @@ def git_commit() -> str | None:
         ref = Path(".git") / head.split(" ", 1)[1]
         return ref.read_text(encoding="utf-8").strip() if ref.exists() else None
     return head
+

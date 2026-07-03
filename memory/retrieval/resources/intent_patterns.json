@@ -1,0 +1,30 @@
+﻿{
+  "relationship": {
+    "patterns": ["friend", "friends", "coworker", "coworkers", "colleague", "colleagues", "teammate", "teammates", "neighbor", "neighbors", "sibling", "siblings", "family", "mentor", "student", "manager", "wife", "husband", "spouse", "partner", "who .* with", "who .* know"],
+    "expansions": ["relationship", "connected", "knows", "friend", "colleague", "family", "met"]
+  },
+  "preference": {
+    "patterns": ["favorite", "likes", "like", "prefers", "prefer", "enjoys", "enjoy", "usually", "often", "always", "never"],
+    "expansions": ["favorite", "likes", "prefers", "enjoys", "usually", "often", "habit", "preference"]
+  },
+  "identity": {
+    "patterns": ["occupation", "job", "work", "city", "country", "birthplace", "birthday", "birthdate", "pet", "pets", "project", "education", "school", "college", "university", "organization", "company", "family", "where .* from", "where .* live", "what .* do"],
+    "expansions": ["identity", "profile", "occupation", "city", "country", "family", "education", "organization"]
+  },
+  "event": {
+    "patterns": ["joined", "started", "began", "moved", "graduated", "married", "visited", "traveled", "travel", "won", "lost", "finished", "gave", "received", "borrowed", "owned"],
+    "expansions": ["event", "happened", "joined", "started", "moved", "visited", "traveled", "gave", "received"]
+  },
+  "temporal": {
+    "patterns": ["before", "after", "during", "while", "earlier", "later", "first", "last", "earliest", "latest", "when living", "before moving", "after graduation", "during vacation", "while working", "after college", "before marriage"],
+    "expansions": ["before", "after", "during", "while", "earlier", "later", "first", "last", "timeline"]
+  },
+  "travel": {
+    "patterns": ["where did .* travel", "where .* visited", "trip", "vacation", "flight", "hotel", "destination", "traveled", "visited"],
+    "expansions": ["travel", "visited", "trip", "vacation", "flight", "hotel", "destination"]
+  },
+  "gift": {
+    "patterns": ["who gave", "gave .*", "received", "gift", "present", "borrowed", "owned", "camera"],
+    "expansions": ["gift", "gave", "received", "present", "borrowed", "owned"]
+  }
+}

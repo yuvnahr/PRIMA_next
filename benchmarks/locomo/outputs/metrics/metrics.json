@@ -2,12 +2,12 @@
   "total_results": 1,
   "answerable_results": 1,
   "exact_match": 0.0,
-  "f1": 0.0,
-  "bleu": 0.0,
-  "rouge_l": 0.0,
-  "bertscore": 0.0,
-  "latency_ms": 19416.981,
-  "average_retrieved_memories": 5.0,
+  "f1": 0.1,
+  "bleu": 0.05263157894736842,
+  "rouge_l": 1.0,
+  "bertscore": 0.1,
+  "latency_ms": 2062.897,
+  "average_retrieved_memories": 2.0,
   "reflection_rate": 0.0,
-  "memory_hits": 0.0
+  "memory_hits": 1.0
 }

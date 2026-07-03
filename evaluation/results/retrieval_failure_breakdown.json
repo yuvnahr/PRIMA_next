@@ -1,0 +1,246 @@
+{
+  "total_failures": 1335,
+  "counts": {
+    "temporal_failure": 295,
+    "entity_resolution_failure": 860,
+    "relation_failure": 130,
+    "preference_failure": 47,
+    "retrieval_miss": 3,
+    "context_truncation": 0,
+    "reranker_failure": 0,
+    "generation_failure": 0
+  },
+  "representative_examples": {
+    "temporal_failure": [
+      {
+        "query": "When did Caroline go to the LGBTQ support group?",
+        "category": "temporal",
+        "expected_memory_ids": [
+          "conv-26:D1:3"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D13:1",
+          "conv-26:D10:5",
+          "conv-26:D3:11",
+          "conv-26:D18:1",
+          "conv-26:D5:2"
+        ]
+      },
+      {
+        "query": "When did Melanie paint a sunrise?",
+        "category": "temporal",
+        "expected_memory_ids": [
+          "conv-26:D1:12"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D14:30",
+          "conv-26:D4:3",
+          "conv-26:D8:18",
+          "conv-26:D14:3",
+          "conv-26:D7:12"
+        ]
+      },
+      {
+        "query": "When did Melanie run a charity race?",
+        "category": "temporal",
+        "expected_memory_ids": [
+          "conv-26:D2:1"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D18:17",
+          "conv-26:D14:28",
+          "conv-26:D14:22",
+          "conv-26:D8:20",
+          "conv-26:D14:3"
+        ]
+      }
+    ],
+    "entity_resolution_failure": [
+      {
+        "query": "What fields would Caroline be likely to pursue in her educaton?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-26:D1:9",
+          "conv-26:D1:11"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D4:14",
+          "conv-26:D16:16",
+          "conv-26:D17:13",
+          "conv-26:D17:7",
+          "conv-26:D14:21"
+        ]
+      },
+      {
+        "query": "What did Caroline research?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-26:D2:8"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D10:15",
+          "conv-26:D13:1",
+          "conv-26:D1:4",
+          "conv-26:D4:13",
+          "conv-26:D10:13"
+        ]
+      },
+      {
+        "query": "What is Caroline's identity?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-26:D1:5"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D3:3",
+          "conv-26:D10:15",
+          "conv-26:D3:4",
+          "conv-26:D3:10",
+          "conv-26:D4:3"
+        ]
+      }
+    ],
+    "relation_failure": [
+      {
+        "query": "What is Caroline's relationship status?",
+        "category": "relationship",
+        "expected_memory_ids": [
+          "conv-26:D3:13",
+          "conv-26:D2:14"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D8:13",
+          "conv-26:D12:11",
+          "conv-26:D5:2",
+          "conv-26:D4:1",
+          "conv-26:D6:16"
+        ]
+      },
+      {
+        "query": "How long has Caroline had her current group of friends for?",
+        "category": "relationship",
+        "expected_memory_ids": [
+          "conv-26:D3:13"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D3:11",
+          "conv-26:D12:1",
+          "conv-26:D6:11",
+          "conv-26:D17:1",
+          "conv-26:D16:5"
+        ]
+      },
+      {
+        "query": "What activities has Melanie done with her family?",
+        "category": "relationship",
+        "expected_memory_ids": [
+          "conv-26:D8:4",
+          "conv-26:D8:6",
+          "conv-26:D9:1",
+          "conv-26:D6:4",
+          "conv-26:D1:18",
+          "conv-26:D3:14"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D6:16",
+          "conv-26:D19:9",
+          "conv-26:D4:8",
+          "conv-26:D14:10",
+          "conv-26:D3:1"
+        ]
+      }
+    ],
+    "preference_failure": [
+      {
+        "query": "What was Melanie's favorite book from her childhood?",
+        "category": "preference",
+        "expected_memory_ids": [
+          "conv-26:D6:10"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D14:30",
+          "conv-26:D7:10",
+          "conv-26:D6:9",
+          "conv-26:D8:15",
+          "conv-26:D13:1"
+        ]
+      },
+      {
+        "query": "What is Gina's favorite style of dance?",
+        "category": "preference",
+        "expected_memory_ids": [
+          "conv-30:D1:9"
+        ],
+        "retrieved_memory_ids": [
+          "conv-30:D5:3",
+          "conv-30:D13:4",
+          "conv-30:D2:7",
+          "conv-30:D9:10",
+          "conv-30:D3:6"
+        ]
+      },
+      {
+        "query": "What is Jon's favorite style of dance?",
+        "category": "preference",
+        "expected_memory_ids": [
+          "conv-30:D1:8"
+        ],
+        "retrieved_memory_ids": [
+          "conv-30:D5:3",
+          "conv-30:D9:10",
+          "conv-30:D8:12",
+          "conv-30:D13:5",
+          "conv-30:D9:9"
+        ]
+      }
+    ],
+    "retrieval_miss": [
+      {
+        "query": "What did the posters at the poetry reading say?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-26:D17:19"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D17:20",
+          "conv-26:D17:12",
+          "conv-26:D13:1",
+          "conv-26:D7:12",
+          "conv-26:D8:11"
+        ]
+      },
+      {
+        "query": "What do the dancers in the photo represent?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-30:D1:25"
+        ],
+        "retrieved_memory_ids": [
+          "conv-30:D9:3",
+          "conv-30:D13:4",
+          "conv-30:D11:3",
+          "conv-30:D13:5",
+          "conv-30:D1:24"
+        ]
+      },
+      {
+        "query": "What is the general sentiment about the upcoming grand opening?",
+        "category": "identity",
+        "expected_memory_ids": [
+          "conv-30:D15:18",
+          "conv-30:D15:19"
+        ],
+        "retrieved_memory_ids": [
+          "conv-30:D5:10",
+          "conv-30:D2:1",
+          "conv-30:D8:12",
+          "conv-30:D2:11",
+          "conv-30:D5:2"
+        ]
+      }
+    ],
+    "context_truncation": [],
+    "reranker_failure": [],
+    "generation_failure": []
+  }
+}

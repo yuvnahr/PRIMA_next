@@ -1,0 +1,19 @@
+﻿{
+  "friend": ["friends", "companion", "close friend", "classmate", "teammate", "coworker", "group member"],
+  "coworker": ["colleague", "workmate", "teammate", "manager", "employee", "office", "work"],
+  "colleague": ["coworker", "workmate", "teammate", "organization", "office"],
+  "teammate": ["team member", "friend", "coworker", "classmate", "club member"],
+  "neighbor": ["nearby", "lives near", "resident", "next door", "same building"],
+  "sibling": ["brother", "sister", "family", "relative"],
+  "brother": ["sibling", "family", "relative"],
+  "sister": ["sibling", "family", "relative"],
+  "family": ["relative", "parent", "child", "sibling", "spouse", "wife", "husband", "partner"],
+  "wife": ["spouse", "partner", "married", "marriage"],
+  "husband": ["spouse", "partner", "married", "marriage"],
+  "spouse": ["wife", "husband", "partner", "married", "marriage"],
+  "mentor": ["advisor", "coach", "teacher", "guide", "manager"],
+  "student": ["learner", "classmate", "school", "college", "university"],
+  "manager": ["boss", "supervisor", "lead", "mentor", "coworker"],
+  "teacher": ["mentor", "professor", "instructor", "school"],
+  "roommate": ["housemate", "neighbor", "lives with", "apartment"]
+}

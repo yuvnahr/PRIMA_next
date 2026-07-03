@@ -1,4 +1,4 @@
-"""Build bounded answering context from retrieved PRIMA memories."""
+﻿"""Build bounded answering context from retrieved PRIMA memories."""
 
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ class RuntimeContextBuilder:
     def build(self, question: str, retrieved: tuple[RetrievalResult, ...]) -> AnswerContext:
         """Build a temporally ordered context window constrained by token budget."""
 
-        ordered = sorted(retrieved, key=lambda item: item.note.timestamp)
+        ordered = sorted(retrieved, key=lambda item: item.score, reverse=True)
         memories: list[ContextMemory] = []
         sections: list[str] = []
         graph_links: list[dict[str, Any]] = []
@@ -91,19 +91,11 @@ class RuntimeContextBuilder:
 
     def _format_memory(self, index: int, memory: ContextMemory) -> str:
         lines = [
-            f"[Memory {index}]",
-            f"id: {memory.memory_id}",
-            f"timestamp: {memory.timestamp}",
-            f"importance: {memory.importance_score}",
-            f"retrieval_score: {memory.retrieval_score}",
-            f"text: {memory.text}",
+            f"[M{index}] {memory.text}",
+            f"importance={memory.importance_score} timestamp={memory.timestamp}",
         ]
-        if memory.emotional_metadata:
-            lines.append(f"emotional_metadata: {memory.emotional_metadata}")
-        if memory.linked_memories:
-            lines.append(f"linked_memories: {memory.linked_memories}")
         if memory.reflection_summary:
-            lines.append(f"reflection_summary: {memory.reflection_summary}")
+            lines.append(f"reflection={memory.reflection_summary}")
         return "\n".join(lines)
 
     def _reflection_summary(self, note: Any) -> str | None:
@@ -125,3 +117,6 @@ class RuntimeContextBuilder:
             for linked_id in linked_ids:
                 links.append({"source_memory_id": memory_id, "relation": str(key), "target_memory_id": linked_id})
         return links
+
+
+
