@@ -1,0 +1,272 @@
+{
+  "identity": {
+    "dense": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 59.554752,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 133.398854,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 97.661243,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.061594,
+      "recall_at_5": 0.139493,
+      "mrr": 0.131884,
+      "ndcg_at_5": 0.114123,
+      "average_retrieval_latency": 466.387746,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.103261,
+      "recall_at_5": 0.177536,
+      "mrr": 0.183333,
+      "ndcg_at_5": 0.156466,
+      "average_retrieval_latency": 449.70287,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.103261,
+      "recall_at_5": 0.177536,
+      "mrr": 0.183333,
+      "ndcg_at_5": 0.156466,
+      "average_retrieval_latency": 465.996657,
+      "average_retrieved_memory_count": 5.0
+    },
+    "improvement_vs_dense": {
+      "recall_at_5_gain": 0.177536,
+      "mrr_gain": 0.183333
+    }
+  },
+  "relationship": {
+    "dense": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 74.745423,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 127.154869,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 106.468454,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.076923,
+      "recall_at_5": 0.230769,
+      "mrr": 0.128205,
+      "ndcg_at_5": 0.153846,
+      "average_retrieval_latency": 610.080615,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.153846,
+      "recall_at_5": 0.230769,
+      "mrr": 0.192308,
+      "ndcg_at_5": 0.202379,
+      "average_retrieval_latency": 668.874454,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.153846,
+      "recall_at_5": 0.230769,
+      "mrr": 0.192308,
+      "ndcg_at_5": 0.202379,
+      "average_retrieval_latency": 549.2998,
+      "average_retrieved_memory_count": 5.0
+    },
+    "improvement_vs_dense": {
+      "recall_at_5_gain": 0.230769,
+      "mrr_gain": 0.192308
+    }
+  },
+  "preference": {
+    "dense": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 0.0,
+      "average_retrieved_memory_count": 0.0
+    },
+    "improvement_vs_dense": {
+      "recall_at_5_gain": 0.0,
+      "mrr_gain": 0.0
+    }
+  },
+  "temporal": {
+    "dense": {
+      "recall_at_1": 0.027027,
+      "recall_at_5": 0.027027,
+      "mrr": 0.027027,
+      "ndcg_at_5": 0.027027,
+      "average_retrieval_latency": 65.232968,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.027027,
+      "recall_at_5": 0.027027,
+      "mrr": 0.027027,
+      "ndcg_at_5": 0.027027,
+      "average_retrieval_latency": 124.703462,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.027027,
+      "recall_at_5": 0.027027,
+      "mrr": 0.027027,
+      "ndcg_at_5": 0.027027,
+      "average_retrieval_latency": 107.356292,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.162162,
+      "recall_at_5": 0.364865,
+      "mrr": 0.230631,
+      "ndcg_at_5": 0.262292,
+      "average_retrieval_latency": 448.406511,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.243243,
+      "recall_at_5": 0.554054,
+      "mrr": 0.37027,
+      "ndcg_at_5": 0.415329,
+      "average_retrieval_latency": 441.928776,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.243243,
+      "recall_at_5": 0.554054,
+      "mrr": 0.37027,
+      "ndcg_at_5": 0.415329,
+      "average_retrieval_latency": 439.230949,
+      "average_retrieved_memory_count": 5.0
+    },
+    "improvement_vs_dense": {
+      "recall_at_5_gain": 0.527027,
+      "mrr_gain": 0.343243
+    }
+  },
+  "multi-hop": {
+    "dense": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 51.19515,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 116.8755,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "average_retrieval_latency": 97.3888,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.5,
+      "average_retrieval_latency": 420.6019,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.5,
+      "average_retrieval_latency": 438.7085,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.5,
+      "average_retrieval_latency": 536.55915,
+      "average_retrieved_memory_count": 5.0
+    },
+    "improvement_vs_dense": {
+      "recall_at_5_gain": 0.5,
+      "mrr_gain": 0.5
+    }
+  }
+}

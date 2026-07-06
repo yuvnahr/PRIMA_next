@@ -21,6 +21,7 @@ from memory.retrieval.sparse_strategy import SparseRetrievalStrategy
 from memory.retrieval.temporal_strategy import TemporalRetrievalStrategy
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
+SEMANTIC_BOOST_WEIGHT = 0.08
 
 
 @dataclass(frozen=True, slots=True)
@@ -136,8 +137,9 @@ class RetrievalController:
                 "relation": round(relation_score, 6),
                 "intent": round(intent_score, 6),
                 "temporal": round(temporal_score, 6),
+                "weight": SEMANTIC_BOOST_WEIGHT,
             }
-            boosted.append(replace(result, score=min(1.0, result.score + semantic_score * 0.12), strategy_scores=strategy_scores, explanation=explanation))
+            boosted.append(replace(result, score=min(1.0, result.score + semantic_score * SEMANTIC_BOOST_WEIGHT), strategy_scores=strategy_scores, explanation=explanation))
         return sorted(boosted, key=lambda item: item.score, reverse=True)
 
     def _diagnostics(
@@ -163,6 +165,12 @@ class RetrievalController:
             "temporal_expressions": list(analysis.temporal_expressions) if analysis is not None else [],
             "preference_terms": list(analysis.preference_terms) if analysis is not None else [],
             "identity_attributes": list(analysis.identity_attributes) if analysis is not None else [],
+            "expanded_query_terms": list(expanded.terms) if expanded is not None else [],
+            "expansion_term_count": len(expanded.terms) if expanded is not None else 0,
+            "dense_top30": self._serialize_results(by_strategy.get("dense", ())[:30]),
+            "sparse_top30": self._serialize_results(by_strategy.get("sparse", ())[:30]),
+            "fused_top30": self._serialize_results(fused[:30]),
+            "reranked_top30": self._serialize_results(reranked_pool[:30]),
             "dense_candidates": self._serialize_results(by_strategy.get("dense", ())),
             "sparse_candidates": self._serialize_results(by_strategy.get("sparse", ())),
             "hybrid_candidates": self._serialize_results(fused),

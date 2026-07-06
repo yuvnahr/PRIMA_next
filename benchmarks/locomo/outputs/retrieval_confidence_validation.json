@@ -1,0 +1,148 @@
+{
+  "histogram": [
+    {
+      "bin_start": 0.0,
+      "bin_end": 0.1,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.1,
+      "bin_end": 0.2,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.2,
+      "bin_end": 0.3,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.3,
+      "bin_end": 0.4,
+      "count": 1,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.4,
+      "bin_end": 0.5,
+      "count": 24,
+      "recall_at_5": 0.458333,
+      "mrr": 0.334722
+    },
+    {
+      "bin_start": 0.5,
+      "bin_end": 0.6,
+      "count": 68,
+      "recall_at_5": 0.289216,
+      "mrr": 0.239216
+    },
+    {
+      "bin_start": 0.6,
+      "bin_end": 0.7,
+      "count": 5,
+      "recall_at_5": 0.4,
+      "mrr": 0.266667
+    },
+    {
+      "bin_start": 0.7,
+      "bin_end": 0.8,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.8,
+      "bin_end": 0.9,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.9,
+      "bin_end": 1.0,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    }
+  ],
+  "curve": [
+    {
+      "bin_start": 0.0,
+      "bin_end": 0.1,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.1,
+      "bin_end": 0.2,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.2,
+      "bin_end": 0.3,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.3,
+      "bin_end": 0.4,
+      "count": 1,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.4,
+      "bin_end": 0.5,
+      "count": 24,
+      "recall_at_5": 0.458333,
+      "mrr": 0.334722
+    },
+    {
+      "bin_start": 0.5,
+      "bin_end": 0.6,
+      "count": 68,
+      "recall_at_5": 0.289216,
+      "mrr": 0.239216
+    },
+    {
+      "bin_start": 0.6,
+      "bin_end": 0.7,
+      "count": 5,
+      "recall_at_5": 0.4,
+      "mrr": 0.266667
+    },
+    {
+      "bin_start": 0.7,
+      "bin_end": 0.8,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.8,
+      "bin_end": 0.9,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "bin_start": 0.9,
+      "bin_end": 1.0,
+      "count": 0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0
+    }
+  ],
+  "confidence_vs_recall_at_5_correlation": -0.151454,
+  "confidence_vs_mrr_correlation": -0.062039
+}
