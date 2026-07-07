@@ -4,7 +4,7 @@
     "recall_at_5": 0.010204,
     "mrr": 0.010204,
     "ndcg_at_5": 0.010204,
-    "average_retrieval_latency": 27.794704,
+    "average_retrieval_latency": 26.691892,
     "average_retrieved_memory_count": 5.0
   },
   "dense_query_analysis": {
@@ -12,7 +12,7 @@
     "recall_at_5": 0.010204,
     "mrr": 0.010204,
     "ndcg_at_5": 0.010204,
-    "average_retrieval_latency": 57.069245,
+    "average_retrieval_latency": 40.256215,
     "average_retrieved_memory_count": 5.0
   },
   "dense_expansion": {
@@ -20,7 +20,7 @@
     "recall_at_5": 0.010204,
     "mrr": 0.010204,
     "ndcg_at_5": 0.010204,
-    "average_retrieval_latency": 63.393661,
+    "average_retrieval_latency": 51.237878,
     "average_retrieved_memory_count": 5.0
   },
   "dense_sparse": {
@@ -28,7 +28,7 @@
     "recall_at_5": 0.244048,
     "mrr": 0.17619,
     "ndcg_at_5": 0.183209,
-    "average_retrieval_latency": 258.174194,
+    "average_retrieval_latency": 172.472185,
     "average_retrieved_memory_count": 5.0
   },
   "dense_sparse_reranker": {
@@ -36,7 +36,7 @@
     "recall_at_5": 0.333333,
     "mrr": 0.261565,
     "ndcg_at_5": 0.267301,
-    "average_retrieval_latency": 244.39376,
+    "average_retrieval_latency": 161.406076,
     "average_retrieved_memory_count": 5.0
   },
   "full_retrieval_v2": {
@@ -44,7 +44,7 @@
     "recall_at_5": 0.333333,
     "mrr": 0.261565,
     "ndcg_at_5": 0.267301,
-    "average_retrieval_latency": 225.053151,
+    "average_retrieval_latency": 139.648689,
     "average_retrieved_memory_count": 5.0
   }
 }

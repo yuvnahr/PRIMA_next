@@ -17,7 +17,7 @@ from typing import Any, Iterable
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
 from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, reciprocal_rank, summarize_retrieval_metrics
-from memory.memory_note import MemoryNote
+from memory.memory_note import MemoryNote, tokenize
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.dense_strategy import DenseRetrievalStrategy
@@ -68,6 +68,7 @@ def run_locomo_retrieval_validation(
     confidence_calibration = _confidence_calibration(full_trace)
     candidate_drift = _candidate_drift(full_trace)
     context_analysis = _context_analysis(full_trace)
+    dense_investigation = _dense_investigation(records, full_trace)
     baseline = _phase42_baseline()
     comparison = _comparison(baseline, ablation["full_retrieval_v2"])
 
@@ -85,6 +86,7 @@ def run_locomo_retrieval_validation(
         "confidence_calibration": confidence_calibration,
         "context_statistics": context,
         "context_analysis": context_analysis,
+        "dense_investigation": dense_investigation["summary"],
         "failure_breakdown": failures,
         "failure_localization": stage_statistics,
         "candidate_drift": candidate_drift["summary"],
@@ -101,6 +103,14 @@ def run_locomo_retrieval_validation(
     _write_json(output_path / "retrieval_stage_statistics.json", stage_statistics)
     _write_json(output_path / "candidate_drift.json", candidate_drift)
     _write_json(output_path / "context_analysis.json", context_analysis)
+    _write_json(output_path / "memory_creation_validation.json", dense_investigation["memory_creation_validation"])
+    _write_json(output_path / "memory_representation_analysis.json", dense_investigation["memory_representation_analysis"])
+    _write_json(output_path / "embedding_similarity_analysis.json", dense_investigation["embedding_similarity_analysis"])
+    _write_json(output_path / "dense_candidate_analysis.json", dense_investigation["dense_candidate_analysis"])
+    _write_json(output_path / "chunking_analysis.json", dense_investigation["chunking_analysis"])
+    _write_json(output_path / "embedding_drift.json", dense_investigation["embedding_drift"])
+    _write_json(output_path / "importance_policy_validation.json", dense_investigation["importance_policy_validation"])
+    _write_json(output_path / "dense_failure_breakdown.json", dense_investigation["dense_failure_breakdown"])
     _write_json(output_path / "retrieval_phase_7_2_results.json", report)
     _write_csv(output_path / "retrieval_ablation.csv", _ablation_rows(ablation, baseline))
     _write_csv(output_path / "retrieval_ablation_stage.csv", _ablation_stage_rows(traces_by_config))
@@ -111,6 +121,8 @@ def run_locomo_retrieval_validation(
     (output_path / "retrieval_debug_readme.md").write_text(_debug_readme(report, output_path), encoding="utf-8")
     (output_path / "retrieval_phase7_vs_phase42.md").write_text(_phase_comparison_md(report), encoding="utf-8")
     (output_path / "retrieval_root_cause_report.md").write_text(_root_cause_report_md(report), encoding="utf-8")
+    (output_path / "dense_root_cause_report.md").write_text(_dense_root_cause_report_md(dense_investigation, report), encoding="utf-8")
+    (output_path / "phase8_dense_investigation_summary.md").write_text(_phase8_dense_summary_md(dense_investigation, report), encoding="utf-8")
     return report
 
 
@@ -133,12 +145,26 @@ def _build_records(conversations: Iterable[Any]) -> list[dict[str, Any]]:
     for conversation in conversations:
         repository = InMemoryMemoryRepository()
         memory_lookup: dict[str, str] = {}
+        memory_details: dict[str, dict[str, Any]] = {}
         for index, turn in enumerate(conversation.turns, start=1):
             content = f"{turn.speaker}: {turn.text}"
             memory_id = f"{conversation.id}:{turn.turn_id or index}"
             note = MemoryNote.create(content=content, memory_type=MemoryType.EPISODIC, note_id=memory_id)
             repository.add(note)
             memory_lookup[memory_id] = content
+            memory_details[memory_id] = {
+                "conversation_id": conversation.id,
+                "memory_id": memory_id,
+                "creation_turn": turn.turn_id or index,
+                "turn_index": index,
+                "session_id": turn.session_id,
+                "speaker": turn.speaker,
+                "raw_turn_text": turn.text,
+                "memory_note_text": content,
+                "embedded_text": content,
+                "importance_score": note.salience_score,
+                "creation_reason": "locomo_turn_ingestion",
+            }
         for question in conversation.questions:
             expected_ids = _expected_ids(question, memory_lookup, conversation.id)
             if not expected_ids:
@@ -153,6 +179,8 @@ def _build_records(conversations: Iterable[Any]) -> list[dict[str, Any]]:
                     "expected_memory_ids": expected_ids,
                     "repository": repository,
                     "memory_lookup": memory_lookup,
+                    "memory_details": memory_details,
+                    "evidence_count": len(getattr(question, "evidence", ()) or ()),
                 }
             )
     return records
@@ -542,6 +570,365 @@ def _context_analysis(traces: list[dict[str, Any]], token_budget: int = 1600) ->
     }
 
 
+def _dense_investigation(records: list[dict[str, Any]], full_trace: list[dict[str, Any]]) -> dict[str, Any]:
+    records_by_key = {
+        (str(record["conversation_id"]), str(record["question_id"])): record
+        for record in records
+    }
+    creation_rows: list[dict[str, Any]] = []
+    representation_rows: list[dict[str, Any]] = []
+    similarity_rows: list[dict[str, Any]] = []
+    candidate_rows: list[dict[str, Any]] = []
+    chunking_rows: list[dict[str, Any]] = []
+    drift_rows: list[dict[str, Any]] = []
+    importance_rows: list[dict[str, Any]] = []
+    taxonomy_counts: Counter[str] = Counter()
+
+    for trace in full_trace:
+        record = records_by_key.get((str(trace["conversation_id"]), str(trace["question_id"])))
+        if record is None:
+            continue
+        dense_candidates = trace.get("diagnostics", {}).get("dense_top30", [])
+        dense_ids = [str(candidate.get("id")) for candidate in dense_candidates]
+        final_success = recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) > 0.0
+        dense_missing = [expected_id for expected_id in trace["expected_memory_ids"] if expected_id not in dense_ids]
+        supporting_turns = len(trace["expected_memory_ids"])
+        chunking_row = {
+            "query": trace["query"],
+            "conversation_id": trace["conversation_id"],
+            "question_id": trace["question_id"],
+            "supporting_turns": supporting_turns,
+            "average_memory_span": 1,
+            "split_memory": supporting_turns > 1,
+            "missing_context": supporting_turns > 1 and bool(dense_missing),
+            "dense_missing_expected_count": len(dense_missing),
+        }
+        chunking_rows.append(chunking_row)
+        for expected_id in trace["expected_memory_ids"]:
+            note = record["repository"].get(expected_id, MemoryType.EPISODIC)
+            details = record["memory_details"].get(expected_id, {})
+            memory_created = bool(details)
+            stored = note is not None
+            filtered_out = memory_created and not stored
+            creation_rows.append(
+                {
+                    "query": trace["query"],
+                    "expected_memory_id": expected_id,
+                    "memory_created": memory_created,
+                    "creation_turn": details.get("creation_turn"),
+                    "importance_score": float(getattr(note, "salience_score", details.get("importance_score", 0.0)) or 0.0),
+                    "creation_reason": details.get("creation_reason", "not_found"),
+                    "filtered_out": filtered_out,
+                    "filter_reason": "not_filtered_stored_in_repository" if stored else ("created_but_missing_from_repository" if memory_created else "expected_id_not_created"),
+                }
+            )
+            representation = _memory_representation_row(trace, expected_id, details, note)
+            representation_rows.append(representation)
+            similarity = _embedding_similarity_row(trace, expected_id, record, dense_candidates)
+            similarity_rows.append(similarity)
+            candidate = _dense_candidate_row(trace, expected_id, dense_candidates, similarity)
+            candidate_rows.append(candidate)
+            drift_rows.append(_embedding_drift_row(trace, expected_id, details, similarity))
+            importance_rows.append(
+                {
+                    "query": trace["query"],
+                    "expected_memory_id": expected_id,
+                    "status": _importance_status(memory_created, stored),
+                    "never_created": not memory_created,
+                    "filtered_by_importance": filtered_out,
+                    "merged": False,
+                    "deleted": False,
+                    "stored": stored,
+                    "importance_score": float(getattr(note, "salience_score", details.get("importance_score", 0.0)) or 0.0),
+                    "retention_score": float(getattr(note, "retention_score", 0.0) or 0.0) if note else 0.0,
+                }
+            )
+            if expected_id in dense_ids:
+                continue
+            category = _dense_failure_category(
+                memory_created=memory_created,
+                stored=stored,
+                representation=representation,
+                similarity=similarity,
+                supporting_turns=supporting_turns,
+            )
+            taxonomy_counts[category] += 1
+            candidate["dense_failure_category"] = category
+            candidate["final_retrieval_success"] = final_success
+
+    candidate_summary = _dense_candidate_summary(candidate_rows)
+    chunking_summary = {
+        "query_count": len(chunking_rows),
+        "average_supporting_turns": _average_values(row["supporting_turns"] for row in chunking_rows),
+        "average_memory_span": _average_values(row["average_memory_span"] for row in chunking_rows),
+        "split_memory_frequency": _average_values(1.0 if row["split_memory"] else 0.0 for row in chunking_rows),
+        "missing_context_frequency": _average_values(1.0 if row["missing_context"] else 0.0 for row in chunking_rows),
+    }
+    dense_failure_breakdown = {
+        "counts": {name: taxonomy_counts.get(name, 0) for name in _dense_failure_categories()},
+        "total_dense_expected_misses": sum(taxonomy_counts.values()),
+        "percentages": {
+            name: round(taxonomy_counts.get(name, 0) / sum(taxonomy_counts.values()), 6) if taxonomy_counts else 0.0
+            for name in _dense_failure_categories()
+        },
+    }
+    return {
+        "summary": {
+            "candidate_generation_success_rate": candidate_summary["candidate_generation_success_rate"],
+            "candidate_generation_miss_rate": candidate_summary["candidate_generation_miss_rate"],
+            "dominant_failure_category": _dominant_dense_category(dense_failure_breakdown),
+            "memory_creation_failures": sum(1 for row in creation_rows if not row["memory_created"]),
+            "stored_memory_failures": sum(1 for row in importance_rows if not row["stored"]),
+            "split_memory_frequency": chunking_summary["split_memory_frequency"],
+            "average_similarity_margin": candidate_summary["average_similarity_margin"],
+        },
+        "memory_creation_validation": creation_rows,
+        "memory_representation_analysis": representation_rows,
+        "embedding_similarity_analysis": similarity_rows,
+        "dense_candidate_analysis": {
+            "summary": candidate_summary,
+            "per_expected_memory": candidate_rows,
+        },
+        "chunking_analysis": {
+            "summary": chunking_summary,
+            "per_query": chunking_rows,
+        },
+        "embedding_drift": drift_rows,
+        "importance_policy_validation": importance_rows,
+        "dense_failure_breakdown": dense_failure_breakdown,
+    }
+
+
+def _memory_representation_row(trace: dict[str, Any], expected_id: str, details: dict[str, Any], note: MemoryNote | None) -> dict[str, Any]:
+    raw_text = str(details.get("raw_turn_text", ""))
+    stored_text = str(getattr(note, "content", details.get("memory_note_text", "")) or "")
+    embedded_text = str(details.get("embedded_text", stored_text))
+    original_tokens = tokenize(raw_text)
+    stored_tokens = tokenize(stored_text)
+    named_entities = _simple_named_entities(raw_text)
+    temporal_terms = _temporal_terms(raw_text)
+    relationship_terms = _relationship_terms(raw_text)
+    preserved_entities = _preserved_terms(named_entities, stored_text)
+    preserved_temporal = _preserved_terms(temporal_terms, stored_text)
+    preserved_relationship = _preserved_terms(relationship_terms, stored_text)
+    preservation_scores = [
+        _preservation_ratio(named_entities, preserved_entities),
+        _preservation_ratio(temporal_terms, preserved_temporal),
+        _preservation_ratio(relationship_terms, preserved_relationship),
+    ]
+    return {
+        "query": trace["query"],
+        "expected_memory_id": expected_id,
+        "raw_conversation_turn": raw_text,
+        "memory_note_text": stored_text,
+        "summary": None,
+        "embedded_text": embedded_text,
+        "original_token_count": len(original_tokens),
+        "stored_token_count": len(stored_tokens),
+        "summary_compression_ratio": round(len(stored_tokens) / max(1, len(original_tokens)), 6),
+        "information_loss": _information_loss(raw_text, stored_text),
+        "named_entities_preserved": preserved_entities,
+        "temporal_expressions_preserved": preserved_temporal,
+        "relationship_terms_preserved": preserved_relationship,
+        "representation_sufficient": all(score >= 0.75 for score in preservation_scores),
+    }
+
+
+def _embedding_similarity_row(
+    trace: dict[str, Any],
+    expected_id: str,
+    record: dict[str, Any],
+    dense_candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    request = RetrievalRequest(query=str(trace["query"]), memory_types=(MemoryType.EPISODIC,), top_k=5)
+    query_embedding = request.embedding()
+    expected_note = record["repository"].get(expected_id, MemoryType.EPISODIC)
+    ranked = _rank_all_dense(record, query_embedding)
+    expected_rank = next((index for index, item in enumerate(ranked, start=1) if item["id"] == expected_id), None)
+    expected_similarity = _cosine(query_embedding, expected_note.embedding) if expected_note is not None else 0.0
+    top_candidate = dense_candidates[0] if dense_candidates else {}
+    retrieved_similarity = float(top_candidate.get("strategy_scores", {}).get("dense", top_candidate.get("score", 0.0)) or 0.0)
+    return {
+        "query": trace["query"],
+        "expected_memory": expected_id,
+        "expected_memory_text": expected_note.content if expected_note is not None else "",
+        "top_retrieved_memory": top_candidate.get("id"),
+        "top_retrieved_text": top_candidate.get("text", ""),
+        "expected_similarity": round(expected_similarity, 6),
+        "retrieved_similarity": round(retrieved_similarity, 6),
+        "similarity_gap": round(retrieved_similarity - expected_similarity, 6),
+        "nearest_correct_rank": expected_rank,
+        "embedding_failure_mode": "semantically_distant" if expected_similarity + 0.05 < retrieved_similarity else "ranking_or_candidate_cutoff",
+    }
+
+
+def _dense_candidate_row(
+    trace: dict[str, Any],
+    expected_id: str,
+    dense_candidates: list[dict[str, Any]],
+    similarity: dict[str, Any],
+) -> dict[str, Any]:
+    dense_rank, dense_score = _candidate_rank(expected_id, dense_candidates)
+    return {
+        "query": trace["query"],
+        "expected_memory_id": expected_id,
+        "dense_top30": [
+            {"id": candidate.get("id"), "score": candidate.get("score")}
+            for candidate in dense_candidates[:30]
+        ],
+        "expected_present": dense_rank is not None,
+        "rank": dense_rank,
+        "score": dense_score,
+        "nearest_correct_memory_rank": similarity["nearest_correct_rank"],
+        "cosine_similarity": similarity["expected_similarity"],
+        "distance_margin": similarity["similarity_gap"],
+        "dense_failure_category": None,
+    }
+
+
+def _embedding_drift_row(trace: dict[str, Any], expected_id: str, details: dict[str, Any], similarity: dict[str, Any]) -> dict[str, Any]:
+    query_text = str(trace["query"])
+    memory_text = str(details.get("memory_note_text", ""))
+    query_tokens = set(tokenize(query_text))
+    memory_tokens = set(tokenize(memory_text))
+    overlap = query_tokens & memory_tokens
+    return {
+        "query": query_text,
+        "expected_memory_id": expected_id,
+        "query_wording": query_text,
+        "memory_wording": memory_text,
+        "semantic_overlap": round(len(overlap) / max(1, len(query_tokens)), 6),
+        "lexical_overlap": sorted(overlap),
+        "embedding_similarity": similarity["expected_similarity"],
+    }
+
+
+def _dense_candidate_summary(candidate_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    total = len(candidate_rows)
+    present = [row for row in candidate_rows if row["expected_present"]]
+    missing = [row for row in candidate_rows if not row["expected_present"]]
+    ranks = [float(row["nearest_correct_memory_rank"]) for row in candidate_rows if row["nearest_correct_memory_rank"] is not None]
+    margins = [float(row["distance_margin"]) for row in candidate_rows]
+    return {
+        "expected_memory_count": total,
+        "candidate_generation_success_count": len(present),
+        "candidate_generation_miss_count": len(missing),
+        "candidate_generation_success_rate": round(len(present) / total, 6) if total else 0.0,
+        "candidate_generation_miss_rate": round(len(missing) / total, 6) if total else 0.0,
+        "average_rank_of_expected_memory": _average_values(ranks),
+        "average_similarity_margin": _average_values(margins),
+    }
+
+
+def _rank_all_dense(record: dict[str, Any], query_embedding: tuple[float, ...]) -> list[dict[str, Any]]:
+    ranked = []
+    for note in record["repository"].list(MemoryType.EPISODIC):
+        ranked.append({"id": note.id, "similarity": _cosine(query_embedding, note.embedding)})
+    return sorted(ranked, key=lambda item: item["similarity"], reverse=True)
+
+
+def _cosine(left: Any, right: Any) -> float:
+    left_values = [float(value) for value in left]
+    right_values = [float(value) for value in right]
+    numerator = sum(x * y for x, y in zip(left_values, right_values))
+    left_norm = math.sqrt(sum(x * x for x in left_values)) or 1.0
+    right_norm = math.sqrt(sum(y * y for y in right_values)) or 1.0
+    return numerator / (left_norm * right_norm)
+
+
+def _dense_failure_category(
+    memory_created: bool,
+    stored: bool,
+    representation: dict[str, Any],
+    similarity: dict[str, Any],
+    supporting_turns: int,
+) -> str:
+    if not memory_created:
+        return "memory_not_created"
+    if memory_created and not stored:
+        return "storage_failure"
+    if not representation["representation_sufficient"]:
+        return "representation_loss"
+    if supporting_turns > 1:
+        return "chunking_failure"
+    if similarity["embedding_failure_mode"] == "semantically_distant":
+        return "embedding_mismatch"
+    if similarity["nearest_correct_rank"] is not None and int(similarity["nearest_correct_rank"]) > 30:
+        return "candidate_generation_failure"
+    if similarity["nearest_correct_rank"] is not None:
+        return "ranking_failure"
+    return "unknown"
+
+
+def _dense_failure_categories() -> tuple[str, ...]:
+    return (
+        "memory_not_created",
+        "memory_filtered",
+        "representation_loss",
+        "embedding_mismatch",
+        "chunking_failure",
+        "candidate_generation_failure",
+        "ranking_failure",
+        "storage_failure",
+        "unknown",
+    )
+
+
+def _dominant_dense_category(breakdown: dict[str, Any]) -> str:
+    counts = breakdown.get("counts", {})
+    return max(counts.items(), key=lambda item: int(item[1]))[0] if counts else "unknown"
+
+
+def _importance_status(memory_created: bool, stored: bool) -> str:
+    if not memory_created:
+        return "never_created"
+    if not stored:
+        return "storage_failure"
+    return "stored"
+
+
+def _information_loss(raw_text: str, stored_text: str) -> dict[str, Any]:
+    raw_tokens = set(tokenize(raw_text))
+    stored_tokens = set(tokenize(stored_text))
+    lost_tokens = sorted(raw_tokens - stored_tokens)
+    return {
+        "lost_token_count": len(lost_tokens),
+        "lost_tokens": lost_tokens[:20],
+        "loss_ratio": round(len(lost_tokens) / max(1, len(raw_tokens)), 6),
+    }
+
+
+def _simple_named_entities(text: str) -> list[str]:
+    return list(dict.fromkeys(token for token in text.split() if token[:1].isupper()))
+
+
+def _temporal_terms(text: str) -> list[str]:
+    lowered = text.lower()
+    terms = [token for token in tokenize(text) if token.isdigit() and len(token) == 4]
+    terms.extend(term for term in ("today", "tomorrow", "yesterday", "week", "month", "year", "before", "after", "during", "when") if term in lowered)
+    return list(dict.fromkeys(terms))
+
+
+def _relationship_terms(text: str) -> list[str]:
+    terms = {
+        "friend", "wife", "husband", "brother", "sister", "neighbor", "coworker", "teammate",
+        "partner", "family", "mother", "father", "daughter", "son", "uncle", "aunt", "mentor",
+    }
+    tokens = set(tokenize(text))
+    return sorted(terms & tokens)
+
+
+def _preserved_terms(terms: list[str], stored_text: str) -> list[str]:
+    lowered = stored_text.lower()
+    return [term for term in terms if term.lower() in lowered]
+
+
+def _preservation_ratio(terms: list[str], preserved: list[str]) -> float:
+    if not terms:
+        return 1.0
+    return len(preserved) / len(terms)
+
+
 def _normalize_category(category: str | None, query: str) -> str:
     category_text = str(category or "")
     text = f"{category_text} {query}".lower()
@@ -885,6 +1272,105 @@ def _root_cause_report_md(report: dict[str, Any]) -> str:
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _dense_root_cause_report_md(dense: dict[str, Any], report: dict[str, Any]) -> str:
+    summary = dense["summary"]
+    candidate_summary = dense["dense_candidate_analysis"]["summary"]
+    breakdown = dense["dense_failure_breakdown"]
+    chunking = dense["chunking_analysis"]["summary"]
+    dominant = summary["dominant_failure_category"]
+    lines = [
+        "# Dense Retrieval Root Cause Report",
+        "",
+        "## Was The Memory Ever Created?",
+        "",
+        f"Memory creation failures: `{summary['memory_creation_failures']}`. Stored-memory failures: `{summary['stored_memory_failures']}`. The benchmark ingestion created one episodic `MemoryNote` per LoCoMo turn and embedded the stored `speaker: text` content.",
+        "",
+        "## What Was Embedded?",
+        "",
+        "The embedded representation is the single-turn `MemoryNote.content`. No summary is inserted in this benchmark path, so representation compression is mostly absent; `memory_representation_analysis.json` records the raw turn, stored note text, embedded text, preservation fields, and information-loss tokens.",
+        "",
+        "## Did The Correct Memory Enter Dense Top30?",
+        "",
+        f"Candidate generation success rate: `{candidate_summary['candidate_generation_success_rate']:.6f}`. Miss rate: `{candidate_summary['candidate_generation_miss_rate']:.6f}`. Average expected-memory rank: `{candidate_summary['average_rank_of_expected_memory']:.6f}`. Average similarity margin: `{candidate_summary['average_similarity_margin']:.6f}`.",
+        "",
+        "## Dense Failure Taxonomy",
+        "",
+        "| Category | Count | Share |",
+        "|---|---:|---:|",
+    ]
+    for category, count in breakdown["counts"].items():
+        lines.append(f"| {category} | {count} | {breakdown['percentages'].get(category, 0.0):.6f} |")
+    lines.extend(
+        [
+            "",
+            "## Chunking",
+            "",
+            f"Average supporting turns: `{chunking['average_supporting_turns']:.6f}`. Split-memory frequency: `{chunking['split_memory_frequency']:.6f}`. Missing-context frequency: `{chunking['missing_context_frequency']:.6f}`.",
+            "",
+            "## Conclusion",
+            "",
+            f"The dominant dense failure category is `{dominant}`. This phase does not change retrieval behavior; it identifies whether the bottleneck is creation, representation, embedding mismatch, chunking, candidate generation, or ranking.",
+            "",
+            "## Highest Expected-Impact Repair",
+            "",
+            _dense_repair_recommendation(dominant),
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _phase8_dense_summary_md(dense: dict[str, Any], report: dict[str, Any]) -> str:
+    summary = dense["summary"]
+    baseline = report["phase_4_2_baseline"]
+    current = report["full_retrieval_v2"]
+    lines = [
+        "# Phase 8 Dense Investigation Summary",
+        "",
+        f"Dataset: `{report['dataset_path']}`",
+        f"Queries evaluated: `{report['query_count']}`",
+        "",
+        "| Metric | Phase 4.2 | Retrieval V2 | Delta |",
+        "|---|---:|---:|---:|",
+    ]
+    for metric in ("recall_at_1", "recall_at_5", "mrr", "ndcg_at_5"):
+        lines.append(
+            f"| {metric} | {baseline.get(metric, 0.0):.6f} | {current.get(metric, 0.0):.6f} | {report['comparison'].get(f'{metric}_gain', 0.0):.6f} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Dense Findings",
+            "",
+            f"- Candidate generation success rate: `{summary['candidate_generation_success_rate']:.6f}`",
+            f"- Candidate generation miss rate: `{summary['candidate_generation_miss_rate']:.6f}`",
+            f"- Dominant failure category: `{summary['dominant_failure_category']}`",
+            f"- Memory creation failures: `{summary['memory_creation_failures']}`",
+            f"- Stored memory failures: `{summary['stored_memory_failures']}`",
+            f"- Split-memory frequency: `{summary['split_memory_frequency']:.6f}`",
+            f"- Average similarity margin: `{summary['average_similarity_margin']:.6f}`",
+            "",
+            "## Evidence-Backed Next Step",
+            "",
+            _dense_repair_recommendation(summary["dominant_failure_category"]),
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _dense_repair_recommendation(dominant: str) -> str:
+    recommendations = {
+        "memory_not_created": "The highest-impact change would be in memory ingestion/admission, because expected evidence never becomes a retrievable memory.",
+        "memory_filtered": "The highest-impact change would be validating the importance/admission policy, because expected evidence is created but filtered.",
+        "storage_failure": "The highest-impact change would be repository write/read validation, because expected notes are created but unavailable to retrieval.",
+        "representation_loss": "The highest-impact change would be improving the text selected for embedding, because expected facts are not preserved in the embedded representation.",
+        "chunking_failure": "The highest-impact change would be changing memory span or adding evidence-preserving multi-turn representation, because questions require context split across one-turn memories.",
+        "embedding_mismatch": "The highest-impact change would be evaluating the embedding interface/model or embedded text selection, because expected memories are semantically distant from their queries.",
+        "candidate_generation_failure": "The highest-impact change would be increasing dense candidate observability or revisiting the embedding representation, because expected memories rank outside dense Top30.",
+        "ranking_failure": "The highest-impact change would be dense ranking diagnostics, because expected memories score well enough to be near candidates but are not selected.",
+    }
+    return recommendations.get(dominant, "No single repair is justified yet; inspect dense_failure_breakdown.json and the per-query artifacts first.")
 
 
 def _largest_stage(stage_stats: dict[str, Any]) -> str:

@@ -42,5 +42,13 @@ evaluation/results/**/*calibration*.json
 evaluation/results/**/*context_analysis*.json
 evaluation/results/**/*stage_statistics*.json
 evaluation/results/**/*stage*.csv
+evaluation/results/**/*creation_validation*.json
+evaluation/results/**/*representation_analysis*.json
+evaluation/results/**/*similarity_analysis*.json
+evaluation/results/**/*candidate_analysis*.json
+evaluation/results/**/*chunking_analysis*.json
+evaluation/results/**/*importance_policy*.json
+evaluation/results/**/*failure_breakdown*.json
+evaluation/results/**/*dense_investigation*.json
 *.tmp.json
 *.tmp.csv

@@ -14,7 +14,7 @@
     "recall_at_5": 0.333333,
     "mrr": 0.261565,
     "ndcg_at_5": 0.267301,
-    "average_retrieval_latency": 225.053151,
+    "average_retrieval_latency": 139.648689,
     "average_retrieved_memory_count": 5.0
   },
   "comparison": {
@@ -29,7 +29,7 @@
       "recall_at_5": 0.010204,
       "mrr": 0.010204,
       "ndcg_at_5": 0.010204,
-      "average_retrieval_latency": 27.794704,
+      "average_retrieval_latency": 26.691892,
       "average_retrieved_memory_count": 5.0
     },
     "dense_query_analysis": {
@@ -37,7 +37,7 @@
       "recall_at_5": 0.010204,
       "mrr": 0.010204,
       "ndcg_at_5": 0.010204,
-      "average_retrieval_latency": 57.069245,
+      "average_retrieval_latency": 40.256215,
       "average_retrieved_memory_count": 5.0
     },
     "dense_expansion": {
@@ -45,7 +45,7 @@
       "recall_at_5": 0.010204,
       "mrr": 0.010204,
       "ndcg_at_5": 0.010204,
-      "average_retrieval_latency": 63.393661,
+      "average_retrieval_latency": 51.237878,
       "average_retrieved_memory_count": 5.0
     },
     "dense_sparse": {
@@ -53,7 +53,7 @@
       "recall_at_5": 0.244048,
       "mrr": 0.17619,
       "ndcg_at_5": 0.183209,
-      "average_retrieval_latency": 258.174194,
+      "average_retrieval_latency": 172.472185,
       "average_retrieved_memory_count": 5.0
     },
     "dense_sparse_reranker": {
@@ -61,7 +61,7 @@
       "recall_at_5": 0.333333,
       "mrr": 0.261565,
       "ndcg_at_5": 0.267301,
-      "average_retrieval_latency": 244.39376,
+      "average_retrieval_latency": 161.406076,
       "average_retrieved_memory_count": 5.0
     },
     "full_retrieval_v2": {
@@ -69,7 +69,7 @@
       "recall_at_5": 0.333333,
       "mrr": 0.261565,
       "ndcg_at_5": 0.267301,
-      "average_retrieval_latency": 225.053151,
+      "average_retrieval_latency": 139.648689,
       "average_retrieved_memory_count": 5.0
     }
   },
@@ -80,7 +80,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 26.700991,
+        "average_retrieval_latency": 26.845759,
         "average_retrieved_memory_count": 5.0
       },
       "dense_query_analysis": {
@@ -88,7 +88,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 55.036998,
+        "average_retrieval_latency": 40.644952,
         "average_retrieved_memory_count": 5.0
       },
       "dense_expansion": {
@@ -96,7 +96,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 60.437843,
+        "average_retrieval_latency": 49.909561,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse": {
@@ -104,7 +104,7 @@
         "recall_at_5": 0.139493,
         "mrr": 0.131884,
         "ndcg_at_5": 0.114123,
-        "average_retrieval_latency": 244.98575,
+        "average_retrieval_latency": 162.859326,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse_reranker": {
@@ -112,7 +112,7 @@
         "recall_at_5": 0.177536,
         "mrr": 0.183333,
         "ndcg_at_5": 0.156466,
-        "average_retrieval_latency": 231.34127,
+        "average_retrieval_latency": 156.840454,
         "average_retrieved_memory_count": 5.0
       },
       "full_retrieval_v2": {
@@ -120,7 +120,7 @@
         "recall_at_5": 0.177536,
         "mrr": 0.183333,
         "ndcg_at_5": 0.156466,
-        "average_retrieval_latency": 224.790939,
+        "average_retrieval_latency": 128.580307,
         "average_retrieved_memory_count": 5.0
       },
       "improvement_vs_dense": {
@@ -134,7 +134,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 28.099108,
+        "average_retrieval_latency": 29.258915,
         "average_retrieved_memory_count": 5.0
       },
       "dense_query_analysis": {
@@ -142,7 +142,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 55.453262,
+        "average_retrieval_latency": 38.660215,
         "average_retrieved_memory_count": 5.0
       },
       "dense_expansion": {
@@ -150,7 +150,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 77.472215,
+        "average_retrieval_latency": 66.702938,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse": {
@@ -158,7 +158,7 @@
         "recall_at_5": 0.230769,
         "mrr": 0.128205,
         "ndcg_at_5": 0.153846,
-        "average_retrieval_latency": 345.869,
+        "average_retrieval_latency": 225.248569,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse_reranker": {
@@ -166,7 +166,7 @@
         "recall_at_5": 0.230769,
         "mrr": 0.192308,
         "ndcg_at_5": 0.202379,
-        "average_retrieval_latency": 302.277146,
+        "average_retrieval_latency": 244.935454,
         "average_retrieved_memory_count": 5.0
       },
       "full_retrieval_v2": {
@@ -174,7 +174,7 @@
         "recall_at_5": 0.230769,
         "mrr": 0.192308,
         "ndcg_at_5": 0.202379,
-        "average_retrieval_latency": 283.869023,
+        "average_retrieval_latency": 207.976923,
         "average_retrieved_memory_count": 5.0
       },
       "improvement_vs_dense": {
@@ -242,7 +242,7 @@
         "recall_at_5": 0.027027,
         "mrr": 0.027027,
         "ndcg_at_5": 0.027027,
-        "average_retrieval_latency": 28.628795,
+        "average_retrieval_latency": 25.732303,
         "average_retrieved_memory_count": 5.0
       },
       "dense_query_analysis": {
@@ -250,7 +250,7 @@
         "recall_at_5": 0.027027,
         "mrr": 0.027027,
         "ndcg_at_5": 0.027027,
-        "average_retrieval_latency": 58.623751,
+        "average_retrieval_latency": 39.879624,
         "average_retrieved_memory_count": 5.0
       },
       "dense_expansion": {
@@ -258,7 +258,7 @@
         "recall_at_5": 0.027027,
         "mrr": 0.027027,
         "ndcg_at_5": 0.027027,
-        "average_retrieval_latency": 63.014411,
+        "average_retrieval_latency": 46.688478,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse": {
@@ -266,7 +266,7 @@
         "recall_at_5": 0.364865,
         "mrr": 0.230631,
         "ndcg_at_5": 0.262292,
-        "average_retrieval_latency": 245.748808,
+        "average_retrieval_latency": 167.079257,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse_reranker": {
@@ -274,7 +274,7 @@
         "recall_at_5": 0.554054,
         "mrr": 0.37027,
         "ndcg_at_5": 0.415329,
-        "average_retrieval_latency": 244.221876,
+        "average_retrieval_latency": 136.9107,
         "average_retrieved_memory_count": 5.0
       },
       "full_retrieval_v2": {
@@ -282,7 +282,7 @@
         "recall_at_5": 0.554054,
         "mrr": 0.37027,
         "ndcg_at_5": 0.415329,
-        "average_retrieval_latency": 205.435568,
+        "average_retrieval_latency": 126.336586,
         "average_retrieved_memory_count": 5.0
       },
       "improvement_vs_dense": {
@@ -296,7 +296,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 35.5408,
+        "average_retrieval_latency": 24.2197,
         "average_retrieved_memory_count": 5.0
       },
       "dense_query_analysis": {
@@ -304,7 +304,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 85.55645,
+        "average_retrieval_latency": 48.6562,
         "average_retrieved_memory_count": 5.0
       },
       "dense_expansion": {
@@ -312,7 +312,7 @@
         "recall_at_5": 0.0,
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
-        "average_retrieval_latency": 46.883,
+        "average_retrieval_latency": 65.43015,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse": {
@@ -320,7 +320,7 @@
         "recall_at_5": 0.5,
         "mrr": 0.5,
         "ndcg_at_5": 0.5,
-        "average_retrieval_latency": 221.3618,
+        "average_retrieval_latency": 150.2906,
         "average_retrieved_memory_count": 5.0
       },
       "dense_sparse_reranker": {
@@ -328,7 +328,7 @@
         "recall_at_5": 0.5,
         "mrr": 0.5,
         "ndcg_at_5": 0.5,
-        "average_retrieval_latency": 171.5389,
+        "average_retrieval_latency": 176.63885,
         "average_retrieved_memory_count": 5.0
       },
       "full_retrieval_v2": {
@@ -336,7 +336,7 @@
         "recall_at_5": 0.5,
         "mrr": 0.5,
         "ndcg_at_5": 0.5,
-        "average_retrieval_latency": 211.70615,
+        "average_retrieval_latency": 196.36185,
         "average_retrieved_memory_count": 5.0
       },
       "improvement_vs_dense": {
@@ -2522,6 +2522,15 @@
         ]
       }
     ]
+  },
+  "dense_investigation": {
+    "candidate_generation_success_rate": 0.046053,
+    "candidate_generation_miss_rate": 0.953947,
+    "dominant_failure_category": "chunking_failure",
+    "memory_creation_failures": 0,
+    "stored_memory_failures": 0,
+    "split_memory_frequency": 0.377551,
+    "average_similarity_margin": 0.374287
   },
   "failure_breakdown": {
     "total_failures": 60,
