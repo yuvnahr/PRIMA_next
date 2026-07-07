@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import importlib.util
 import logging
 import re
@@ -12,8 +11,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any
 
-import numpy as np
-
+from memory.embedding_backend import embed_text
 from memory.memory_context import StateSnapshot
 from memory.memory_lineage import MemoryLineage
 from memory.memory_types import MemoryLevel, MemoryType
@@ -39,20 +37,9 @@ GENERIC_NOUNS = {
 
 
 def stable_embedding(text: str, dimensions: int = 64) -> list[float]:
-    """Deterministic local embedding fallback."""
-    digest = hashlib.sha256(text.encode("utf-8")).digest()
-    values: list[float] = []
-    while len(values) < dimensions:
-        for byte in digest:
-            values.append((byte / 127.5) - 1.0)
-            if len(values) == dimensions:
-                break
-        digest = hashlib.sha256(digest).digest()
-    vector = np.array(values, dtype="float32")
-    norm = np.linalg.norm(vector)
-    if norm:
-        vector = vector / norm
-    return [float(v) for v in vector.tolist()]
+    """Return the configured embedding while preserving the existing interface."""
+
+    return embed_text(text, dimensions)
 
 
 def tokenize(text: str) -> list[str]:

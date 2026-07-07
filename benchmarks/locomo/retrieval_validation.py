@@ -7,6 +7,7 @@ import csv
 import json
 import math
 import os
+import random
 import statistics
 import time
 from collections import Counter
@@ -17,6 +18,8 @@ from typing import Any, Iterable
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
 from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, reciprocal_rank, summarize_retrieval_metrics
+from memory.embedding_backend import embedding_backend_info
+from memory.event_memory import EventMemoryBuilder, EventSegmenter
 from memory.memory_note import MemoryNote, tokenize
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
@@ -69,6 +72,8 @@ def run_locomo_retrieval_validation(
     candidate_drift = _candidate_drift(full_trace)
     context_analysis = _context_analysis(full_trace)
     dense_investigation = _dense_investigation(records, full_trace)
+    chunking_hypothesis = _chunking_hypothesis_validation(records, full_trace)
+    event_investigation = _event_memory_investigation(conversations, records, top_k) if chunking_hypothesis["summary"]["event_memory_supported"] else _empty_event_investigation(chunking_hypothesis)
     baseline = _phase42_baseline()
     comparison = _comparison(baseline, ablation["full_retrieval_v2"])
 
@@ -87,6 +92,8 @@ def run_locomo_retrieval_validation(
         "context_statistics": context,
         "context_analysis": context_analysis,
         "dense_investigation": dense_investigation["summary"],
+        "chunking_hypothesis": chunking_hypothesis["summary"],
+        "event_memory": event_investigation["summary"],
         "failure_breakdown": failures,
         "failure_localization": stage_statistics,
         "candidate_drift": candidate_drift["summary"],
@@ -111,6 +118,12 @@ def run_locomo_retrieval_validation(
     _write_json(output_path / "embedding_drift.json", dense_investigation["embedding_drift"])
     _write_json(output_path / "importance_policy_validation.json", dense_investigation["importance_policy_validation"])
     _write_json(output_path / "dense_failure_breakdown.json", dense_investigation["dense_failure_breakdown"])
+    _write_json(output_path / "chunking_hypothesis_validation.json", chunking_hypothesis)
+    _write_json(output_path / "event_memory_statistics.json", event_investigation["event_memory_statistics"])
+    _write_json(output_path / "event_segmentation_quality.json", event_investigation["event_segmentation_quality"])
+    _write_json(output_path / "event_size_distribution.json", event_investigation["event_size_distribution"])
+    _write_json(output_path / "event_overlap_analysis.json", event_investigation["event_overlap_analysis"])
+    _write_json(output_path / "event_vs_turn_retrieval.json", event_investigation["event_vs_turn_retrieval"])
     _write_json(output_path / "retrieval_phase_7_2_results.json", report)
     _write_csv(output_path / "retrieval_ablation.csv", _ablation_rows(ablation, baseline))
     _write_csv(output_path / "retrieval_ablation_stage.csv", _ablation_stage_rows(traces_by_config))
@@ -123,6 +136,8 @@ def run_locomo_retrieval_validation(
     (output_path / "retrieval_root_cause_report.md").write_text(_root_cause_report_md(report), encoding="utf-8")
     (output_path / "dense_root_cause_report.md").write_text(_dense_root_cause_report_md(dense_investigation, report), encoding="utf-8")
     (output_path / "phase8_dense_investigation_summary.md").write_text(_phase8_dense_summary_md(dense_investigation, report), encoding="utf-8")
+    (output_path / "event_memory_case_studies.md").write_text(_event_case_studies_md(event_investigation), encoding="utf-8")
+    (output_path / "phase9_event_memory_report.md").write_text(_phase9_event_report_md(chunking_hypothesis, event_investigation), encoding="utf-8")
     return report
 
 
@@ -929,6 +944,324 @@ def _preservation_ratio(terms: list[str], preserved: list[str]) -> float:
     return len(preserved) / len(terms)
 
 
+def _chunking_hypothesis_validation(records: list[dict[str, Any]], full_trace: list[dict[str, Any]], sample_size: int = 25) -> dict[str, Any]:
+    records_by_key = {(str(record["conversation_id"]), str(record["question_id"])): record for record in records}
+    dense_failures = []
+    for trace in full_trace:
+        dense_ids = {str(candidate.get("id")) for candidate in trace.get("diagnostics", {}).get("dense_top30", [])}
+        if not set(trace["expected_memory_ids"]) <= dense_ids:
+            dense_failures.append(trace)
+    sample = random.Random(9).sample(dense_failures, min(sample_size, len(dense_failures))) if dense_failures else []
+    cases = []
+    counts: Counter[str] = Counter()
+    for trace in sample:
+        record = records_by_key[(str(trace["conversation_id"]), str(trace["question_id"]))]
+        classification = _chunking_case_classification(trace, record)
+        counts[classification] += 1
+        cases.append(
+            {
+                "query": trace["query"],
+                "category": trace["category"],
+                "expected_memory_ids": trace["expected_memory_ids"],
+                "supporting_turn_count": len(trace["expected_memory_ids"]),
+                "classification": classification,
+                "rationale": _chunking_case_rationale(classification),
+            }
+        )
+    event_classes = {"multi-turn event", "relationship evolution", "temporal sequence", "preference evolution", "identity evolution"}
+    event_supported_count = sum(counts.get(name, 0) for name in event_classes)
+    support_rate = round(event_supported_count / len(cases), 6) if cases else 0.0
+    return {
+        "summary": {
+            "dense_failure_population": len(dense_failures),
+            "sample_size": len(cases),
+            "classification_counts": dict(counts),
+            "event_memory_support_rate": support_rate,
+            "event_memory_supported": bool(support_rate >= 0.5),
+            "random_seed": 9,
+        },
+        "cases": cases,
+    }
+
+
+def _chunking_case_classification(trace: dict[str, Any], record: dict[str, Any]) -> str:
+    support_count = len(trace["expected_memory_ids"])
+    category = str(trace.get("category", ""))
+    query = str(trace.get("query", "")).lower()
+    if support_count > 1:
+        if category == "relationship":
+            return "relationship evolution"
+        if category == "temporal":
+            return "temporal sequence"
+        if category == "preference":
+            return "preference evolution"
+        if category == "identity":
+            return "identity evolution"
+        return "multi-turn event"
+    expected_id = trace["expected_memory_ids"][0]
+    dense_candidates = trace.get("diagnostics", {}).get("dense_top30", [])
+    similarity = _embedding_similarity_row(trace, expected_id, record, dense_candidates)
+    if similarity["embedding_failure_mode"] == "semantically_distant":
+        return "embedding mismatch"
+    if any(term in query for term in ("when", "before", "after", "first", "last")):
+        return "temporal sequence"
+    return "single-turn fact"
+
+
+def _chunking_case_rationale(classification: str) -> str:
+    rationale = {
+        "single-turn fact": "The evidence is a single turn and the miss is not explained by split support.",
+        "multi-turn event": "The answer depends on multiple evidence turns grouped by one underlying event.",
+        "relationship evolution": "The evidence spans multiple turns about a relationship or role.",
+        "temporal sequence": "The answer depends on ordering or time across turns.",
+        "preference evolution": "The answer depends on preference evidence across turns.",
+        "identity evolution": "The answer depends on identity evidence across turns.",
+        "embedding mismatch": "The expected memory is single-turn but semantically distant under the embedding.",
+    }
+    return rationale.get(classification, "The available evidence is inconclusive.")
+
+
+def _event_memory_investigation(conversations: list[Any], turn_records: list[dict[str, Any]], top_k: int) -> dict[str, Any]:
+    event_records, event_memories = _build_event_records(conversations, turn_records)
+    turn_dense = _candidate_generation_metrics(turn_records)
+    event_dense = _candidate_generation_metrics(event_records)
+    turn_full = _run_config(ValidationConfig("turn_full", (DenseRetrievalStrategy(), SparseRetrievalStrategy(), TemporalRetrievalStrategy()), use_controller=True, rerank=True), turn_records, top_k)
+    event_full = _run_config(ValidationConfig("event_full", (DenseRetrievalStrategy(), SparseRetrievalStrategy(), TemporalRetrievalStrategy()), use_controller=True, rerank=True), event_records, top_k)
+    event_vs_turn = {
+        "turn_memory": {
+            "retrieval_metrics": _metrics(turn_full),
+            "candidate_generation": turn_dense,
+        },
+        "event_memory": {
+            "retrieval_metrics": _metrics(event_full),
+            "candidate_generation": event_dense,
+        },
+        "delta": {
+            "recall_at_1": round(_metrics(event_full)["recall_at_1"] - _metrics(turn_full)["recall_at_1"], 6),
+            "recall_at_5": round(_metrics(event_full)["recall_at_5"] - _metrics(turn_full)["recall_at_5"], 6),
+            "mrr": round(_metrics(event_full)["mrr"] - _metrics(turn_full)["mrr"], 6),
+            "ndcg_at_5": round(_metrics(event_full)["ndcg_at_5"] - _metrics(turn_full)["ndcg_at_5"], 6),
+            "dense_top30_success": round(event_dense["dense_top30_success_rate"] - turn_dense["dense_top30_success_rate"], 6),
+            "average_expected_rank": round(event_dense["average_expected_rank"] - turn_dense["average_expected_rank"], 6),
+        },
+        "category_metrics": _event_category_comparison(turn_full, event_full),
+        "embedding_backend": embedding_backend_info(),
+    }
+    return {
+        "summary": {
+            "event_memory_supported": True,
+            "event_count": len(event_memories),
+            "turn_record_count": len(turn_records),
+            "event_record_count": len(event_records),
+            "dense_top30_success_delta": event_vs_turn["delta"]["dense_top30_success"],
+            "average_expected_rank_delta": event_vs_turn["delta"]["average_expected_rank"],
+            "recall_at_5_delta": event_vs_turn["delta"]["recall_at_5"],
+        },
+        "event_memory_statistics": _event_memory_statistics(event_memories),
+        "event_segmentation_quality": _event_segmentation_quality(event_memories, conversations),
+        "event_size_distribution": _event_size_distribution(event_memories),
+        "event_overlap_analysis": _event_overlap_analysis(event_memories),
+        "event_vs_turn_retrieval": event_vs_turn,
+        "case_studies": _event_case_studies(turn_full, event_full, turn_records, event_records),
+    }
+
+
+def _empty_event_investigation(chunking_hypothesis: dict[str, Any]) -> dict[str, Any]:
+    reason = "Chunking hypothesis sample did not support event-based memories as the primary bottleneck."
+    return {
+        "summary": {"event_memory_supported": False, "reason": reason},
+        "event_memory_statistics": {"skipped": True, "reason": reason},
+        "event_segmentation_quality": {"skipped": True, "reason": reason},
+        "event_size_distribution": {"skipped": True, "reason": reason},
+        "event_overlap_analysis": {"skipped": True, "reason": reason},
+        "event_vs_turn_retrieval": {"skipped": True, "reason": reason, "chunking_hypothesis": chunking_hypothesis["summary"]},
+        "case_studies": [],
+    }
+
+
+def _build_event_records(conversations: list[Any], turn_records: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[Any]]:
+    segmenter = EventSegmenter()
+    builder = EventMemoryBuilder()
+    event_payload_by_conversation: dict[str, dict[str, Any]] = {}
+    all_events: list[Any] = []
+    for conversation in conversations:
+        repository = InMemoryMemoryRepository()
+        event_lookup: dict[str, str] = {}
+        turn_to_event: dict[str, str] = {}
+        event_details: dict[str, dict[str, Any]] = {}
+        conversation_id = str(getattr(conversation, "id", "conversation"))
+        turn_index_by_identity = {id(turn): index for index, turn in enumerate(getattr(conversation, "turns", ()), start=1)}
+        for segment in segmenter.segment(conversation):
+            event = builder.build(segment)
+            note = event.to_memory_note()
+            repository.add(note)
+            all_events.append(event)
+            event_lookup[event.event_id] = note.content
+            event_details[event.event_id] = event.to_dict()
+            for turn in segment.turns:
+                turn_index = turn_index_by_identity.get(id(turn), 0)
+                turn_id = f"{conversation_id}:{getattr(turn, 'turn_id', None) or turn_index}"
+                turn_to_event[turn_id] = event.event_id
+        event_payload_by_conversation[conversation_id] = {
+            "repository": repository,
+            "event_lookup": event_lookup,
+            "event_details": event_details,
+            "turn_to_event": turn_to_event,
+        }
+    event_records = []
+    for record in turn_records:
+        payload = event_payload_by_conversation[str(record["conversation_id"])]
+        expected_event_ids = list(dict.fromkeys(payload["turn_to_event"].get(expected_id) for expected_id in record["expected_memory_ids"] if payload["turn_to_event"].get(expected_id)))
+        if not expected_event_ids:
+            continue
+        event_records.append(
+            {
+                **record,
+                "expected_memory_ids": expected_event_ids,
+                "repository": payload["repository"],
+                "memory_lookup": payload["event_lookup"],
+                "memory_details": payload["event_details"],
+                "turn_expected_memory_ids": record["expected_memory_ids"],
+            }
+        )
+    return event_records, all_events
+
+
+def _candidate_generation_metrics(records: list[dict[str, Any]]) -> dict[str, Any]:
+    expected_count = 0
+    top30_hits = 0
+    ranks: list[float] = []
+    for record in records:
+        query_embedding = RetrievalRequest(query=str(record["query"]), memory_types=(MemoryType.EPISODIC,), top_k=5).embedding()
+        ranked = _rank_all_dense(record, query_embedding)
+        rank_by_id = {item["id"]: index for index, item in enumerate(ranked, start=1)}
+        for expected_id in record["expected_memory_ids"]:
+            expected_count += 1
+            rank = rank_by_id.get(expected_id)
+            if rank is not None:
+                ranks.append(float(rank))
+                if rank <= 30:
+                    top30_hits += 1
+    return {
+        "expected_memory_count": expected_count,
+        "dense_top30_success_count": top30_hits,
+        "dense_top30_success_rate": round(top30_hits / expected_count, 6) if expected_count else 0.0,
+        "dense_top30_miss_rate": round(1.0 - (top30_hits / expected_count), 6) if expected_count else 0.0,
+        "average_expected_rank": _average_values(ranks),
+    }
+
+
+def _event_category_comparison(turn_trace: list[dict[str, Any]], event_trace: list[dict[str, Any]]) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    categories = sorted({trace["category"] for trace in turn_trace} | {trace["category"] for trace in event_trace})
+    for category in categories:
+        turn_subset = [trace for trace in turn_trace if trace["category"] == category]
+        event_subset = [trace for trace in event_trace if trace["category"] == category]
+        output[category] = {
+            "turn_memory": _metrics(turn_subset),
+            "event_memory": _metrics(event_subset),
+            "recall_at_5_delta": round(_metrics(event_subset)["recall_at_5"] - _metrics(turn_subset)["recall_at_5"], 6),
+        }
+    return output
+
+
+def _event_memory_statistics(events: list[Any]) -> dict[str, Any]:
+    return {
+        "event_count": len(events),
+        "average_turns_per_event": _average_values(len(event.turns_included) for event in events),
+        "average_entities_per_event": _average_values(len(event.metadata.participants) for event in events),
+        "average_temporal_expressions": _average_values(len(event.metadata.temporal_expressions) for event in events),
+        "average_object_count": _average_values(len(event.metadata.objects) for event in events),
+        "average_event_length_tokens": _average_values(estimate_tokens(event.embedding_text) for event in events),
+        "average_compression_ratio": _average_values(estimate_tokens(event.summary) / max(1, estimate_tokens(event.embedding_text)) for event in events),
+        "embedding_backend": embedding_backend_info(),
+    }
+
+
+def _event_segmentation_quality(events: list[Any], conversations: list[Any]) -> dict[str, Any]:
+    total_turns = sum(len(getattr(conversation, "turns", ())) for conversation in conversations)
+    covered_turns = sum(len(event.turns_included) for event in events)
+    multi_turn_events = sum(1 for event in events if len(event.turns_included) > 1)
+    return {
+        "conversation_count": len(conversations),
+        "total_turns": total_turns,
+        "event_count": len(events),
+        "covered_turns": covered_turns,
+        "turn_coverage": round(covered_turns / total_turns, 6) if total_turns else 0.0,
+        "multi_turn_event_count": multi_turn_events,
+        "multi_turn_event_rate": round(multi_turn_events / len(events), 6) if events else 0.0,
+        "singleton_event_count": len(events) - multi_turn_events,
+    }
+
+
+def _event_size_distribution(events: list[Any]) -> dict[str, Any]:
+    turn_counts = [len(event.turns_included) for event in events]
+    token_counts = [estimate_tokens(event.embedding_text) for event in events]
+    return {
+        "turn_count_distribution": dict(Counter(turn_counts)),
+        "token_count": _distribution([float(value) for value in token_counts]),
+        "max_turns_per_event": max(turn_counts) if turn_counts else 0,
+        "max_tokens_per_event": max(token_counts) if token_counts else 0,
+    }
+
+
+def _event_overlap_analysis(events: list[Any]) -> dict[str, Any]:
+    overlaps = []
+    for left, right in zip(events, events[1:]):
+        if left.conversation_id != right.conversation_id:
+            continue
+        left_terms = set(tokenize(left.embedding_text))
+        right_terms = set(tokenize(right.embedding_text))
+        overlaps.append(len(left_terms & right_terms) / max(1, len(left_terms | right_terms)))
+    return {
+        "adjacent_event_pairs": len(overlaps),
+        "average_adjacent_lexical_overlap": _average_values(overlaps),
+        "source_turn_overlap_count": 0,
+    }
+
+
+def _event_case_studies(turn_trace: list[dict[str, Any]], event_trace: list[dict[str, Any]], turn_records: list[dict[str, Any]], event_records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    turn_by_key = {(str(trace["conversation_id"]), str(trace["question_id"])): trace for trace in turn_trace}
+    event_by_key = {(str(trace["conversation_id"]), str(trace["question_id"])): trace for trace in event_trace}
+    event_record_by_key = {(str(record["conversation_id"]), str(record["question_id"])): record for record in event_records}
+    studies = []
+    for key, turn_item in list(turn_by_key.items())[:60]:
+        event_item = event_by_key.get(key)
+        event_record = event_record_by_key.get(key)
+        if event_item is None or event_record is None:
+            continue
+        turn_hit = recall_at_k(turn_item["expected_memory_ids"], turn_item["retrieved_memory_ids"], 5) > 0.0
+        event_hit = recall_at_k(event_item["expected_memory_ids"], event_item["retrieved_memory_ids"], 5) > 0.0
+        if len(studies) < 20 and (turn_hit != event_hit or len(studies) < 10):
+            studies.append(
+                {
+                    "question": turn_item["query"],
+                    "category": turn_item["category"],
+                    "turn_memory_retrieval": turn_item["retrieved_memory_ids"],
+                    "event_memory_retrieval": event_item["retrieved_memory_ids"],
+                    "ground_truth_turns": turn_item["expected_memory_ids"],
+                    "ground_truth_events": event_item["expected_memory_ids"],
+                    "why_event_helped_or_not": _event_case_explanation(turn_hit, event_hit, event_record),
+                }
+            )
+        if len(studies) >= 20:
+            break
+    return studies
+
+
+def _event_case_explanation(turn_hit: bool, event_hit: bool, event_record: dict[str, Any]) -> str:
+    expected_events = event_record["expected_memory_ids"]
+    event_details = [event_record["memory_details"].get(event_id, {}) for event_id in expected_events]
+    turns = sum(len(detail.get("turns_included", [])) for detail in event_details)
+    if event_hit and not turn_hit:
+        return f"Event memory helped by grouping {turns} source turns into the expected event representation."
+    if turn_hit and not event_hit:
+        return "Turn memory retrieved the exact evidence while the broader event representation diluted the target."
+    if event_hit and turn_hit:
+        return "Both representations retrieved supporting evidence."
+    return "Neither representation retrieved the expected evidence; this points to embedding mismatch or event segmentation limits."
+
+
 def _normalize_category(category: str | None, query: str) -> str:
     category_text = str(category or "")
     text = f"{category_text} {query}".lower()
@@ -1357,6 +1690,114 @@ def _phase8_dense_summary_md(dense: dict[str, Any], report: dict[str, Any]) -> s
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _event_case_studies_md(event_investigation: dict[str, Any]) -> str:
+    studies = event_investigation.get("case_studies", [])
+    lines = ["# Event Memory Case Studies", ""]
+    if not studies:
+        lines.extend(["No event-memory case studies were generated.", ""])
+        return "\n".join(lines)
+    for index, study in enumerate(studies, start=1):
+        lines.extend(
+            [
+                f"## Case {index}",
+                "",
+                f"Question: {study['question']}",
+                "",
+                f"Category: `{study['category']}`",
+                "",
+                f"Turn Memory Retrieval: `{study['turn_memory_retrieval']}`",
+                "",
+                f"Event Memory Retrieval: `{study['event_memory_retrieval']}`",
+                "",
+                f"Ground Truth Turns: `{study['ground_truth_turns']}`",
+                "",
+                f"Ground Truth Events: `{study['ground_truth_events']}`",
+                "",
+                f"Why Event Representation Helped (or Didn't): {study['why_event_helped_or_not']}",
+                "",
+            ]
+        )
+    return "\n".join(lines)
+
+
+def _phase9_event_report_md(chunking_hypothesis: dict[str, Any], event_investigation: dict[str, Any]) -> str:
+    chunking_summary = chunking_hypothesis["summary"]
+    event_summary = event_investigation["summary"]
+    event_vs_turn = event_investigation["event_vs_turn_retrieval"]
+    lines = [
+        "# Phase 9 Event Memory Report",
+        "",
+        "## Chunking Hypothesis Validation",
+        "",
+        f"Sample size: `{chunking_summary['sample_size']}` from `{chunking_summary['dense_failure_population']}` dense failures.",
+        f"Event-memory support rate: `{chunking_summary['event_memory_support_rate']:.6f}`.",
+        f"Proceed with event memory ablation: `{chunking_summary['event_memory_supported']}`.",
+        "",
+        "Classification counts:",
+        "",
+    ]
+    for name, count in chunking_summary["classification_counts"].items():
+        lines.append(f"- `{name}`: {count}")
+    if not event_summary.get("event_memory_supported", False):
+        lines.extend(["", "Event memory ablation was skipped because the sampled failures did not support chunking as the primary bottleneck."])
+        return "\n".join(lines) + "\n"
+    turn = event_vs_turn["turn_memory"]
+    event = event_vs_turn["event_memory"]
+    delta = event_vs_turn["delta"]
+    lines.extend(
+        [
+            "",
+            "## Event vs Turn Retrieval",
+            "",
+            "| Metric | Turn Memory | Event Memory | Delta |",
+            "|---|---:|---:|---:|",
+        ]
+    )
+    for metric in ("recall_at_1", "recall_at_5", "mrr", "ndcg_at_5"):
+        lines.append(
+            f"| {metric} | {turn['retrieval_metrics'][metric]:.6f} | {event['retrieval_metrics'][metric]:.6f} | {delta[metric]:.6f} |"
+        )
+    lines.extend(
+        [
+            f"| dense_top30_success | {turn['candidate_generation']['dense_top30_success_rate']:.6f} | {event['candidate_generation']['dense_top30_success_rate']:.6f} | {delta['dense_top30_success']:.6f} |",
+            f"| average_expected_rank | {turn['candidate_generation']['average_expected_rank']:.6f} | {event['candidate_generation']['average_expected_rank']:.6f} | {delta['average_expected_rank']:.6f} |",
+            "",
+            "## Question Classes",
+            "",
+            "| Category | Turn Recall@5 | Event Recall@5 | Delta |",
+            "|---|---:|---:|---:|",
+        ]
+    )
+    for category, payload in event_vs_turn["category_metrics"].items():
+        lines.append(
+            f"| {category} | {payload['turn_memory']['recall_at_5']:.6f} | {payload['event_memory']['recall_at_5']:.6f} | {payload['recall_at_5_delta']:.6f} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Trade-Offs",
+            "",
+            f"Event count: `{event_summary['event_count']}` for `{event_summary['turn_record_count']}` evaluated turn records.",
+            f"Dense Top30 success delta: `{event_summary['dense_top30_success_delta']:.6f}`.",
+            f"Average expected rank delta: `{event_summary['average_expected_rank_delta']:.6f}`.",
+            f"Recall@5 delta: `{event_summary['recall_at_5_delta']:.6f}`.",
+            "",
+            "## Conclusion",
+            "",
+            _event_conclusion(event_summary),
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _event_conclusion(event_summary: dict[str, Any]) -> str:
+    if event_summary.get("dense_top30_success_delta", 0.0) > 0:
+        return "Event-centric representation improved dense candidate generation in this controlled ablation."
+    if event_summary.get("recall_at_5_delta", 0.0) > 0:
+        return "Event-centric representation improved final retrieval despite no dense Top30 gain; inspect category metrics before adopting it."
+    return "Event-centric representation did not improve retrieval in this run. Keep it as an ablation artifact unless later semantic embeddings change the result."
 
 
 def _dense_repair_recommendation(dominant: str) -> str:
