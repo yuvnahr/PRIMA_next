@@ -1,31 +1,17 @@
 {
-  "total_failures": 1335,
+  "total_failures": 60,
   "counts": {
-    "temporal_failure": 295,
-    "entity_resolution_failure": 860,
-    "relation_failure": 130,
-    "preference_failure": 47,
-    "retrieval_miss": 3,
+    "temporal_failure": 16,
+    "entity_resolution_failure": 34,
+    "relation_failure": 10,
+    "retrieval_miss": 0,
+    "preference_failure": 0,
     "context_truncation": 0,
     "reranker_failure": 0,
     "generation_failure": 0
   },
   "representative_examples": {
     "temporal_failure": [
-      {
-        "query": "When did Caroline go to the LGBTQ support group?",
-        "category": "temporal",
-        "expected_memory_ids": [
-          "conv-26:D1:3"
-        ],
-        "retrieved_memory_ids": [
-          "conv-26:D13:1",
-          "conv-26:D10:5",
-          "conv-26:D3:11",
-          "conv-26:D18:1",
-          "conv-26:D5:2"
-        ]
-      },
       {
         "query": "When did Melanie paint a sunrise?",
         "category": "temporal",
@@ -34,8 +20,8 @@
         ],
         "retrieved_memory_ids": [
           "conv-26:D14:30",
-          "conv-26:D4:3",
           "conv-26:D8:18",
+          "conv-26:D4:3",
           "conv-26:D14:3",
           "conv-26:D7:12"
         ]
@@ -47,11 +33,26 @@
           "conv-26:D2:1"
         ],
         "retrieved_memory_ids": [
-          "conv-26:D18:17",
           "conv-26:D14:28",
+          "conv-26:D18:17",
           "conv-26:D14:22",
           "conv-26:D8:20",
           "conv-26:D14:3"
+        ]
+      },
+      {
+        "query": "Where did Caroline move from 4 years ago?",
+        "category": "temporal",
+        "expected_memory_ids": [
+          "conv-26:D3:13",
+          "conv-26:D4:3"
+        ],
+        "retrieved_memory_ids": [
+          "conv-26:D13:13",
+          "conv-26:D11:12",
+          "conv-26:D16:9",
+          "conv-26:D3:3",
+          "conv-26:D13:1"
         ]
       }
     ],
@@ -66,9 +67,9 @@
         "retrieved_memory_ids": [
           "conv-26:D4:14",
           "conv-26:D16:16",
-          "conv-26:D17:13",
+          "conv-26:D7:8",
           "conv-26:D17:7",
-          "conv-26:D14:21"
+          "conv-26:D4:4"
         ]
       },
       {
@@ -127,7 +128,7 @@
           "conv-26:D12:1",
           "conv-26:D6:11",
           "conv-26:D17:1",
-          "conv-26:D16:5"
+          "conv-26:D9:6"
         ]
       },
       {
@@ -145,100 +146,13 @@
           "conv-26:D6:16",
           "conv-26:D19:9",
           "conv-26:D4:8",
-          "conv-26:D14:10",
-          "conv-26:D3:1"
+          "conv-26:D3:10",
+          "conv-26:D4:3"
         ]
       }
     ],
-    "preference_failure": [
-      {
-        "query": "What was Melanie's favorite book from her childhood?",
-        "category": "preference",
-        "expected_memory_ids": [
-          "conv-26:D6:10"
-        ],
-        "retrieved_memory_ids": [
-          "conv-26:D14:30",
-          "conv-26:D7:10",
-          "conv-26:D6:9",
-          "conv-26:D8:15",
-          "conv-26:D13:1"
-        ]
-      },
-      {
-        "query": "What is Gina's favorite style of dance?",
-        "category": "preference",
-        "expected_memory_ids": [
-          "conv-30:D1:9"
-        ],
-        "retrieved_memory_ids": [
-          "conv-30:D5:3",
-          "conv-30:D13:4",
-          "conv-30:D2:7",
-          "conv-30:D9:10",
-          "conv-30:D3:6"
-        ]
-      },
-      {
-        "query": "What is Jon's favorite style of dance?",
-        "category": "preference",
-        "expected_memory_ids": [
-          "conv-30:D1:8"
-        ],
-        "retrieved_memory_ids": [
-          "conv-30:D5:3",
-          "conv-30:D9:10",
-          "conv-30:D8:12",
-          "conv-30:D13:5",
-          "conv-30:D9:9"
-        ]
-      }
-    ],
-    "retrieval_miss": [
-      {
-        "query": "What did the posters at the poetry reading say?",
-        "category": "identity",
-        "expected_memory_ids": [
-          "conv-26:D17:19"
-        ],
-        "retrieved_memory_ids": [
-          "conv-26:D17:20",
-          "conv-26:D17:12",
-          "conv-26:D13:1",
-          "conv-26:D7:12",
-          "conv-26:D8:11"
-        ]
-      },
-      {
-        "query": "What do the dancers in the photo represent?",
-        "category": "identity",
-        "expected_memory_ids": [
-          "conv-30:D1:25"
-        ],
-        "retrieved_memory_ids": [
-          "conv-30:D9:3",
-          "conv-30:D13:4",
-          "conv-30:D11:3",
-          "conv-30:D13:5",
-          "conv-30:D1:24"
-        ]
-      },
-      {
-        "query": "What is the general sentiment about the upcoming grand opening?",
-        "category": "identity",
-        "expected_memory_ids": [
-          "conv-30:D15:18",
-          "conv-30:D15:19"
-        ],
-        "retrieved_memory_ids": [
-          "conv-30:D5:10",
-          "conv-30:D2:1",
-          "conv-30:D8:12",
-          "conv-30:D2:11",
-          "conv-30:D5:2"
-        ]
-      }
-    ],
+    "retrieval_miss": [],
+    "preference_failure": [],
     "context_truncation": [],
     "reranker_failure": [],
     "generation_failure": []

@@ -6,8 +6,10 @@ import argparse
 import csv
 import json
 import math
+import os
 import statistics
 import time
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -61,6 +63,11 @@ def run_locomo_retrieval_validation(
     confidence = _confidence_validation(full_trace)
     context = _context_statistics(traces_by_config["dense"], full_trace)
     failures = _failure_breakdown(full_trace)
+    localization = _failure_localization(full_trace)
+    stage_statistics = _stage_statistics(localization, len(full_trace))
+    confidence_calibration = _confidence_calibration(full_trace)
+    candidate_drift = _candidate_drift(full_trace)
+    context_analysis = _context_analysis(full_trace)
     baseline = _phase42_baseline()
     comparison = _comparison(baseline, ablation["full_retrieval_v2"])
 
@@ -75,22 +82,35 @@ def run_locomo_retrieval_validation(
         "ablation": ablation,
         "category_improvements": category,
         "confidence_validation": confidence,
+        "confidence_calibration": confidence_calibration,
         "context_statistics": context,
+        "context_analysis": context_analysis,
         "failure_breakdown": failures,
+        "failure_localization": stage_statistics,
+        "candidate_drift": candidate_drift["summary"],
     }
 
     _write_json(output_path / "retrieval_ablation_v2.json", ablation)
-    _write_json(output_path / "retrieval_trace.json", traces_by_config)
+    if _env_bool("PRIMA_WRITE_FULL_RETRIEVAL_TRACE", False):
+        _write_json(output_path / "retrieval_trace.json", traces_by_config)
     _write_json(output_path / "retrieval_category_improvements.json", category)
     _write_json(output_path / "retrieval_confidence_validation.json", confidence)
+    _write_json(output_path / "retrieval_confidence_calibration.json", confidence_calibration)
     _write_json(output_path / "retrieval_failure_breakdown.json", failures)
+    _write_json(output_path / "retrieval_failure_localization.json", localization)
+    _write_json(output_path / "retrieval_stage_statistics.json", stage_statistics)
+    _write_json(output_path / "candidate_drift.json", candidate_drift)
+    _write_json(output_path / "context_analysis.json", context_analysis)
     _write_json(output_path / "retrieval_phase_7_2_results.json", report)
     _write_csv(output_path / "retrieval_ablation.csv", _ablation_rows(ablation, baseline))
+    _write_csv(output_path / "retrieval_ablation_stage.csv", _ablation_stage_rows(traces_by_config))
     _write_csv(output_path / "retrieval_category.csv", _category_rows(category))
     _write_csv(output_path / "confidence_curve.csv", confidence["curve"])
     _write_csv(output_path / "context_statistics.csv", _context_rows(context))
     (output_path / "retrieval_improvement_summary.md").write_text(_summary_md(report), encoding="utf-8")
     (output_path / "retrieval_debug_readme.md").write_text(_debug_readme(report, output_path), encoding="utf-8")
+    (output_path / "retrieval_phase7_vs_phase42.md").write_text(_phase_comparison_md(report), encoding="utf-8")
+    (output_path / "retrieval_root_cause_report.md").write_text(_root_cause_report_md(report), encoding="utf-8")
     return report
 
 
@@ -298,6 +318,230 @@ def _failure_type(record: dict[str, Any], retrieved_ids: list[str], diagnostics:
     return "retrieval_miss"
 
 
+def _failure_localization(traces: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    localized: list[dict[str, Any]] = []
+    for trace in traces:
+        if recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) > 0.0:
+            continue
+        diagnostics = dict(trace.get("diagnostics", {}))
+        for expected_id in trace["expected_memory_ids"]:
+            history = _candidate_rank_history(expected_id, diagnostics, trace["retrieved_memory_ids"])
+            failure_stage, reason = _failure_stage(history)
+            localized.append(
+                {
+                    "query": trace["query"],
+                    "conversation_id": trace["conversation_id"],
+                    "question_id": trace["question_id"],
+                    "category": trace["category"],
+                    "expected_memory": expected_id,
+                    "expected_memory_ids": trace["expected_memory_ids"],
+                    "failure_stage": failure_stage,
+                    "reason": reason,
+                    "candidate_rank_history": history,
+                    "confidence": trace.get("confidence", 0.0),
+                    "retrieved_memories": trace["retrieved_memory_ids"],
+                }
+            )
+    return localized
+
+
+def _candidate_rank_history(expected_id: str, diagnostics: dict[str, Any], retrieved_ids: list[str]) -> dict[str, Any]:
+    stages = (
+        ("dense", diagnostics.get("dense_top30") or diagnostics.get("dense_candidates") or []),
+        ("sparse", diagnostics.get("sparse_top30") or diagnostics.get("sparse_candidates") or []),
+        ("fusion", diagnostics.get("fused_top30") or diagnostics.get("hybrid_candidates") or []),
+        ("reranker", diagnostics.get("reranked_top30") or diagnostics.get("reranked_candidates") or []),
+        ("final", diagnostics.get("final_candidates") or [{"id": item, "score": None} for item in retrieved_ids[:5]]),
+    )
+    history: dict[str, Any] = {}
+    previous_present = False
+    previous_stage = ""
+    for stage_name, candidates in stages:
+        rank, score = _candidate_rank(expected_id, candidates)
+        present = rank is not None
+        reason_removed = ""
+        if previous_present and not present:
+            reason_removed = f"present_in_{previous_stage}_missing_from_{stage_name}"
+        elif not present:
+            reason_removed = f"not_in_{stage_name}_top{len(candidates)}"
+        history[stage_name] = {
+            "expected_present": present,
+            "rank": rank,
+            "score": score,
+            "reason_removed": reason_removed,
+        }
+        previous_present = present
+        previous_stage = stage_name
+    return history
+
+
+def _candidate_rank(expected_id: str, candidates: Any) -> tuple[int | None, float | None]:
+    for index, candidate in enumerate(candidates or [], start=1):
+        if str(candidate.get("id")) == expected_id:
+            raw_score = candidate.get("score")
+            score = round(float(raw_score), 6) if raw_score is not None else None
+            return index, score
+    return None, None
+
+
+def _failure_stage(history: dict[str, Any]) -> tuple[str, str]:
+    dense_present = bool(history["dense"]["expected_present"])
+    sparse_present = bool(history["sparse"]["expected_present"])
+    fusion_present = bool(history["fusion"]["expected_present"])
+    reranker_present = bool(history["reranker"]["expected_present"])
+    final_present = bool(history["final"]["expected_present"])
+    if not dense_present and not sparse_present:
+        return "dense_failure", "expected memory was absent from both dense_top30 and sparse_top30 candidate sources"
+    if not sparse_present and dense_present:
+        return "sparse_failure", "expected memory was present in dense_top30 but absent from sparse_top30"
+    if (dense_present or sparse_present) and not fusion_present:
+        return "fusion_failure", "expected memory entered retrieval candidates but was removed before fused_top30"
+    if fusion_present and not reranker_present:
+        return "reranker_failure", "expected memory was present in fused_top30 but absent after reranking"
+    if reranker_present and not final_present:
+        return "selection_failure", "expected memory survived reranking but was ranked below the final top5"
+    return "generation_failure", "retrieval succeeded but downstream answer generation would need investigation"
+
+
+def _stage_statistics(localization: list[dict[str, Any]], query_count: int) -> dict[str, Any]:
+    counts = Counter(str(item["failure_stage"]) for item in localization)
+    total = sum(counts.values())
+    stages = ("dense_failure", "sparse_failure", "fusion_failure", "reranker_failure", "selection_failure", "context_truncation", "generation_failure")
+    return {
+        "query_count": query_count,
+        "localized_failure_count": total,
+        "stage_counts": {stage: counts.get(stage, 0) for stage in stages},
+        "stage_percentages": {
+            stage: round(counts.get(stage, 0) / total, 6) if total else 0.0
+            for stage in stages
+        },
+    }
+
+
+def _confidence_calibration(traces: list[dict[str, Any]]) -> dict[str, Any]:
+    bins: list[dict[str, Any]] = []
+    confidences = [float(trace.get("confidence", 0.0)) for trace in traces]
+    successes = [1.0 if recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) > 0.0 else 0.0 for trace in traces]
+    mrrs = [reciprocal_rank(trace["expected_memory_ids"], trace["retrieved_memory_ids"]) for trace in traces]
+    ece = 0.0
+    for lower in [0.0, 0.2, 0.4, 0.6, 0.8]:
+        upper = round(lower + 0.2, 1)
+        subset_indexes = [
+            index
+            for index, confidence in enumerate(confidences)
+            if lower <= confidence < upper or (upper == 1.0 and confidence == 1.0)
+        ]
+        subset_traces = [traces[index] for index in subset_indexes]
+        avg_confidence = _average_values(confidences[index] for index in subset_indexes)
+        accuracy = _average_values(successes[index] for index in subset_indexes)
+        if traces:
+            ece += (len(subset_indexes) / len(traces)) * abs(avg_confidence - accuracy)
+        metrics = _metrics(subset_traces)
+        bins.append(
+            {
+                "bin_start": lower,
+                "bin_end": upper,
+                "count": len(subset_indexes),
+                "average_confidence": avg_confidence,
+                "success_rate": accuracy,
+                "recall_at_5": metrics["recall_at_5"],
+                "mrr": metrics["mrr"],
+            }
+        )
+    brier = _average_values((confidence - success) ** 2 for confidence, success in zip(confidences, successes))
+    return {
+        "bins": bins,
+        "pearson_correlation": _pearson(confidences, successes),
+        "spearman_correlation": _spearman(confidences, successes),
+        "expected_calibration_error": round(ece, 6),
+        "brier_score": brier,
+        "confidence_reliable": bool(abs(_pearson(confidences, successes)) >= 0.3 and ece <= 0.15),
+    }
+
+
+def _candidate_drift(traces: list[dict[str, Any]]) -> dict[str, Any]:
+    failed = [trace for trace in traces if recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) == 0.0]
+    examples = []
+    for trace in failed[:20]:
+        diagnostics = dict(trace.get("diagnostics", {}))
+        examples.append(
+            {
+                "query": trace["query"],
+                "expected_memory_ids": trace["expected_memory_ids"],
+                "retrieval_v2_stage_presence": {
+                    stage: any(
+                        expected_id == candidate.get("id")
+                        for expected_id in trace["expected_memory_ids"]
+                        for candidate in diagnostics.get(stage, [])
+                    )
+                    for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
+                },
+                "phase_4_2_candidate_trace_available": False,
+                "drift_assessment": "Phase 4.2 artifact contains aggregate metrics but no per-query candidate trace, so exact candidate drift cannot be proven for this query.",
+            }
+        )
+    return {
+        "summary": {
+            "phase_4_2_candidate_trace_available": False,
+            "reason": "Stored Phase 4.2 results in evaluation/results/retrieval_optimization_results.json contain aggregate metrics only.",
+            "retrieval_v2_failed_query_count": len(failed),
+            "action_required": "Regenerate Phase 4.2 with per-query stage traces before claiming exact candidate drift.",
+        },
+        "failed_query_examples": examples,
+    }
+
+
+def _context_analysis(traces: list[dict[str, Any]], token_budget: int = 1600) -> dict[str, Any]:
+    per_query: list[dict[str, Any]] = []
+    for trace in traces:
+        diagnostics = dict(trace.get("diagnostics", {}))
+        candidates = diagnostics.get("final_candidates", [])
+        memory_rows = []
+        seen_ids: set[str] = set()
+        duplicate_count = 0
+        for candidate in candidates:
+            memory_id = str(candidate.get("id", ""))
+            if memory_id in seen_ids:
+                duplicate_count += 1
+            seen_ids.add(memory_id)
+            content = str(candidate.get("text", ""))
+            metadata = {key: value for key, value in candidate.items() if key != "text"}
+            memory_rows.append(
+                {
+                    "memory_id": memory_id,
+                    "content_tokens": estimate_tokens(content),
+                    "metadata_tokens": estimate_tokens(json.dumps(metadata, sort_keys=True)),
+                    "total_tokens": estimate_tokens(content) + estimate_tokens(json.dumps(metadata, sort_keys=True)),
+                }
+            )
+        context_tokens = int(trace.get("context_tokens", 0))
+        per_query.append(
+            {
+                "query": trace["query"],
+                "retrieved_count": len(candidates),
+                "context_tokens": context_tokens,
+                "unused_context_tokens": max(0, token_budget - context_tokens),
+                "duplicate_memory_count": duplicate_count,
+                "tokens_per_retrieved_memory": memory_rows,
+            }
+        )
+    token_totals = [
+        memory["total_tokens"]
+        for query in per_query
+        for memory in query["tokens_per_retrieved_memory"]
+    ]
+    return {
+        "summary": {
+            "query_count": len(traces),
+            "average_context_tokens": _average_values(float(query["context_tokens"]) for query in per_query),
+            "average_unused_context_tokens": _average_values(float(query["unused_context_tokens"]) for query in per_query),
+            "average_tokens_per_retrieved_memory": _average_values(float(value) for value in token_totals),
+            "duplicate_memory_count": sum(int(query["duplicate_memory_count"]) for query in per_query),
+        },
+        "per_query": per_query[:50],
+    }
+
+
 def _normalize_category(category: str | None, query: str) -> str:
     category_text = str(category or "")
     text = f"{category_text} {query}".lower()
@@ -374,9 +618,56 @@ def _pearson(left: list[float], right: list[float]) -> float:
     return round(numerator / (left_den * right_den), 6)
 
 
+def _spearman(left: list[float], right: list[float]) -> float:
+    if len(left) < 2 or len(left) != len(right):
+        return 0.0
+    return _pearson(_ranks(left), _ranks(right))
+
+
+def _ranks(values: list[float]) -> list[float]:
+    ordered = sorted(enumerate(values), key=lambda item: item[1])
+    ranks = [0.0 for _ in values]
+    index = 0
+    while index < len(ordered):
+        end = index
+        while end + 1 < len(ordered) and ordered[end + 1][1] == ordered[index][1]:
+            end += 1
+        average_rank = (index + end + 2) / 2
+        for ordered_index in range(index, end + 1):
+            ranks[ordered[ordered_index][0]] = average_rank
+        index = end + 1
+    return ranks
+
+
+def _average_values(values: Any) -> float:
+    values_list = [float(value) for value in values]
+    return round(sum(values_list) / len(values_list), 6) if values_list else 0.0
+
+
 def _ablation_rows(ablation: dict[str, dict[str, float]], baseline: dict[str, float]) -> list[dict[str, Any]]:
     rows = [{"configuration": "phase_4_2_baseline", **baseline}]
     rows.extend({"configuration": name, **metrics} for name, metrics in ablation.items())
+    return rows
+
+
+def _ablation_stage_rows(traces_by_config: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for name, traces in traces_by_config.items():
+        metrics = _metrics(traces)
+        rows.append({"configuration": name, "stage": "final_top5", **metrics})
+        if name != "full_retrieval_v2":
+            continue
+        for stage_name, diagnostic_key in (
+            ("dense_top30", "dense_top30"),
+            ("sparse_top30", "sparse_top30"),
+            ("fusion_top30", "fused_top30"),
+            ("reranker_top30", "reranked_top30"),
+        ):
+            stage_trace = []
+            for trace in traces:
+                retrieved_ids = [str(candidate.get("id")) for candidate in trace.get("diagnostics", {}).get(diagnostic_key, [])]
+                stage_trace.append({**trace, "retrieved_memory_ids": retrieved_ids})
+            rows.append({"configuration": name, "stage": stage_name, **_metrics(stage_trace)})
     return rows
 
 
@@ -410,6 +701,13 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
 
 
 def _summary_md(report: dict[str, Any]) -> str:
@@ -463,12 +761,16 @@ def _debug_readme(report: dict[str, Any], output_path: Path) -> str:
         "## Artifacts",
         "",
         f"- Output directory: `{output_path}`",
-        "- `retrieval_trace.json`: per-query dense, sparse, fused, reranked, and final candidates.",
+        "- `retrieval_failure_localization.json`: failed-query stage forensics with rank history.",
+        "- `retrieval_stage_statistics.json`: aggregate stage-loss counts and percentages.",
         "- `retrieval_ablation_v2.json` and `retrieval_ablation.csv`: Recall@1/5, MRR, nDCG@5, latency, and retrieved count by config.",
+        "- `retrieval_ablation_stage.csv`: Recall@1/5, MRR, and nDCG@5 by ablation and stage.",
         "- `retrieval_category.csv`: per-category retrieval metrics.",
-        "- `retrieval_failure_breakdown.json`: failure classes with representative examples.",
-        "- `retrieval_confidence_validation.json` and `confidence_curve.csv`: confidence calibration against Recall@5 and MRR.",
-        "- `retrieval_improvement_summary.md`: compact baseline comparison and ablation summary.",
+        "- `retrieval_confidence_calibration.json`: confidence bins, Pearson, Spearman, ECE, and Brier score.",
+        "- `candidate_drift.json`: Retrieval V2 stage presence plus Phase 4.2 trace availability notes.",
+        "- `context_analysis.json`: token and duplicate-context accounting.",
+        "- `retrieval_phase7_vs_phase42.md` and `retrieval_root_cause_report.md`: scientific summaries.",
+        "- `retrieval_trace.json`: optional full raw trace only when `PRIMA_WRITE_FULL_RETRIEVAL_TRACE=1`.",
         "",
         "## Current Run",
         "",
@@ -492,10 +794,104 @@ def _debug_readme(report: dict[str, Any], output_path: Path) -> str:
     lines.extend(
         [
             "",
-            "Use `retrieval_trace.json` to inspect where each expected memory drops out. The most useful stage keys are `dense_top30`, `sparse_top30`, `fused_top30`, and `reranked_top30` under each trace record's `diagnostics` field.",
+            "Use `retrieval_failure_localization.json` to inspect where each expected memory drops out. Full raw traces are opt-in because they can become too large for version control.",
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _phase_comparison_md(report: dict[str, Any]) -> str:
+    lines = [
+        "# Retrieval Phase 7 vs Phase 4.2",
+        "",
+        "| Metric | Phase 4.2 | Retrieval V2 | Delta |",
+        "|---|---:|---:|---:|",
+    ]
+    for metric in ("recall_at_1", "recall_at_5", "mrr", "ndcg_at_5"):
+        baseline = report["phase_4_2_baseline"].get(metric, 0.0)
+        current = report["full_retrieval_v2"].get(metric, 0.0)
+        delta = report["comparison"].get(f"{metric}_gain", 0.0)
+        lines.append(f"| {metric} | {baseline:.6f} | {current:.6f} | {delta:.6f} |")
+    stage_stats = report["failure_localization"]
+    calibration = report["confidence_calibration"]
+    lines.extend(
+        [
+            "",
+            "## Explanation",
+            "",
+            f"Retrieval V2 remains below the stored Phase 4.2 aggregate baseline on this run. The largest localized failure bucket is `{_largest_stage(stage_stats)}`.",
+            f"Confidence is not reliable when `confidence_reliable` is `{calibration['confidence_reliable']}` with Pearson `{calibration['pearson_correlation']:.6f}`, Spearman `{calibration['spearman_correlation']:.6f}`, ECE `{calibration['expected_calibration_error']:.6f}`, and Brier `{calibration['brier_score']:.6f}`.",
+            "",
+            "No additional retrieval fix is claimed here unless the metric deltas above improve. The artifact is intended to explain the regression and guide the next small repair.",
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _root_cause_report_md(report: dict[str, Any]) -> str:
+    stage_stats = report["failure_localization"]
+    drift = report["candidate_drift"]
+    calibration = report["confidence_calibration"]
+    context = report["context_analysis"]["summary"]
+    largest_stage = _largest_stage(stage_stats)
+    lines = [
+        "# Retrieval Root Cause Report",
+        "",
+        "## Where Correct Memories Are First Lost",
+        "",
+        f"The dominant localized stage is `{largest_stage}`. Stage counts are:",
+        "",
+        "| Stage | Count | Share |",
+        "|---|---:|---:|",
+    ]
+    for stage, count in stage_stats["stage_counts"].items():
+        share = stage_stats["stage_percentages"].get(stage, 0.0)
+        lines.append(f"| {stage} | {count} | {share:.6f} |")
+    lines.extend(
+        [
+            "",
+            "## Why They Are Lost",
+            "",
+            "The localization artifact records per-expected-memory rank histories across dense, sparse, fusion, reranker, and final selection. A `selection_failure` means the correct memory survives into reranker top30 but falls below final top5. A `fusion_failure` means candidate generation found it but fusion removed it from the tracked top30. A `dense_failure` here means neither initial dense nor sparse top30 contained the expected memory.",
+            "",
+            "## Component Most Responsible",
+            "",
+            f"On this run, `{largest_stage}` contributes the largest share of localized failures. See `retrieval_failure_localization.json` for the query-level evidence.",
+            "",
+            "## Confidence Calibration",
+            "",
+            f"Confidence reliability is `{calibration['confidence_reliable']}`. Pearson is `{calibration['pearson_correlation']:.6f}`, Spearman is `{calibration['spearman_correlation']:.6f}`, ECE is `{calibration['expected_calibration_error']:.6f}`, and Brier score is `{calibration['brier_score']:.6f}`. When this remains weak, confidence should not be used as a success proxy.",
+            "",
+            "## Candidate Drift",
+            "",
+            drift["reason"],
+            "Exact Phase 4.2 candidate drift cannot be proven from the stored aggregate baseline alone. The current report records Retrieval V2 stage presence and explicitly marks Phase 4.2 candidate traces as unavailable.",
+            "",
+            "## Context Analysis",
+            "",
+            f"Average context tokens: `{context['average_context_tokens']:.6f}`. Average unused context tokens: `{context['average_unused_context_tokens']:.6f}`. Average tokens per retrieved memory: `{context['average_tokens_per_retrieved_memory']:.6f}`. Duplicate final memory count: `{context['duplicate_memory_count']}`.",
+            "",
+            "## Fixes Measurably Improved Retrieval",
+            "",
+            "No new algorithmic fix is introduced by this forensic pass. The instruction prohibits blind changes, so this run only localizes failure and measures calibration/context behavior.",
+            "",
+            "## Rejected Hypotheses",
+            "",
+            "Context truncation is rejected for this retrieval-only run unless `context_analysis.json` shows exhausted token budgets. Phase 4.2 candidate drift is unproven until a baseline candidate trace exists.",
+            "",
+            "## Future Work",
+            "",
+            "Regenerate Phase 4.2 with the same per-stage trace schema, then apply one small fix to the dominant failure stage and rerun the 100-query benchmark before considering full LoCoMo validation.",
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _largest_stage(stage_stats: dict[str, Any]) -> str:
+    counts = stage_stats.get("stage_counts", {})
+    if not counts:
+        return "none"
+    return max(counts.items(), key=lambda item: int(item[1]))[0]
 
 
 def main() -> None:
