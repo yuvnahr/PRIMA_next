@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.codex_pycache/
 .coverage
 htmlcov/
 
@@ -53,6 +54,19 @@ evaluation/results/**/*failure_breakdown*.json
 evaluation/results/**/*dense_investigation*.json
 evaluation/results/**/*event*.json
 evaluation/results/**/*event*.md
+evaluation/results/**/*embedding_backend_audit*.json
+evaluation/results/**/*embedding_ablation*.json
+evaluation/results/**/*embedding_ablation*.csv
+evaluation/results/**/*embedding_ablation*.md
+evaluation/results/**/*representation_ablation*.json
+evaluation/results/**/*representation_ablation*.csv
+evaluation/results/**/*representation_ablation*.md
+evaluation/results/**/*identity_normalization*.json
+evaluation/results/**/*semantic_representation*.json
+evaluation/results/**/*semantic_representation*.md
+evaluation/results/**/*phase10*.json
+evaluation/results/**/*phase10*.csv
+evaluation/results/**/*phase10*.md
 benchmarks/locomo/outputs/**/*event*.json
 benchmarks/locomo/outputs/**/*event*.md
 *.tmp.json
