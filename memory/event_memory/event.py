@@ -1,4 +1,4 @@
-"""Event-level memory model."""
+﻿"""Event-level memory model."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from memory.event_memory.event_metadata import EventMetadata
-from memory.memory_note import MemoryNote, stable_embedding
+from memory.memory_note import MemoryNote
 from memory.memory_types import MemoryLevel, MemoryType
 
 
@@ -36,11 +36,11 @@ class EventMemory:
             "source_turn_ids": list(self.turns_included),
             "embedding_text": self.embedding_text,
         }
-        return MemoryNote.create(
+        note = MemoryNote.create(
             content=self.summary,
             memory_type=MemoryType.EPISODIC,
             memory_level=MemoryLevel.EPISODIC_EVENT,
-            embedding=stable_embedding(self.embedding_text),
+            embedding_text=self.embedding_text,
             context={
                 "type": "event_memory",
                 "conversation_id": self.conversation_id,
@@ -48,4 +48,6 @@ class EventMemory:
             },
             salience_score=self.metadata.importance,
             note_id=self.event_id,
-        ).with_updates(retrieval_metadata=retrieval_metadata)
+        )
+        return note.with_updates(retrieval_metadata={**note.retrieval_metadata, **retrieval_metadata})
+

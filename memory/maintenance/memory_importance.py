@@ -8,7 +8,8 @@ from typing import Any, Mapping
 
 from memory.maintenance.importance_score import ImportanceScore, clamp_score
 from memory.maintenance.importance_types import ImportanceWeights, MemoryAdmissionDecision, MemoryImportanceConfig
-from memory.memory_note import extract_dominant_context_chain, stable_embedding
+from memory.embedding_pipeline import get_embedding_pipeline
+from memory.memory_note import extract_dominant_context_chain
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
 
@@ -127,7 +128,7 @@ class MemoryImportanceEngine:
         )
 
     def novelty_score(self, query: str) -> float:
-        results = self.repository.query(stable_embedding(query), memory_type=MemoryType.EPISODIC, limit=self.config.top_k)
+        results = self.repository.query(get_embedding_pipeline().embed_query(query).vector, memory_type=MemoryType.EPISODIC, limit=self.config.top_k)
         if not results:
             return 1.0
         max_similarity = max(clamp_score(score) for _, score in results)

@@ -1,4 +1,4 @@
-"""Memory evolution pipeline."""
+﻿"""Memory evolution pipeline."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from memory.graph.graph_edge import GraphEdge
 from memory.graph.graph_node import GraphNode
 from memory.graph.graph_reasoning_engine import GraphReasoningEngine
 from memory.graph.graph_repository import GraphRepository
-from memory.memory_note import MemoryNote, stable_embedding
+from memory.memory_note import MemoryNote
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryLevel, MemoryType
 
@@ -56,7 +56,7 @@ class MemoryEvolutionEngine:
                 content=summary,
                 memory_type=MemoryType.SEMANTIC,
                 memory_level=MemoryLevel.SEMANTIC_ABSTRACTION,
-                embedding=stable_embedding(summary, dimensions=len(parents[0].embedding)),
+
                 context={"type": "semantic_abstraction", "source": "memory_evolution", "references": list(lineage.parent_ids)},
                 salience_score=max(parent.salience_score for parent in parents),
                 retention_score=max(parent.retention_score for parent in parents),
@@ -100,3 +100,4 @@ class MemoryEvolutionEngine:
             source_memory_ids=tuple(dict.fromkeys(memory_id for cluster in clusters for memory_id in cluster)),
             clusters=tuple(clusters),
         )
+
