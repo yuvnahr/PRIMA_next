@@ -11,6 +11,10 @@ from benchmarks.common.utils import configure_benchmark_logger
 from benchmarks.locomo.adapter import LoCoMoAdapter
 from benchmarks.locomo.config import DATASET_PATH, LOG_LEVEL, LOG_PATH
 
+LOCOMO_V2_DATASET_PATH = (
+    Path(__file__).resolve().parents[1] / "locomo-v2" / "external" / "data" / "locomo_v2_minicpm.json"
+)
+
 logger = configure_benchmark_logger("benchmarks.locomo.loader", LOG_PATH, LOG_LEVEL)
 
 
@@ -52,3 +56,13 @@ class LoCoMoDataset(BenchmarkDataset):
         if self._conversations is None:
             self._conversations = self.adapter.adapt(self._raw_data)
         return self._conversations
+
+
+def dataset_path(name: str) -> Path:
+    """Resolve a supported benchmark variant without changing the adapter."""
+
+    if name == "locomo":
+        return DATASET_PATH
+    if name == "locomo-v2":
+        return LOCOMO_V2_DATASET_PATH
+    raise ValueError(f"Unsupported benchmark dataset: {name}")
