@@ -1,58 +1,56 @@
-﻿{
-    "configuration":  {
-                          "conversation_count":  1,
-                          "dataset_path":  "C:\\PRIMA_next\\benchmarks\\locomo\\external\\data\\locomo10.json",
-                          "platform":  "Windows-10-10.0.26200-SP0",
-                          "processor":  "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
-                          "python":  "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
-                          "seed":  13,
-                          "subset_validation":  true,
-                          "top_k":  30,
-                          "cuda_available":  true,
-                          "gpu":  "NVIDIA GeForce GTX 1650"
-                      },
-    "rows":  [
-                 {
-                     "backend":  "nomic",
-                     "candidate_generation_success":  0.746193,
-                     "candidate_miss_rate":  0.253807,
-                     "embedding_time_seconds":  22.046307,
-                     "entity_resolution_success":  0.0,
-                     "execution_time_seconds":  26.900982,
-                     "expected_rank":  13.106599,
-                     "identity_enabled":  false,
-                     "mrr":  0.329488,
-                     "ndcg_at_5":  0.32473,
-                     "query_count":  197,
-                     "recall_at_1":  0.207276,
-                     "recall_at_10":  0.513536,
-                     "recall_at_5":  0.415821,
-                     "representation":  "raw",
-                     "retrieval_time_seconds":  4.837625,
-                     "similarity_margin":  -0.484547,
-                     "status":  "completed",
-                     "backend_fingerprint":  "2e38b1d02447e479eea89931681eb2c986a5d9bee24c99fc6693596c79d44a85"
-                 },
-                 {
-                     "backend":  "nomic",
-                     "candidate_generation_success":  0.715736,
-                     "candidate_miss_rate":  0.284264,
-                     "embedding_time_seconds":  20.133268,
-                     "entity_resolution_success":  0.0,
-                     "execution_time_seconds":  24.774207,
-                     "expected_rank":  13.517766,
-                     "identity_enabled":  true,
-                     "mrr":  0.323311,
-                     "ndcg_at_5":  0.317139,
-                     "query_count":  197,
-                     "recall_at_1":  0.21066,
-                     "recall_at_10":  0.503384,
-                     "recall_at_5":  0.40313,
-                     "representation":  "raw",
-                     "retrieval_time_seconds":  4.62373,
-                     "similarity_margin":  -0.538394,
-                     "status":  "completed",
-                     "backend_fingerprint":  "e27ca6cad06c26506f87d4dd835a19331f557e5f1ae67c712557b7826ef443f1"
-                 }
-             ]
+{
+  "configuration": {
+    "conversation_count": 10,
+    "dataset_path": "benchmarks/locomo/external/data/locomo10.json",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "seed": 13,
+    "subset_validation": false,
+    "top_k": 30
+  },
+  "rows": [
+    {
+      "backend": "nomic",
+      "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+      "candidate_generation_success": 0.734209,
+      "candidate_miss_rate": 0.265791,
+      "embedding_time_seconds": 274.194135,
+      "entity_resolution_success": 0.0,
+      "execution_time_seconds": 385.092674,
+      "expected_rank": 13.055584,
+      "identity_enabled": false,
+      "mrr": 0.326786,
+      "ndcg_at_5": 0.314753,
+      "query_count": 1979,
+      "recall_at_1": 0.186345,
+      "recall_at_10": 0.515587,
+      "recall_at_5": 0.409464,
+      "representation": "raw",
+      "retrieval_time_seconds": 110.641954,
+      "similarity_margin": -0.503195,
+      "status": "completed"
+    },
+    {
+      "backend": "nomic",
+      "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+      "candidate_generation_success": 0.715513,
+      "candidate_miss_rate": 0.284487,
+      "embedding_time_seconds": 275.16113,
+      "entity_resolution_success": 0.0,
+      "execution_time_seconds": 384.230325,
+      "expected_rank": 13.611925,
+      "identity_enabled": true,
+      "mrr": 0.313333,
+      "ndcg_at_5": 0.30085,
+      "query_count": 1979,
+      "recall_at_1": 0.176657,
+      "recall_at_10": 0.495895,
+      "recall_at_5": 0.392039,
+      "representation": "raw",
+      "retrieval_time_seconds": 108.827956,
+      "similarity_margin": -0.53704,
+      "status": "completed"
+    }
+  ]
 }
