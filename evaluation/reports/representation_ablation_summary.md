@@ -1,21 +1,70 @@
-# Campaign II — Representation Ablation
+# Representation Ablation
 
-## Methodology
-
-The best learned backend from Campaign I, Nomic, was fixed. Raw, semantic, and event modes were evaluated on the same one-conversation, 197-query subset. Identity normalization remained enabled for every row; only representation mode changed.
-
-## Results
-
-| Mode | Recall@1 | Recall@5 | Recall@10 | MRR | nDCG@5 | Candidate success |
-|---|---:|---:|---:|---:|---:|---:|
-| Raw | 0.210660 | 0.403130 | 0.503384 | 0.323311 | 0.317139 | 0.715736 |
-| Semantic | 0.145939 | 0.329103 | 0.419205 | 0.254356 | 0.246090 | 0.695431 |
-| Event | 0.158629 | 0.355753 | 0.443739 | 0.268545 | 0.266548 | 0.654822 |
-
-## Observation
-
-Raw representation was highest on every listed retrieval metric in this subset. Structured semantic representation did not improve retrieval here; event representation also did not provide a measured benefit.
-
-## Limitations
-
-This is one conversation and is preliminary validation, not a full-dataset conclusion. Event mode is included only because it executed through the production pipeline.
+[
+  {
+    "recall_at_1": 0.176657,
+    "recall_at_5": 0.392039,
+    "recall_at_10": 0.495895,
+    "mrr": 0.313333,
+    "ndcg_at_5": 0.30085,
+    "candidate_generation_success": 0.715513,
+    "candidate_miss_rate": 0.284487,
+    "expected_rank": 13.611925,
+    "similarity_margin": -0.53704,
+    "backend": "nomic",
+    "representation": "raw",
+    "identity_enabled": true,
+    "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+    "status": "completed",
+    "embedding_time_seconds": 276.892689,
+    "retrieval_time_seconds": 110.846262,
+    "execution_time_seconds": 387.993057,
+    "query_count": 1979,
+    "serialization_cost_seconds": 276.892689,
+    "storage_overhead": 1.0
+  },
+  {
+    "recall_at_1": 0.135577,
+    "recall_at_5": 0.315778,
+    "recall_at_10": 0.419223,
+    "mrr": 0.253191,
+    "ndcg_at_5": 0.238999,
+    "candidate_generation_success": 0.629611,
+    "candidate_miss_rate": 0.370389,
+    "expected_rank": 16.0571,
+    "similarity_margin": -0.711775,
+    "backend": "nomic",
+    "representation": "semantic",
+    "identity_enabled": true,
+    "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+    "status": "completed",
+    "embedding_time_seconds": 272.556782,
+    "retrieval_time_seconds": 112.094435,
+    "execution_time_seconds": 384.900699,
+    "query_count": 1979,
+    "serialization_cost_seconds": 272.556782,
+    "storage_overhead": 1.0
+  },
+  {
+    "recall_at_1": 0.147022,
+    "recall_at_5": 0.306238,
+    "recall_at_10": 0.402382,
+    "mrr": 0.253916,
+    "ndcg_at_5": 0.236954,
+    "candidate_generation_success": 0.617484,
+    "candidate_miss_rate": 0.382516,
+    "expected_rank": 16.605356,
+    "similarity_margin": -0.72865,
+    "backend": "nomic",
+    "representation": "event",
+    "identity_enabled": true,
+    "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+    "status": "completed",
+    "embedding_time_seconds": 285.671536,
+    "retrieval_time_seconds": 113.605898,
+    "execution_time_seconds": 399.515772,
+    "query_count": 1979,
+    "serialization_cost_seconds": 285.671536,
+    "storage_overhead": 1.0
+  }
+]
