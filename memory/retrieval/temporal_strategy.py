@@ -55,7 +55,7 @@ class TemporalRetrievalStrategy(RetrievalStrategy):
         if request.temporal_window != RetrievalWindow.LONG_TERM:
             return True
         if analysis is None:
-            return False
+            return True
         return bool(analysis.temporal_expressions or analysis.temporal_constraints or "temporal" in analysis.intents)
 
     def _constraint_score(self, request: RetrievalRequest, memory_text: str) -> float:

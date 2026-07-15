@@ -58,4 +58,4 @@ class LoggingBenchmarkRunner(GenericBenchmarkRunner):
     """Generic runner configured with a dedicated benchmark log file."""
 
     def __init__(self, name: str, log_dir: str | Path) -> None:
-        super().__init__(configure_benchmark_logger(name, log_dir))
+        super().__init__(configure_benchmark_logger(name, Path(log_dir)))

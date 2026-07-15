@@ -27,6 +27,7 @@ strict = false
 ignore_errors = true
 exclude = [
     "__pycache__",
+    "benchmarks/locomo-v2/external|benchmarks/locomo/external",
 ]
 
 [tool.bandit]

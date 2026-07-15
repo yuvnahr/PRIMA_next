@@ -19,6 +19,8 @@ STOPWORDS = {
     "on", "or", "the", "to", "was", "were", "what", "when", "where", "which", "who", "whom", "why",
 }
 RESOURCE_DIR = Path(__file__).resolve().parent / "resources"
+MAX_EXPANSIONS_PER_SOURCE = 5
+MAX_TOTAL_EXPANSION_TERMS = 30
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,22 +116,22 @@ class QueryAnalyzer:
         for term in (*analysis.keywords, *analysis.relations, *analysis.preference_terms, *analysis.identity_attributes, *analysis.events):
             values = _lookup(term, relation_expansions) + _lookup(term, lexical_expansions) + _lookup(term, temporal_expansions)
             if values:
-                expansion_map[term] = tuple(dict.fromkeys(values))
+                expansion_map[term] = _limited_unique(values, MAX_EXPANSIONS_PER_SOURCE)
 
         for intent in analysis.intents:
             intent_config = intent_patterns.get(intent, {})
             values = intent_config.get("expansions", []) if isinstance(intent_config, dict) else []
             if values:
-                expansion_map[f"intent:{intent}"] = tuple(str(value).lower() for value in values)
+                expansion_map[f"intent:{intent}"] = _limited_unique((str(value).lower() for value in values), MAX_EXPANSIONS_PER_SOURCE)
 
         for constraint in analysis.temporal_constraints:
             values = _lookup(constraint.operator, temporal_expansions)
             if constraint.anchor:
                 values.extend(_lookup(constraint.anchor, lexical_expansions))
             if values:
-                expansion_map[f"temporal:{constraint.operator}"] = tuple(dict.fromkeys(values))
+                expansion_map[f"temporal:{constraint.operator}"] = _limited_unique(values, MAX_EXPANSIONS_PER_SOURCE)
 
-        expansion_terms = tuple(dict.fromkeys(term for values in expansion_map.values() for term in values))
+        expansion_terms = _limited_unique((term for values in expansion_map.values() for term in values), MAX_TOTAL_EXPANSION_TERMS)
         expanded_text = " ".join((query, *expansion_terms)).strip()
         return ExpandedQuery(text=expanded_text, terms=expansion_terms, expansion_map=expansion_map)
 
@@ -268,6 +270,20 @@ def _lookup(term: str, resource: dict[str, Any]) -> list[str]:
     if isinstance(value, list):
         return [str(item).lower() for item in value]
     return []
+
+
+def _limited_unique(values: Any, limit: int) -> tuple[str, ...]:
+    output: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        term = str(value).lower().strip()
+        if not term or term in seen:
+            continue
+        seen.add(term)
+        output.append(term)
+        if len(output) >= limit:
+            break
+    return tuple(output)
 
 
 def _canonical_term(term: str) -> str:

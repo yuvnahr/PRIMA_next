@@ -49,7 +49,6 @@ class Reranker:
         for index, result in enumerate(results):
             fallback_score = self._semantic_score(query, result)
             rerank_score = cross_scores[index] if cross_scores is not None else fallback_score
-            combined = max(0.0, min(1.0, result.score * 0.45 + rerank_score * 0.55))
             explanation = dict(result.explanation)
             explanation["reranker"] = {
                 "enabled": True,
@@ -58,10 +57,15 @@ class Reranker:
             }
             strategy_scores = dict(result.strategy_scores)
             strategy_scores["reranker"] = round(float(rerank_score), 6)
-            scored.append(replace(result, score=combined, strategy_scores=strategy_scores, explanation=explanation))
+            scored.append(replace(result, strategy_scores=strategy_scores, explanation=explanation))
         return sorted(
             scored,
-            key=lambda result: (result.score, result.note.salience_score, result.note.retention_score),
+            key=lambda result: (
+                result.strategy_scores.get("reranker", 0.0),
+                result.score,
+                result.note.salience_score,
+                result.note.retention_score,
+            ),
             reverse=True,
         )
 

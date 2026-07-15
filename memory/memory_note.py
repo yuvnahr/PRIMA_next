@@ -1,8 +1,7 @@
-"""Memory note model and backward-compatible ingestion helpers."""
+﻿"""Memory note model and backward-compatible ingestion helpers."""
 
 from __future__ import annotations
 
-import hashlib
 import importlib.util
 import logging
 import re
@@ -11,8 +10,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any
-
-import numpy as np
 
 from memory.memory_context import StateSnapshot
 from memory.memory_lineage import MemoryLineage
@@ -39,20 +36,10 @@ GENERIC_NOUNS = {
 
 
 def stable_embedding(text: str, dimensions: int = 64) -> list[float]:
-    """Deterministic local embedding fallback."""
-    digest = hashlib.sha256(text.encode("utf-8")).digest()
-    values: list[float] = []
-    while len(values) < dimensions:
-        for byte in digest:
-            values.append((byte / 127.5) - 1.0)
-            if len(values) == dimensions:
-                break
-        digest = hashlib.sha256(digest).digest()
-    vector = np.array(values, dtype="float32")
-    norm = np.linalg.norm(vector)
-    if norm:
-        vector = vector / norm
-    return [float(v) for v in vector.tolist()]
+    """Return the configured embedding while preserving the existing interface."""
+
+    from memory.embedding_backend import embed_text
+    return embed_text(text, dimensions)
 
 
 def tokenize(text: str) -> list[str]:
@@ -167,6 +154,7 @@ class MemoryNote:
             "version": self.version,
             "keywords": self.keywords,
             "tags": self.retrieval_metadata.get("tags", []),
+            **{key: self.retrieval_metadata.get(key) for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version", "backend_fingerprint")},
         }
 
     def to_record(self) -> dict[str, Any]:
@@ -190,48 +178,43 @@ class MemoryNote:
         salience_score: float = 0.0,
         retention_score: float = 1.0,
         note_id: str | None = None,
+        embedding_text: str | None = None,
     ) -> MemoryNote:
+        from memory.embedding_pipeline import get_embedding_pipeline
         keywords = extract_dominant_context_chain(content)
+        embedding_metadata: dict[str, Any] = {}
+        if embedding is None:
+            embedded = get_embedding_pipeline().embed_memory(content, embedding_text=embedding_text)
+            embedding = embedded.vector
+            embedding_metadata = embedded.metadata
         return cls(
-            id=note_id or f"mem_{uuid.uuid4()}",
-            memory_type=memory_type,
-            memory_level=memory_level,
-            content=content,
-            embedding=tuple(embedding if embedding is not None else stable_embedding(content)),
-            affective_state=affective_state or {},
-            context=context or {},
-            retrieval_metadata={"keywords": keywords, "dominant_context_chain": keywords},
-            state_snapshot=state_snapshot or StateSnapshot(),
-            salience_score=salience_score,
-            retention_score=retention_score,
+            id=note_id or f"mem_{uuid.uuid4()}", memory_type=memory_type, memory_level=memory_level,
+            content=content, embedding=tuple(embedding), affective_state=affective_state or {}, context=context or {},
+            retrieval_metadata={"keywords": keywords, "dominant_context_chain": keywords, **embedding_metadata},
+            state_snapshot=state_snapshot or StateSnapshot(), salience_score=salience_score, retention_score=retention_score,
         )
-
     @classmethod
     def from_record(cls, record: dict[str, Any]) -> MemoryNote:
         metadata = record.get("metadata", {})
         timestamp = metadata.get("timestamp")
-        parsed_timestamp = (
-            datetime.fromisoformat(timestamp) if isinstance(timestamp, str) else datetime.now(timezone.utc)
-        )
+        parsed_timestamp = datetime.fromisoformat(timestamp) if isinstance(timestamp, str) else datetime.now(timezone.utc)
+        embedding = record.get("embedding")
+        if embedding is None:
+            embedding = stable_embedding(str(record.get("document", "")))
+        retrieval_metadata = dict(metadata.get("retrieval_metadata", {"keywords": metadata.get("keywords", [])}))
+        for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version", "backend_fingerprint"):
+            if metadata.get(key) is not None:
+                retrieval_metadata.setdefault(key, metadata[key])
         return cls(
-            id=str(record.get("id") or metadata.get("id")),
-            memory_type=MemoryType(metadata.get("memory_type", MemoryType.EPISODIC.value)),
+            id=str(record.get("id") or metadata.get("id")), memory_type=MemoryType(metadata.get("memory_type", MemoryType.EPISODIC.value)),
             memory_level=MemoryLevel(metadata.get("memory_level", MemoryLevel.EPISODIC_EVENT.value)),
-            content=str(record.get("document") or metadata.get("source_input", "")),
-            embedding=tuple(record.get("embedding", stable_embedding(str(record.get("document", ""))))),
-            timestamp=parsed_timestamp,
-            affective_state=dict(metadata.get("affective_state", {})),
-            context=dict(metadata.get("context", {})),
-            lineage=MemoryLineage.from_dict(metadata.get("lineage")),
-            graph_links=dict(metadata.get("graph_links", {})),
-            retrieval_metadata=dict(metadata.get("retrieval_metadata", {"keywords": metadata.get("keywords", [])})),
-            evolution_metadata=dict(metadata.get("evolution_metadata", {})),
-            state_snapshot=StateSnapshot.from_dict(metadata.get("state_snapshot")),
-            salience_score=float(metadata.get("salience_score", 0.0)),
-            retention_score=float(metadata.get("retention_score", 1.0)),
-            version=int(metadata.get("version", 1)),
+            content=str(record.get("document") or metadata.get("source_input", "")), embedding=tuple(embedding), timestamp=parsed_timestamp,
+            affective_state=dict(metadata.get("affective_state", {})), context=dict(metadata.get("context", {})),
+            lineage=MemoryLineage.from_dict(metadata.get("lineage")), graph_links=dict(metadata.get("graph_links", {})),
+            retrieval_metadata=retrieval_metadata, evolution_metadata=dict(metadata.get("evolution_metadata", {})),
+            state_snapshot=StateSnapshot.from_dict(metadata.get("state_snapshot")), salience_score=float(metadata.get("salience_score", 0.0)),
+            retention_score=float(metadata.get("retention_score", 1.0)), version=int(metadata.get("version", 1)),
         )
-
 
 def format_memory_note(input_data: dict[str, Any]) -> dict[str, Any]:
     """Backward-compatible A-MEM formatter returning Chroma-style fields."""
@@ -252,3 +235,9 @@ def format_memory_note(input_data: dict[str, Any]) -> dict[str, Any]:
     metadata["tags"] = list(dict.fromkeys(["memory_note", primary_emotion]))
     metadata["keywords"] = keywords
     return {"id": note.id, "embedding": list(note.embedding), "metadata": metadata}
+
+
+
+
+
+

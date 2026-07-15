@@ -2,6 +2,7 @@ numpy>=1.24
 chromadb>=0.5
 networkx>=3.2
 sentence-transformers>=2.7
+einops>=0.7
 spacy>=3.7
 
 # Optional compatibility/runtime dependencies for the legacy DistilBERT benchmark path:

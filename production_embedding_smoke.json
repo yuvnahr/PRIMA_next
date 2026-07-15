@@ -1,0 +1,12 @@
+﻿{
+  "backend_dimensions": true,
+  "backend_loaded": true,
+  "identity_normalization_active": true,
+  "memory_embedding_path": true,
+  "query_embedding_path": true,
+  "repository_fingerprint_valid": true,
+  "repository_metadata": true,
+  "semantic_representation_active": true,
+  "status": "PASS"
+}
+
