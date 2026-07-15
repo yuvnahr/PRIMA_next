@@ -18,7 +18,7 @@ from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, recipro
 from memory.embedding_backend import MODEL_BY_BACKEND, embedding_backend_info, reset_embedding_backend_cache
 from memory.event_memory import EventMemoryBuilder, EventSegmenter
 from memory.identity_normalization import IdentityNormalizer
-from memory.memory_note import MemoryNote, stable_embedding, tokenize
+from memory.memory_note import MemoryNote, stable_embedding
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
 from memory.semantic_representation import build_semantic_representation, semantic_representation_analysis_row

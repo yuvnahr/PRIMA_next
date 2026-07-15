@@ -203,7 +203,8 @@ class MemoryNote:
             embedding = stable_embedding(str(record.get("document", "")))
         retrieval_metadata = dict(metadata.get("retrieval_metadata", {"keywords": metadata.get("keywords", [])}))
         for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version", "backend_fingerprint"):
-            if metadata.get(key) is not None: retrieval_metadata.setdefault(key, metadata[key])
+            if metadata.get(key) is not None:
+                retrieval_metadata.setdefault(key, metadata[key])
         return cls(
             id=str(record.get("id") or metadata.get("id")), memory_type=MemoryType(metadata.get("memory_type", MemoryType.EPISODIC.value)),
             memory_level=MemoryLevel(metadata.get("memory_level", MemoryLevel.EPISODIC_EVENT.value)),

@@ -8,5 +8,7 @@ exclude = [
     "__pycache__",
     ".pytest_cache",
     "build",
-    "dist"
+    "dist",
+    "benchmarks/locomo-v2/external",
+    "benchmarks/locomo/external",
 ]

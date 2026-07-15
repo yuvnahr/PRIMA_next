@@ -37,7 +37,7 @@ def run_locomo_experiment(
     """Run LoCoMo at a configurable scale and write standard artifacts."""
 
     conversations = list(LoCoMoDataset().conversations())
-    random.Random(seed).shuffle(conversations)
+    random.Random(seed).shuffle(conversations)  # nosec B311
     max_conversations = MAX_CONVERSATIONS if max_conversations is None else max_conversations
     max_questions = MAX_QUESTIONS if max_questions is None else max_questions
     if max_conversations > 0:

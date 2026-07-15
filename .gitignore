@@ -71,3 +71,25 @@ benchmarks/locomo/outputs/**/*event*.json
 benchmarks/locomo/outputs/**/*event*.md
 *.tmp.json
 *.tmp.csv
+
+# Generated large reports and documents
+evaluation/**/results/**/*.json
+evaluation/**/results/**/*.csv
+evaluation/**/results/**/*.md
+evaluation/**/results/**/*.txt
+evaluation/**/results/**/*.html
+evaluation/**/results/**/*.pdf
+benchmarks/**/outputs/**/*.json
+benchmarks/**/outputs/**/*.csv
+benchmarks/**/outputs/**/*.md
+benchmarks/**/outputs/**/*.txt
+benchmarks/**/outputs/**/*.html
+benchmarks/**/outputs/**/*.pdf
+benchmarks/**/results/**/*.json
+benchmarks/**/results/**/*.csv
+benchmarks/**/results/**/*.md
+benchmarks/**/results/**/*.txt
+benchmarks/**/results/**/*.html
+benchmarks/**/results/**/*.pdf
+*.generated.json
+*.generated.md
