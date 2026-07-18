@@ -1,24 +1,42 @@
 """Parsers that convert provider-specific responses into LLMResponse."""
+
+import json
+import re
 from typing import Any
 
 from llm.llm_types import LLMResponse
 
+_THINKING_BLOCK = re.compile(r"<think>.*?</think>\s*", re.IGNORECASE | re.DOTALL)
+
+
+def extract_answer(text: str) -> str:
+    """Return the final answer from a local model response."""
+
+    answer = _THINKING_BLOCK.sub("", str(text)).strip()
+    if answer.startswith("```") and answer.endswith("```"):
+        answer = answer.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    try:
+        payload = json.loads(answer)
+    except (TypeError, ValueError):
+        return answer
+    if isinstance(payload, dict) and "answer" in payload:
+        value = payload["answer"]
+        if value is None or str(value).strip().lower() in {"null", "none"}:
+            return "No information available"
+        return str(value).strip()
+    return answer
+
 
 def parse_openai_response(raw: Any) -> LLMResponse:
-    """Parse a typical OpenAI chat-completions REST response.
+    """Parse a typical OpenAI chat-completions REST response."""
 
-    This function is defensive — it accepts raw dicts or already-stringified
-    responses and returns a normalized LLMResponse.
-    """
     text = ""
     usage = None
     try:
         if isinstance(raw, dict):
             choices = raw.get("choices", [])
             if choices:
-                # Chat completion structure
                 first = choices[0]
-                # prefer message.content, fallback to text
                 text = (first.get("message", {}) or {}).get("content") or first.get("text") or ""
             usage = raw.get("usage")
         else:
@@ -30,12 +48,9 @@ def parse_openai_response(raw: Any) -> LLMResponse:
 
 def parse_generic_response(raw: Any, provider: str = "generic") -> LLMResponse:
     """Fallback parser for other providers."""
+
     try:
-        if isinstance(raw, dict):
-            # attempt common fields
-            text = raw.get("text") or raw.get("output") or raw.get("response") or str(raw)
-        else:
-            text = str(raw)
+        text = (raw.get("text") or raw.get("output") or raw.get("response") or str(raw)) if isinstance(raw, dict) else str(raw)
     except Exception:
         text = str(raw)
     return LLMResponse(text=text, raw=raw, provider=provider)

@@ -8,7 +8,8 @@ from typing import Any, Mapping
 
 from memory.maintenance.importance_score import ImportanceScore, clamp_score
 from memory.maintenance.importance_types import ImportanceWeights, MemoryAdmissionDecision, MemoryImportanceConfig
-from memory.memory_note import extract_dominant_context_chain, stable_embedding
+from memory.embedding_pipeline import get_embedding_pipeline
+from memory.memory_note import extract_dominant_context_chain
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
 
@@ -127,11 +128,17 @@ class MemoryImportanceEngine:
         )
 
     def novelty_score(self, query: str) -> float:
-        results = self.repository.query(stable_embedding(query), memory_type=MemoryType.EPISODIC, limit=self.config.top_k)
+        results = self.repository.query(get_embedding_pipeline().embed_query(query).vector, memory_type=MemoryType.EPISODIC, limit=self.config.top_k)
         if not results:
             return 1.0
-        max_similarity = max(clamp_score(score) for _, score in results)
-        return clamp_score(1.0 - max_similarity)
+        query_tokens = set(_tokens(query))
+        if not query_tokens:
+            return 0.0
+        overlaps = []
+        for note, _ in results:
+            note_tokens = set(_tokens(note.content))
+            overlaps.append(len(query_tokens & note_tokens) / max(1, len(query_tokens | note_tokens)))
+        return clamp_score(1.0 - max(overlaps))
 
     def emotional_salience_score(self, query: str, affect_update: Any | None = None) -> float:
         profile = getattr(affect_update, "profile", None)

@@ -1,0 +1,14 @@
+﻿{
+  "before": ["before", "prior to", "earlier than", "preceded"],
+  "after": ["after", "following", "later than", "subsequent"],
+  "during": ["during", "while", "when", "throughout"],
+  "first": ["first", "earliest", "initial", "started", "began"],
+  "last": ["last", "latest", "most recent", "final"],
+  "earlier": ["earlier", "previous", "before", "prior"],
+  "later": ["later", "after", "subsequent", "next"],
+  "living": ["living in", "lived in", "when living", "while living"],
+  "moving": ["moving", "moved", "relocated"],
+  "graduation": ["graduation", "graduated", "after college", "finished school"],
+  "vacation": ["vacation", "trip", "travel", "visited", "destination"],
+  "marriage": ["marriage", "married", "wedding", "spouse"]
+}

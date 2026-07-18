@@ -8,9 +8,13 @@ lightweight and explicit about where secrets are read from.
 from __future__ import annotations
 
 import logging
+import json
 import os
+import urllib.error
+import urllib.request
 from abc import ABC, abstractmethod
 from typing import Any
+from urllib.parse import urlparse
 
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.response_parser import parse_generic_response, parse_openai_response
@@ -22,6 +26,53 @@ try:
     requests = _requests_module
 except Exception:
     requests = None
+
+
+def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None = None, timeout: int = 60) -> Any:
+    """POST JSON using requests when available, otherwise urllib."""
+
+    if urlparse(url).scheme not in {"http", "https"}:
+        raise ProviderError("Only HTTP(S) provider URLs are allowed")
+
+    if requests is not None:
+        response = requests.post(url, json=payload, headers=headers, timeout=timeout)
+        try:
+            response.raise_for_status()
+        except Exception as exc:
+            raise ProviderError(f"HTTP request failed: {exc} - {response.text}") from exc
+        return response.json()
+
+    data = json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers=headers or {"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise ProviderError(f"HTTP request failed: {exc} - {body}") from exc
+    except urllib.error.URLError as exc:
+        raise ProviderError(f"HTTP request failed: {exc.reason}") from exc
+    except TimeoutError as exc:
+        raise ProviderError(f"HTTP request timed out after {timeout} seconds") from exc
+
+
+def env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except ValueError:
+        return default
+
+
+def env_int(name: str, default: int) -> int:
+    try:
+        return int(os.getenv(name, str(default)))
+    except ValueError:
+        return default
 
 # default then attempt to load real settings provider
 def get_settings() -> Any:
@@ -52,6 +103,35 @@ class Provider(ABC):
         ...
 
 
+class OpenAICompatibleProvider(Provider):
+    """Provider for local servers exposing `/v1/chat/completions`."""
+
+    base_url_env: str = ""
+    default_base_url: str = ""
+    default_model: str = ""
+
+    def send(self, request: LLMRequest) -> LLMResponse:
+        base = os.getenv(self.base_url_env) or self.default_base_url
+        if not base:
+            raise ProviderError(f"{self.name} base URL is not configured")
+        model = request.model or os.getenv(f"{self.name.upper()}_MODEL") or self.default_model
+        if not model:
+            raise ProviderError(f"{self.name} model is not configured")
+        url = f"{base.rstrip('/')}/v1/chat/completions"
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": request.prompt}],
+            "temperature": request.temperature,
+        }
+        if request.max_tokens is not None:
+            payload["max_tokens"] = int(request.max_tokens)
+
+        try:
+            return parse_openai_response(post_json(url, payload, timeout=60))
+        except ProviderError as exc:
+            raise ProviderError(f"{self.name} request failed: {exc}") from exc
+
+
 class OpenAIProvider(Provider):
     name = "openai"
 
@@ -72,16 +152,11 @@ class OpenAIProvider(Provider):
         if request.max_tokens is not None:
             payload["max_tokens"] = int(request.max_tokens)
 
-        if requests is None:
-            raise ProviderError("requests library is required for HTTP providers but is not installed")
         headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-        resp = requests.post(url, json=payload, headers=headers, timeout=30)
         try:
-            resp.raise_for_status()
-        except Exception as e:
-            raise ProviderError(f"OpenAI request failed: {e} - {resp.text}")
-        raw = resp.json()
-        return parse_openai_response(raw)
+            return parse_openai_response(post_json(url, payload, headers=headers, timeout=30))
+        except ProviderError as exc:
+            raise ProviderError(f"OpenAI request failed: {exc}") from exc
 
 
 class AnthropicProvider(Provider):
@@ -103,39 +178,56 @@ class AnthropicProvider(Provider):
             "max_tokens": request.max_tokens,
             "temperature": request.temperature,
         }
-        if requests is None:
-            raise ProviderError("requests library is required for HTTP providers but is not installed")
         headers = {"x-api-key": key, "Content-Type": "application/json"}
-        resp = requests.post(url, json=payload, headers=headers, timeout=30)
         try:
-            resp.raise_for_status()
-        except Exception as e:
-            raise ProviderError(f"Anthropic request failed: {e} - {resp.text}")
-        raw = resp.json()
-        return parse_generic_response(raw, provider="anthropic")
+            return parse_generic_response(post_json(url, payload, headers=headers, timeout=30), provider="anthropic")
+        except ProviderError as exc:
+            raise ProviderError(f"Anthropic request failed: {exc}") from exc
 
 
-class OllamaProvider(Provider):
+class OllamaProvider(OpenAICompatibleProvider):
     name = "ollama"
+    base_url_env = "OLLAMA_URL"
+    default_base_url = "http://localhost:11434"
+    default_model = "llama3.1"
 
     def send(self, request: LLMRequest) -> LLMResponse:
-        # Ollama commonly runs locally; read URL from settings or env
-        base = None
-        if self.settings is not None:
-            base = getattr(self.settings, "ollama_url", None)
-        base = base or os.getenv("OLLAMA_URL") or "http://localhost:11434"
+        if os.getenv("OLLAMA_OPENAI_API", "").lower() in {"1", "true", "yes"}:
+            return super().send(request)
 
+        base = getattr(self.settings, "ollama_url", None) if self.settings is not None else None
+        base = base or os.getenv("OLLAMA_URL") or self.default_base_url
         url = f"{base.rstrip('/')}/api/generate"
-        payload = {"model": request.model, "prompt": request.prompt}
-        if requests is None:
-            raise ProviderError("requests library is required for HTTP providers but is not installed")
-        resp = requests.post(url, json=payload, timeout=30)
-        try:
-            resp.raise_for_status()
-        except Exception as e:
-            raise ProviderError(f"Ollama request failed: {e} - {resp.text}")
-        raw = resp.json()
-        return parse_generic_response(raw, provider="ollama")
+        payload = {
+            "model": request.model or self.default_model,
+            "prompt": request.prompt,
+            "stream": False,
+            "think": False,
+            "options": {
+                "seed": env_int("PRIMA_ANSWER_SEED", 13),
+                "temperature": env_float("PRIMA_ANSWER_TEMPERATURE", request.temperature),
+                "top_p": env_float("PRIMA_ANSWER_TOP_P", 0.8),
+                "top_k": env_int("PRIMA_ANSWER_TOP_K", 40),
+                "repeat_penalty": env_float("PRIMA_ANSWER_REPEAT_PENALTY", 1.1),
+                "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
+            },
+        }
+        timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
+        retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
+        last_error: ProviderError | None = None
+        for _ in range(retries + 1):
+            try:
+                return parse_generic_response(post_json(url, payload, timeout=timeout), provider="ollama")
+            except ProviderError as exc:
+                last_error = exc
+        raise ProviderError(f"Ollama request failed after {retries + 1} attempts: {last_error}") from last_error
+
+
+class LMStudioProvider(OpenAICompatibleProvider):
+    name = "lmstudio"
+    base_url_env = "LM_STUDIO_URL"
+    default_base_url = "http://localhost:1234"
+    default_model = "local-model"
 
 
 class LocalProvider(OllamaProvider):
@@ -147,6 +239,8 @@ class ProviderFactory:
         "openai": OpenAIProvider,
         "anthropic": AnthropicProvider,
         "ollama": OllamaProvider,
+        "lmstudio": LMStudioProvider,
+        "lm-studio": LMStudioProvider,
         "local": LocalProvider,
     }
 

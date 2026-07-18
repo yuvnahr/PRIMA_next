@@ -57,6 +57,9 @@ jobs:
       - name: Run Ruff
         run: ruff check .
 
+      - name: Run Xenon
+        run: python scripts/run_xenon.py
+
       - name: Run MyPy
         run: mypy .
 

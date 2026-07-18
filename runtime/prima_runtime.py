@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -12,11 +13,17 @@ from typing import Any
 from affect.affect_engine import DynamicAffectEngine
 from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.maintenance.importance_types import MemoryAdmissionDecision
+from memory.embedding_pipeline import current_embedding_metadata
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
+from memory.retrieval.retrieval_request import RetrievalRequest
+from llm.llm_client import LLMClient
+from llm.provider import ProviderError
+from llm.response_parser import extract_answer
 from reflection.reflection_engine import ReflectionEngine
+from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
@@ -39,13 +46,130 @@ class PrimaRuntime:
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
+        self.retrieval_controller = RetrievalController(
+            self.memory_repository,
+            candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+        )
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
-            retrieval_controller=RetrievalController(self.memory_repository),
+            retrieval_controller=self.retrieval_controller,
             reflection_engine=self.reflection_engine,
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
+
+    def reset(self, mode: str = "isolated", preserve_repository: bool = True) -> None:
+        """Reset runtime conversation state without deleting long-term memory by default."""
+
+        if mode not in {"isolated", "persistent"}:
+            raise ValueError("Runtime reset mode must be 'isolated' or 'persistent'.")
+        if mode == "isolated" and not preserve_repository:
+            self.memory_repository = InMemoryMemoryRepository()
+            self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
+            self.retrieval_controller = RetrievalController(
+                self.memory_repository,
+                candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+            )
+            self.workflow = PrimaWorkflow.from_controllers(
+                affect_engine=self.affect_engine,
+                retrieval_controller=self.retrieval_controller,
+                reflection_engine=self.reflection_engine,
+            )
+
+    def answer_question(
+        self,
+        question: str,
+        context: RuntimeContext | None = None,
+        top_k: int | None = None,
+        provider: str | None = None,
+        model: str | None = None,
+        max_context_tokens: int | None = None,
+    ) -> RuntimeResult:
+        """Answer a question from retrieved runtime memories instead of echoing input."""
+
+        start = time.perf_counter()
+        top_k = int(top_k or os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
+        max_context_tokens = int(max_context_tokens or os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
+        request = RetrievalRequest(query=question, top_k=top_k)
+        retrieval_response = self.retrieval_controller.retrieve(request)
+        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, retrieval_response.results)
+        errors: list[str] = []
+        llm_used = False
+        prompt: str | None = None
+        raw_response: str | None = None
+        llm_metadata: dict[str, Any] = {}
+        inference_settings = self._inference_settings(
+            provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
+            model=model or os.getenv("PRIMA_LLM_MODEL", ""),
+            answer_context=answer_context,
+        )
+
+        if not answer_context.memories:
+            answer = self._insufficient_information_answer(question, reason="no_retrieved_memories")
+        else:
+            prompt = self._build_answer_prompt(question, answer_context)
+            self._log_inference_settings(inference_settings)
+            try:
+                llm_response = LLMClient(provider_name=str(inference_settings["provider"])).chat(
+                    prompt=prompt,
+                    model=str(inference_settings["model"]),
+                    temperature=float(inference_settings["temperature"]),
+                    max_tokens=int(inference_settings["num_predict"]),
+                )
+                raw_response = llm_response.text
+                if isinstance(llm_response.raw, dict):
+                    llm_metadata = {
+                        key: llm_response.raw.get(key)
+                        for key in ("model", "thinking", "done", "done_reason", "total_duration", "load_duration", "prompt_eval_count", "eval_count")
+                    }
+                if llm_metadata.get("done_reason") == "length":
+                    errors.append("LLM answer was truncated at the generation limit.")
+                answer = extract_answer(raw_response)
+                llm_used = bool(answer)
+                if not answer:
+                    errors.append("LLM returned an empty answer.")
+                    answer = self._extractive_answer(answer_context)
+            except (ProviderError, RuntimeError, ValueError) as exc:
+                errors.append(str(exc))
+                answer = self._extractive_answer(answer_context)
+
+        if answer.strip() == question.strip():
+            errors.append("Answer matched question text; replaced with insufficient-information response.")
+            answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
+
+        latency_ms = round((time.perf_counter() - start) * 1000, 3)
+        diagnostics = self._answer_diagnostics(
+            question=question,
+            answer_context=answer_context,
+            retrieval_response=retrieval_response,
+            llm_used=llm_used,
+            latency_ms=latency_ms,
+            provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
+            model=model or os.getenv("PRIMA_LLM_MODEL", ""),
+            errors=tuple(errors),
+            inference_settings=inference_settings,
+            prompt=prompt,
+            raw_response=raw_response,
+            llm_metadata=llm_metadata,
+        )
+        result = RuntimeResult(
+            final_response=answer,
+            prediction_before_reflection=answer,
+            prediction_after_reflection=answer,
+            affect_state={},
+            retrieved_memories=retrieval_response.results,
+            memory_notes_created=(),
+            reflection_triggered=answer_context.reflection_used,
+            confidence_score=retrieval_response.confidence.confidence,
+            latency_ms=latency_ms,
+            errors=tuple(errors),
+            answer_diagnostics=diagnostics,
+        )
+        if context is not None:
+            context.retrieved_memories = retrieval_response.results
+            context.confidence_score = result.confidence_score
+        self._log_answer(question, diagnostics)
+        return result
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
         """Process one user input through the integrated workflow."""
@@ -64,7 +188,7 @@ class PrimaRuntime:
 
         try:
             execution_context = await self.workflow.run(user_input, execution_context)
-            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context)
+            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context, runtime_context)
         except Exception as exc:
             errors.append(str(exc))
             execution_context.workflow_state.errors.append(str(exc))
@@ -96,6 +220,7 @@ class PrimaRuntime:
         self,
         user_input: str,
         execution_context: ExecutionContext,
+        runtime_context: RuntimeContext,
     ) -> tuple[tuple[MemoryNote, ...], MemoryAdmissionDecision]:
         admission_decision = self.memory_importance_engine.decide(
             user_input,
@@ -109,9 +234,15 @@ class PrimaRuntime:
             content=user_input,
             memory_type=MemoryType.EPISODIC,
             affective_state=(affect_update.to_dict() if (affect_update is not None and hasattr(affect_update, "to_dict")) else {}),
-            context={"source": "prima_runtime", "execution_id": execution_context.execution_id},
+            context={
+                "source": "prima_runtime",
+                "execution_id": execution_context.execution_id,
+                "source_session_id": runtime_context.session_id,
+                "source_turn_id": runtime_context.turn_id,
+            },
             state_snapshot=getattr(execution_context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+            timestamp=runtime_context.timestamp,
         )
         return (self.memory_repository.add(note),), admission_decision
 
@@ -176,12 +307,179 @@ class PrimaRuntime:
         payload: dict[str, Any] = {
             "input": user_input,
             "retrieval_count": metrics.retrieval_count,
+            "memory_creation_count": metrics.memory_creation_count,
+            "memory_admission": dict(result.memory_admission),
             "reflection_events": metrics.reflection_trigger_count,
             "confidence_score": metrics.confidence_score,
             "latency_ms": metrics.latency_ms,
             "errors": list(result.errors),
         }
         self.logger.info(json.dumps(payload, sort_keys=True))
+
+    def _build_answer_prompt(self, question: str, answer_context: AnswerContext) -> str:
+        return (
+            "You are answering a benchmark question.\n"
+            "Use ONLY the retrieved memory context below.\n"
+            "Do not use outside knowledge.\n"
+            f"Question: {question}\n\n"
+            f"Retrieved memory context:\n{answer_context.context_text}\n\n"
+            "Return exactly one JSON object and nothing else: {\"answer\": \"<short factual answer>\"}.\n"
+            "Use a date, name, list, or yes/no answer when possible; do not explain.\n"
+            "If the context is insufficient, return exactly: {\"answer\": null}."
+        )
+
+    def _extractive_answer(self, answer_context: AnswerContext) -> str:
+        if not answer_context.memories:
+            return self._insufficient_information_answer(answer_context.question, reason="no_context")
+        best = max(answer_context.memories, key=lambda memory: memory.retrieval_score)
+        return (
+            "Based on retrieved memory: "
+            f"{best.text}"
+        )
+
+    def _insufficient_information_answer(self, question: str, reason: str) -> str:
+        return json.dumps(
+            {
+                "answer": None,
+                "insufficient_information": True,
+                "reason": reason,
+                "question": question,
+            },
+            sort_keys=True,
+        )
+
+    def _answer_diagnostics(
+        self,
+        question: str,
+        answer_context: AnswerContext,
+        retrieval_response: Any,
+        llm_used: bool,
+        latency_ms: float,
+        provider: str,
+        model: str,
+        errors: tuple[str, ...],
+        inference_settings: dict[str, Any],
+        prompt: str | None,
+        raw_response: str | None,
+        llm_metadata: dict[str, Any],
+    ) -> dict[str, Any]:
+        retrieval_diagnostics = dict(getattr(retrieval_response, "diagnostics", {}))
+        diagnostics = {
+            "question": question,
+            "retrieved_memory_ids": [memory.memory_id for memory in answer_context.memories],
+            "retrieved_memories": [
+                {
+                    "id": memory.memory_id,
+                    "text": memory.text,
+                    "timestamp": memory.timestamp,
+                    "importance_score": memory.importance_score,
+                    "retrieval_score": memory.retrieval_score,
+                }
+                for memory in answer_context.memories
+            ],
+            "retrieval_scores": [memory.retrieval_score for memory in answer_context.memories],
+            "context_length": answer_context.token_count,
+            "llm_used": llm_used,
+            "latency_ms": latency_ms,
+            "reflection_used": answer_context.reflection_used,
+            "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
+            "graph_links_traversed": list(answer_context.graph_links_traversed),
+            "importance_scores": [memory.importance_score for memory in answer_context.memories],
+            "retrieval_confidence": retrieval_response.confidence.confidence,
+            "retrieval_confidence_components": retrieval_response.confidence.to_dict(),
+            "expanded_query": dict(retrieval_diagnostics.get("expanded_query", {})),
+            "entities": list(retrieval_diagnostics.get("entities", [])),
+            "relations": list(retrieval_diagnostics.get("relations", [])),
+            "temporal_constraints": list(retrieval_diagnostics.get("temporal_constraints", [])),
+            "retrieval_stages": {
+                stage: _compact_candidates(retrieval_diagnostics.get(stage, ()))
+                for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
+            },
+            "stored_source_turn_ids": sorted(
+                {
+                    str(note.context["source_turn_id"])
+                    for note in self.memory_repository.list()
+                    if note.context.get("source_turn_id")
+                }
+            ),
+            "embedding": current_embedding_metadata(),
+            "context_tokens": answer_context.token_count,
+            "provider": provider,
+            "model": model,
+            "errors": list(errors),
+            "prompt": prompt,
+            "raw_response": raw_response,
+            "parsed_answer": extract_answer(raw_response) if raw_response is not None else None,
+            "llm_metadata": llm_metadata,
+            "generation_settings": dict(inference_settings),
+        }
+        diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
+        return diagnostics
+
+
+    def _classify_answer_failure(self, diagnostics: dict[str, Any], errors: tuple[str, ...], llm_used: bool) -> str | None:
+        if errors:
+            return "generation_error"
+        retrieved = diagnostics.get("retrieved_memory_ids", [])
+        if not retrieved:
+            return "retrieval_miss"
+        if not llm_used:
+            return "generation_error"
+        return None
+
+    def _log_answer(self, question: str, diagnostics: dict[str, Any]) -> None:
+        payload = {
+            "answer_event": {
+                "retrieved_memory_count": len(diagnostics.get("retrieved_memory_ids", ())),
+                "context_length": diagnostics.get("context_length", 0),
+                "llm_used": diagnostics.get("llm_used", False),
+                "latency_ms": diagnostics.get("latency_ms", 0.0),
+                "reflection_used": diagnostics.get("reflection_used", False),
+                "provider": diagnostics.get("provider", ""),
+                "model": diagnostics.get("model", ""),
+                "errors": diagnostics.get("errors", []),
+            }
+        }
+        self.logger.info(json.dumps(payload, sort_keys=True))
+
+    def _inference_settings(
+        self,
+        provider: str,
+        model: str,
+        answer_context: AnswerContext,
+    ) -> dict[str, Any]:
+        return {
+            "provider": provider,
+            "model": model,
+            "temperature": self._env_float("PRIMA_ANSWER_TEMPERATURE", 0.0),
+            "top_p": self._env_float("PRIMA_ANSWER_TOP_P", 0.8),
+            "top_k": self._env_int("PRIMA_ANSWER_TOP_K", 40),
+            "repeat_penalty": self._env_float("PRIMA_ANSWER_REPEAT_PENALTY", 1.1),
+            "seed": self._env_int("PRIMA_ANSWER_SEED", 13),
+            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 128),
+            "context_tokens": answer_context.token_count,
+            "retrieved_memories": len(answer_context.memories),
+        }
+
+    def _log_inference_settings(self, settings: dict[str, Any]) -> None:
+        if not self._debug_inference_enabled():
+            return
+        self.logger.info(json.dumps({"inference_settings": settings}, sort_keys=True))
+
+    def _debug_inference_enabled(self) -> bool:
+        return os.getenv("PRIMA_DEBUG_INFERENCE", "").lower() in {"1", "true", "yes"}
+
+    def _env_float(self, name: str, default: float) -> float:
+        try:
+            return float(os.getenv(name, str(default)))
+        except ValueError:
+            return default
+
+    def _env_int(self, name: str, default: int) -> int:
+        try:
+            return int(os.getenv(name, str(default)))
+        except ValueError:
+            return default
 
     def _build_logger(self, log_path: Path) -> logging.Logger:
         log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -193,3 +491,18 @@ class PrimaRuntime:
             handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(handler)
         return logger
+
+
+def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": item.get("id"),
+            "source_session_id": item.get("source_session_id"),
+            "source_turn_id": item.get("source_turn_id"),
+            "score": item.get("score"),
+            "strategy_scores": dict(item.get("strategy_scores", {})),
+        }
+        for item in candidates
+    ]
+
+

@@ -1,0 +1,2723 @@
+{
+  "dataset_path": "benchmarks\\locomo\\outputs\\processed\\locomo_debug_100.json",
+  "dataset_available": true,
+  "dataset_note": "Full LoCoMo dataset used.",
+  "query_count": 98,
+  "phase_4_2_baseline": {
+    "recall_at_1": 0.279352,
+    "recall_at_5": 0.544352,
+    "mrr": 0.393704,
+    "ndcg_at_5": 0.424999
+  },
+  "full_retrieval_v2": {
+    "recall_at_1": 0.170918,
+    "recall_at_5": 0.333333,
+    "mrr": 0.261565,
+    "ndcg_at_5": 0.267301,
+    "average_retrieval_latency": 139.648689,
+    "average_retrieved_memory_count": 5.0
+  },
+  "comparison": {
+    "recall_at_1_gain": -0.108434,
+    "recall_at_5_gain": -0.211019,
+    "mrr_gain": -0.132139,
+    "ndcg_at_5_gain": -0.157698
+  },
+  "ablation": {
+    "dense": {
+      "recall_at_1": 0.010204,
+      "recall_at_5": 0.010204,
+      "mrr": 0.010204,
+      "ndcg_at_5": 0.010204,
+      "average_retrieval_latency": 26.691892,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_query_analysis": {
+      "recall_at_1": 0.010204,
+      "recall_at_5": 0.010204,
+      "mrr": 0.010204,
+      "ndcg_at_5": 0.010204,
+      "average_retrieval_latency": 40.256215,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_expansion": {
+      "recall_at_1": 0.010204,
+      "recall_at_5": 0.010204,
+      "mrr": 0.010204,
+      "ndcg_at_5": 0.010204,
+      "average_retrieval_latency": 51.237878,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse": {
+      "recall_at_1": 0.110544,
+      "recall_at_5": 0.244048,
+      "mrr": 0.17619,
+      "ndcg_at_5": 0.183209,
+      "average_retrieval_latency": 172.472185,
+      "average_retrieved_memory_count": 5.0
+    },
+    "dense_sparse_reranker": {
+      "recall_at_1": 0.170918,
+      "recall_at_5": 0.333333,
+      "mrr": 0.261565,
+      "ndcg_at_5": 0.267301,
+      "average_retrieval_latency": 161.406076,
+      "average_retrieved_memory_count": 5.0
+    },
+    "full_retrieval_v2": {
+      "recall_at_1": 0.170918,
+      "recall_at_5": 0.333333,
+      "mrr": 0.261565,
+      "ndcg_at_5": 0.267301,
+      "average_retrieval_latency": 139.648689,
+      "average_retrieved_memory_count": 5.0
+    }
+  },
+  "category_improvements": {
+    "identity": {
+      "dense": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 26.845759,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 40.644952,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 49.909561,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.061594,
+        "recall_at_5": 0.139493,
+        "mrr": 0.131884,
+        "ndcg_at_5": 0.114123,
+        "average_retrieval_latency": 162.859326,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.103261,
+        "recall_at_5": 0.177536,
+        "mrr": 0.183333,
+        "ndcg_at_5": 0.156466,
+        "average_retrieval_latency": 156.840454,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.103261,
+        "recall_at_5": 0.177536,
+        "mrr": 0.183333,
+        "ndcg_at_5": 0.156466,
+        "average_retrieval_latency": 128.580307,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.177536,
+        "mrr_gain": 0.183333
+      }
+    },
+    "relationship": {
+      "dense": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 29.258915,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 38.660215,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 66.702938,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.076923,
+        "recall_at_5": 0.230769,
+        "mrr": 0.128205,
+        "ndcg_at_5": 0.153846,
+        "average_retrieval_latency": 225.248569,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.153846,
+        "recall_at_5": 0.230769,
+        "mrr": 0.192308,
+        "ndcg_at_5": 0.202379,
+        "average_retrieval_latency": 244.935454,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.153846,
+        "recall_at_5": 0.230769,
+        "mrr": 0.192308,
+        "ndcg_at_5": 0.202379,
+        "average_retrieval_latency": 207.976923,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.230769,
+        "mrr_gain": 0.192308
+      }
+    },
+    "preference": {
+      "dense": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 0.0,
+        "average_retrieved_memory_count": 0.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.0,
+        "mrr_gain": 0.0
+      }
+    },
+    "temporal": {
+      "dense": {
+        "recall_at_1": 0.027027,
+        "recall_at_5": 0.027027,
+        "mrr": 0.027027,
+        "ndcg_at_5": 0.027027,
+        "average_retrieval_latency": 25.732303,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.027027,
+        "recall_at_5": 0.027027,
+        "mrr": 0.027027,
+        "ndcg_at_5": 0.027027,
+        "average_retrieval_latency": 39.879624,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.027027,
+        "recall_at_5": 0.027027,
+        "mrr": 0.027027,
+        "ndcg_at_5": 0.027027,
+        "average_retrieval_latency": 46.688478,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.162162,
+        "recall_at_5": 0.364865,
+        "mrr": 0.230631,
+        "ndcg_at_5": 0.262292,
+        "average_retrieval_latency": 167.079257,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.243243,
+        "recall_at_5": 0.554054,
+        "mrr": 0.37027,
+        "ndcg_at_5": 0.415329,
+        "average_retrieval_latency": 136.9107,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.243243,
+        "recall_at_5": 0.554054,
+        "mrr": 0.37027,
+        "ndcg_at_5": 0.415329,
+        "average_retrieval_latency": 126.336586,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.527027,
+        "mrr_gain": 0.343243
+      }
+    },
+    "multi-hop": {
+      "dense": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 24.2197,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_query_analysis": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 48.6562,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_expansion": {
+        "recall_at_1": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "average_retrieval_latency": 65.43015,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse": {
+        "recall_at_1": 0.5,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.5,
+        "average_retrieval_latency": 150.2906,
+        "average_retrieved_memory_count": 5.0
+      },
+      "dense_sparse_reranker": {
+        "recall_at_1": 0.5,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.5,
+        "average_retrieval_latency": 176.63885,
+        "average_retrieved_memory_count": 5.0
+      },
+      "full_retrieval_v2": {
+        "recall_at_1": 0.5,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.5,
+        "average_retrieval_latency": 196.36185,
+        "average_retrieved_memory_count": 5.0
+      },
+      "improvement_vs_dense": {
+        "recall_at_5_gain": 0.5,
+        "mrr_gain": 0.5
+      }
+    }
+  },
+  "confidence_validation": {
+    "histogram": [
+      {
+        "bin_start": 0.0,
+        "bin_end": 0.1,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.1,
+        "bin_end": 0.2,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.2,
+        "bin_end": 0.3,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.3,
+        "bin_end": 0.4,
+        "count": 1,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.4,
+        "bin_end": 0.5,
+        "count": 24,
+        "recall_at_5": 0.458333,
+        "mrr": 0.334722
+      },
+      {
+        "bin_start": 0.5,
+        "bin_end": 0.6,
+        "count": 68,
+        "recall_at_5": 0.289216,
+        "mrr": 0.239216
+      },
+      {
+        "bin_start": 0.6,
+        "bin_end": 0.7,
+        "count": 5,
+        "recall_at_5": 0.4,
+        "mrr": 0.266667
+      },
+      {
+        "bin_start": 0.7,
+        "bin_end": 0.8,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.8,
+        "bin_end": 0.9,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.9,
+        "bin_end": 1.0,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "curve": [
+      {
+        "bin_start": 0.0,
+        "bin_end": 0.1,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.1,
+        "bin_end": 0.2,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.2,
+        "bin_end": 0.3,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.3,
+        "bin_end": 0.4,
+        "count": 1,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.4,
+        "bin_end": 0.5,
+        "count": 24,
+        "recall_at_5": 0.458333,
+        "mrr": 0.334722
+      },
+      {
+        "bin_start": 0.5,
+        "bin_end": 0.6,
+        "count": 68,
+        "recall_at_5": 0.289216,
+        "mrr": 0.239216
+      },
+      {
+        "bin_start": 0.6,
+        "bin_end": 0.7,
+        "count": 5,
+        "recall_at_5": 0.4,
+        "mrr": 0.266667
+      },
+      {
+        "bin_start": 0.7,
+        "bin_end": 0.8,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.8,
+        "bin_end": 0.9,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.9,
+        "bin_end": 1.0,
+        "count": 0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "confidence_vs_recall_at_5_correlation": -0.151454,
+    "confidence_vs_mrr_correlation": -0.062039
+  },
+  "confidence_calibration": {
+    "bins": [
+      {
+        "bin_start": 0.0,
+        "bin_end": 0.2,
+        "count": 0,
+        "average_confidence": 0.0,
+        "success_rate": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.2,
+        "bin_end": 0.4,
+        "count": 1,
+        "average_confidence": 0.38448,
+        "success_rate": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "bin_start": 0.4,
+        "bin_end": 0.6,
+        "count": 92,
+        "average_confidence": 0.525466,
+        "success_rate": 0.391304,
+        "recall_at_5": 0.333333,
+        "mrr": 0.26413
+      },
+      {
+        "bin_start": 0.6,
+        "bin_end": 0.8,
+        "count": 5,
+        "average_confidence": 0.617286,
+        "success_rate": 0.4,
+        "recall_at_5": 0.4,
+        "mrr": 0.266667
+      },
+      {
+        "bin_start": 0.8,
+        "bin_end": 1.0,
+        "count": 0,
+        "average_confidence": 0.0,
+        "success_rate": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "pearson_correlation": -0.106271,
+    "spearman_correlation": -0.118451,
+    "expected_calibration_error": 0.140957,
+    "brier_score": 0.264104,
+    "confidence_reliable": false
+  },
+  "context_statistics": {
+    "before_retrieval_v2": {
+      "average": 266.591837,
+      "median": 265.5,
+      "p95": 320.0
+    },
+    "after_retrieval_v2": {
+      "average": 205.989796,
+      "median": 209.0,
+      "p95": 283.0
+    },
+    "recall_at_5_before": 0.010204,
+    "recall_at_5_after": 0.333333,
+    "recall_at_5_delta": 0.323129
+  },
+  "context_analysis": {
+    "summary": {
+      "query_count": 98,
+      "average_context_tokens": 205.989796,
+      "average_unused_context_tokens": 1394.010204,
+      "average_tokens_per_retrieved_memory": 99.095918,
+      "duplicate_memory_count": 0
+    },
+    "per_query": [
+      {
+        "query": "When did Caroline go to the LGBTQ support group?",
+        "retrieved_count": 5,
+        "context_tokens": 234,
+        "unused_context_tokens": 1366,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 57,
+            "total_tokens": 117
+          },
+          {
+            "memory_id": "conv-26:D10:5",
+            "content_tokens": 48,
+            "metadata_tokens": 59,
+            "total_tokens": 107
+          },
+          {
+            "memory_id": "conv-26:D1:3",
+            "content_tokens": 14,
+            "metadata_tokens": 57,
+            "total_tokens": 71
+          },
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 57,
+            "total_tokens": 89
+          },
+          {
+            "memory_id": "conv-26:D12:1",
+            "content_tokens": 65,
+            "metadata_tokens": 57,
+            "total_tokens": 122
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie paint a sunrise?",
+        "retrieved_count": 5,
+        "context_tokens": 123,
+        "unused_context_tokens": 1477,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D14:30",
+            "content_tokens": 17,
+            "metadata_tokens": 55,
+            "total_tokens": 72
+          },
+          {
+            "memory_id": "conv-26:D8:18",
+            "content_tokens": 8,
+            "metadata_tokens": 55,
+            "total_tokens": 63
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 53,
+            "total_tokens": 109
+          },
+          {
+            "memory_id": "conv-26:D14:3",
+            "content_tokens": 11,
+            "metadata_tokens": 53,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 53,
+            "total_tokens": 69
+          }
+        ]
+      },
+      {
+        "query": "What fields would Caroline be likely to pursue in her educaton?",
+        "retrieved_count": 5,
+        "context_tokens": 203,
+        "unused_context_tokens": 1397,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D4:14",
+            "content_tokens": 26,
+            "metadata_tokens": 67,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D16:16",
+            "content_tokens": 44,
+            "metadata_tokens": 67,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D7:8",
+            "content_tokens": 43,
+            "metadata_tokens": 67,
+            "total_tokens": 110
+          },
+          {
+            "memory_id": "conv-26:D17:7",
+            "content_tokens": 50,
+            "metadata_tokens": 67,
+            "total_tokens": 117
+          },
+          {
+            "memory_id": "conv-26:D4:4",
+            "content_tokens": 25,
+            "metadata_tokens": 67,
+            "total_tokens": 92
+          }
+        ]
+      },
+      {
+        "query": "What did Caroline research?",
+        "retrieved_count": 5,
+        "context_tokens": 178,
+        "unused_context_tokens": 1422,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D10:15",
+            "content_tokens": 7,
+            "metadata_tokens": 52,
+            "total_tokens": 59
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 52,
+            "total_tokens": 112
+          },
+          {
+            "memory_id": "conv-26:D1:4",
+            "content_tokens": 17,
+            "metadata_tokens": 52,
+            "total_tokens": 69
+          },
+          {
+            "memory_id": "conv-26:D4:13",
+            "content_tokens": 69,
+            "metadata_tokens": 32,
+            "total_tokens": 101
+          },
+          {
+            "memory_id": "conv-26:D10:13",
+            "content_tokens": 10,
+            "metadata_tokens": 32,
+            "total_tokens": 42
+          }
+        ]
+      },
+      {
+        "query": "What is Caroline's identity?",
+        "retrieved_count": 5,
+        "context_tokens": 237,
+        "unused_context_tokens": 1363,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 52,
+            "total_tokens": 130
+          },
+          {
+            "memory_id": "conv-26:D10:15",
+            "content_tokens": 7,
+            "metadata_tokens": 54,
+            "total_tokens": 61
+          },
+          {
+            "memory_id": "conv-26:D3:4",
+            "content_tokens": 52,
+            "metadata_tokens": 54,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D3:10",
+            "content_tokens": 29,
+            "metadata_tokens": 52,
+            "total_tokens": 81
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 52,
+            "total_tokens": 108
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie run a charity race?",
+        "retrieved_count": 5,
+        "context_tokens": 81,
+        "unused_context_tokens": 1519,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D14:28",
+            "content_tokens": 10,
+            "metadata_tokens": 54,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D18:17",
+            "content_tokens": 25,
+            "metadata_tokens": 56,
+            "total_tokens": 81
+          },
+          {
+            "memory_id": "conv-26:D14:22",
+            "content_tokens": 9,
+            "metadata_tokens": 54,
+            "total_tokens": 63
+          },
+          {
+            "memory_id": "conv-26:D8:20",
+            "content_tokens": 11,
+            "metadata_tokens": 54,
+            "total_tokens": 65
+          },
+          {
+            "memory_id": "conv-26:D14:3",
+            "content_tokens": 11,
+            "metadata_tokens": 54,
+            "total_tokens": 65
+          }
+        ]
+      },
+      {
+        "query": "When is Melanie planning on going camping?",
+        "retrieved_count": 5,
+        "context_tokens": 151,
+        "unused_context_tokens": 1449,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D4:1",
+            "content_tokens": 20,
+            "metadata_tokens": 55,
+            "total_tokens": 75
+          },
+          {
+            "memory_id": "conv-26:D11:3",
+            "content_tokens": 25,
+            "metadata_tokens": 55,
+            "total_tokens": 80
+          },
+          {
+            "memory_id": "conv-26:D2:7",
+            "content_tokens": 35,
+            "metadata_tokens": 55,
+            "total_tokens": 90
+          },
+          {
+            "memory_id": "conv-26:D13:6",
+            "content_tokens": 26,
+            "metadata_tokens": 57,
+            "total_tokens": 83
+          },
+          {
+            "memory_id": "conv-26:D10:18",
+            "content_tokens": 30,
+            "metadata_tokens": 55,
+            "total_tokens": 85
+          }
+        ]
+      },
+      {
+        "query": "What is Caroline's relationship status?",
+        "retrieved_count": 5,
+        "context_tokens": 144,
+        "unused_context_tokens": 1456,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D8:13",
+            "content_tokens": 17,
+            "metadata_tokens": 55,
+            "total_tokens": 72
+          },
+          {
+            "memory_id": "conv-26:D12:11",
+            "content_tokens": 32,
+            "metadata_tokens": 55,
+            "total_tokens": 87
+          },
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 55,
+            "total_tokens": 87
+          },
+          {
+            "memory_id": "conv-26:D4:1",
+            "content_tokens": 20,
+            "metadata_tokens": 53,
+            "total_tokens": 73
+          },
+          {
+            "memory_id": "conv-26:D6:16",
+            "content_tokens": 28,
+            "metadata_tokens": 53,
+            "total_tokens": 81
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline give a speech at a school?",
+        "retrieved_count": 5,
+        "context_tokens": 292,
+        "unused_context_tokens": 1308,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D3:1",
+            "content_tokens": 59,
+            "metadata_tokens": 61,
+            "total_tokens": 120
+          },
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 61,
+            "total_tokens": 139
+          },
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 63,
+            "total_tokens": 119
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 61,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D13:13",
+            "content_tokens": 24,
+            "metadata_tokens": 61,
+            "total_tokens": 85
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline meet up with her friends, family, and mentors?",
+        "retrieved_count": 5,
+        "context_tokens": 240,
+        "unused_context_tokens": 1360,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 96,
+            "total_tokens": 129
+          },
+          {
+            "memory_id": "conv-26:D16:5",
+            "content_tokens": 41,
+            "metadata_tokens": 96,
+            "total_tokens": 137
+          },
+          {
+            "memory_id": "conv-26:D19:9",
+            "content_tokens": 66,
+            "metadata_tokens": 96,
+            "total_tokens": 162
+          },
+          {
+            "memory_id": "conv-26:D6:11",
+            "content_tokens": 43,
+            "metadata_tokens": 96,
+            "total_tokens": 139
+          },
+          {
+            "memory_id": "conv-26:D16:15",
+            "content_tokens": 42,
+            "metadata_tokens": 98,
+            "total_tokens": 140
+          }
+        ]
+      },
+      {
+        "query": "How long has Caroline had her current group of friends for?",
+        "retrieved_count": 5,
+        "context_tokens": 235,
+        "unused_context_tokens": 1365,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 80,
+            "total_tokens": 113
+          },
+          {
+            "memory_id": "conv-26:D12:1",
+            "content_tokens": 65,
+            "metadata_tokens": 82,
+            "total_tokens": 147
+          },
+          {
+            "memory_id": "conv-26:D6:11",
+            "content_tokens": 43,
+            "metadata_tokens": 80,
+            "total_tokens": 123
+          },
+          {
+            "memory_id": "conv-26:D17:1",
+            "content_tokens": 41,
+            "metadata_tokens": 80,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D9:6",
+            "content_tokens": 38,
+            "metadata_tokens": 80,
+            "total_tokens": 118
+          }
+        ]
+      },
+      {
+        "query": "Where did Caroline move from 4 years ago?",
+        "retrieved_count": 5,
+        "context_tokens": 270,
+        "unused_context_tokens": 1330,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:13",
+            "content_tokens": 24,
+            "metadata_tokens": 66,
+            "total_tokens": 90
+          },
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 66,
+            "total_tokens": 103
+          },
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 66,
+            "total_tokens": 122
+          },
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 66,
+            "total_tokens": 144
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 66,
+            "total_tokens": 126
+          }
+        ]
+      },
+      {
+        "query": "How long ago was Caroline's 18th birthday?",
+        "retrieved_count": 5,
+        "context_tokens": 243,
+        "unused_context_tokens": 1357,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D4:5",
+            "content_tokens": 39,
+            "metadata_tokens": 69,
+            "total_tokens": 108
+          },
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 69,
+            "total_tokens": 147
+          },
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 69,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D11:1",
+            "content_tokens": 40,
+            "metadata_tokens": 69,
+            "total_tokens": 109
+          },
+          {
+            "memory_id": "conv-26:D16:7",
+            "content_tokens": 34,
+            "metadata_tokens": 69,
+            "total_tokens": 103
+          }
+        ]
+      },
+      {
+        "query": "What career path has Caroline decided to persue?",
+        "retrieved_count": 5,
+        "context_tokens": 237,
+        "unused_context_tokens": 1363,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D14:13",
+            "content_tokens": 40,
+            "metadata_tokens": 56,
+            "total_tokens": 96
+          },
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 56,
+            "total_tokens": 88
+          },
+          {
+            "memory_id": "conv-26:D16:13",
+            "content_tokens": 59,
+            "metadata_tokens": 56,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D4:11",
+            "content_tokens": 27,
+            "metadata_tokens": 56,
+            "total_tokens": 83
+          },
+          {
+            "memory_id": "conv-26:D15:3",
+            "content_tokens": 64,
+            "metadata_tokens": 56,
+            "total_tokens": 120
+          }
+        ]
+      },
+      {
+        "query": "Would Caroline still want to pursue counseling as a career if she hadn't received support growing up?",
+        "retrieved_count": 5,
+        "context_tokens": 293,
+        "unused_context_tokens": 1307,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 84,
+            "total_tokens": 140
+          },
+          {
+            "memory_id": "conv-26:D4:15",
+            "content_tokens": 62,
+            "metadata_tokens": 82,
+            "total_tokens": 144
+          },
+          {
+            "memory_id": "conv-26:D10:5",
+            "content_tokens": 48,
+            "metadata_tokens": 82,
+            "total_tokens": 130
+          },
+          {
+            "memory_id": "conv-26:D7:7",
+            "content_tokens": 53,
+            "metadata_tokens": 82,
+            "total_tokens": 135
+          },
+          {
+            "memory_id": "conv-26:D3:1",
+            "content_tokens": 59,
+            "metadata_tokens": 82,
+            "total_tokens": 141
+          }
+        ]
+      },
+      {
+        "query": "What activities does Melanie partake in?",
+        "retrieved_count": 5,
+        "context_tokens": 220,
+        "unused_context_tokens": 1380,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 65,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 65,
+            "total_tokens": 102
+          },
+          {
+            "memory_id": "conv-26:D17:22",
+            "content_tokens": 13,
+            "metadata_tokens": 65,
+            "total_tokens": 78
+          },
+          {
+            "memory_id": "conv-26:D13:2",
+            "content_tokens": 21,
+            "metadata_tokens": 65,
+            "total_tokens": 86
+          },
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 65,
+            "total_tokens": 143
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie sign up for a pottery class?",
+        "retrieved_count": 5,
+        "context_tokens": 162,
+        "unused_context_tokens": 1438,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:4",
+            "content_tokens": 38,
+            "metadata_tokens": 56,
+            "total_tokens": 94
+          },
+          {
+            "memory_id": "conv-26:D12:2",
+            "content_tokens": 30,
+            "metadata_tokens": 56,
+            "total_tokens": 86
+          },
+          {
+            "memory_id": "conv-26:D15:4",
+            "content_tokens": 39,
+            "metadata_tokens": 56,
+            "total_tokens": 95
+          },
+          {
+            "memory_id": "conv-26:D14:4",
+            "content_tokens": 22,
+            "metadata_tokens": 56,
+            "total_tokens": 78
+          },
+          {
+            "memory_id": "conv-26:D5:12",
+            "content_tokens": 18,
+            "metadata_tokens": 56,
+            "total_tokens": 74
+          }
+        ]
+      },
+      {
+        "query": "When is Caroline going to the transgender conference?",
+        "retrieved_count": 5,
+        "context_tokens": 273,
+        "unused_context_tokens": 1327,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:13",
+            "content_tokens": 30,
+            "metadata_tokens": 56,
+            "total_tokens": 86
+          },
+          {
+            "memory_id": "conv-26:D3:1",
+            "content_tokens": 59,
+            "metadata_tokens": 56,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D12:11",
+            "content_tokens": 32,
+            "metadata_tokens": 58,
+            "total_tokens": 90
+          },
+          {
+            "memory_id": "conv-26:D7:1",
+            "content_tokens": 81,
+            "metadata_tokens": 56,
+            "total_tokens": 137
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 56,
+            "total_tokens": 112
+          }
+        ]
+      },
+      {
+        "query": "Where has Melanie camped?",
+        "retrieved_count": 5,
+        "context_tokens": 161,
+        "unused_context_tokens": 1439,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D10:20",
+            "content_tokens": 41,
+            "metadata_tokens": 52,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D16:13",
+            "content_tokens": 59,
+            "metadata_tokens": 52,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D7:22",
+            "content_tokens": 14,
+            "metadata_tokens": 52,
+            "total_tokens": 66
+          },
+          {
+            "memory_id": "conv-26:D7:24",
+            "content_tokens": 16,
+            "metadata_tokens": 52,
+            "total_tokens": 68
+          },
+          {
+            "memory_id": "conv-26:D7:10",
+            "content_tokens": 16,
+            "metadata_tokens": 52,
+            "total_tokens": 68
+          }
+        ]
+      },
+      {
+        "query": "What do Melanie's kids like?",
+        "retrieved_count": 5,
+        "context_tokens": 205,
+        "unused_context_tokens": 1395,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D11:7",
+            "content_tokens": 44,
+            "metadata_tokens": 60,
+            "total_tokens": 104
+          },
+          {
+            "memory_id": "conv-26:D9:17",
+            "content_tokens": 26,
+            "metadata_tokens": 60,
+            "total_tokens": 86
+          },
+          {
+            "memory_id": "conv-26:D4:14",
+            "content_tokens": 26,
+            "metadata_tokens": 60,
+            "total_tokens": 86
+          },
+          {
+            "memory_id": "conv-26:D17:4",
+            "content_tokens": 33,
+            "metadata_tokens": 60,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D14:10",
+            "content_tokens": 61,
+            "metadata_tokens": 60,
+            "total_tokens": 121
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie go to the museum?",
+        "retrieved_count": 5,
+        "context_tokens": 181,
+        "unused_context_tokens": 1419,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 55,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D18:17",
+            "content_tokens": 25,
+            "metadata_tokens": 55,
+            "total_tokens": 80
+          },
+          {
+            "memory_id": "conv-26:D17:12",
+            "content_tokens": 27,
+            "metadata_tokens": 55,
+            "total_tokens": 82
+          },
+          {
+            "memory_id": "conv-26:D18:3",
+            "content_tokens": 38,
+            "metadata_tokens": 55,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 55,
+            "total_tokens": 71
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline have a picnic?",
+        "retrieved_count": 5,
+        "context_tokens": 168,
+        "unused_context_tokens": 1432,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D12:10",
+            "content_tokens": 17,
+            "metadata_tokens": 53,
+            "total_tokens": 70
+          },
+          {
+            "memory_id": "conv-26:D6:7",
+            "content_tokens": 28,
+            "metadata_tokens": 53,
+            "total_tokens": 81
+          },
+          {
+            "memory_id": "conv-26:D12:11",
+            "content_tokens": 32,
+            "metadata_tokens": 53,
+            "total_tokens": 85
+          },
+          {
+            "memory_id": "conv-26:D6:11",
+            "content_tokens": 43,
+            "metadata_tokens": 53,
+            "total_tokens": 96
+          },
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 53,
+            "total_tokens": 86
+          }
+        ]
+      },
+      {
+        "query": "Would Caroline likely have Dr. Seuss books on her bookshelf?",
+        "retrieved_count": 5,
+        "context_tokens": 236,
+        "unused_context_tokens": 1364,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D7:8",
+            "content_tokens": 43,
+            "metadata_tokens": 69,
+            "total_tokens": 112
+          },
+          {
+            "memory_id": "conv-26:D7:7",
+            "content_tokens": 53,
+            "metadata_tokens": 69,
+            "total_tokens": 122
+          },
+          {
+            "memory_id": "conv-26:D12:11",
+            "content_tokens": 32,
+            "metadata_tokens": 69,
+            "total_tokens": 101
+          },
+          {
+            "memory_id": "conv-26:D5:1",
+            "content_tokens": 43,
+            "metadata_tokens": 69,
+            "total_tokens": 112
+          },
+          {
+            "memory_id": "conv-26:D17:7",
+            "content_tokens": 50,
+            "metadata_tokens": 69,
+            "total_tokens": 119
+          }
+        ]
+      },
+      {
+        "query": "What books has Melanie read?",
+        "retrieved_count": 5,
+        "context_tokens": 149,
+        "unused_context_tokens": 1451,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D7:10",
+            "content_tokens": 16,
+            "metadata_tokens": 53,
+            "total_tokens": 69
+          },
+          {
+            "memory_id": "conv-26:D6:8",
+            "content_tokens": 12,
+            "metadata_tokens": 53,
+            "total_tokens": 65
+          },
+          {
+            "memory_id": "conv-26:D16:14",
+            "content_tokens": 31,
+            "metadata_tokens": 53,
+            "total_tokens": 84
+          },
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 53,
+            "total_tokens": 85
+          },
+          {
+            "memory_id": "conv-26:D7:8",
+            "content_tokens": 43,
+            "metadata_tokens": 53,
+            "total_tokens": 96
+          }
+        ]
+      },
+      {
+        "query": "What does Melanie do to destress?",
+        "retrieved_count": 5,
+        "context_tokens": 179,
+        "unused_context_tokens": 1421,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 65,
+            "total_tokens": 102
+          },
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 65,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D17:22",
+            "content_tokens": 13,
+            "metadata_tokens": 65,
+            "total_tokens": 78
+          },
+          {
+            "memory_id": "conv-26:D13:15",
+            "content_tokens": 37,
+            "metadata_tokens": 67,
+            "total_tokens": 104
+          },
+          {
+            "memory_id": "conv-26:D13:2",
+            "content_tokens": 21,
+            "metadata_tokens": 65,
+            "total_tokens": 86
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline go to the LGBTQ conference?",
+        "retrieved_count": 5,
+        "context_tokens": 285,
+        "unused_context_tokens": 1315,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D7:1",
+            "content_tokens": 81,
+            "metadata_tokens": 56,
+            "total_tokens": 137
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 58,
+            "total_tokens": 118
+          },
+          {
+            "memory_id": "conv-26:D3:1",
+            "content_tokens": 59,
+            "metadata_tokens": 56,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D13:7",
+            "content_tokens": 37,
+            "metadata_tokens": 56,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 56,
+            "total_tokens": 89
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie read the book \"nothing is impossible\"?",
+        "retrieved_count": 5,
+        "context_tokens": 239,
+        "unused_context_tokens": 1361,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 57,
+            "total_tokens": 117
+          },
+          {
+            "memory_id": "conv-26:D7:8",
+            "content_tokens": 43,
+            "metadata_tokens": 57,
+            "total_tokens": 100
+          },
+          {
+            "memory_id": "conv-26:D18:3",
+            "content_tokens": 38,
+            "metadata_tokens": 57,
+            "total_tokens": 95
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 57,
+            "total_tokens": 113
+          },
+          {
+            "memory_id": "conv-26:D17:12",
+            "content_tokens": 27,
+            "metadata_tokens": 57,
+            "total_tokens": 84
+          }
+        ]
+      },
+      {
+        "query": "Would Caroline pursue writing as a career option?",
+        "retrieved_count": 5,
+        "context_tokens": 223,
+        "unused_context_tokens": 1377,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D7:7",
+            "content_tokens": 53,
+            "metadata_tokens": 56,
+            "total_tokens": 109
+          },
+          {
+            "memory_id": "conv-26:D7:8",
+            "content_tokens": 43,
+            "metadata_tokens": 56,
+            "total_tokens": 99
+          },
+          {
+            "memory_id": "conv-26:D4:11",
+            "content_tokens": 27,
+            "metadata_tokens": 56,
+            "total_tokens": 83
+          },
+          {
+            "memory_id": "conv-26:D10:3",
+            "content_tokens": 60,
+            "metadata_tokens": 56,
+            "total_tokens": 116
+          },
+          {
+            "memory_id": "conv-26:D11:3",
+            "content_tokens": 25,
+            "metadata_tokens": 58,
+            "total_tokens": 83
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline go to the adoption meeting?",
+        "retrieved_count": 5,
+        "context_tokens": 236,
+        "unused_context_tokens": 1364,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 56,
+            "total_tokens": 116
+          },
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 56,
+            "total_tokens": 89
+          },
+          {
+            "memory_id": "conv-26:D2:10",
+            "content_tokens": 59,
+            "metadata_tokens": 56,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D13:7",
+            "content_tokens": 37,
+            "metadata_tokens": 56,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D12:11",
+            "content_tokens": 32,
+            "metadata_tokens": 56,
+            "total_tokens": 88
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie go to the pottery workshop?",
+        "retrieved_count": 5,
+        "context_tokens": 207,
+        "unused_context_tokens": 1393,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D8:2",
+            "content_tokens": 35,
+            "metadata_tokens": 63,
+            "total_tokens": 98
+          },
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 63,
+            "total_tokens": 119
+          },
+          {
+            "memory_id": "conv-26:D3:4",
+            "content_tokens": 52,
+            "metadata_tokens": 63,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D4:16",
+            "content_tokens": 29,
+            "metadata_tokens": 63,
+            "total_tokens": 92
+          },
+          {
+            "memory_id": "conv-26:D1:2",
+            "content_tokens": 20,
+            "metadata_tokens": 63,
+            "total_tokens": 83
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie go camping in June?",
+        "retrieved_count": 5,
+        "context_tokens": 124,
+        "unused_context_tokens": 1476,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:6",
+            "content_tokens": 26,
+            "metadata_tokens": 56,
+            "total_tokens": 82
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 58,
+            "total_tokens": 74
+          },
+          {
+            "memory_id": "conv-26:D8:18",
+            "content_tokens": 8,
+            "metadata_tokens": 56,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D10:14",
+            "content_tokens": 50,
+            "metadata_tokens": 56,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D14:22",
+            "content_tokens": 9,
+            "metadata_tokens": 56,
+            "total_tokens": 65
+          }
+        ]
+      },
+      {
+        "query": "What LGBTQ+ events has Caroline participated in?",
+        "retrieved_count": 5,
+        "context_tokens": 283,
+        "unused_context_tokens": 1317,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 55,
+            "total_tokens": 87
+          },
+          {
+            "memory_id": "conv-26:D15:3",
+            "content_tokens": 64,
+            "metadata_tokens": 55,
+            "total_tokens": 119
+          },
+          {
+            "memory_id": "conv-26:D10:5",
+            "content_tokens": 48,
+            "metadata_tokens": 55,
+            "total_tokens": 103
+          },
+          {
+            "memory_id": "conv-26:D7:1",
+            "content_tokens": 81,
+            "metadata_tokens": 57,
+            "total_tokens": 138
+          },
+          {
+            "memory_id": "conv-26:D5:1",
+            "content_tokens": 43,
+            "metadata_tokens": 55,
+            "total_tokens": 98
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline go to a pride parade during the summer?",
+        "retrieved_count": 5,
+        "context_tokens": 210,
+        "unused_context_tokens": 1390,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D11:4",
+            "content_tokens": 53,
+            "metadata_tokens": 66,
+            "total_tokens": 119
+          },
+          {
+            "memory_id": "conv-26:D14:23",
+            "content_tokens": 45,
+            "metadata_tokens": 66,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D13:7",
+            "content_tokens": 37,
+            "metadata_tokens": 66,
+            "total_tokens": 103
+          },
+          {
+            "memory_id": "conv-26:D2:3",
+            "content_tokens": 36,
+            "metadata_tokens": 66,
+            "total_tokens": 102
+          },
+          {
+            "memory_id": "conv-26:D8:17",
+            "content_tokens": 24,
+            "metadata_tokens": 68,
+            "total_tokens": 92
+          }
+        ]
+      },
+      {
+        "query": "What events has Caroline participated in to help children?",
+        "retrieved_count": 5,
+        "context_tokens": 246,
+        "unused_context_tokens": 1354,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 57,
+            "total_tokens": 89
+          },
+          {
+            "memory_id": "conv-26:D7:9",
+            "content_tokens": 49,
+            "metadata_tokens": 57,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D14:13",
+            "content_tokens": 40,
+            "metadata_tokens": 57,
+            "total_tokens": 97
+          },
+          {
+            "memory_id": "conv-26:D8:9",
+            "content_tokens": 50,
+            "metadata_tokens": 57,
+            "total_tokens": 107
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 57,
+            "total_tokens": 117
+          }
+        ]
+      },
+      {
+        "query": "When did Melanie go camping in July?",
+        "retrieved_count": 5,
+        "context_tokens": 124,
+        "unused_context_tokens": 1476,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D13:6",
+            "content_tokens": 26,
+            "metadata_tokens": 56,
+            "total_tokens": 82
+          },
+          {
+            "memory_id": "conv-26:D8:18",
+            "content_tokens": 8,
+            "metadata_tokens": 56,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 56,
+            "total_tokens": 72
+          },
+          {
+            "memory_id": "conv-26:D10:14",
+            "content_tokens": 50,
+            "metadata_tokens": 56,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D14:22",
+            "content_tokens": 9,
+            "metadata_tokens": 56,
+            "total_tokens": 65
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline join a mentorship program?",
+        "retrieved_count": 5,
+        "context_tokens": 218,
+        "unused_context_tokens": 1382,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D3:11",
+            "content_tokens": 33,
+            "metadata_tokens": 75,
+            "total_tokens": 108
+          },
+          {
+            "memory_id": "conv-26:D9:2",
+            "content_tokens": 24,
+            "metadata_tokens": 75,
+            "total_tokens": 99
+          },
+          {
+            "memory_id": "conv-26:D17:5",
+            "content_tokens": 46,
+            "metadata_tokens": 75,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D16:5",
+            "content_tokens": 41,
+            "metadata_tokens": 75,
+            "total_tokens": 116
+          },
+          {
+            "memory_id": "conv-26:D2:10",
+            "content_tokens": 59,
+            "metadata_tokens": 75,
+            "total_tokens": 134
+          }
+        ]
+      },
+      {
+        "query": "What did Melanie paint recently?",
+        "retrieved_count": 5,
+        "context_tokens": 96,
+        "unused_context_tokens": 1504,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D14:30",
+            "content_tokens": 17,
+            "metadata_tokens": 53,
+            "total_tokens": 70
+          },
+          {
+            "memory_id": "conv-26:D13:8",
+            "content_tokens": 20,
+            "metadata_tokens": 53,
+            "total_tokens": 73
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 53,
+            "total_tokens": 69
+          },
+          {
+            "memory_id": "conv-26:D8:20",
+            "content_tokens": 11,
+            "metadata_tokens": 53,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D1:4",
+            "content_tokens": 17,
+            "metadata_tokens": 53,
+            "total_tokens": 70
+          }
+        ]
+      },
+      {
+        "query": "What activities has Melanie done with her family?",
+        "retrieved_count": 5,
+        "context_tokens": 244,
+        "unused_context_tokens": 1356,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D6:16",
+            "content_tokens": 28,
+            "metadata_tokens": 86,
+            "total_tokens": 114
+          },
+          {
+            "memory_id": "conv-26:D19:9",
+            "content_tokens": 66,
+            "metadata_tokens": 86,
+            "total_tokens": 152
+          },
+          {
+            "memory_id": "conv-26:D4:8",
+            "content_tokens": 50,
+            "metadata_tokens": 84,
+            "total_tokens": 134
+          },
+          {
+            "memory_id": "conv-26:D3:10",
+            "content_tokens": 29,
+            "metadata_tokens": 84,
+            "total_tokens": 113
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 84,
+            "total_tokens": 140
+          }
+        ]
+      },
+      {
+        "query": "In what ways is Caroline participating in the LGBTQ community?",
+        "retrieved_count": 5,
+        "context_tokens": 231,
+        "unused_context_tokens": 1369,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D10:3",
+            "content_tokens": 60,
+            "metadata_tokens": 58,
+            "total_tokens": 118
+          },
+          {
+            "memory_id": "conv-26:D11:8",
+            "content_tokens": 35,
+            "metadata_tokens": 58,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 58,
+            "total_tokens": 90
+          },
+          {
+            "memory_id": "conv-26:D3:2",
+            "content_tokens": 48,
+            "metadata_tokens": 58,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D16:5",
+            "content_tokens": 41,
+            "metadata_tokens": 60,
+            "total_tokens": 101
+          }
+        ]
+      },
+      {
+        "query": "How many times has Melanie gone to the beach in 2023?",
+        "retrieved_count": 5,
+        "context_tokens": 236,
+        "unused_context_tokens": 1364,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D10:18",
+            "content_tokens": 30,
+            "metadata_tokens": 59,
+            "total_tokens": 89
+          },
+          {
+            "memory_id": "conv-26:D3:4",
+            "content_tokens": 52,
+            "metadata_tokens": 59,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D3:1",
+            "content_tokens": 59,
+            "metadata_tokens": 59,
+            "total_tokens": 118
+          },
+          {
+            "memory_id": "conv-26:D10:10",
+            "content_tokens": 36,
+            "metadata_tokens": 59,
+            "total_tokens": 95
+          },
+          {
+            "memory_id": "conv-26:D11:7",
+            "content_tokens": 44,
+            "metadata_tokens": 59,
+            "total_tokens": 103
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline join a new activist group?",
+        "retrieved_count": 5,
+        "context_tokens": 230,
+        "unused_context_tokens": 1370,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D10:3",
+            "content_tokens": 60,
+            "metadata_tokens": 55,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D13:1",
+            "content_tokens": 60,
+            "metadata_tokens": 55,
+            "total_tokens": 115
+          },
+          {
+            "memory_id": "conv-26:D6:7",
+            "content_tokens": 28,
+            "metadata_tokens": 57,
+            "total_tokens": 85
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 55,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D14:3",
+            "content_tokens": 11,
+            "metadata_tokens": 55,
+            "total_tokens": 66
+          }
+        ]
+      },
+      {
+        "query": "Would Melanie be more interested in going to a national park or a theme park?",
+        "retrieved_count": 5,
+        "context_tokens": 214,
+        "unused_context_tokens": 1386,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:13",
+            "content_tokens": 30,
+            "metadata_tokens": 61,
+            "total_tokens": 91
+          },
+          {
+            "memory_id": "conv-26:D10:10",
+            "content_tokens": 36,
+            "metadata_tokens": 61,
+            "total_tokens": 97
+          },
+          {
+            "memory_id": "conv-26:D8:32",
+            "content_tokens": 30,
+            "metadata_tokens": 61,
+            "total_tokens": 91
+          },
+          {
+            "memory_id": "conv-26:D11:15",
+            "content_tokens": 43,
+            "metadata_tokens": 61,
+            "total_tokens": 104
+          },
+          {
+            "memory_id": "conv-26:D16:2",
+            "content_tokens": 60,
+            "metadata_tokens": 61,
+            "total_tokens": 121
+          }
+        ]
+      },
+      {
+        "query": "What kind of art does Caroline make?",
+        "retrieved_count": 5,
+        "context_tokens": 238,
+        "unused_context_tokens": 1362,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 66,
+            "total_tokens": 122
+          },
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 66,
+            "total_tokens": 103
+          },
+          {
+            "memory_id": "conv-26:D3:3",
+            "content_tokens": 78,
+            "metadata_tokens": 66,
+            "total_tokens": 144
+          },
+          {
+            "memory_id": "conv-26:D14:29",
+            "content_tokens": 28,
+            "metadata_tokens": 66,
+            "total_tokens": 94
+          },
+          {
+            "memory_id": "conv-26:D13:13",
+            "content_tokens": 24,
+            "metadata_tokens": 66,
+            "total_tokens": 90
+          }
+        ]
+      },
+      {
+        "query": "When is Melanie's daughter's birthday?",
+        "retrieved_count": 5,
+        "context_tokens": 243,
+        "unused_context_tokens": 1357,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D11:1",
+            "content_tokens": 40,
+            "metadata_tokens": 67,
+            "total_tokens": 107
+          },
+          {
+            "memory_id": "conv-26:D4:5",
+            "content_tokens": 39,
+            "metadata_tokens": 67,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D11:12",
+            "content_tokens": 37,
+            "metadata_tokens": 67,
+            "total_tokens": 104
+          },
+          {
+            "memory_id": "conv-26:D16:9",
+            "content_tokens": 56,
+            "metadata_tokens": 67,
+            "total_tokens": 123
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 69,
+            "total_tokens": 125
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline attend a pride parade in August?",
+        "retrieved_count": 5,
+        "context_tokens": 229,
+        "unused_context_tokens": 1371,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D14:23",
+            "content_tokens": 45,
+            "metadata_tokens": 57,
+            "total_tokens": 102
+          },
+          {
+            "memory_id": "conv-26:D11:4",
+            "content_tokens": 53,
+            "metadata_tokens": 57,
+            "total_tokens": 110
+          },
+          {
+            "memory_id": "conv-26:D10:7",
+            "content_tokens": 49,
+            "metadata_tokens": 57,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D8:17",
+            "content_tokens": 24,
+            "metadata_tokens": 57,
+            "total_tokens": 81
+          },
+          {
+            "memory_id": "conv-26:D5:1",
+            "content_tokens": 43,
+            "metadata_tokens": 57,
+            "total_tokens": 100
+          }
+        ]
+      },
+      {
+        "query": "Who supports Caroline when she has a negative experience?",
+        "retrieved_count": 5,
+        "context_tokens": 255,
+        "unused_context_tokens": 1345,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 56,
+            "total_tokens": 88
+          },
+          {
+            "memory_id": "conv-26:D18:1",
+            "content_tokens": 45,
+            "metadata_tokens": 56,
+            "total_tokens": 101
+          },
+          {
+            "memory_id": "conv-26:D17:3",
+            "content_tokens": 42,
+            "metadata_tokens": 56,
+            "total_tokens": 98
+          },
+          {
+            "memory_id": "conv-26:D12:1",
+            "content_tokens": 65,
+            "metadata_tokens": 56,
+            "total_tokens": 121
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 56,
+            "total_tokens": 112
+          }
+        ]
+      },
+      {
+        "query": "What types of pottery have Melanie and her kids made?",
+        "retrieved_count": 5,
+        "context_tokens": 193,
+        "unused_context_tokens": 1407,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D8:2",
+            "content_tokens": 35,
+            "metadata_tokens": 58,
+            "total_tokens": 93
+          },
+          {
+            "memory_id": "conv-26:D14:4",
+            "content_tokens": 22,
+            "metadata_tokens": 58,
+            "total_tokens": 80
+          },
+          {
+            "memory_id": "conv-26:D5:6",
+            "content_tokens": 23,
+            "metadata_tokens": 58,
+            "total_tokens": 81
+          },
+          {
+            "memory_id": "conv-26:D10:5",
+            "content_tokens": 48,
+            "metadata_tokens": 58,
+            "total_tokens": 106
+          },
+          {
+            "memory_id": "conv-26:D10:14",
+            "content_tokens": 50,
+            "metadata_tokens": 58,
+            "total_tokens": 108
+          }
+        ]
+      },
+      {
+        "query": "When did Caroline and Melanie go to a pride fesetival together?",
+        "retrieved_count": 5,
+        "context_tokens": 184,
+        "unused_context_tokens": 1416,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D8:22",
+            "content_tokens": 17,
+            "metadata_tokens": 59,
+            "total_tokens": 76
+          },
+          {
+            "memory_id": "conv-26:D18:17",
+            "content_tokens": 25,
+            "metadata_tokens": 59,
+            "total_tokens": 84
+          },
+          {
+            "memory_id": "conv-26:D15:4",
+            "content_tokens": 39,
+            "metadata_tokens": 59,
+            "total_tokens": 98
+          },
+          {
+            "memory_id": "conv-26:D14:2",
+            "content_tokens": 32,
+            "metadata_tokens": 59,
+            "total_tokens": 91
+          },
+          {
+            "memory_id": "conv-26:D4:3",
+            "content_tokens": 56,
+            "metadata_tokens": 59,
+            "total_tokens": 115
+          }
+        ]
+      },
+      {
+        "query": "What would Caroline's political leaning likely be?",
+        "retrieved_count": 5,
+        "context_tokens": 205,
+        "unused_context_tokens": 1395,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D9:7",
+            "content_tokens": 22,
+            "metadata_tokens": 63,
+            "total_tokens": 85
+          },
+          {
+            "memory_id": "conv-26:D16:16",
+            "content_tokens": 44,
+            "metadata_tokens": 63,
+            "total_tokens": 107
+          },
+          {
+            "memory_id": "conv-26:D17:7",
+            "content_tokens": 50,
+            "metadata_tokens": 63,
+            "total_tokens": 113
+          },
+          {
+            "memory_id": "conv-26:D17:13",
+            "content_tokens": 48,
+            "metadata_tokens": 63,
+            "total_tokens": 111
+          },
+          {
+            "memory_id": "conv-26:D4:14",
+            "content_tokens": 26,
+            "metadata_tokens": 63,
+            "total_tokens": 89
+          }
+        ]
+      },
+      {
+        "query": "What has Melanie painted?",
+        "retrieved_count": 5,
+        "context_tokens": 128,
+        "unused_context_tokens": 1472,
+        "duplicate_memory_count": 0,
+        "tokens_per_retrieved_memory": [
+          {
+            "memory_id": "conv-26:D5:2",
+            "content_tokens": 32,
+            "metadata_tokens": 52,
+            "total_tokens": 84
+          },
+          {
+            "memory_id": "conv-26:D16:14",
+            "content_tokens": 31,
+            "metadata_tokens": 52,
+            "total_tokens": 83
+          },
+          {
+            "memory_id": "conv-26:D6:8",
+            "content_tokens": 12,
+            "metadata_tokens": 52,
+            "total_tokens": 64
+          },
+          {
+            "memory_id": "conv-26:D7:12",
+            "content_tokens": 16,
+            "metadata_tokens": 52,
+            "total_tokens": 68
+          },
+          {
+            "memory_id": "conv-26:D9:7",
+            "content_tokens": 22,
+            "metadata_tokens": 52,
+            "total_tokens": 74
+          }
+        ]
+      }
+    ]
+  },
+  "dense_investigation": {
+    "candidate_generation_success_rate": 0.046053,
+    "candidate_generation_miss_rate": 0.953947,
+    "dominant_failure_category": "chunking_failure",
+    "memory_creation_failures": 0,
+    "stored_memory_failures": 0,
+    "split_memory_frequency": 0.377551,
+    "average_similarity_margin": 0.374287
+  },
+  "failure_breakdown": {
+    "total_failures": 60,
+    "counts": {
+      "temporal_failure": 16,
+      "entity_resolution_failure": 34,
+      "relation_failure": 10,
+      "retrieval_miss": 0,
+      "preference_failure": 0,
+      "context_truncation": 0,
+      "reranker_failure": 0,
+      "generation_failure": 0
+    },
+    "representative_examples": {
+      "temporal_failure": [
+        {
+          "query": "When did Melanie paint a sunrise?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D1:12"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D14:30",
+            "conv-26:D8:18",
+            "conv-26:D4:3",
+            "conv-26:D14:3",
+            "conv-26:D7:12"
+          ]
+        },
+        {
+          "query": "When did Melanie run a charity race?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D2:1"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D14:28",
+            "conv-26:D18:17",
+            "conv-26:D14:22",
+            "conv-26:D8:20",
+            "conv-26:D14:3"
+          ]
+        },
+        {
+          "query": "Where did Caroline move from 4 years ago?",
+          "category": "temporal",
+          "expected_memory_ids": [
+            "conv-26:D3:13",
+            "conv-26:D4:3"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D13:13",
+            "conv-26:D11:12",
+            "conv-26:D16:9",
+            "conv-26:D3:3",
+            "conv-26:D13:1"
+          ]
+        }
+      ],
+      "entity_resolution_failure": [
+        {
+          "query": "What fields would Caroline be likely to pursue in her educaton?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D1:9",
+            "conv-26:D1:11"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D4:14",
+            "conv-26:D16:16",
+            "conv-26:D7:8",
+            "conv-26:D17:7",
+            "conv-26:D4:4"
+          ]
+        },
+        {
+          "query": "What did Caroline research?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D2:8"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D10:15",
+            "conv-26:D13:1",
+            "conv-26:D1:4",
+            "conv-26:D4:13",
+            "conv-26:D10:13"
+          ]
+        },
+        {
+          "query": "What is Caroline's identity?",
+          "category": "identity",
+          "expected_memory_ids": [
+            "conv-26:D1:5"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D3:3",
+            "conv-26:D10:15",
+            "conv-26:D3:4",
+            "conv-26:D3:10",
+            "conv-26:D4:3"
+          ]
+        }
+      ],
+      "relation_failure": [
+        {
+          "query": "What is Caroline's relationship status?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D3:13",
+            "conv-26:D2:14"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D8:13",
+            "conv-26:D12:11",
+            "conv-26:D5:2",
+            "conv-26:D4:1",
+            "conv-26:D6:16"
+          ]
+        },
+        {
+          "query": "How long has Caroline had her current group of friends for?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D3:13"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D3:11",
+            "conv-26:D12:1",
+            "conv-26:D6:11",
+            "conv-26:D17:1",
+            "conv-26:D9:6"
+          ]
+        },
+        {
+          "query": "What activities has Melanie done with her family?",
+          "category": "relationship",
+          "expected_memory_ids": [
+            "conv-26:D8:4",
+            "conv-26:D8:6",
+            "conv-26:D9:1",
+            "conv-26:D6:4",
+            "conv-26:D1:18",
+            "conv-26:D3:14"
+          ],
+          "retrieved_memory_ids": [
+            "conv-26:D6:16",
+            "conv-26:D19:9",
+            "conv-26:D4:8",
+            "conv-26:D3:10",
+            "conv-26:D4:3"
+          ]
+        }
+      ],
+      "retrieval_miss": [],
+      "preference_failure": [],
+      "context_truncation": [],
+      "reranker_failure": [],
+      "generation_failure": []
+    }
+  },
+  "failure_localization": {
+    "query_count": 98,
+    "localized_failure_count": 98,
+    "stage_counts": {
+      "dense_failure": 77,
+      "sparse_failure": 3,
+      "fusion_failure": 6,
+      "reranker_failure": 0,
+      "selection_failure": 12,
+      "context_truncation": 0,
+      "generation_failure": 0
+    },
+    "stage_percentages": {
+      "dense_failure": 0.785714,
+      "sparse_failure": 0.030612,
+      "fusion_failure": 0.061224,
+      "reranker_failure": 0.0,
+      "selection_failure": 0.122449,
+      "context_truncation": 0.0,
+      "generation_failure": 0.0
+    }
+  },
+  "candidate_drift": {
+    "phase_4_2_candidate_trace_available": false,
+    "reason": "Stored Phase 4.2 results in evaluation/results/retrieval_optimization_results.json contain aggregate metrics only.",
+    "retrieval_v2_failed_query_count": 60,
+    "action_required": "Regenerate Phase 4.2 with per-query stage traces before claiming exact candidate drift."
+  }
+}
