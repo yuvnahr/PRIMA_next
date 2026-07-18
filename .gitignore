@@ -37,7 +37,9 @@ benchmarks/locomo/outputs/**/__pycache__/
 evaluation/results/debug_*/
 evaluation/results/tmp_*/
 evaluation/qa/
+evaluation/qa_baseline_frozen/
 evaluation/qa_validation/
+evaluation/qa_diagnostics/
 evaluation/results/**/*trace*.json
 evaluation/results/**/*localization*.json
 evaluation/results/**/*drift*.json

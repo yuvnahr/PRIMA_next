@@ -43,6 +43,7 @@ class LoCoMoEvaluator(BenchmarkEvaluator):
             memory_hit(item.response.metadata.get("answer_diagnostics", {}), item.expected_answer)
             for item in answerable
         ]
+        evidence = [summary for item in answerable if (summary := evidence_summary(item)) is not None]
 
         return {
             "total_results": len(items),
@@ -56,6 +57,9 @@ class LoCoMoEvaluator(BenchmarkEvaluator):
             "average_retrieved_memories": mean(float(count) for count in retrieved_counts),
             "reflection_rate": mean(1.0 if flag else 0.0 for flag in reflection_flags),
             "memory_hits": mean(memory_hits),
+            **evidence_metrics(evidence),
+            "category_metrics": category_metrics(answerable),
+            "failure_taxonomy": failure_taxonomy(answerable),
         }
 
 
@@ -79,6 +83,8 @@ def write_locomo_artifacts(
         {
             "conversation_id": item.conversation_id,
             "question_id": item.question_id,
+            "category": item.metadata.get("category"),
+            "expected_evidence": list(item.metadata.get("evidence", ())),
             **dict(item.response.metadata.get("answer_diagnostics", {})),
         }
         for item in items
@@ -103,6 +109,9 @@ def write_locomo_artifacts(
         "reflection_percent": round(float(metrics.get("reflection_rate", 0.0)) * 100.0, 6),
         "memory_growth": None,
         "memory_hits": metrics.get("memory_hits", 0.0),
+        "candidate_evidence_recall": metrics.get("candidate_evidence_recall", 0.0),
+        "final_context_evidence_recall": metrics.get("final_context_evidence_recall", 0.0),
+        "final_all_evidence_rate": metrics.get("final_all_evidence_rate", 0.0),
         "runtime_errors": runtime_errors,
         "provider": provider,
         "model": model,
@@ -121,7 +130,7 @@ def write_locomo_artifacts(
         "report": paths_by_kind["reports"] / "locomo_qa_report.md",
         "log": paths_by_kind["logs"] / "run_metadata.json",
     }
-    answers = [{"conversation_id": item.conversation_id, "question_id": item.question_id, "answer": item.response.text, "expected_answer": item.expected_answer, "category": item.metadata.get("category")} for item in items]
+    answers = [{"conversation_id": item.conversation_id, "question_id": item.question_id, "answer": item.response.text, "expected_answer": item.expected_answer, "category": item.metadata.get("category"), "evidence": list(item.metadata.get("evidence", ()))} for item in items]
     parsed = [{"conversation_id": item.conversation_id, "question_id": item.question_id, "raw_response": item.response.metadata.get("answer_diagnostics", {}).get("raw_response"), "parsed_answer": item.response.text, "errors": item.response.metadata.get("answer_diagnostics", {}).get("errors", [])} for item in items]
     prompts = [{"conversation_id": item.conversation_id, "question_id": item.question_id, "prompt": item.response.metadata.get("answer_diagnostics", {}).get("prompt")} for item in items]
     paths["raw"].write_text(json.dumps({"responses": diagnostics, "failures": failures}, indent=2), encoding="utf-8")
@@ -139,14 +148,7 @@ def write_locomo_artifacts(
 def failure_record(result: RunnerResult) -> dict[str, Any]:
     diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
     retrieved = diagnostics.get("retrieved_memory_ids", [])
-    failure_type = diagnostics.get("failure_type")
-    if not failure_type:
-        if not retrieved:
-            failure_type = "retrieval_miss"
-        elif diagnostics.get("llm_used"):
-            failure_type = "generation_error"
-        else:
-            failure_type = "retrieval_partial"
+    summary = evidence_summary(result)
     return {
         "conversation_id": result.conversation_id,
         "question_id": result.question_id,
@@ -155,7 +157,136 @@ def failure_record(result: RunnerResult) -> dict[str, Any]:
         "prediction": result.response.text,
         "retrieved_memories": retrieved,
         "reflection_used": bool(diagnostics.get("reflection_used", False)),
-        "failure_type": failure_type,
+        "failure_type": localized_failure_type(result, summary),
+        "evidence_localization": summary,
+    }
+
+
+FAILURE_TYPES = (
+    "A_gold_absent_candidate_pool",
+    "B_gold_lost_ranking_or_selection",
+    "C_evidence_present_llm_error",
+    "D_evaluation_penalty",
+    "E_temporal_reasoning",
+    "F_multi_memory_aggregation",
+    "G_query_understanding_or_expansion",
+    "H_other_ambiguous",
+)
+
+
+def evidence_summary(result: RunnerResult) -> dict[str, Any] | None:
+    evidence = {str(item) for item in result.metadata.get("evidence", ()) if str(item)}
+    category = str(result.metadata.get("category", ""))
+    if not evidence or category == "5":
+        return None
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    stages = dict(diagnostics.get("retrieval_stages", {}))
+    stored = {str(item) for item in diagnostics.get("stored_source_turn_ids", ())}
+    dense = _source_ids(stages.get("dense_top30", ()))
+    sparse = _source_ids(stages.get("sparse_top30", ()))
+    fused = _source_ids(stages.get("fused_top30", ()))
+    reranked = _source_ids(stages.get("reranked_top30", ()))
+    final_items = list(stages.get("final_candidates", ()))
+    final = _source_ids(final_items)
+    ranks = [
+        index
+        for index, item in enumerate(final_items, start=1)
+        if str(item.get("source_turn_id", "")) in evidence
+    ]
+
+    def recall(found: set[str]) -> float:
+        return len(evidence & found) / len(evidence)
+
+    candidate = dense | sparse
+    return {
+        "gold_evidence_count": len(evidence),
+        "stored_evidence_recall": recall(stored),
+        "dense_evidence_recall": recall(dense),
+        "sparse_evidence_recall": recall(sparse),
+        "candidate_evidence_recall": recall(candidate),
+        "fusion_evidence_recall": recall(fused),
+        "reranked_evidence_recall": recall(reranked),
+        "final_context_evidence_recall": recall(final),
+        "final_all_evidence": evidence <= final,
+        "final_relevant_ranks": ranks,
+    }
+
+
+def evidence_metrics(summaries: list[dict[str, Any]]) -> dict[str, float]:
+    ranks = [float(rank) for summary in summaries for rank in summary["final_relevant_ranks"]]
+    keys = (
+        "stored_evidence_recall",
+        "dense_evidence_recall",
+        "sparse_evidence_recall",
+        "candidate_evidence_recall",
+        "fusion_evidence_recall",
+        "reranked_evidence_recall",
+        "final_context_evidence_recall",
+    )
+    return {
+        **{key: mean(float(summary[key]) for summary in summaries) for key in keys},
+        "final_all_evidence_rate": mean(1.0 if summary["final_all_evidence"] else 0.0 for summary in summaries),
+        "average_relevant_final_rank": mean(ranks),
+        "evidence_scored_questions": float(len(summaries)),
+    }
+
+
+def category_metrics(results: list[RunnerResult]) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for category in sorted({str(item.metadata.get("category", "")) for item in results}):
+        rows = [item for item in results if str(item.metadata.get("category", "")) == category]
+        evidence = [summary for item in rows if (summary := evidence_summary(item)) is not None]
+        output[category] = {
+            "question_count": len(rows),
+            "exact_match": mean(exact_match_score(item.response.text, item.expected_answer or "") for item in rows),
+            "f1": mean(f1_score(item.response.text, item.expected_answer or "") for item in rows),
+            "memory_hits": mean(memory_hit(item.response.metadata.get("answer_diagnostics", {}), item.expected_answer) for item in rows),
+            **evidence_metrics(evidence),
+        }
+    return output
+
+
+def failure_taxonomy(results: list[RunnerResult]) -> dict[str, Any]:
+    failures = [
+        localized_failure_type(item)
+        for item in results
+        if not exact_match_score(item.response.text, item.expected_answer or "")
+    ]
+    counts = Counter(failures)
+    total = len(failures)
+    return {
+        "total_failures": total,
+        "counts": {name: counts.get(name, 0) for name in FAILURE_TYPES},
+        "percentages": {name: (counts.get(name, 0) / total if total else 0.0) for name in FAILURE_TYPES},
+    }
+
+
+def localized_failure_type(result: RunnerResult, summary: dict[str, Any] | None = None) -> str:
+    diagnostics = dict(result.response.metadata.get("answer_diagnostics", {}))
+    if diagnostics.get("errors"):
+        return "H_other_ambiguous"
+    if f1_score(result.response.text, result.expected_answer or "") >= 0.8:
+        return "D_evaluation_penalty"
+    summary = summary if summary is not None else evidence_summary(result)
+    if summary is None:
+        return "H_other_ambiguous"
+    category = str(result.metadata.get("category", ""))
+    if summary["candidate_evidence_recall"] < 1.0:
+        return "A_gold_absent_candidate_pool"
+    if summary["final_context_evidence_recall"] < 1.0:
+        return "F_multi_memory_aggregation" if category == "1" else "B_gold_lost_ranking_or_selection"
+    if category == "2":
+        return "E_temporal_reasoning"
+    if category == "1":
+        return "F_multi_memory_aggregation"
+    return "C_evidence_present_llm_error"
+
+
+def _source_ids(candidates: Iterable[dict[str, Any]]) -> set[str]:
+    return {
+        str(item["source_turn_id"])
+        for item in candidates
+        if item.get("source_turn_id")
     }
 
 

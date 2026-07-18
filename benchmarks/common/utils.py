@@ -22,6 +22,10 @@ def configure_benchmark_logger(name: str, log_dir: Path, level: int = logging.IN
     logger.propagate = False
 
     log_file = log_dir / f"{name.replace('.', '_')}.log"
+    for handler in list(logger.handlers):
+        if isinstance(handler, logging.FileHandler) and Path(handler.baseFilename) != log_file:
+            logger.removeHandler(handler)
+            handler.close()
     handler_exists = any(
         isinstance(handler, logging.FileHandler) and Path(handler.baseFilename) == log_file
         for handler in logger.handlers

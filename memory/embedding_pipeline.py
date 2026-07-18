@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -26,16 +27,15 @@ class EmbeddedText:
     metadata: dict[str, Any]
 
 
-def current_embedding_metadata() -> dict[str, Any]:
+def current_embedding_metadata(experiment: EmbeddingExperimentConfig | None = None) -> dict[str, Any]:
+    experiment = experiment or get_embedding_pipeline().config
     config = embedding_backend_config()
-    identity = f"{IDENTITY_VERSION}:on"
-    representation = f"{REPRESENTATION_VERSION}:semantic"
     payload = {
         "embedding_backend": config.name,
         "embedding_model": config.model_identifier,
         "embedding_dimension": config.dimensions,
-        "representation_version": representation,
-        "identity_version": identity,
+        "representation_version": f"{REPRESENTATION_VERSION}:{experiment.representation_mode}",
+        "identity_version": f"{IDENTITY_VERSION}:{'on' if experiment.identity_enabled else 'off'}",
     }
     fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return {**payload, "backend_fingerprint": fingerprint}
@@ -72,12 +72,8 @@ class CanonicalEmbeddingPipeline:
             serialized = EventMemoryBuilder().build(EventSegment("experiment", 1, (turn,))).embedding_text
         else:
             serialized = representation.serialize()
-        metadata = current_embedding_metadata()
+        metadata = current_embedding_metadata(self.config)
         vector = tuple(embed_text(serialized, dimensions=metadata["embedding_dimension"]))
-        metadata["representation_version"] = f"{REPRESENTATION_VERSION}:{self.config.representation_mode}"
-        metadata["identity_version"] = f"{IDENTITY_VERSION}:{'on' if self.config.identity_enabled else 'off'}"
-        fingerprint_payload = {key: metadata[key] for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version")}
-        metadata["backend_fingerprint"] = hashlib.sha256(json.dumps(fingerprint_payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         metadata.update(
             {
                 "embedding_text": serialized,
@@ -98,7 +94,13 @@ class CanonicalEmbeddingPipeline:
         return self.embed_memory(query)
 
 
-_PIPELINE = CanonicalEmbeddingPipeline()
+_PIPELINE = CanonicalEmbeddingPipeline(
+    EmbeddingExperimentConfig(
+        backend=os.getenv("PRIMA_EMBEDDING_BACKEND", "stable"),
+        representation_mode=os.getenv("PRIMA_REPRESENTATION_MODE", "semantic"),
+        identity_enabled=os.getenv("PRIMA_IDENTITY_NORMALIZATION", "true").lower() not in {"0", "false", "no", "off"},
+    )
+)
 _ACTIVE_PIPELINE: ContextVar[CanonicalEmbeddingPipeline] = ContextVar("prima_embedding_pipeline", default=_PIPELINE)
 
 

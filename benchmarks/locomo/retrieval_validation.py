@@ -1466,12 +1466,11 @@ def _debug_readme(report: dict[str, Any], output_path: Path) -> str:
     counts = failures.get("counts", {})
     top_failures = sorted(counts.items(), key=lambda item: int(item[1]), reverse=True)[:5]
     lines = [
-        "# Retrieval V2 Debug Artifacts",
+        "# Retrieval Validation Artifacts",
         "",
         "## Reproduce",
         "",
         "```bash",
-        "git checkout retrieval-v2-debug",
         "python -m compileall memory/retrieval benchmarks/locomo runtime",
         "python -m benchmarks.locomo.retrieval_validation --dataset-path benchmarks/locomo/outputs/processed/locomo_debug_100.json --output-dir benchmarks/locomo/outputs --top-k 5",
         "python -m benchmarks.locomo.retrieval_validation --dataset-path benchmarks/locomo/external/data/locomo10.json --output-dir benchmarks/locomo/outputs/debug_full --top-k 5",

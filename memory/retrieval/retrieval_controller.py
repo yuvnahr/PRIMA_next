@@ -187,6 +187,8 @@ class RetrievalController:
                 "strategy_scores": {key: round(float(value), 6) for key, value in result.strategy_scores.items()},
                 "timestamp": result.note.timestamp.isoformat(),
                 "text": result.note.content,
+                "source_session_id": result.note.context.get("source_session_id"),
+                "source_turn_id": result.note.context.get("source_turn_id"),
                 "explanation": dict(result.explanation),
             }
             for result in results

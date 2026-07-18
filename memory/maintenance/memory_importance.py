@@ -131,8 +131,14 @@ class MemoryImportanceEngine:
         results = self.repository.query(get_embedding_pipeline().embed_query(query).vector, memory_type=MemoryType.EPISODIC, limit=self.config.top_k)
         if not results:
             return 1.0
-        max_similarity = max(clamp_score(score) for _, score in results)
-        return clamp_score(1.0 - max_similarity)
+        query_tokens = set(_tokens(query))
+        if not query_tokens:
+            return 0.0
+        overlaps = []
+        for note, _ in results:
+            note_tokens = set(_tokens(note.content))
+            overlaps.append(len(query_tokens & note_tokens) / max(1, len(query_tokens | note_tokens)))
+        return clamp_score(1.0 - max(overlaps))
 
     def emotional_salience_score(self, query: str, affect_update: Any | None = None) -> float:
         profile = getattr(affect_update, "profile", None)
