@@ -1,4 +1,4 @@
-﻿"""Retrieval controller that exposes structured APIs only."""
+"""Retrieval controller that exposes structured APIs only."""
 
 from __future__ import annotations
 

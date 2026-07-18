@@ -1,4 +1,4 @@
-﻿"""Resource-backed query analysis and deterministic expansion for retrieval."""
+"""Resource-backed query analysis and deterministic expansion for retrieval."""
 
 from __future__ import annotations
 

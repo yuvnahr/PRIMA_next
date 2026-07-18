@@ -1,4 +1,4 @@
-﻿"""LoCoMo metric computation over runner outputs."""
+"""LoCoMo metric computation over runner outputs."""
 
 from __future__ import annotations
 

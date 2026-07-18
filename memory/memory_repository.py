@@ -1,4 +1,4 @@
-﻿"""Repository layer for Chroma-backed or deterministic in-memory storage."""
+"""Repository layer for Chroma-backed or deterministic in-memory storage."""
 
 from __future__ import annotations
 

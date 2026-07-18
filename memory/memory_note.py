@@ -1,4 +1,4 @@
-﻿"""Memory note model and backward-compatible ingestion helpers."""
+"""Memory note model and backward-compatible ingestion helpers."""
 
 from __future__ import annotations
 

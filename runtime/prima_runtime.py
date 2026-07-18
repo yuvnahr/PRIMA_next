@@ -1,4 +1,4 @@
-﻿"""Integrated PRIMA-NEXT runtime."""
+"""Integrated PRIMA-NEXT runtime."""
 
 from __future__ import annotations
 

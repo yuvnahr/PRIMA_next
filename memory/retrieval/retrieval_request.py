@@ -1,4 +1,4 @@
-﻿"""Retrieval request model."""
+"""Retrieval request model."""
 
 from __future__ import annotations
 

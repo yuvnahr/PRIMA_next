@@ -1,4 +1,4 @@
-﻿"""LoCoMo retrieval-only scientific validation for Retrieval V2."""
+"""LoCoMo retrieval-only scientific validation for Retrieval V2."""
 
 from __future__ import annotations
 

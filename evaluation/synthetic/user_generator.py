@@ -366,7 +366,7 @@ class UserGenerator:
     def generate_user(self, user_index: int) -> SyntheticUser:
         """Generate a single synthetic user by index (deterministic)."""
         seed = self.seed_base + user_index * 1000
-        rng = random.Random(seed)  # nosec B311 — deterministic simulation seed, not security-critical
+        rng = random.Random(seed)  # nosec B311
 
         user_id = f"user_{user_index:04d}"
         first = rng.choice(_FIRST_NAMES)

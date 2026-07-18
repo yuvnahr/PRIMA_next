@@ -1,4 +1,4 @@
-﻿"""Temporal retrieval strategy."""
+"""Temporal retrieval strategy."""
 
 from __future__ import annotations
 

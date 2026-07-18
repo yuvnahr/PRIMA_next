@@ -1,4 +1,4 @@
-﻿"""Build bounded answering context from retrieved PRIMA memories."""
+"""Build bounded answering context from retrieved PRIMA memories."""
 
 from __future__ import annotations
 

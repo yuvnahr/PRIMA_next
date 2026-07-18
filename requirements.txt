@@ -28,6 +28,7 @@ spacy>=3.7
 # Development/rule-set checks:
 pytest>=8.0
 ruff>=0.5
+xenon>=0.9.3
 mypy>=1.10
 bandit>=1.7
 requests>=2.28

@@ -1,4 +1,4 @@
-﻿"""Reflection memory and rule models."""
+"""Reflection memory and rule models."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-﻿"""Retrieval confidence estimation from multiple evidence signals."""
+"""Retrieval confidence estimation from multiple evidence signals."""
 
 from __future__ import annotations
 
