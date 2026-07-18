@@ -179,6 +179,7 @@ class MemoryNote:
         retention_score: float = 1.0,
         note_id: str | None = None,
         embedding_text: str | None = None,
+        timestamp: datetime | None = None,
     ) -> MemoryNote:
         from memory.embedding_pipeline import get_embedding_pipeline
         keywords = extract_dominant_context_chain(content)
@@ -189,7 +190,7 @@ class MemoryNote:
             embedding_metadata = embedded.metadata
         return cls(
             id=note_id or f"mem_{uuid.uuid4()}", memory_type=memory_type, memory_level=memory_level,
-            content=content, embedding=tuple(embedding), affective_state=affective_state or {}, context=context or {},
+            content=content, embedding=tuple(embedding), timestamp=timestamp or datetime.now(timezone.utc), affective_state=affective_state or {}, context=context or {},
             retrieval_metadata={"keywords": keywords, "dominant_context_chain": keywords, **embedding_metadata},
             state_snapshot=state_snapshot or StateSnapshot(), salience_score=salience_score, retention_score=retention_score,
         )

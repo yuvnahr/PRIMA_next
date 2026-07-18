@@ -204,6 +204,7 @@ class OllamaProvider(OpenAICompatibleProvider):
             "stream": False,
             "think": False,
             "options": {
+                "seed": env_int("PRIMA_ANSWER_SEED", 13),
                 "temperature": env_float("PRIMA_ANSWER_TEMPERATURE", request.temperature),
                 "top_p": env_float("PRIMA_ANSWER_TOP_P", 0.8),
                 "top_k": env_int("PRIMA_ANSWER_TOP_K", 40),
@@ -211,10 +212,15 @@ class OllamaProvider(OpenAICompatibleProvider):
                 "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
             },
         }
-        try:
-            return parse_generic_response(post_json(url, payload, timeout=180), provider="ollama")
-        except ProviderError as exc:
-            raise ProviderError(f"Ollama request failed: {exc}") from exc
+        timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
+        retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
+        last_error: ProviderError | None = None
+        for _ in range(retries + 1):
+            try:
+                return parse_generic_response(post_json(url, payload, timeout=timeout), provider="ollama")
+            except ProviderError as exc:
+                last_error = exc
+        raise ProviderError(f"Ollama request failed after {retries + 1} attempts: {last_error}") from last_error
 
 
 class LMStudioProvider(OpenAICompatibleProvider):

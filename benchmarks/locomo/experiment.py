@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
+import shutil
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 from benchmarks.common.runtime_adapter import PrimaRuntimeAdapter
@@ -15,6 +18,7 @@ from benchmarks.locomo.config import (
     MAX_CONVERSATIONS,
     MAX_QUESTIONS,
     MODEL,
+    OUTPUT_PATH,
     PARALLEL_WORKERS,
     PROVIDER,
     SEED,
@@ -33,10 +37,13 @@ def run_locomo_experiment(
     provider: str = PROVIDER,
     model: str = MODEL,
     parallel_workers: int = PARALLEL_WORKERS,
+    dataset_path: str | None = None,
+    output_path: str | None = None,
 ) -> dict[str, Any]:
     """Run LoCoMo at a configurable scale and write standard artifacts."""
 
-    conversations = list(LoCoMoDataset().conversations())
+    dataset = LoCoMoDataset(Path(dataset_path) if dataset_path else None) if dataset_path else LoCoMoDataset()
+    conversations = list(dataset.conversations())
     random.Random(seed).shuffle(conversations)  # nosec B311
     max_conversations = MAX_CONVERSATIONS if max_conversations is None else max_conversations
     max_questions = MAX_QUESTIONS if max_questions is None else max_questions
@@ -70,7 +77,18 @@ def run_locomo_experiment(
         provider=provider,
         model=model,
         runtime_errors=runtime_errors,
+        output_path=Path(output_path) if output_path else OUTPUT_PATH,
+        metadata={
+            "dataset_path": str(dataset.dataset_path),
+            "backend_fingerprint": hashlib.sha256(dataset.dataset_path.read_bytes()).hexdigest(),
+            "seed": seed,
+            "benchmark_version": "locomo10",
+            "max_conversations": max_conversations,
+            "max_questions": max_questions,
+        },
     )
+    if runtime_errors:
+        raise RuntimeError(f"LoCoMo QA run invalid: {runtime_errors} generation errors; see {paths['raw']}")
     return {
         "conversations": len(conversations),
         "questions": len(results),
@@ -98,8 +116,15 @@ def main() -> None:
     parser.add_argument("--provider", default=PROVIDER)
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--parallel-workers", type=int, default=PARALLEL_WORKERS)
+    parser.add_argument("--dataset-path")
+    parser.add_argument("--output-path", default=str(OUTPUT_PATH))
+    parser.add_argument("--clean-output", action="store_true")
     args = parser.parse_args()
 
+    output_path = Path(args.output_path)
+    if args.clean_output and output_path.exists():
+        shutil.rmtree(output_path)
+    (output_path / "logs").mkdir(parents=True, exist_ok=True)
     result = run_locomo_experiment(
         max_conversations=args.max_conversations,
         max_questions=args.max_questions,
@@ -108,6 +133,8 @@ def main() -> None:
         provider=args.provider,
         model=args.model,
         parallel_workers=args.parallel_workers,
+        dataset_path=args.dataset_path,
+        output_path=str(output_path),
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 

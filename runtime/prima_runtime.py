@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,7 @@ from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
+from llm.response_parser import extract_answer
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext
@@ -87,6 +89,9 @@ class PrimaRuntime:
         answer_context = RuntimeContextBuilder(max_context_tokens).build(question, retrieval_response.results)
         errors: list[str] = []
         llm_used = False
+        prompt: str | None = None
+        raw_response: str | None = None
+        llm_metadata: dict[str, Any] = {}
         inference_settings = self._inference_settings(
             provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
@@ -105,7 +110,15 @@ class PrimaRuntime:
                     temperature=float(inference_settings["temperature"]),
                     max_tokens=int(inference_settings["num_predict"]),
                 )
-                answer = llm_response.text.strip()
+                raw_response = llm_response.text
+                if isinstance(llm_response.raw, dict):
+                    llm_metadata = {
+                        key: llm_response.raw.get(key)
+                        for key in ("model", "thinking", "done", "done_reason", "total_duration", "load_duration", "prompt_eval_count", "eval_count")
+                    }
+                if llm_metadata.get("done_reason") == "length":
+                    errors.append("LLM answer was truncated at the generation limit.")
+                answer = extract_answer(raw_response)
                 llm_used = bool(answer)
                 if not answer:
                     errors.append("LLM returned an empty answer.")
@@ -129,6 +142,9 @@ class PrimaRuntime:
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
             errors=tuple(errors),
             inference_settings=inference_settings,
+            prompt=prompt,
+            raw_response=raw_response,
+            llm_metadata=llm_metadata,
         )
         result = RuntimeResult(
             final_response=answer,
@@ -166,7 +182,7 @@ class PrimaRuntime:
 
         try:
             execution_context = await self.workflow.run(user_input, execution_context)
-            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context)
+            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context, runtime_context.timestamp)
         except Exception as exc:
             errors.append(str(exc))
             execution_context.workflow_state.errors.append(str(exc))
@@ -198,6 +214,7 @@ class PrimaRuntime:
         self,
         user_input: str,
         execution_context: ExecutionContext,
+        timestamp: datetime,
     ) -> tuple[tuple[MemoryNote, ...], MemoryAdmissionDecision]:
         admission_decision = self.memory_importance_engine.decide(
             user_input,
@@ -214,6 +231,7 @@ class PrimaRuntime:
             context={"source": "prima_runtime", "execution_id": execution_context.execution_id},
             state_snapshot=getattr(execution_context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+            timestamp=timestamp,
         )
         return (self.memory_repository.add(note),), admission_decision
 
@@ -290,19 +308,11 @@ class PrimaRuntime:
             "You are answering a benchmark question.\n"
             "Use ONLY the retrieved memory context below.\n"
             "Do not use outside knowledge.\n"
-            "If the context does not contain enough evidence, return exactly: "
-            "{\"answer\": null, \"insufficient_information\": true}\n"
             f"Question: {question}\n\n"
             f"Retrieved memory context:\n{answer_context.context_text}\n\n"
-            "Now answer the question only.\n"
-            "Use a short factual phrase, date, name, list, or yes/no answer when possible.\n"
-            "Maximum two sentences.\n"
-            "Do not explain reasoning.\n"
-            "Do not summarize the conversation.\n"
-            "Do not mention retrieved memories, memory logs, memory IDs, evidence, or context.\n"
-            "Do not start with 'Based on', 'According to', or 'The retrieved'.\n"
-            "Return only the final answer.\n\n"
-            "Final answer:"
+            "Return exactly one JSON object and nothing else: {\"answer\": \"<short factual answer>\"}.\n"
+            "Use a date, name, list, or yes/no answer when possible; do not explain.\n"
+            "If the context is insufficient, return exactly: {\"answer\": null}."
         )
 
     def _extractive_answer(self, answer_context: AnswerContext) -> str:
@@ -336,6 +346,9 @@ class PrimaRuntime:
         model: str,
         errors: tuple[str, ...],
         inference_settings: dict[str, Any],
+        prompt: str | None,
+        raw_response: str | None,
+        llm_metadata: dict[str, Any],
     ) -> dict[str, Any]:
         diagnostics = {
             "question": question,
@@ -360,18 +373,18 @@ class PrimaRuntime:
             "importance_scores": [memory.importance_score for memory in answer_context.memories],
             "retrieval_confidence": retrieval_response.confidence.confidence,
             "retrieval_confidence_components": retrieval_response.confidence.to_dict(),
-            "retrieval_trace": dict(getattr(retrieval_response, "diagnostics", {})),
             "expanded_query": dict(getattr(retrieval_response, "diagnostics", {}).get("expanded_query", {})),
             "entities": list(getattr(retrieval_response, "diagnostics", {}).get("entities", [])),
             "relations": list(getattr(retrieval_response, "diagnostics", {}).get("relations", [])),
             "temporal_constraints": list(getattr(retrieval_response, "diagnostics", {}).get("temporal_constraints", [])),
-            "dense_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("dense_candidates", [])),
-            "sparse_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("sparse_candidates", [])),
-            "reranked_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("reranked_candidates", [])),
             "context_tokens": answer_context.token_count,
             "provider": provider,
             "model": model,
             "errors": list(errors),
+            "prompt": prompt,
+            "raw_response": raw_response,
+            "parsed_answer": extract_answer(raw_response) if raw_response is not None else None,
+            "llm_metadata": llm_metadata,
         }
         diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
         if self._debug_inference_enabled():
@@ -385,9 +398,8 @@ class PrimaRuntime:
         retrieved = diagnostics.get("retrieved_memory_ids", [])
         if not retrieved:
             return "retrieval_miss"
-        trace = diagnostics.get("retrieval_trace", {})
-        entities = set(str(item).lower() for item in trace.get("entities", [])) if isinstance(trace, dict) else set()
-        temporal = trace.get("temporal_constraints", []) if isinstance(trace, dict) else []
+        entities = set(str(item).lower() for item in diagnostics.get("entities", []))
+        temporal = diagnostics.get("temporal_constraints", [])
         confidence = diagnostics.get("retrieval_confidence_components", {})
         if entities and float(confidence.get("entity_overlap_score", 0.0) or 0.0) <= 0.0:
             return "entity_resolution_failure"
@@ -429,7 +441,8 @@ class PrimaRuntime:
             "top_p": self._env_float("PRIMA_ANSWER_TOP_P", 0.8),
             "top_k": self._env_int("PRIMA_ANSWER_TOP_K", 40),
             "repeat_penalty": self._env_float("PRIMA_ANSWER_REPEAT_PENALTY", 1.1),
-            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 64),
+            "seed": self._env_int("PRIMA_ANSWER_SEED", 13),
+            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 128),
             "context_tokens": answer_context.token_count,
             "retrieved_memories": len(answer_context.memories),
         }

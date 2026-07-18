@@ -73,6 +73,10 @@ class LoCoMoAdapter:
         for index, question in enumerate(qa_payload):
             if not isinstance(question, dict):
                 continue
+            category = self._optional_string(question.get("category"))
+            answer = question.get("answer")
+            if answer is None and category == "5":
+                answer = "No information available"
             metadata = {
                 key: value
                 for key, value in question.items()
@@ -87,9 +91,9 @@ class LoCoMoAdapter:
             questions.append(
                 ConversationQuestion(
                     question=str(question.get("question", "")),
-                    answer=self._optional_string(question.get("answer")),
+                    answer=self._optional_string(answer),
                     question_id=self._optional_string(question.get("question_id") or question.get("id") or index),
-                    category=self._optional_string(question.get("category")),
+                    category=category,
                     evidence=tuple(str(item) for item in evidence),
                     metadata=metadata,
                 )
