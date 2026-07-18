@@ -1,0 +1,26 @@
+# LoCoMo QA Report
+
+- total_results: 1986
+- answerable_results: 1986
+- exact_match: 0.23011077542799596
+- f1: 0.3533504816810778
+- bleu: 0.13835007719503647
+- rouge_l: 0.3449650788255692
+- bertscore: 0.39668885399539383
+- latency_ms: 1707.9623731117824
+- average_retrieved_memories: 5.0
+- reflection_rate: 0.0
+- memory_hits: 0.6097683786505539
+- stored_evidence_recall: 0.9890172652867966
+- dense_evidence_recall: 0.7084921783643182
+- sparse_evidence_recall: 0.4970832430090424
+- candidate_evidence_recall: 0.8023224576226523
+- fusion_evidence_recall: 0.734671040953845
+- reranked_evidence_recall: 0.7369179332397997
+- final_context_evidence_recall: 0.543555859345333
+- final_all_evidence_rate: 0.4876302083333333
+- average_relevant_final_rank: 1.8338249754178957
+- evidence_scored_questions: 1536.0
+- category_metrics: {'1': {'question_count': 282, 'exact_match': 0.06382978723404255, 'f1': 0.2579539333723566, 'memory_hits': 0.6879432624113475, 'stored_evidence_recall': 0.9789175954069571, 'dense_evidence_recall': 0.5191250814011172, 'sparse_evidence_recall': 0.2943350410735629, 'candidate_evidence_recall': 0.6207731409439136, 'fusion_evidence_recall': 0.5238956985737501, 'reranked_evidence_recall': 0.5092428376442933, 'final_context_evidence_recall': 0.2540843970015303, 'final_all_evidence_rate': 0.06382978723404255, 'average_relevant_final_rank': 2.391089108910891, 'evidence_scored_questions': 282.0}, '2': {'question_count': 321, 'exact_match': 0.03115264797507788, 'f1': 0.11604361370716511, 'memory_hits': 0.4205607476635514, 'stored_evidence_recall': 0.9922118380062306, 'dense_evidence_recall': 0.754932502596054, 'sparse_evidence_recall': 0.6103322949117341, 'candidate_evidence_recall': 0.833852544132918, 'fusion_evidence_recall': 0.7980269989615785, 'reranked_evidence_recall': 0.7988058151609554, 'final_context_evidence_recall': 0.6529075804776739, 'final_all_evidence_rate': 0.6199376947040498, 'average_relevant_final_rank': 1.5782608695652174, 'evidence_scored_questions': 321.0}, '3': {'question_count': 96, 'exact_match': 0.11458333333333333, 'f1': 0.19479070042544264, 'memory_hits': 0.59375, 'stored_evidence_recall': 0.9555335968379446, 'dense_evidence_recall': 0.40055122839649693, 'sparse_evidence_recall': 0.2927613733240332, 'candidate_evidence_recall': 0.5305355343718515, 'fusion_evidence_recall': 0.42082752073161284, 'reranked_evidence_recall': 0.46249418739827947, 'final_context_evidence_recall': 0.2717391304347826, 'final_all_evidence_rate': 0.1956521739130435, 'average_relevant_final_rank': 2.088235294117647, 'evidence_scored_questions': 92.0}, '4': {'question_count': 841, 'exact_match': 0.29607609988109396, 'f1': 0.48045319877143106, 'memory_hits': 0.8989298454221165, 'stored_evidence_recall': 0.9948474038842647, 'dense_evidence_recall': 0.7879508521601268, 'sparse_evidence_recall': 0.5441934205311137, 'candidate_evidence_recall': 0.8808957590170432, 'fusion_evidence_recall': 0.8154974237019422, 'reranked_evidence_recall': 0.8196591359492668, 'final_context_evidence_recall': 0.6286167261196988, 'final_all_evidence_rate': 0.6111771700356718, 'average_relevant_final_rank': 1.720508166969147, 'evidence_scored_questions': 841.0}, '5': {'question_count': 446, 'exact_match': 0.3789237668161435, 'f1': 0.3789237668161435, 'memory_hits': 0.1547085201793722, 'stored_evidence_recall': 0.0, 'dense_evidence_recall': 0.0, 'sparse_evidence_recall': 0.0, 'candidate_evidence_recall': 0.0, 'fusion_evidence_recall': 0.0, 'reranked_evidence_recall': 0.0, 'final_context_evidence_recall': 0.0, 'final_all_evidence_rate': 0.0, 'average_relevant_final_rank': 0.0, 'evidence_scored_questions': 0.0}}
+- failure_taxonomy: {'total_failures': 1529, 'counts': {'A_gold_absent_candidate_pool': 370, 'B_gold_lost_ranking_or_selection': 283, 'C_evidence_present_llm_error': 248, 'D_evaluation_penalty': 63, 'E_temporal_reasoning': 192, 'F_multi_memory_aggregation': 92, 'G_query_understanding_or_expansion': 0, 'H_other_ambiguous': 281}, 'percentages': {'A_gold_absent_candidate_pool': 0.2419882275997384, 'B_gold_lost_ranking_or_selection': 0.18508829300196206, 'C_evidence_present_llm_error': 0.16219751471550034, 'D_evaluation_penalty': 0.041203400915631135, 'E_temporal_reasoning': 0.12557226945716154, 'F_multi_memory_aggregation': 0.060170045781556575, 'G_query_understanding_or_expansion': 0.0, 'H_other_ambiguous': 0.18378024852844996}}
+- failures: 1529
