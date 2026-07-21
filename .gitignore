@@ -71,3 +71,6 @@ benchmarks/locomo/outputs/**/*event*.json
 benchmarks/locomo/outputs/**/*event*.md
 *.tmp.json
 *.tmp.csv
+# Request-local reasoning validation output
+evaluation/results/reasoning_controller_validation.json
+evaluation/results/reasoning_smoke_results.json

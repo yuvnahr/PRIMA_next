@@ -21,6 +21,9 @@ from memory.retrieval.retrieval_request import RetrievalRequest
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
 from reflection.reflection_engine import ReflectionEngine
+from reasoning.config import reasoning_budget, reasoning_mode as configured_reasoning_mode
+from reasoning.controller import ReasoningController
+from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
@@ -45,6 +48,7 @@ class PrimaRuntime:
         self.reflection_engine = reflection_engine or ReflectionEngine()
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
         self.retrieval_controller = RetrievalController(self.memory_repository)
+        self.reasoning_controller = ReasoningController()
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -62,6 +66,7 @@ class PrimaRuntime:
             self.memory_repository = InMemoryMemoryRepository()
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
             self.retrieval_controller = RetrievalController(self.memory_repository)
+            self.reasoning_controller = ReasoningController()
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
@@ -76,15 +81,56 @@ class PrimaRuntime:
         provider: str | None = None,
         model: str | None = None,
         max_context_tokens: int | None = None,
-    ) -> RuntimeResult:
-        """Answer a question from retrieved runtime memories instead of echoing input."""
+        session_id: str | None = None,
+        reasoning_mode: str | None = None,
+        max_hops: int | None = None,
+        diagnostics: bool = False,
+    ) -> AnswerResult:
+        """Answer through the canonical bounded evidence-acquisition controller."""
 
-        start = time.perf_counter()
         top_k = int(top_k or os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
         max_context_tokens = int(max_context_tokens or os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
-        request = RetrievalRequest(query=question, top_k=top_k)
-        retrieval_response = self.retrieval_controller.retrieve(request)
-        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, retrieval_response.results)
+        mode = ReasoningMode.DIAGNOSTIC if diagnostics else configured_reasoning_mode(reasoning_mode)
+        request = ReasoningRequest(
+            question=question,
+            session_id=session_id or (context.session_id if context is not None else ""),
+            mode=mode,
+            budget=reasoning_budget(max_hops=max_hops, max_context_tokens=max_context_tokens),
+        )
+        result = self.reasoning_controller.answer(
+            request,
+            retrieve=lambda query: self.retrieval_controller.retrieve(RetrievalRequest(query=query, top_k=top_k)),
+            synthesize=lambda prompt, evidence: self._synthesize_evidence(
+                prompt, evidence, provider=provider, model=model, max_context_tokens=max_context_tokens
+            ),
+        )
+        if context is not None:
+            context.retrieved_memories = result.retrieved_memories
+            context.confidence_score = result.confidence
+        self._log_answer(question, {
+            "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
+            "context_length": result.answer_diagnostics.get("context_tokens", 0),
+            "llm_used": result.answer_diagnostics.get("llm_used", False),
+            "latency_ms": 0.0,
+            "reflection_used": False,
+            "provider": result.answer_diagnostics.get("provider", ""),
+            "model": result.answer_diagnostics.get("model", ""),
+            "errors": list(result.errors),
+        })
+        return result
+
+    def _synthesize_evidence(
+        self,
+        question: str,
+        evidence: tuple[Any, ...],
+        *,
+        provider: str | None,
+        model: str | None,
+        max_context_tokens: int,
+    ) -> tuple[str, bool, tuple[str, ...], dict[str, Any]]:
+        """Reuse the established bounded context and LLM answer path after acquisition."""
+
+        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, evidence)
         errors: list[str] = []
         llm_used = False
         inference_settings = self._inference_settings(
@@ -92,7 +138,6 @@ class PrimaRuntime:
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
             answer_context=answer_context,
         )
-
         if not answer_context.memories:
             answer = self._insufficient_information_answer(question, reason="no_retrieved_memories")
         else:
@@ -113,41 +158,16 @@ class PrimaRuntime:
             except (ProviderError, RuntimeError, ValueError) as exc:
                 errors.append(str(exc))
                 answer = self._extractive_answer(answer_context)
-
         if answer.strip() == question.strip():
             errors.append("Answer matched question text; replaced with insufficient-information response.")
             answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
-
-        latency_ms = round((time.perf_counter() - start) * 1000, 3)
-        diagnostics = self._answer_diagnostics(
-            question=question,
-            answer_context=answer_context,
-            retrieval_response=retrieval_response,
-            llm_used=llm_used,
-            latency_ms=latency_ms,
-            provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
-            model=model or os.getenv("PRIMA_LLM_MODEL", ""),
-            errors=tuple(errors),
-            inference_settings=inference_settings,
-        )
-        result = RuntimeResult(
-            final_response=answer,
-            prediction_before_reflection=answer,
-            prediction_after_reflection=answer,
-            affect_state={},
-            retrieved_memories=retrieval_response.results,
-            memory_notes_created=(),
-            reflection_triggered=answer_context.reflection_used,
-            confidence_score=retrieval_response.confidence.confidence,
-            latency_ms=latency_ms,
-            errors=tuple(errors),
-            answer_diagnostics=diagnostics,
-        )
-        if context is not None:
-            context.retrieved_memories = retrieval_response.results
-            context.confidence_score = result.confidence_score
-        self._log_answer(question, diagnostics)
-        return result
+        return answer, llm_used, tuple(errors), {
+            "llm_used": llm_used,
+            "context_tokens": answer_context.token_count,
+            "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
+            "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
+            "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+        }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
         """Process one user input through the integrated workflow."""
@@ -287,7 +307,7 @@ class PrimaRuntime:
 
     def _build_answer_prompt(self, question: str, answer_context: AnswerContext) -> str:
         return (
-            "You are answering a benchmark question.\n"
+            "You are answering a question from PRIMA-NEXT memory.\n"
             "Use ONLY the retrieved memory context below.\n"
             "Do not use outside knowledge.\n"
             "If the context does not contain enough evidence, return exactly: "
