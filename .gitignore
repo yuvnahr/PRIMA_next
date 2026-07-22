@@ -30,6 +30,7 @@ Thumbs.db
 cleanup_reports/
 
 # Generated benchmark/debug artifacts
+benchmarks/*/external/
 benchmarks/locomo/outputs/debug_*/
 benchmarks/locomo/outputs/tmp_*/
 benchmarks/locomo/outputs/**/*.log
