@@ -26,6 +26,9 @@ def evaluate(gold: list[frozenset[str]], predicted: list[frozenset[str]], labels
     micro_precision, micro_recall, micro_f1 = _scores(**totals)
     supports = [int(per_class[label]["support"]) for label in labels]
     exact_accuracy = _ratio(sum(actual == guess for actual, guess in zip(gold, predicted, strict=True)), len(gold))
+    sample_scores = [_scores(len(actual & guess), len(guess - actual), len(actual - guess)) for actual, guess in zip(gold, predicted, strict=True)]
+    cooccurrence = _cooccurrence(gold, predicted, labels)
+    total_labels = max(1, len(gold) * len(labels))
     return {
         "sample_count": len(gold),
         "accuracy": exact_accuracy,
@@ -41,8 +44,31 @@ def evaluate(gold: list[frozenset[str]], predicted: list[frozenset[str]], labels
         "per_class": per_class,
         "label_distribution": dict(Counter(label for row in gold for label in row)),
         "prediction_distribution": dict(Counter(label for row in predicted for label in row)),
-        "confusion_matrix": _cooccurrence(gold, predicted, labels),
+        "confusion_matrix": cooccurrence,
+        "row_normalized_cooccurrence": {label: {guess: _ratio(value, sum(cooccurrence[label].values())) for guess, value in cooccurrence[label].items()} for label in labels},
+        "hamming_loss": _ratio(sum(len(actual ^ guess) for actual, guess in zip(gold, predicted, strict=True)), total_labels),
+        "sample_precision": _mean(score[0] for score in sample_scores),
+        "sample_recall": _mean(score[1] for score in sample_scores),
+        "sample_f1": _mean(score[2] for score in sample_scores),
+        "jaccard": _mean(_ratio(len(actual & guess), len(actual | guess)) for actual, guess in zip(gold, predicted, strict=True)),
+        "label_cardinality": _mean(len(row) for row in gold),
+        "prediction_cardinality": _mean(len(row) for row in predicted),
+        "cardinality_error": _mean(abs(len(actual) - len(guess)) for actual, guess in zip(gold, predicted, strict=True)),
+        "empty_prediction_count": sum(not row for row in predicted),
+        "neutral_only_rate": _ratio(sum(row == {"neutral"} for row in predicted), len(predicted)),
+        "multi_label_prediction_rate": _ratio(sum(len(row) > 1 for row in predicted), len(predicted)),
     }
+
+
+def probability_metrics(gold: list[frozenset[str]], probabilities: list[dict[str, float]], labels: list[str]) -> dict[str, Any]:
+    """Probability-only diagnostics; callers must not use this for label-only systems."""
+    if len(gold) != len(probabilities):
+        raise ValueError("Gold and probability counts must match.")
+    values = [(label in truth, float(row[label])) for truth, row in zip(gold, probabilities, strict=True) for label in labels]
+    brier = _mean((score - int(target)) ** 2 for target, score in values)
+    per_label = {label: _pr_auc([(label in truth, float(row[label])) for truth, row in zip(gold, probabilities, strict=True)]) for label in labels}
+    valid = [value for value in per_label.values() if value is not None]
+    return {"available": True, "brier_score": brier, "expected_calibration_error": _ece(values), "per_label_pr_auc": per_label, "macro_pr_auc": _mean(valid) if valid else None, "micro_pr_auc": _pr_auc(values)}
 
 
 def render_figures(metrics: dict[str, Any], labels: list[str], confusion_path: str, label_path: str, prediction_path: str) -> None:
@@ -96,3 +122,28 @@ def _weighted(per_class: dict[str, dict[str, float | int]], labels: list[str], s
 
 def _cooccurrence(gold: list[frozenset[str]], predicted: list[frozenset[str]], labels: list[str]) -> dict[str, dict[str, int]]:
     return {actual: {guess: sum(actual in truth and guess in prediction for truth, prediction in zip(gold, predicted, strict=True)) for guess in labels} for actual in labels}
+
+
+def _pr_auc(values: list[tuple[bool, float]]) -> float | None:
+    positives = sum(target for target, _ in values)
+    if not positives:
+        return None
+    tp = fp = 0
+    previous_recall = area = 0.0
+    for target, _ in sorted(values, key=lambda item: item[1], reverse=True):
+        tp += int(target)
+        fp += int(not target)
+        recall, precision = tp / positives, tp / (tp + fp)
+        area += (recall - previous_recall) * precision
+        previous_recall = recall
+    return round(area, 6)
+
+
+def _ece(values: list[tuple[bool, float]], bins: int = 10) -> float:
+    error = 0.0
+    for index in range(bins):
+        lower, upper = index / bins, (index + 1) / bins
+        bucket = [(target, score) for target, score in values if lower <= score < upper or (index == bins - 1 and score == upper)]
+        if bucket:
+            error += len(bucket) / len(values) * abs(_mean(score for _, score in bucket) - _mean(int(target) for target, _ in bucket))
+    return round(error, 6)

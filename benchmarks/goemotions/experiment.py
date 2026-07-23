@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Any
 
 from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExample, load_examples, load_labels
-from benchmarks.goemotions.metrics import evaluate, render_figures
+from benchmarks.goemotions.metrics import evaluate, probability_metrics, render_figures
 from benchmarks.goemotions.prompts import build_prompt
-from llm.llm_client import LLMClient
+from benchmarks.goemotions.systems import EncoderSystem, GoEmotionsSystem, HybridSystem, PrimaGoEmotionsSystem, PrimaQwenSystem, QwenSchemaSystem, QwenZeroShotSystem
 
 
 OUTPUT_PATH = Path("evaluation/goemotions")
@@ -34,31 +34,49 @@ def run_goemotions_experiment(
     parallel_workers: int = 1,
     provider: str = "ollama",
     model: str = DEFAULT_MODEL,
+    system: str = "qwen_zero_shot",
+    split: str = "test",
+    sample_manifest: Path | None = None,
+    write_sample_manifest: Path | None = None,
+    thresholds: Path | None = None,
+    calibration: Path | None = None,
+    progress: bool = True,
 ) -> dict[str, Any]:
     """Run a deterministic GoEmotions test split and write standard artifacts."""
 
+    if split not in {"train", "dev", "test"}:
+        raise ValueError("split must be train, dev, or test.")
+    dataset_path = dataset_path.with_name(f"{split}.tsv")
     labels = load_labels(dataset_path.with_name("emotions.txt"))
     examples = load_examples(dataset_path, dataset_path.with_name("emotions.txt"))
     if batch_size < 1 or parallel_workers < 1:
         raise ValueError("batch_size and parallel_workers must be positive.")
-    if max_samples > 0:
+    if sample_manifest and max_samples:
+        raise ValueError("Use either sample_manifest or max_samples, not both.")
+    if sample_manifest:
+        examples = _examples_from_manifest(examples, dataset_path, sample_manifest)
+    elif max_samples > 0:
         examples = random.Random(seed).sample(examples, min(max_samples, len(examples)))  # nosec B311
+    if write_sample_manifest:
+        _write_sample_manifest(examples, dataset_path, split, seed, write_sample_manifest)
     paths = _artifact_paths(output_path)
     for path in {item.parent for item in paths.values()}:
         path.mkdir(parents=True, exist_ok=True)
 
+    active_system = _system(system, provider, model, device, batch_size, thresholds, calibration)
     previous_seed, previous_temperature = os.environ.get("PRIMA_ANSWER_SEED"), os.environ.get("PRIMA_ANSWER_TEMPERATURE")
     os.environ["PRIMA_ANSWER_SEED"] = str(seed)
     os.environ["PRIMA_ANSWER_TEMPERATURE"] = "0"
     try:
-        records: list[dict[str, Any]] = []
-        for start in range(0, len(examples), batch_size):
-            batch = examples[start : start + batch_size]
-            if parallel_workers > 1:
-                with ThreadPoolExecutor(max_workers=parallel_workers) as executor:
-                    records.extend(executor.map(lambda item: _classify(item, labels, provider, model), batch))
-            else:
-                records.extend(_classify(example, labels, provider, model) for example in batch)
+        if hasattr(active_system, "predict_many"):
+            responses = active_system.predict_many([example.text for example in examples], labels)  # type: ignore[attr-defined]
+            records = [_classify_response(example, labels, raw_response, details, build_prompt(example.text, labels)) for example, (raw_response, details) in zip(examples, responses, strict=True)]
+            _progress_update(len(records), len(records), enabled=progress, complete=True)
+        elif parallel_workers > 1:
+            with ThreadPoolExecutor(max_workers=parallel_workers) as executor:
+                records = list(_progress(executor.map(lambda item: _classify(item, labels, active_system), examples), len(examples), enabled=progress))
+        else:
+            records = [_classify(example, labels, active_system) for example in _progress(examples, len(examples), enabled=progress)]
     finally:
         _restore_environment("PRIMA_ANSWER_SEED", previous_seed)
         _restore_environment("PRIMA_ANSWER_TEMPERATURE", previous_temperature)
@@ -67,14 +85,18 @@ def run_goemotions_experiment(
     predicted = [frozenset(record["predicted_labels"]) for record in records]
     metrics = evaluate(gold, predicted, labels)
     failures = [record for record in records if record["gold_labels"] != record["predicted_labels"]]
+    metrics["parse_failure_count"] = sum(record["parse_error"] is not None for record in records)
+    metrics["parse_failure_rate"] = round(metrics["parse_failure_count"] / len(records), 6) if records else 0.0
+    probability_rows = [record["prediction"]["probabilities"] for record in records if isinstance(record.get("prediction"), dict)]
+    metrics["probability_metrics"] = probability_metrics(gold, probability_rows, labels) if len(probability_rows) == len(records) else {"available": False, "reason": "This system emits label sets, not calibrated per-label probabilities."}
     metadata = {
         "benchmark": "goemotions",
         "dataset_path": str(dataset_path),
         "dataset_sha256": hashlib.sha256(dataset_path.read_bytes()).hexdigest(),
         "dataset_samples": len(examples),
         "labels": labels,
-        "runtime": {"provider": provider, "model": model, "temperature": 0, "thinking": False, "seed": seed, "device": device},
-        "execution": {"batch_size": batch_size, "parallel_workers": parallel_workers},
+        "runtime": {"provider": provider, "model": model, "system": active_system.name, "temperature": 0, "thinking": False, "seed": seed, "device": device, "split": split},
+        "execution": {"requested_batch_size": batch_size, "actual_batch_size": batch_size if hasattr(active_system, "predict_many") else 1, "parallel_workers": parallel_workers, "note": "Ollama systems issue one request per example; encoder systems batch tensors."},
         "hardware": {"platform": platform.platform(), "machine": platform.machine(), "processor": platform.processor()},
         "git_commit": _git_commit(),
     }
@@ -90,11 +112,32 @@ def run_goemotions_experiment(
     return {"samples": len(records), "metrics": metrics, "artifacts": {name: str(path) for name, path in paths.items()}}
 
 
-def _classify(example: GoEmotionsExample, labels: list[str], provider: str, model: str) -> dict[str, Any]:
+def _classify(example: GoEmotionsExample, labels: list[str], system: GoEmotionsSystem) -> dict[str, Any]:
     prompt = build_prompt(example.text, labels)
-    response = LLMClient(provider_name=provider).chat(prompt=prompt, model=model, temperature=0, max_tokens=128)
-    predicted, parse_error = _parse_labels(response.text, labels)
-    return {"id": example.example_id, "text": example.text, "gold_labels": sorted(example.labels), "predicted_labels": sorted(predicted), "prompt": prompt, "raw_response": response.text, "provider_response": response.raw, "parse_error": parse_error}
+    raw_response, metadata = system.predict(example.text, labels)
+    return _classify_response(example, labels, raw_response, metadata, prompt)
+
+
+def _classify_response(example: GoEmotionsExample, labels: list[str], raw_response: str, metadata: dict[str, Any], prompt: str) -> dict[str, Any]:
+    predicted, parse_error = _parse_labels(raw_response, labels)
+    return {"id": example.example_id, "text": example.text, "gold_labels": sorted(example.labels), "predicted_labels": sorted(predicted), "prompt": prompt, "raw_response": raw_response, **metadata, "parse_error": parse_error}
+
+
+def _system(name: str, provider: str, model: str, device: str, batch_size: int, thresholds: Path | None = None, calibration: Path | None = None) -> GoEmotionsSystem:
+    if name == "qwen_zero_shot":
+        return QwenZeroShotSystem(provider, model)
+    if name == "qwen_schema":
+        return QwenSchemaSystem(provider, model)
+    if name == "prima_qwen":
+        return PrimaQwenSystem(provider, model)
+    if name == "prima_goemotions":
+        return PrimaGoEmotionsSystem(model if model != DEFAULT_MODEL else "SamLowe/roberta-base-go_emotions", device, batch_size, thresholds, calibration)
+    if name == "goemotions_hybrid":
+        return HybridSystem(model if model != DEFAULT_MODEL else "microsoft/deberta-v3-small", provider, device, batch_size, thresholds, calibration)
+    if name in {"goemotions_pretrained", "goemotions_deberta"}:
+        default = "SamLowe/roberta-base-go_emotions" if name == "goemotions_pretrained" else "microsoft/deberta-v3-small"
+        return EncoderSystem(name, model if model != DEFAULT_MODEL else default, device, batch_size, thresholds, calibration)
+    raise ValueError(f"Unsupported GoEmotions system: {name}")
 
 
 def _parse_labels(response: str, labels: list[str]) -> tuple[frozenset[str], str | None]:
@@ -107,9 +150,33 @@ def _parse_labels(response: str, labels: list[str]) -> tuple[frozenset[str], str
         if unknown:
             raise ValueError(f"Unknown labels: {', '.join(unknown)}")
         parsed = frozenset(values)
-        return (parsed - {"neutral"} if len(parsed) > 1 else parsed), None
+        if "neutral" in parsed and len(parsed) > 1:
+            raise ValueError("neutral cannot coexist with non-neutral labels")
+        return parsed, None
     except (json.JSONDecodeError, ValueError) as exc:
         return frozenset(), str(exc)
+
+
+def _examples_from_manifest(examples: list[GoEmotionsExample], dataset_path: Path, manifest_path: Path) -> list[GoEmotionsExample]:
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    expected_hash = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+    if payload.get("dataset_sha256") != expected_hash:
+        raise ValueError("Sample manifest belongs to a different dataset split.")
+    by_id = {example.example_id: example for example in examples}
+    ids = [item["id"] for item in payload.get("samples", []) if isinstance(item, dict) and isinstance(item.get("id"), str)]
+    if not ids or len(ids) != len(payload.get("samples", [])) or len(set(ids)) != len(ids):
+        raise ValueError("Sample manifest must contain unique sample IDs.")
+    try:
+        return [by_id[example_id] for example_id in ids]
+    except KeyError as exc:
+        raise ValueError(f"Sample manifest ID is not in this split: {exc.args[0]}") from exc
+
+
+def _write_sample_manifest(examples: list[GoEmotionsExample], dataset_path: Path, split: str, seed: int, path: Path) -> None:
+    payload: dict[str, Any] = {"seed": seed, "split": split, "dataset_sha256": hashlib.sha256(dataset_path.read_bytes()).hexdigest(), "samples": [{"id": example.example_id, "labels": sorted(example.labels)} for example in examples]}
+    payload["manifest_sha256"] = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(path, payload)
 
 
 def _artifact_paths(root: Path) -> dict[str, Path]:
@@ -139,6 +206,28 @@ def _git_commit() -> str | None:
         return None
 
 
+def _progress(items, total: int, *, enabled: bool):
+    if not enabled:
+        yield from items
+        return
+    try:
+        from tqdm import tqdm
+        yield from tqdm(items, total=total, desc="GoEmotions test", unit="sample")
+    except ImportError:
+        import time
+        started = time.monotonic()
+        for index, item in enumerate(items, start=1):
+            if index == total or index % max(1, total // 20) == 0:
+                rate = index / max(time.monotonic() - started, 1e-6)
+                print(f"GoEmotions test: {index}/{total} [{index * 100 // total}%] | {rate:.1f} samples/s", flush=True)
+            yield item
+
+
+def _progress_update(current: int, total: int, *, enabled: bool, complete: bool = False) -> None:
+    if enabled and complete:
+        print(f"GoEmotions test: {current}/{total} [100%] | batched classifier complete", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the GoEmotions benchmark.")
     parser.add_argument("--dataset-path", type=Path, default=DEFAULT_DATASET_PATH)
@@ -150,8 +239,17 @@ def main() -> None:
     parser.add_argument("--parallel-workers", type=int, default=1)
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--system", choices=("qwen_zero_shot", "qwen_schema", "prima_qwen", "prima_goemotions", "goemotions_pretrained", "goemotions_deberta", "goemotions_hybrid"), default="qwen_zero_shot")
+    parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
+    parser.add_argument("--sample-manifest", type=Path)
+    parser.add_argument("--write-sample-manifest", type=Path)
+    parser.add_argument("--thresholds", type=Path)
+    parser.add_argument("--calibration", type=Path)
+    parser.add_argument("--no-progress", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(run_goemotions_experiment(**vars(args)), indent=2, sort_keys=True))
+    values = vars(args)
+    values["progress"] = not values.pop("no_progress")
+    print(json.dumps(run_goemotions_experiment(**values), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

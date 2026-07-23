@@ -32,9 +32,9 @@ class LLMClient:
         self.provider = ProviderFactory.get_provider(self.provider_name, settings=self.settings)
         self.rate_limiter = rate_limiter or RateLimiter(getattr(self.settings, "rate_limit_per_minute", 60) if self.settings else 60)
 
-    def chat(self, prompt: str, model: str | None = None, temperature: float = 0.0, max_tokens: int | None = None) -> LLMResponse:
+    def chat(self, prompt: str, model: str | None = None, temperature: float = 0.0, max_tokens: int | None = None, response_schema: dict[str, Any] | None = None) -> LLMResponse:
         model_arg = str(model or getattr(self.settings, "default_model", ""))
-        request = LLMRequest(model=model_arg, prompt=prompt, temperature=temperature, max_tokens=max_tokens)
+        request = LLMRequest(model=model_arg, prompt=prompt, temperature=temperature, max_tokens=max_tokens, response_schema=response_schema)
         if not self.rate_limiter.allow():
             raise RuntimeError("Rate limit exceeded")
 

@@ -9,14 +9,20 @@ if ($venvReady) {
 }
 
 if (-not $venvReady) {
-    if (Test-Path 'venv') { Remove-Item -Recurse -Force 'venv' }
+    $venvCreator = $null
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        & py -3 -m venv venv
-    } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-        & python -m venv venv
-    } else {
+        & py -3 --version 2>$null
+        if ($LASTEXITCODE -eq 0) { $venvCreator = 'py' }
+    }
+    if (-not $venvCreator -and (Get-Command python -ErrorAction SilentlyContinue)) {
+        & python --version 2>$null
+        if ($LASTEXITCODE -eq 0) { $venvCreator = 'python' }
+    }
+    if (-not $venvCreator) {
         throw 'Python 3 is required to create venv.'
     }
+    if (Test-Path 'venv') { Remove-Item -Recurse -Force 'venv' }
+    if ($venvCreator -eq 'py') { & py -3 -m venv venv } else { & python -m venv venv }
     if ($LASTEXITCODE) { throw 'Failed to create venv.' }
 }
 
@@ -37,3 +43,5 @@ if ($LASTEXITCODE) { throw 'Failed to configure the GoEmotions sparse checkout.'
 
 & $venvPython -m pip install -r (Join-Path $PSScriptRoot 'requirements.txt')
 if ($LASTEXITCODE) { throw 'Failed to install requirements.' }
+& $venvPython -m pip install -r (Join-Path $PSScriptRoot 'requirements-goemotions.txt')
+if ($LASTEXITCODE) { throw 'Failed to install GoEmotions requirements.' }

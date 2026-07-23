@@ -194,7 +194,10 @@ class EmotionEvalRunner:
 def canonical_label(label: str) -> str:
     """Map legacy and external labels onto the core evaluation label set."""
     normalized = label.strip().lower().replace(" ", "_")
-    return LABEL_ALIASES.get(normalized, normalized if normalized in CORE_LABELS else "joy")
+    canonical = LABEL_ALIASES.get(normalized, normalized)
+    if canonical not in CORE_LABELS:
+        raise ValueError(f"Unsupported emotion label: {label!r}")
+    return canonical
 
 
 def default_models() -> tuple[EmotionModel, ...]:

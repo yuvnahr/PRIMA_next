@@ -123,6 +123,8 @@ class OpenAICompatibleProvider(Provider):
             "messages": [{"role": "user", "content": request.prompt}],
             "temperature": request.temperature,
         }
+        if request.response_schema is not None:
+            payload["response_format"] = {"type": "json_schema", "json_schema": {"name": "response", "schema": request.response_schema}}
         if request.max_tokens is not None:
             payload["max_tokens"] = int(request.max_tokens)
 
@@ -212,6 +214,8 @@ class OllamaProvider(OpenAICompatibleProvider):
                 "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
             },
         }
+        if request.response_schema is not None:
+            payload["format"] = request.response_schema
         timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
         retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
         last_error: ProviderError | None = None
