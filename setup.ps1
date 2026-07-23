@@ -2,8 +2,14 @@ $ErrorActionPreference = 'Stop'
 
 Set-Location $PSScriptRoot
 $venvPython = Join-Path $PSScriptRoot 'venv\Scripts\python.exe'
+$venvReady = Test-Path $venvPython
+if ($venvReady) {
+    & $venvPython --version 2>$null
+    $venvReady = $LASTEXITCODE -eq 0
+}
 
-if (-not (Test-Path $venvPython)) {
+if (-not $venvReady) {
+    if (Test-Path 'venv') { Remove-Item -Recurse -Force 'venv' }
     if (Get-Command py -ErrorAction SilentlyContinue) {
         & py -3 -m venv venv
     } elseif (Get-Command python -ErrorAction SilentlyContinue) {

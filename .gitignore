@@ -31,6 +31,7 @@ cleanup_reports/
 
 # Generated benchmark/debug artifacts
 benchmarks/*/external/
+evaluation/goemotions/
 benchmarks/locomo/outputs/debug_*/
 benchmarks/locomo/outputs/tmp_*/
 benchmarks/locomo/outputs/**/*.log
