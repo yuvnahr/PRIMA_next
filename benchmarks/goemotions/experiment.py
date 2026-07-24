@@ -9,6 +9,8 @@ import os
 import platform
 import random
 import subprocess
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -17,7 +19,7 @@ from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExampl
 from benchmarks.goemotions.metrics import evaluate, probability_metrics, render_figures
 from benchmarks.goemotions.prompts import build_prompt
 from benchmarks.goemotions.systems import EncoderSystem, GoEmotionsSystem, HybridSystem, PrimaGoEmotionsSystem, PrimaQwenSystem, QwenSchemaSystem, QwenZeroShotSystem
-
+from llm.provider import ProviderError
 
 OUTPUT_PATH = Path("evaluation/goemotions")
 DEFAULT_MODEL = "qwen3.5:4b"
@@ -59,6 +61,7 @@ def run_goemotions_experiment(
         examples = random.Random(seed).sample(examples, min(max_samples, len(examples)))  # nosec B311
     if write_sample_manifest:
         _write_sample_manifest(examples, dataset_path, split, seed, write_sample_manifest)
+    _preflight_provider(provider, system, model)
     paths = _artifact_paths(output_path)
     for path in {item.parent for item in paths.values()}:
         path.mkdir(parents=True, exist_ok=True)
@@ -122,6 +125,19 @@ def _classify_response(example: GoEmotionsExample, labels: list[str], raw_respon
     predicted, parse_error = _parse_labels(raw_response, labels)
     return {"id": example.example_id, "text": example.text, "gold_labels": sorted(example.labels), "predicted_labels": sorted(predicted), "prompt": prompt, "raw_response": raw_response, **metadata, "parse_error": parse_error}
 
+
+def _preflight_provider(provider: str, system: str, model: str) -> None:
+    if provider.lower() != "ollama" or system not in {"qwen_zero_shot", "qwen_schema", "prima_qwen", "goemotions_hybrid"}:
+        return
+    base = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
+    try:
+        with urllib.request.urlopen(f"{base}/api/tags", timeout=5) as response:  # nosec B310
+            payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, urllib.error.URLError, TimeoutError) as exc:
+        raise ProviderError(f"Ollama is not reachable at {base}. Start it with: ollama serve") from None
+    names = {item.get("name") for item in payload.get("models", []) if isinstance(item, dict)}
+    if model not in names:
+        raise ProviderError(f"Ollama model '{model}' is not installed. Run: ollama pull {model}")
 
 def _system(name: str, provider: str, model: str, device: str, batch_size: int, thresholds: Path | None = None, calibration: Path | None = None) -> GoEmotionsSystem:
     if name == "qwen_zero_shot":
@@ -249,8 +265,11 @@ def main() -> None:
     args = parser.parse_args()
     values = vars(args)
     values["progress"] = not values.pop("no_progress")
-    print(json.dumps(run_goemotions_experiment(**values), indent=2, sort_keys=True))
-
+    try:
+        result = run_goemotions_experiment(**values)
+    except ProviderError as exc:
+        parser.exit(2, f"error: {exc}\n")
+    print(json.dumps(result, indent=2, sort_keys=True))
 
 if __name__ == "__main__":
     main()

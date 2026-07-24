@@ -11,8 +11,9 @@ venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system qwen_schema
 venv\Scripts\python.exe -m benchmarks.goemotions.training.cli --limit 4 --device cuda
 ```
 
-The locally frozen TF-IDF PRIMA candidate is ignored by Git. Run its full test split with:
+The locally frozen TF-IDF PRIMA candidate is ignored by Git. Build it once, then run its full test split with:
 
 ```powershell
+venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --train --data-dir benchmarks/goemotions/external/goemotions/data --output-dir evaluation/goemotions/models/final_candidate
 venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --model evaluation/goemotions/models/final_candidate/model.joblib --thresholds evaluation/goemotions/models/final_candidate/thresholds.json --data-dir benchmarks/goemotions/external/goemotions/data --split test --output-dir evaluation/goemotions/final/prima_tfidf
 ```

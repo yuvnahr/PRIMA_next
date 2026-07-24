@@ -26,13 +26,13 @@ if (-not $venvReady) {
     if ($LASTEXITCODE) { throw 'Failed to create venv.' }
 }
 
-& git submodule update --init --recursive
+& git -c core.protectNTFS=false submodule update --init --recursive
 if ($LASTEXITCODE) { throw 'Failed to initialize git submodules.' }
 
 $goEmotions = Join-Path $PSScriptRoot 'benchmarks\goemotions\external'
 if (-not (Test-Path $goEmotions)) {
     New-Item -ItemType Directory -Force (Split-Path $goEmotions) | Out-Null
-    & git clone --depth 1 --filter=blob:none --sparse https://github.com/google-research/google-research.git $goEmotions
+    & git clone --depth 1 --filter=blob:none --sparse --no-checkout https://github.com/google-research/google-research.git $goEmotions
     if ($LASTEXITCODE) { throw 'Failed to clone GoEmotions.' }
 }
 if (-not (Test-Path (Join-Path $goEmotions '.git'))) {
@@ -40,6 +40,8 @@ if (-not (Test-Path (Join-Path $goEmotions '.git'))) {
 }
 & git -C $goEmotions sparse-checkout set goemotions
 if ($LASTEXITCODE) { throw 'Failed to configure the GoEmotions sparse checkout.' }
+& git -C $goEmotions checkout
+if ($LASTEXITCODE) { throw 'Failed to checkout GoEmotions.' }
 
 & $venvPython -m pip install -r (Join-Path $PSScriptRoot 'requirements.txt')
 if ($LASTEXITCODE) { throw 'Failed to install requirements.' }

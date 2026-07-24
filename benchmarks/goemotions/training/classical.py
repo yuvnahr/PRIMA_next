@@ -164,17 +164,28 @@ def _change_analysis(gold: list[frozenset[str]], initial: list[frozenset[str]], 
 
 def main() -> None:
     import argparse
-    parser = argparse.ArgumentParser(description="Score a frozen PRIMA TF-IDF GoEmotions candidate.")
-    parser.add_argument("--model", type=Path, required=True)
-    parser.add_argument("--thresholds", type=Path, required=True)
+    parser = argparse.ArgumentParser(description="Train or score a PRIMA TF-IDF GoEmotions candidate.")
+    parser.add_argument("--train", action="store_true", help="Write model.joblib and thresholds.json to --output-dir.")
+    parser.add_argument("--model", type=Path)
+    parser.add_argument("--thresholds", type=Path)
     parser.add_argument("--data-dir", type=Path, default=Path("benchmarks/goemotions/external/goemotions/data"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
     parser.add_argument("--max-samples", type=int, default=0)
     parser.add_argument("--sample-manifest", type=Path)
     parser.add_argument("--no-progress", action="store_true")
+    parser.add_argument("--features", choices=("word", "char", "combined"), default="combined")
+    parser.add_argument("--balanced", action="store_true", default=True)
+    parser.add_argument("--unbalanced", dest="balanced", action="store_false")
+    parser.add_argument("--seed", type=int, default=13)
     args = parser.parse_args()
-    print(json.dumps(run_frozen_tfidf(args.model, args.thresholds, args.data_dir, args.output_dir, split=args.split, max_samples=args.max_samples, sample_manifest=args.sample_manifest, progress=not args.no_progress), indent=2, sort_keys=True))
+    if args.train:
+        result = run_tfidf_logreg(args.data_dir, args.output_dir, features=args.features, balanced=args.balanced, seed=args.seed)
+    else:
+        if not args.model or not args.thresholds:
+            parser.error("--model and --thresholds are required unless --train is used.")
+        result = run_frozen_tfidf(args.model, args.thresholds, args.data_dir, args.output_dir, split=args.split, max_samples=args.max_samples, sample_manifest=args.sample_manifest, progress=not args.no_progress)
+    print(json.dumps(result, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

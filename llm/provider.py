@@ -35,12 +35,12 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
         raise ProviderError("Only HTTP(S) provider URLs are allowed")
 
     if requests is not None:
-        response = requests.post(url, json=payload, headers=headers, timeout=timeout)
         try:
+            response = requests.post(url, json=payload, headers=headers, timeout=timeout)
             response.raise_for_status()
-        except Exception as exc:
-            raise ProviderError(f"HTTP request failed: {exc} - {response.text}") from exc
-        return response.json()
+            return response.json()
+        except requests.exceptions.RequestException as exc:
+            raise ProviderError(f"HTTP request failed: {exc}") from exc
 
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
