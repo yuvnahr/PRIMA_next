@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 from benchmarks.common.agent import BenchmarkAgent
@@ -19,14 +20,18 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         self,
         runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime,
         log_path: str | Path | None = None,
+        document_ingestion: bool = False,
     ) -> None:
         self.runtime_factory = runtime_factory
         self.log_path = Path(log_path or "logs/prima_runtime_adapter.log")
         self.runtime: PrimaRuntime | None = None
         self.context: RuntimeContext | None = None
+        self.document_ingestion = document_ingestion
         self.answer_options: dict[str, Any] = {}
         self.turn_count = 0
         self.question_count = 0
+        self.ingestion_time = 0.0
+        self.reasoning_time = 0.0
         self.reset()
 
     def reset(self) -> None:
@@ -36,6 +41,8 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         self.context = RuntimeContext()
         self.turn_count = 0
         self.question_count = 0
+        self.ingestion_time = 0.0
+        self.reasoning_time = 0.0
 
     def process_turn(self, turn: ConversationTurn) -> AgentResponse:
         """Replay a benchmark conversation turn through PRIMA."""
@@ -45,18 +52,22 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         context.session_id = turn.session_id or context.session_id
         context.turn_id = turn.turn_id or context.turn_id
 
-        result = runtime.process(self._format_turn(turn), context=context)
+        started = perf_counter()
+        result = runtime.ingest_document(self._format_turn(turn), metadata=turn.metadata) if self.document_ingestion else runtime.process(self._format_turn(turn), context=context)
+        self.ingestion_time += perf_counter() - started
         self.turn_count += 1
         return self._response_from_runtime(result)
 
     def answer_question(self, question: ConversationQuestion) -> AgentResponse:
         """Ask a benchmark question after replay has completed."""
 
+        started = perf_counter()
         result = self._runtime().answer_question(
             self._format_question(question),
             context=self._context(),
             **self.answer_options,
         )
+        self.reasoning_time += perf_counter() - started
         self.question_count += 1
         return self._response_from_runtime(result)
 
@@ -67,6 +78,8 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         return {
             "turn_count": self.turn_count,
             "question_count": self.question_count,
+            "ingestion_time": self.ingestion_time,
+            "reasoning_time": self.reasoning_time,
             "context": context,
         }
 

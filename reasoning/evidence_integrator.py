@@ -37,7 +37,7 @@ class EvidenceIntegrator:
             state.evidence_items.append(EvidenceItem(
                 evidence_id=f"{source_id}:{hop}", text=result.note.content, source_id=source_id,
                 source_type=result.note.memory_type.value, retrieval_score=float(result.score), hop=hop, query=query,
-                provenance={"strategy_scores": dict(result.strategy_scores)}, result=result,
+                provenance={"strategy_scores": dict(result.strategy_scores), **dict(result.note.context)}, result=result,
             ))
             seen_sources.add(source_id)
             seen_text.add(normalised)

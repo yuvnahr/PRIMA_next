@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from pathlib import Path
 
 from benchmarks.common.agent import BenchmarkAgent
-from benchmarks.common.interfaces import BenchmarkResult, BenchmarkRunner, Conversation
+from benchmarks.common.interfaces import BenchmarkResult, BenchmarkRunner, Conversation, ConversationQuestion
 from benchmarks.common.utils import configure_benchmark_logger
 
 
@@ -31,7 +31,7 @@ class GenericBenchmarkRunner(BenchmarkRunner):
                 self.logger.info("Conversation %s replay complete", conversation.id)
                 if conversation.questions:
                     for question_index, question in enumerate(conversation.questions, start=1):
-                        response = agent.answer_question(question)
+                        response = agent.answer_question(ConversationQuestion(question=question.question, question_id=question.question_id, category=question.category))
                         self.logger.info("Conversation %s question %s answered", conversation.id, question_index)
                         results.append(
                             BenchmarkResult(
@@ -42,6 +42,8 @@ class GenericBenchmarkRunner(BenchmarkRunner):
                                 expected_answer=question.answer,
                                 metadata={
                                     "category": question.category,
+                                    "conversation_metadata": dict(conversation.metadata),
+                                    "question_metadata": dict(question.metadata),
                                     "agent_state": agent.get_state(),
                                 },
                             )

@@ -120,6 +120,13 @@ class PrimaRuntime:
         })
         return result
 
+    def ingest_document(self, text: str, metadata: dict[str, Any] | None = None) -> MemoryNote:
+        """Store one caller-supplied document through the public runtime boundary."""
+        if not str(text).strip():
+            raise ValueError("Document text must not be empty.")
+        note = MemoryNote.create(content=str(text), memory_type=MemoryType.SEMANTIC, context={"source": "document_ingestion", **dict(metadata or {})})
+        return self.memory_repository.add(note)
+
     def _synthesize_evidence(
         self,
         question: str,

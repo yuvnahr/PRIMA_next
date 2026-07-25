@@ -77,3 +77,7 @@ benchmarks/locomo/outputs/**/*event*.md
 # Request-local reasoning validation output
 evaluation/results/reasoning_controller_validation.json
 evaluation/results/reasoning_smoke_results.json
+
+benchmarks/hotpotqa/outputs/**/*.json
+benchmarks/hotpotqa/outputs/**/*.jsonl
+benchmarks/hotpotqa/outputs/**/*.log

@@ -172,7 +172,7 @@ class AnswerResult:
             "status": self.status.value,
             "confidence": self.confidence,
             "evidence_references": [
-                {"source_id": item.source_id, "score": item.retrieval_score, "hop": item.hop, "query": item.query}
+                {"source_id": item.source_id, "score": item.retrieval_score, "hop": item.hop, "query": item.query, "provenance": dict(item.provenance)}
                 for item in self.evidence_references
             ],
             "hop_count": self.hop_count,
