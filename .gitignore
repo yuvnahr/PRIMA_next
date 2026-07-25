@@ -54,6 +54,9 @@ evaluation/results/**/*failure_breakdown*.json
 evaluation/results/**/*dense_investigation*.json
 evaluation/results/**/*event*.json
 evaluation/results/**/*event*.md
+evaluation/results/reasoning_reflection_integration_validation.json
+evaluation/results/legacy_reflection_audit.json
+evaluation/results/procedural_memory_isolation_validation.json
 evaluation/results/**/*embedding_backend_audit*.json
 evaluation/results/**/*embedding_ablation*.json
 evaluation/results/**/*embedding_ablation*.csv

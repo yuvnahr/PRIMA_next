@@ -14,6 +14,7 @@ from reasoning.stopping_policy import StoppingPolicy
 from reasoning.sufficiency_verifier import SufficiencyVerifier
 from reasoning.task_analyzer import TaskAnalyzer
 
+from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvisor, ReflectionEvent
 Retriever = Callable[[str], RetrievalResponse]
 Synthesizer = Callable[[str, tuple[Any, ...]], tuple[str, bool, tuple[str, ...], dict[str, Any]]]
 
@@ -28,6 +29,7 @@ class ReasoningController:
     need_generator: InformationNeedGenerator = field(default_factory=InformationNeedGenerator)
     stopping_policy: StoppingPolicy = field(default_factory=StoppingPolicy)
 
+    reflection_advisor: ReflectionAdvisor | None = None
     def answer(self, request: ReasoningRequest, *, retrieve: Retriever, synthesize: Synthesizer) -> AnswerResult:
         state = EvidenceState(request=request)
         route = self.task_analyzer.route(request)
@@ -65,6 +67,11 @@ class ReasoningController:
             need = self.need_generator.generate(state, decision) if decision.status is SufficiencyStatus.NEED_MORE_EVIDENCE else None
             stop_reason = self.stopping_policy.stop_reason(state, decision, next_query=need.query if need else None)
             if stop_reason:
+                reflected_query = self._advised_query(state, query, hop, stop_reason)
+                if reflected_query:
+                    query = reflected_query
+                    hop += 1
+                    continue
                 return self._synthesize(state, decision, synthesize, stop_reason)
             if need is None:
                 return self._synthesize(state, decision, synthesize, "unanswerable")
@@ -73,6 +80,34 @@ class ReasoningController:
             state.add_trace("ReasoningContinued", hop + 1, query=need.query)
             query = need.query
             hop += 1
+    def _advised_query(self, state: EvidenceState, query: str, hop: int, stop_reason: str) -> str | None:
+        event = {"no_new_evidence": ReflectionEvent.NO_NEW_EVIDENCE, "duplicate_query": ReflectionEvent.DUPLICATE_QUERY, "contradictory": ReflectionEvent.CONTRADICTORY_EVIDENCE}.get(stop_reason)
+        budget = state.request.budget
+        if event is None or self.reflection_advisor is None or state.reflection_interventions >= budget.max_reflection_interventions:
+            if event is not None:
+                state.add_trace("ReflectionSuppressed", hop, reason_code="disabled_or_budget")
+            return None
+        state.add_trace("ReflectionRequested", hop, event=event.value)
+        state.reflection_interventions += 1
+        try:
+            advice = self.reflection_advisor.advise(event, state, query=query, stop_reason=stop_reason)
+        except Exception as exc:
+            state.add_trace("ReflectionRejected", hop, reason_code="advisor_error", error_category=type(exc).__name__)
+            return None
+        state.last_reflection_advice = advice.action.value
+        state.reflection_advice_confidence = advice.confidence
+        state.add_trace("ReflectionGenerated", hop, action=advice.action.value, confidence=round(advice.confidence, 6))
+        candidate = " ".join(advice.suggested_query.split())
+        rejected = (not advice.should_intervene or advice.action not in {ReflectionAction.CONTINUE_WITH_REVISED_QUERY, ReflectionAction.BROADEN_QUERY, ReflectionAction.PIVOT_ENTITY, ReflectionAction.RETRY_TRANSIENT_FAILURE} or not candidate or advice.confidence < budget.reflection_confidence_threshold or any(token in f"{advice.metadata} {advice.reason_code}".lower() for token in ("gold", "ground_truth", "expected_answer", "retrieval scoring", "rerank")))
+        attempted = {" ".join(item.lower().split()) for item in state.attempted_queries}
+        exceeds_budget = state.retrieval_calls + 1 > budget.max_retrieval_calls or len(state.attempted_queries) + 1 > budget.max_hops
+        if rejected or candidate.lower() in attempted or exceeds_budget:
+            state.add_trace("ReflectionRejected", hop, reason_code="invalid_advice")
+            return None
+        state.add_trace("ReflectionAccepted", hop, action=advice.action.value, query=candidate)
+        state.add_trace("ReflectionApplied", hop + 1, action=advice.action.value, query=candidate)
+        return candidate
+
 
     def _synthesize(self, state: EvidenceState, decision: Any, synthesize: Synthesizer, stop_reason: str) -> AnswerResult:
         answer = ""

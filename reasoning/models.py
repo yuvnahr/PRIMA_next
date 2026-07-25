@@ -45,6 +45,8 @@ class ReasoningBudget:
     time_budget_seconds: float = 15.0
     no_progress_limit: int = 1
 
+    max_reflection_interventions: int = 1
+    reflection_confidence_threshold: float = 0.6
     def to_dict(self) -> dict[str, Any]:
         return {name: getattr(self, name) for name in self.__dataclass_fields__}
 
@@ -57,6 +59,11 @@ class ReasoningRequest:
     budget: ReasoningBudget = field(default_factory=ReasoningBudget)
     caller_metadata: dict[str, Any] = field(default_factory=dict)
     request_id: str = field(default_factory=lambda: f"reasoning_{uuid4()}")
+
+    def __post_init__(self) -> None:
+        forbidden = {"ground_truth", "gold_answer", "expected_answer", "gold_supporting_facts", "correct_answer", "is_gold", "truth"}
+        if forbidden & {str(key).lower() for key in self.caller_metadata}:
+            raise ValueError("Benchmark gold fields are not accepted by production reasoning.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,6 +124,9 @@ class EvidenceState:
     llm_calls: int = 0
     no_progress_hops: int = 0
     started_at: float = field(default_factory=time)
+    reflection_interventions: int = 0
+    last_reflection_advice: str = ""
+    reflection_advice_confidence: float = 0.0
     trace: list[ReasoningTraceEvent] = field(default_factory=list)
 
     @property

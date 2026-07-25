@@ -1,4 +1,4 @@
-"""Verifier behavior preserved from Reflexion benchmarks."""
+"""Legacy benchmark verifier; not a production evidence sufficiency check."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ class VerificationResult:
 
 
 class VerifierAdapter:
-    """Verifier adapter preserving PASS parsing, fuzzy matching, and grounding."""
+    """Evaluation-only answer verifier preserving old Reflexion behavior."""
 
     def parse_verifier_response(self, response: str) -> VerificationResult:
         upper_response = response.upper()

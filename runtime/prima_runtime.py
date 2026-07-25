@@ -21,6 +21,7 @@ from memory.retrieval.retrieval_request import RetrievalRequest
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
 from reflection.reflection_engine import ReflectionEngine
+from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reasoning.config import reasoning_budget, reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
 from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
@@ -48,7 +49,7 @@ class PrimaRuntime:
         self.reflection_engine = reflection_engine or ReflectionEngine()
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
         self.retrieval_controller = RetrievalController(self.memory_repository)
-        self.reasoning_controller = ReasoningController()
+        self.reasoning_controller = ReasoningController(reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine))
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -66,7 +67,7 @@ class PrimaRuntime:
             self.memory_repository = InMemoryMemoryRepository()
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
             self.retrieval_controller = RetrievalController(self.memory_repository)
-            self.reasoning_controller = ReasoningController()
+            self.reasoning_controller = ReasoningController(reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine))
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,

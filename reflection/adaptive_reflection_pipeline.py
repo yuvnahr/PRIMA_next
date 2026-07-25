@@ -1,4 +1,4 @@
-"""Retry-gated adaptive reflection pipeline."""
+"""Legacy evaluation-only retry pipeline; never use in production inference."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class PipelineRunResult:
 
 
 class AdaptiveReflectionPipeline:
-    """Preserves verifier -> reflector -> retry -> ExpeL flow without globals."""
+    """Compatibility path for legacy evaluation tests with benchmark truth."""
 
     def __init__(
         self,

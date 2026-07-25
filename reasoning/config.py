@@ -23,4 +23,6 @@ def reasoning_budget(max_hops: int | None = None, max_context_tokens: int | None
         max_context_tokens=max(128, int(max_context_tokens or os.getenv("PRIMA_REASONING_MAX_CONTEXT_TOKENS", "1600"))),
         time_budget_seconds=max(0.1, float(os.getenv("PRIMA_REASONING_TIME_BUDGET_SECONDS", "15"))),
         no_progress_limit=max(1, int(os.getenv("PRIMA_REASONING_NO_PROGRESS_LIMIT", "1"))),
+        max_reflection_interventions=max(0, int(os.getenv("PRIMA_REASONING_MAX_REFLECTION_INTERVENTIONS", "1"))),
+        reflection_confidence_threshold=max(0.0, min(1.0, float(os.getenv("PRIMA_REASONING_REFLECTION_CONFIDENCE", "0.6")))),
     )
