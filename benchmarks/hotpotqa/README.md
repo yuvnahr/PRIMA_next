@@ -1,4 +1,4 @@
-﻿# HotpotQA benchmark
+# HotpotQA benchmark
 
 This package runs supplied-context HotpotQA samples through the shared benchmark models, `PrimaRuntimeAdapter`, `PrimaRuntime`, and the unchanged production `ReasoningController`. It contains no benchmark-specific retriever, reasoning loop, LLM client, or network lookup.
 
@@ -11,6 +11,15 @@ Download the official files into a location of your choice and pass the path exp
 - Either development file: `oracle`, labelled `oracle_gold_context`. Oracle is a diagnostic reasoning ceiling and must not be reported as the primary result.
 
 Do not run the obsolete baseline preprocessing, download GloVe, scrape Wikipedia, or modify `external/`.
+
+The original `external/download.sh` URLs may return HTTP 403. To obtain the distractor validation data from Hugging Face instead, install `datasets` plus the fixed PyArrow patch release and run the included converter:
+
+```powershell
+py -m pip install datasets pyarrow==19.0.1
+py benchmarks\hotpotqa\convert_to_json.py
+```
+
+This writes `benchmarks\hotpotqa\data\hotpot_dev_distractor_v1.json`. PyArrow 19.0.0 has a known Parquet reader bug and must not be used.
 
 ## Architecture and leakage safeguards
 
