@@ -1,0 +1,57 @@
+[
+  {
+    "sample_id": "5aba9e235542994dbf019984",
+    "reasoning_hops": 1,
+    "reflection_interventions": 0,
+    "final_stop_reason": "sufficient",
+    "runtime_error": null,
+    "failure_category": null,
+    "ingestion_time": 0.057648100424557924,
+    "reasoning_time": 28.401585899991915,
+    "total_latency": 28.47773710009642
+  },
+  {
+    "sample_id": "5a84c01e5542991dd0999dd6",
+    "reasoning_hops": 1,
+    "reflection_interventions": 0,
+    "final_stop_reason": "sufficient",
+    "runtime_error": null,
+    "failure_category": null,
+    "ingestion_time": 0.11945610074326396,
+    "reasoning_time": 25.701395299984142,
+    "total_latency": 25.851043700007722
+  },
+  {
+    "sample_id": "5a77c74155429967ab105291",
+    "reasoning_hops": 1,
+    "reflection_interventions": 0,
+    "final_stop_reason": "sufficient",
+    "runtime_error": null,
+    "failure_category": null,
+    "ingestion_time": 0.10353680117987096,
+    "reasoning_time": 19.28917789994739,
+    "total_latency": 19.42085639992729
+  },
+  {
+    "sample_id": "5abed4d55542990832d3a0e0",
+    "reasoning_hops": 1,
+    "reflection_interventions": 0,
+    "final_stop_reason": "sufficient",
+    "runtime_error": null,
+    "failure_category": null,
+    "ingestion_time": 0.1165307997725904,
+    "reasoning_time": 19.808612199965864,
+    "total_latency": 19.95455150003545
+  },
+  {
+    "sample_id": "5a8bc1565542996e8ac88a0c",
+    "reasoning_hops": 1,
+    "reflection_interventions": 0,
+    "final_stop_reason": "sufficient",
+    "runtime_error": null,
+    "failure_category": null,
+    "ingestion_time": 0.09889569948427379,
+    "reasoning_time": 23.57892640004866,
+    "total_latency": 23.705578800057992
+  }
+]

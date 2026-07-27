@@ -141,6 +141,9 @@ class PrimaRuntime:
         answer_context = RuntimeContextBuilder(max_context_tokens).build(question, evidence)
         errors: list[str] = []
         llm_used = False
+        raw_model_response = ""
+        selected_memory_ids: list[str] = []
+        structured_answer_valid = False
         inference_settings = self._inference_settings(
             provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
@@ -157,15 +160,18 @@ class PrimaRuntime:
                     model=str(inference_settings["model"]),
                     temperature=float(inference_settings["temperature"]),
                     max_tokens=int(inference_settings["num_predict"]),
+                    system_prompt=self._answer_system_prompt(),
+                    response_format=self._answer_response_schema(),
                 )
-                answer = llm_response.text.strip()
-                llm_used = bool(answer)
-                if not answer:
-                    errors.append("LLM returned an empty answer.")
-                    answer = self._extractive_answer(answer_context)
-            except (ProviderError, RuntimeError, ValueError) as exc:
+                raw_model_response = llm_response.text.strip()
+                llm_used = bool(raw_model_response)
+                answer, selected_memory_ids = self._parse_structured_answer(raw_model_response, answer_context)
+                structured_answer_valid = True
+            except (json.JSONDecodeError, TypeError, KeyError, ProviderError, RuntimeError, ValueError) as exc:
                 errors.append(str(exc))
-                answer = self._extractive_answer(answer_context)
+                answer = self._parse_partial_answer(raw_model_response) if raw_model_response.startswith("{") else raw_model_response
+                if not answer:
+                    answer = self._extractive_answer(answer_context)
         if answer.strip() == question.strip():
             errors.append("Answer matched question text; replaced with insufficient-information response.")
             answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
@@ -173,8 +179,62 @@ class PrimaRuntime:
             "llm_used": llm_used,
             "context_tokens": answer_context.token_count,
             "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
+            "selected_memory_ids": selected_memory_ids,
+            "structured_answer_valid": structured_answer_valid,
+            "raw_model_response": raw_model_response,
             "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+        }
+
+    def _parse_structured_answer(self, raw: str, answer_context: AnswerContext) -> tuple[str, list[str]]:
+        payload = json.loads(raw)
+        if not isinstance(payload, dict) or not isinstance(payload.get("insufficient_information"), bool):
+            raise ValueError("LLM returned an invalid structured answer.")
+        answer = payload.get("answer")
+        if payload["insufficient_information"]:
+            if answer is not None:
+                raise ValueError("Insufficient-information answer must be null.")
+            return self._insufficient_information_answer(answer_context.question, reason="model_abstention"), []
+        if not isinstance(answer, str) or not answer.strip():
+            raise ValueError("Structured answer must contain a non-empty answer string.")
+        labels = payload.get("evidence")
+        if not isinstance(labels, list) or not labels or any(not isinstance(label, str) for label in labels):
+            raise ValueError("Structured answer evidence must be a list of context labels.")
+        label_map = {f"M{index}": memory.memory_id for index, memory in enumerate(answer_context.memories, 1)}
+        unknown = [label for label in labels if label not in label_map]
+        if unknown:
+            raise ValueError(f"Structured answer cited unknown context labels: {', '.join(unknown)}")
+        return answer.strip(), list(dict.fromkeys(label_map[label] for label in labels))
+
+    @staticmethod
+    def _parse_partial_answer(raw: str) -> str:
+        key = raw.find('"answer"')
+        colon = raw.find(":", key + 8) if key >= 0 else -1
+        if colon < 0:
+            return ""
+        try:
+            answer, _ = json.JSONDecoder().raw_decode(raw[colon + 1:].lstrip())
+        except json.JSONDecodeError:
+            return ""
+        return answer.strip() if isinstance(answer, str) else ""
+    def _answer_system_prompt(self) -> str:
+        return (
+            "You are a factual question-answering engine. Return only JSON matching the supplied schema. "
+            "The answer must be the shortest exact answer span, normally one to eight words, never a sentence or explanation. "
+            "Use the canonical singular form for a category, profession, nationality, or type. "
+            "Cite the smallest sufficient set of [M#] labels; for comparisons or shared properties, cite evidence for each subject."
+        )
+
+    def _answer_response_schema(self) -> dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "answer": {"type": ["string", "null"], "maxLength": 80},
+                "evidence": {"type": "array", "items": {"type": "string", "pattern": "^M[1-9][0-9]*$"}, "minItems": 1, "maxItems": 4},
+                "insufficient_information": {"type": "boolean"},
+            },
+            "required": ["answer", "evidence", "insufficient_information"],
+            "additionalProperties": False,
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
@@ -315,22 +375,11 @@ class PrimaRuntime:
 
     def _build_answer_prompt(self, question: str, answer_context: AnswerContext) -> str:
         return (
-            "You are answering a question from PRIMA-NEXT memory.\n"
-            "Use ONLY the retrieved memory context below.\n"
-            "Do not use outside knowledge.\n"
-            "If the context does not contain enough evidence, return exactly: "
-            "{\"answer\": null, \"insufficient_information\": true}\n"
+            "Use only the retrieved context below.\n"
             f"Question: {question}\n\n"
-            f"Retrieved memory context:\n{answer_context.context_text}\n\n"
-            "Now answer the question only.\n"
-            "Use a short factual phrase, date, name, list, or yes/no answer when possible.\n"
-            "Maximum two sentences.\n"
-            "Do not explain reasoning.\n"
-            "Do not summarize the conversation.\n"
-            "Do not mention retrieved memories, memory logs, memory IDs, evidence, or context.\n"
-            "Do not start with 'Based on', 'According to', or 'The retrieved'.\n"
-            "Return only the final answer.\n\n"
-            "Final answer:"
+            f"Retrieved context:\n{answer_context.context_text}\n\n"
+            "Return JSON matching the supplied schema. Put only the shortest exact answer in `answer`; "
+            "use null only when the context is insufficient. Cite the smallest sufficient set of context labels in `evidence`."
         )
 
     def _extractive_answer(self, answer_context: AnswerContext) -> str:

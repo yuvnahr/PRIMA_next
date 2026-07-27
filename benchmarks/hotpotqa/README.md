@@ -1,55 +1,115 @@
 # HotpotQA benchmark
 
-This package runs supplied-context HotpotQA samples through the shared benchmark models, `PrimaRuntimeAdapter`, `PrimaRuntime`, and the unchanged production `ReasoningController`. It contains no benchmark-specific retriever, reasoning loop, LLM client, or network lookup.
+This package runs supplied-context HotpotQA through `PrimaRuntimeAdapter`, `PrimaRuntime`, and the unchanged production `ReasoningController`. It does not implement benchmark-specific retrieval, reasoning, or Wikipedia access.
 
-## Data and modes
+## Evaluation data
 
-Download the official files into a location of your choice and pass the path explicitly:
+Only the two official validation/evaluation sets are offered:
 
-- `hotpot_dev_distractor_v1.json`: `distractor`, using every supplied context sentence.
-- `hotpot_dev_fullwiki_v1.json`: `fullwiki`, labelled `official_retrieved_context`. This file contains paragraphs returned by the benchmark authors' retriever; it is not a complete Wikipedia corpus or a custom full-Wikipedia retrieval run.
-- Either development file: `oracle`, labelled `oracle_gold_context`. Oracle is a diagnostic reasoning ceiling and must not be reported as the primary result.
+- `distractor` writes `benchmarks\hotpotqa\data\hotpot_dev_distractor_v1.json` and uses all supplied distractor context.
+- `fullwiki` writes `benchmarks\hotpotqa\data\hotpot_dev_fullwiki_v1.json` and is labelled `official_retrieved_context`. This is the context returned by the benchmark authors' retriever, not a complete Wikipedia corpus.
 
-Do not run the obsolete baseline preprocessing, download GloVe, scrape Wikipedia, or modify `external/`.
-
-The original `external/download.sh` URLs may return HTTP 403. To obtain the distractor validation data from Hugging Face instead, install `datasets` plus the fixed PyArrow patch release and run the included converter:
+Train sets are intentionally excluded. Missing JSON is prepared automatically from the selected Hugging Face validation Parquet file. Existing valid JSON is reused unless `--refresh-data` is passed. Preparation requires:
 
 ```powershell
 py -m pip install datasets pyarrow==19.0.1
-py benchmarks\hotpotqa\convert_to_json.py
 ```
 
-This writes `benchmarks\hotpotqa\data\hotpot_dev_distractor_v1.json`. PyArrow 19.0.0 has a known Parquet reader bug and must not be used.
+PyArrow 19.0.0 is rejected because it cannot reliably read these files. Optional conversion imports are loaded only when preparation is needed.
 
-## Architecture and leakage safeguards
-
-`loader.py` validates official JSON. `adapter.py` creates one isolated conversation per sample. Context is ingested at sentence granularity through the runtime's generic document-ingestion API, preserving exact title, paragraph index, sentence ID, text, and source label. Sentence granularity creates more retrieval units than paragraph ingestion, but makes supporting-fact projection exact: only evidence retained by production reasoning becomes a predicted `[title, sentence_id]`.
-
-Answers and supporting facts remain evaluator-only fields. The shared runner constructs a clean inference question and attaches evaluator metadata only after the runtime returns. Distractor/fullwiki adaptation never filters, sorts, or labels context using gold facts. Oracle filters before ingestion and writes to a separate mode directory.
-
-## Ollama
-
-Install Ollama, pull `qwen3.5:4b`, and ensure the service is available. Configuration respects `OLLAMA_URL`, `PRIMA_LLM_PROVIDER`, and `PRIMA_LLM_MODEL`; CLI flags override provider/model. No credentials are hard-coded.
-
-## Progressive commands
+Prepare data without running the benchmark:
 
 ```powershell
-python -m benchmarks.hotpotqa.experiment --mode oracle --dataset-path PATH\hotpot_dev_distractor_v1.json --max-samples 1 --provider ollama --model qwen3.5:4b --progress
-python -m benchmarks.hotpotqa.experiment --mode distractor --dataset-path PATH\hotpot_dev_distractor_v1.json --max-samples 1 --provider ollama --model qwen3.5:4b --progress
-python -m benchmarks.hotpotqa.experiment --mode fullwiki --dataset-path PATH\hotpot_dev_fullwiki_v1.json --max-samples 1 --provider ollama --model qwen3.5:4b --progress
-python -m benchmarks.hotpotqa.experiment --mode distractor --dataset-path PATH\hotpot_dev_distractor_v1.json --max-samples 5 --provider ollama --model qwen3.5:4b --progress
+py -m benchmarks.hotpotqa.convert_to_json --dataset-set distractor
+py -m benchmarks.hotpotqa.convert_to_json --dataset-set fullwiki
+py -m benchmarks.hotpotqa.convert_to_json --dataset-set distractor --output-path C:\data\hotpot.json --force
 ```
 
-Scale only after inspecting those outputs. Defaults are adaptive reasoning, top-k 5, max-hops 3, and one worker. Use `--offset`, `--seed`, `--reasoning-mode`, `--top-k`, `--max-hops`, `--parallel-workers`, and `--output-path` as needed.
+In an interactive terminal, omitting `--dataset-set` shows a two-choice evaluation menu. Scripts and redirected commands must provide `--dataset-set` explicitly.
 
-Resume an interrupted compatible run:
+## Running locally
+
+Fresh runs use a newly generated random seed, printed in the run header and stored in the manifest. Supply `--seed` for reproducible selection. `--sampling sequential` preserves file order; both strategies apply `--offset` before `--max-samples`.
+
+Distractor:
 
 ```powershell
-python -m benchmarks.hotpotqa.experiment --mode distractor --dataset-path PATH\hotpot_dev_distractor_v1.json --max-samples 5 --resume --checkpoint-every 1 --progress
+py -m benchmarks.hotpotqa.experiment `
+  --dataset-set distractor `
+  --max-samples 5 `
+  --top-k 10 `
+  --provider ollama `
+  --model "qwen3.5:4b" `
+  --progress
 ```
 
-Resume rejects changes to dataset fingerprint, mode, provider, model, reasoning mode, top-k, max-hops, or seed. Each completion, including failures, is flushed to `raw/hotpot_results.jsonl`; final artifacts are rebuilt from it.
+Fullwiki:
 
-## Outputs and metrics
+```powershell
+py -m benchmarks.hotpotqa.experiment `
+  --dataset-set fullwiki `
+  --max-samples 5 `
+  --provider ollama `
+  --model "qwen3.5:4b" `
+  --progress
+```
 
-Each mode has its own `raw/`, `processed/`, `metrics/`, and `logs/` directory. Outputs include official-format `hotpot_predictions.json`, failures, retrieval/reasoning diagnostics, run manifest, summary, and metrics. The evaluator reproduces official lowercase, punctuation/article removal, whitespace normalization, yes/no/noanswer handling, answer EM/F1/precision/recall, supporting-fact EM/F1/precision/recall, and joint metrics. Full reasoning traces are not enabled by the benchmark; production trace exposure remains governed by the reasoning mode.
+Reproducible selection:
+
+```powershell
+py -m benchmarks.hotpotqa.experiment `
+  --dataset-set distractor `
+  --max-samples 20 `
+  --seed 42 `
+  --provider ollama `
+  --model "qwen3.5:4b" `
+  --progress
+```
+
+Oracle diagnostic:
+
+```powershell
+py -m benchmarks.hotpotqa.experiment `
+  --mode oracle `
+  --dataset-set distractor `
+  --max-samples 5 `
+  --provider ollama `
+  --model "qwen3.5:4b" `
+  --progress
+```
+
+Sequential selection:
+
+```powershell
+py -m benchmarks.hotpotqa.experiment --dataset-set distractor --sampling sequential --offset 10 --max-samples 5 --progress
+```
+
+The original explicit-path form remains supported:
+
+```powershell
+py -m benchmarks.hotpotqa.experiment --mode distractor --dataset-path C:\data\hotpot_dev_distractor_v1.json --max-samples 5 --progress
+```
+
+Use `--refresh-data` to regenerate the selected validation JSON. Use `--quiet` to suppress the run header, per-question blocks, and aggregate summary while still writing artifacts. Use `--json-summary` for a machine-readable final result. `--progress` enables one readable result block per newly completed question; it never prints retrieved documents, raw metadata, or hidden reasoning.
+
+## Resume
+
+```powershell
+py -m benchmarks.hotpotqa.experiment --dataset-set distractor --max-samples 20 --resume --progress
+```
+
+When no seed is supplied on resume, the stored resolved seed is reused. Resume validates the dataset fingerprint and set, mode, provider/model, reasoning settings, sampling strategy, offset, requested sample count, resolved seed, and exact selected sample IDs. Per-question output covers only work completed by the current command; the final summary includes all compatible checkpoint records.
+
+## Architecture, metrics, and artifacts
+
+`loader.py` validates official-style JSON. `adapter.py` creates one isolated conversation per sample and preserves exact title and sentence provenance without exposing gold labels during inference. Oracle alone filters gold context and writes to its own output directory. Answers use the existing production structured-output path; supporting facts are projected only from retained production evidence.
+
+The evaluator uses official HotpotQA normalization and reports answer, supporting-fact, and joint EM/F1/precision/recall. The same scoring helper powers per-question terminal scores and saved aggregate metrics; terminal values are percentages while JSON remains in the 0–1 range.
+
+Each mode writes under `benchmarks\hotpotqa\outputs\<mode>\` (or the selected `--output-path`) with:
+
+- `raw\hotpot_results.jsonl`, `hotpot_predictions.json`, `hotpot_failures.json`, retrieval diagnostics, and reasoning diagnostics.
+- `metrics\hotpot_metrics.json`, `supporting_fact_metrics.json`, `hotpot_summary.json`, and `run_manifest.json`.
+- `logs\hotpotqa.log` and `prima_runtime_adapter.log` where produced by the existing runtime.
+
+Do not run the obsolete external baseline preprocessing, scrape Wikipedia, or modify `external\`.

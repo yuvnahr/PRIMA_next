@@ -80,6 +80,8 @@ def test_projection_and_prediction_schema() -> None:
     metadata = {"evidence_references": [{"source_id": "m1", "hop": 0, "query": "q", "provenance": {"source_title": "Exact Title", "sentence_id": 2}}]}
     facts, provenance = project_supporting_facts(metadata)
     assert facts == [["Exact Title", 2]] and provenance[0]["source_id"] == "m1"
+    selected = metadata | {"answer_diagnostics": {"structured_answer_valid": True, "selected_memory_ids": []}}
+    assert project_supporting_facts(selected) == ([], [])
     validate_predictions({"answer": {"x": "yes"}, "sp": {"x": facts}})
     with pytest.raises(ValueError): validate_predictions({"answer": {}, "sp": {"x": [["T", "1"]]}})
 

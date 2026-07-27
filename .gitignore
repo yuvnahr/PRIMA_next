@@ -78,10 +78,5 @@ benchmarks/locomo/outputs/**/*event*.md
 evaluation/results/reasoning_controller_validation.json
 evaluation/results/reasoning_smoke_results.json
 
-benchmarks/hotpotqa/outputs/**/*.json
-benchmarks/hotpotqa/outputs/**/*.jsonl
-benchmarks/hotpotqa/outputs/**/*.log
-
-benchmarks/hotpotqa/data/*.json
 benchmarks/hotpotqa/data/*.parquet
-benchmarks/hotpotqa/data/*.tmp
+

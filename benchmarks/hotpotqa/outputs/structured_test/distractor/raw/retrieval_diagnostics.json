@@ -1,0 +1,19 @@
+[
+  {
+    "sample_id": "5ac3bd0c554299204fd21e21",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 1,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Ruby Yang",
+          0
+        ],
+        "source_id": "mem_06fd0028-01a0-436f-bf69-b00bb9d67e98",
+        "hop": 0,
+        "query": "Sam Mendes and Ruby Yang share what profession?"
+      }
+    ]
+  }
+]

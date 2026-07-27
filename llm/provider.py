@@ -207,6 +207,10 @@ class OllamaProvider(OpenAICompatibleProvider):
                 "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
             },
         }
+        if request.system_prompt:
+            payload["system"] = request.system_prompt
+        if request.response_format:
+            payload["format"] = request.response_format
         try:
             return parse_generic_response(post_json(url, payload, timeout=180), provider="ollama")
         except ProviderError as exc:

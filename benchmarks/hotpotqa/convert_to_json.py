@@ -1,52 +1,60 @@
-﻿import json
+﻿"""Prepare supported HotpotQA validation sets as official-style JSON."""
+from __future__ import annotations
+import argparse
+import json
 from pathlib import Path
+from typing import Any
+from benchmarks.hotpotqa.data_sources import DATA_SOURCES, choose_dataset_set, get_data_source
+from benchmarks.hotpotqa.loader import HotpotQADataset
 
-from datasets import load_dataset
-import pyarrow
+def _row_to_record(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "_id": row["id"], "question": row["question"], "answer": row["answer"],
+        "type": row["type"], "level": row["level"],
+        "context": [[title, sentences] for title, sentences in zip(row["context"]["title"], row["context"]["sentences"])],
+        "supporting_facts": [[title, int(sentence_id)] for title, sentence_id in zip(row["supporting_facts"]["title"], row["supporting_facts"]["sent_id"])],
+    }
 
-if pyarrow.__version__ == "19.0.0":
-    raise RuntimeError("PyArrow 19.0.0 cannot read these Parquet files. Run: py -m pip install pyarrow==19.0.1")
+def convert_validation_set(dataset_set: str, output_path: str | Path | None = None, force: bool = False) -> Path:
+    source = get_data_source(dataset_set)
+    output = Path(output_path) if output_path is not None else source.default_path
+    if output.exists() and not force:
+        try:
+            HotpotQADataset(output, source.mode).load()
+            return output
+        except ValueError:
+            pass
+    try:
+        import pyarrow
+        from datasets import load_dataset
+    except ImportError as exc:
+        raise RuntimeError("Dataset preparation requires: py -m pip install datasets pyarrow==19.0.1") from exc
+    if pyarrow.__version__ == "19.0.0":
+        raise RuntimeError("PyArrow 19.0.0 cannot read these Parquet files. Run: py -m pip install pyarrow==19.0.1")
+    rows = [_row_to_record(row) for row in load_dataset("parquet", data_files={"validation": source.parquet_url}, split="validation")]
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(output.name + ".tmp")
+    try:
+        temporary.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
+        HotpotQADataset(temporary, source.mode).load()
+        temporary.replace(output)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+    return output
 
-PARQUET_URL = (
-    "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/main/"
-    "distractor/validation-00000-of-00001.parquet"
-)
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Prepare a HotpotQA validation/evaluation JSON file.")
+    parser.add_argument("--dataset-set", choices=tuple(DATA_SOURCES))
+    parser.add_argument("--output-path", type=Path)
+    parser.add_argument("--force", action="store_true")
+    args = parser.parse_args()
+    try:
+        dataset_set = args.dataset_set or choose_dataset_set()
+        output = convert_validation_set(dataset_set, args.output_path, args.force)
+    except (RuntimeError, ValueError) as exc:
+        parser.error(str(exc))
+    print(f"Prepared {dataset_set} validation data: {output}")
 
-dataset = load_dataset(
-    "parquet",
-    data_files={"validation": PARQUET_URL},
-    split="validation",
-)
-
-records = []
-for row in dataset:
-    records.append({
-        "_id": row["id"],
-        "question": row["question"],
-        "answer": row["answer"],
-        "type": row["type"],
-        "level": row["level"],
-        "context": [
-            [title, sentences]
-            for title, sentences in zip(
-                row["context"]["title"],
-                row["context"]["sentences"],
-            )
-        ],
-        "supporting_facts": [
-            [title, int(sentence_id)]
-            for title, sentence_id in zip(
-                row["supporting_facts"]["title"],
-                row["supporting_facts"]["sent_id"],
-            )
-        ],
-    })
-
-output = Path(__file__).parent / "data" / "hotpot_dev_distractor_v1.json"
-output.parent.mkdir(parents=True, exist_ok=True)
-temporary = output.with_suffix(".json.tmp")
-with temporary.open("w", encoding="utf-8") as file:
-    json.dump(records, file, ensure_ascii=False)
-temporary.replace(output)
-print(f"Wrote {len(records)} samples to {output}")
-
+if __name__ == "__main__":
+    main()

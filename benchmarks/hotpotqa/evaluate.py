@@ -10,6 +10,7 @@ from typing import Any
 from benchmarks.common.interfaces import BenchmarkEvaluator, BenchmarkResult
 
 SPECIAL = {"yes", "no", "noanswer"}
+METRIC_KEYS = ("em", "f1", "prec", "recall", "sp_em", "sp_f1", "sp_prec", "sp_recall", "joint_em", "joint_f1", "joint_prec", "joint_recall")
 
 def normalize_answer(text: str) -> str:
     text = "".join(char for char in str(text).lower() if char not in set(string.punctuation))
@@ -39,7 +40,12 @@ def supporting_fact_scores(prediction: Iterable[Iterable[Any]], gold: Iterable[I
 def project_supporting_facts(response_metadata: dict[str, Any]) -> tuple[list[list[Any]], list[dict[str, Any]]]:
     facts, provenance = [], []
     seen = set()
+    diagnostics = response_metadata.get("answer_diagnostics", {})
+    selected = set(diagnostics.get("selected_memory_ids", []))
+    filter_selected = diagnostics.get("structured_answer_valid") is True
     for evidence in response_metadata.get("evidence_references", []):
+        if filter_selected and evidence.get("source_id") not in selected:
+            continue
         source = evidence.get("provenance", {})
         title, sentence_id = source.get("source_title"), source.get("sentence_id")
         if isinstance(title, str) and isinstance(sentence_id, int) and not isinstance(sentence_id, bool) and (title, sentence_id) not in seen:
@@ -47,6 +53,27 @@ def project_supporting_facts(response_metadata: dict[str, Any]) -> tuple[list[li
             facts.append([title, sentence_id])
             provenance.append({"prediction": [title, sentence_id], "source_id": evidence.get("source_id"), "hop": evidence.get("hop"), "query": evidence.get("query")})
     return facts, provenance
+
+def score_hotpot_record(row: BenchmarkResult | dict[str, Any]) -> dict[str, float]:
+    if isinstance(row, dict):
+        gold, prediction = row.get("expected_answer"), row.get("prediction", "")
+        pred_sp, gold_sp = row.get("supporting_facts", []), row.get("gold_supporting_facts", [])
+    else:
+        gold, prediction = row.expected_answer, row.response.text
+        pred_sp, _ = project_supporting_facts(row.response.metadata)
+        gold_sp = row.metadata.get("question_metadata", {}).get("supporting_facts", [])
+    if gold is None:
+        return {}
+    em, f1, prec, recall = answer_scores(prediction, gold)
+    sp_em, sp_f1, sp_prec, sp_recall = supporting_fact_scores(pred_sp, gold_sp)
+    joint_prec, joint_recall = prec * sp_prec, recall * sp_recall
+    return {
+        "em": em, "f1": f1, "prec": prec, "recall": recall,
+        "sp_em": sp_em, "sp_f1": sp_f1, "sp_prec": sp_prec, "sp_recall": sp_recall,
+        "joint_em": em * sp_em,
+        "joint_f1": 2 * joint_prec * joint_recall / (joint_prec + joint_recall) if joint_prec + joint_recall else 0.0,
+        "joint_prec": joint_prec, "joint_recall": joint_recall,
+    }
 
 def validate_predictions(predictions: dict[str, Any]) -> None:
     if set(predictions) != {"answer", "sp"} or not all(isinstance(predictions[key], dict) for key in predictions):
@@ -67,22 +94,13 @@ def write_predictions(predictions: dict[str, Any], path: str | Path) -> Path:
 class HotpotQAEvaluator(BenchmarkEvaluator):
     def evaluate(self, results: Iterable[BenchmarkResult | dict[str, Any]]) -> dict[str, float]:
         rows = list(results)
-        totals = {key: 0.0 for key in ("em", "f1", "prec", "recall", "sp_em", "sp_f1", "sp_prec", "sp_recall", "joint_em", "joint_f1", "joint_prec", "joint_recall")}
+        totals = {key: 0.0 for key in METRIC_KEYS}
         scored = 0
         for row in rows:
-            if isinstance(row, dict):
-                gold, prediction, pred_sp, gold_sp = row.get("expected_answer"), row.get("prediction", ""), row.get("supporting_facts", []), row.get("gold_supporting_facts", [])
-            else:
-                gold, prediction = row.expected_answer, row.response.text
-                pred_sp, _ = project_supporting_facts(row.response.metadata)
-                gold_sp = row.metadata.get("question_metadata", {}).get("supporting_facts", [])
-            if gold is None:
+            values = score_hotpot_record(row)
+            if not values:
                 continue
             scored += 1
-            em, f1, prec, recall = answer_scores(prediction, gold)
-            sp_em, sp_f1, sp_prec, sp_recall = supporting_fact_scores(pred_sp, gold_sp)
-            values = {"em": em, "f1": f1, "prec": prec, "recall": recall, "sp_em": sp_em, "sp_f1": sp_f1, "sp_prec": sp_prec, "sp_recall": sp_recall}
-            joint_prec, joint_recall = prec * sp_prec, recall * sp_recall
-            values.update(joint_em=em * sp_em, joint_prec=joint_prec, joint_recall=joint_recall, joint_f1=(2 * joint_prec * joint_recall / (joint_prec + joint_recall) if joint_prec + joint_recall else 0.0))
-            for key, value in values.items(): totals[key] += value
+            for key, value in values.items():
+                totals[key] += value
         return {key: value / scored if scored else 0.0 for key, value in totals.items()} | {"total": len(rows), "scored": scored}
