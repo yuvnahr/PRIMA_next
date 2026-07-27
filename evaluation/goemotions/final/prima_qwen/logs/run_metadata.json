@@ -1,0 +1,58 @@
+{
+  "benchmark": "goemotions",
+  "dataset_path": "benchmarks\\goemotions\\external\\goemotions\\data\\test.tsv",
+  "dataset_samples": 5427,
+  "dataset_sha256": "dc3aab545d76079817c3002a77239d53accc11ec8f16313aa19d8e1a8f2e412e",
+  "execution": {
+    "actual_batch_size": 1,
+    "note": "Ollama systems issue one request per example; encoder systems batch tensors.",
+    "parallel_workers": 1,
+    "requested_batch_size": 1
+  },
+  "git_commit": "ce6cec222da4dedf0916f981340927ed959d9326",
+  "hardware": {
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "labels": [
+    "admiration",
+    "amusement",
+    "anger",
+    "annoyance",
+    "approval",
+    "caring",
+    "confusion",
+    "curiosity",
+    "desire",
+    "disappointment",
+    "disapproval",
+    "disgust",
+    "embarrassment",
+    "excitement",
+    "fear",
+    "gratitude",
+    "grief",
+    "joy",
+    "love",
+    "nervousness",
+    "optimism",
+    "pride",
+    "realization",
+    "relief",
+    "remorse",
+    "sadness",
+    "surprise",
+    "neutral"
+  ],
+  "runtime": {
+    "device": "auto",
+    "model": "qwen3.5:4b",
+    "provider": "ollama",
+    "seed": 13,
+    "split": "test",
+    "system": "prima_qwen",
+    "temperature": 0,
+    "thinking": false
+  }
+}
