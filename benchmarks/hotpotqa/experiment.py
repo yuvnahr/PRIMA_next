@@ -1,28 +1,48 @@
-﻿"""Terminal-runnable HotpotQA experiment with checkpoint/resume."""
+"""Terminal-runnable HotpotQA experiment with checkpoint/resume."""
 from __future__ import annotations
+
 import argparse
 import hashlib
 import json
 import platform
 import random
 import secrets
-import subprocess
+import shutil
+import subprocess  # nosec B404
 import sys
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urlsplit, urlunsplit
+
 from benchmarks.common.runtime_adapter import PrimaRuntimeAdapter
 from benchmarks.hotpotqa.checkpoint import append_checkpoint, read_checkpoint, validate_resume
-from benchmarks.hotpotqa.config import CONTEXT_SOURCES, MAX_HOPS, MODEL, OLLAMA_URL, OUTPUT_PATH, PARALLEL_WORKERS, PROVIDER, REASONING_MODE, SEED, TOP_K
+from benchmarks.hotpotqa.config import (
+    CONTEXT_SOURCES,
+    MAX_HOPS,
+    MODEL,
+    OLLAMA_URL,
+    OUTPUT_PATH,
+    PARALLEL_WORKERS,
+    PROVIDER,
+    REASONING_MODE,
+    SEED,
+    TOP_K,
+)
 from benchmarks.hotpotqa.console import HotpotQATerminalReporter
 from benchmarks.hotpotqa.convert_to_json import convert_validation_set
 from benchmarks.hotpotqa.data_sources import DATA_SOURCES, choose_dataset_set, get_data_source
-from benchmarks.hotpotqa.evaluate import HotpotQAEvaluator, project_supporting_facts, write_predictions
+from benchmarks.hotpotqa.evaluate import (
+    HotpotQAEvaluator,
+    project_supporting_facts,
+    write_predictions,
+)
 from benchmarks.hotpotqa.loader import HotpotQADataset
 from benchmarks.hotpotqa.runner import HotpotQARunner
 from runtime.prima_runtime import PrimaRuntime
+
 
 def fingerprint(path: Path) -> str:
     digest = hashlib.sha256()
@@ -39,8 +59,11 @@ def safe_url(url: str) -> str:
     return urlunsplit((parsed.scheme, host, parsed.path, parsed.query, ""))
 
 def git_commit() -> str | None:
+    git = shutil.which("git")
+    if git is None:
+        return None
     try:
-        return subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
+        return subprocess.run([git, "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()  # noqa: S603  # nosec B603
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -77,7 +100,7 @@ def select_conversations(conversations: list[Any], sampling: str, seed: int | No
     if sampling == "random":
         if seed is None:
             raise ValueError("Random sampling requires a resolved seed")
-        random.Random(seed).shuffle(selected)
+        random.Random(seed).shuffle(selected)  # nosec B311
     return selected[offset:offset + max_samples if max_samples else None]
 
 def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str, model: str, reasoning_mode: str, top_k: int, max_hops: int, workers: int, configured_seed: int | None, resolved_seed: int | None, sampling: str, offset: int, max_samples: int, sample_ids: list[str], resume: bool) -> dict[str, Any]:

@@ -1,8 +1,11 @@
 """HotpotQA-to-conversation adapter."""
 from __future__ import annotations
+
 from typing import Any
+
 from benchmarks.common.interfaces import Conversation, ConversationQuestion, ConversationTurn
 from benchmarks.hotpotqa.config import CONTEXT_SOURCES
+
 
 class HotpotQAAdapter:
     """Adapt supplied HotpotQA contexts without exposing gold labels to inference."""

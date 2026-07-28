@@ -3,9 +3,9 @@
 from benchmarks.common.agent import BenchmarkAgent
 from benchmarks.common.interfaces import (
     AgentResponse,
-    BenchmarkResult,
     BenchmarkDataset,
     BenchmarkEvaluator,
+    BenchmarkResult,
     BenchmarkRunner,
     Conversation,
     ConversationQuestion,

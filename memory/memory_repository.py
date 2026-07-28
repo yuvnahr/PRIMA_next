@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import builtins
+import json
+import os
 from abc import ABC, abstractmethod
 from collections import defaultdict
-import os
-import json
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 import numpy as np
 
@@ -32,11 +33,11 @@ class MemoryRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         raise NotImplementedError
 
     @abstractmethod
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         raise NotImplementedError
 
 
@@ -63,7 +64,7 @@ class InMemoryMemoryRepository(MemoryRepository):
                 return notes[note_id]
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         if memory_type is not None:
             return list(self._notes[memory_type].values())
         notes: list[MemoryNote] = []
@@ -71,7 +72,7 @@ class InMemoryMemoryRepository(MemoryRepository):
             notes.extend(typed_notes.values())
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         query = np.array(list(embedding), dtype="float32")
         query_norm = np.linalg.norm(query) or 1.0
         query = query / query_norm
@@ -170,7 +171,7 @@ class ChromaMemoryRepository(MemoryRepository):
                 return self._from_chroma_result(result, 0)
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         notes: list[MemoryNote] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
@@ -178,10 +179,10 @@ class ChromaMemoryRepository(MemoryRepository):
             notes.extend(self._from_chroma_result(result, index) for index in range(len(result["ids"])))
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         if self.fingerprint_status != "valid":
             raise RuntimeError("Repository fingerprint is invalid; rebuild before retrieval")
-        notes: List[tuple[MemoryNote, float]] = []
+        notes: list[tuple[MemoryNote, float]] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
             result = self.collections[candidate_type].query(

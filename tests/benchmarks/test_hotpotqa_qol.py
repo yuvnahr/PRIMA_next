@@ -1,15 +1,23 @@
 from __future__ import annotations
+
 import json
 import sys
 import types
 from pathlib import Path
+
 import pytest
+
+from benchmarks.hotpotqa.checkpoint import read_checkpoint
 from benchmarks.hotpotqa.console import HotpotQATerminalReporter
 from benchmarks.hotpotqa.convert_to_json import convert_validation_set
 from benchmarks.hotpotqa.data_sources import DATA_SOURCES, choose_dataset_set, get_data_source
 from benchmarks.hotpotqa.evaluate import HotpotQAEvaluator, score_hotpot_record
-from benchmarks.hotpotqa.experiment import resolve_dataset, resolve_mode, run_hotpotqa_experiment, select_conversations
-from benchmarks.hotpotqa.checkpoint import read_checkpoint
+from benchmarks.hotpotqa.experiment import (
+    resolve_dataset,
+    resolve_mode,
+    run_hotpotqa_experiment,
+    select_conversations,
+)
 from tests.benchmarks.test_hotpotqa import FIXTURE, FakeRuntime, write_fixture
 
 ROW = {
@@ -94,7 +102,10 @@ def sample_record(prediction: str = "alpha", error: str | None = None) -> dict:
     return {"sample_id": "x", "type": "bridge", "level": "hard", "question": "A very long question " * 8, "prediction": prediction, "expected_answer": "alpha", "supporting_facts": [["Doc", 0]], "gold_supporting_facts": [["Doc", 0]], "runtime_error": error, "failure_stage": "runtime" if error else None, "failure_category": "RUNTIME_ERROR" if error else None, "final_stop_reason": "sufficient", "reasoning_hops": 1, "retrieval_calls": 1, "reflection_interventions": 0, "evidence_count": 1, "total_latency": 1.25}
 
 def test_reporter_success_partial_failure_summary_quiet_and_wrapping(capsys, monkeypatch) -> None:
-    monkeypatch.setattr("shutil.get_terminal_size", lambda fallback: types.SimpleNamespace(columns=50))
+    monkeypatch.setattr(
+        "benchmarks.hotpotqa.console.shutil",
+        types.SimpleNamespace(get_terminal_size=lambda fallback: types.SimpleNamespace(columns=50)),
+    )
     reporter = HotpotQATerminalReporter(progress=True)
     config = {"dataset_set": "distractor", "mode": "distractor", "dataset_path": "data.json", "sample_count": 3, "sampling_strategy": "random", "resolved_seed": 42, "provider": "ollama", "model": "qwen", "reasoning_mode": "adaptive", "top_k": 5, "max_hops": 3, "output_dir": "out", "resume": False}
     exact, partial, failed = sample_record(), sample_record("alpha beta"), sample_record(error="RuntimeError: boom")

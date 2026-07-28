@@ -80,3 +80,14 @@ evaluation/results/reasoning_smoke_results.json
 
 benchmarks/hotpotqa/data/*.parquet
 
+# Large generated/data blobs
+evaluation/qa/raw/responses.json
+evaluation/goemotions/final/prima_qwen/raw/responses.json
+benchmarks/locomo/outputs/retrieval_trace.json
+benchmarks/hotpotqa/data/hotpot_dev_fullwiki_v1.json
+benchmarks/hotpotqa/data/hotpot_dev_distractor_v1.json
+evaluation/results/reflection_utility.json
+pytest-tmp/
+pytest-cache-files-*/
+benchmarks/goemotions/external/
+benchmarks/locomo-v2/external/

@@ -10,11 +10,11 @@ from memory.retrieval.retrieval_controller import RetrievalResponse
 from reasoning.evidence_integrator import EvidenceIntegrator
 from reasoning.information_need_generator import InformationNeedGenerator
 from reasoning.models import AnswerResult, EvidenceState, ReasoningRequest, Route, SufficiencyStatus
+from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvisor, ReflectionEvent
 from reasoning.stopping_policy import StoppingPolicy
 from reasoning.sufficiency_verifier import SufficiencyVerifier
 from reasoning.task_analyzer import TaskAnalyzer
 
-from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvisor, ReflectionEvent
 Retriever = Callable[[str], RetrievalResponse]
 Synthesizer = Callable[[str, tuple[Any, ...]], tuple[str, bool, tuple[str, ...], dict[str, Any]]]
 

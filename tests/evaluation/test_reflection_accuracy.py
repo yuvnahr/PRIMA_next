@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from evaluation.metrics.reflection_accuracy import accuracy_after, accuracy_before, accuracy_gain, reflection_accuracy_summary
+from evaluation.metrics.reflection_accuracy import (
+    accuracy_after,
+    accuracy_before,
+    accuracy_gain,
+    reflection_accuracy_summary,
+)
 
 
 def test_reflection_accuracy_summary_counts_correct_predictions() -> None:

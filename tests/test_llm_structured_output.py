@@ -5,7 +5,7 @@ import json
 import pytest
 
 from llm.llm_types import LLMRequest, LLMResponse
-from llm.provider import OllamaProvider
+from llm.provider import OllamaProvider, ProviderError, post_json
 from memory.memory_note import MemoryNote
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_result import RetrievalResult
@@ -29,6 +29,11 @@ def test_ollama_sends_optional_system_prompt_and_schema(monkeypatch) -> None:
     assert captured["payload"]["format"] == schema
     assert captured["payload"]["think"] is False
     assert response.text.startswith("{")
+
+
+def test_post_json_rejects_non_http_urls() -> None:
+    with pytest.raises(ProviderError, match="http or https"):
+        post_json("file:///etc/passwd", {})
 
 
 def _evidence(note_id: str, text: str, score: float) -> RetrievalResult:
@@ -99,7 +104,6 @@ def test_runtime_recovers_answer_from_truncated_structured_response(monkeypatch,
 
 def test_runtime_rejects_unknown_context_label(tmp_path) -> None:
     runtime = PrimaRuntime(log_path=tmp_path / "runtime.log")
-    context = runtime._synthesize_evidence
     from runtime.context_builder import RuntimeContextBuilder
     answer_context = RuntimeContextBuilder().build("Q?", (_evidence("one", "Evidence.", 0.9),))
     with pytest.raises(ValueError, match="unknown context labels"):

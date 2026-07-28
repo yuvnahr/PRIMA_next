@@ -1,11 +1,14 @@
-﻿"""Prepare supported HotpotQA validation sets as official-style JSON."""
+"""Prepare supported HotpotQA validation sets as official-style JSON."""
 from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path
 from typing import Any
+
 from benchmarks.hotpotqa.data_sources import DATA_SOURCES, choose_dataset_set, get_data_source
 from benchmarks.hotpotqa.loader import HotpotQADataset
+
 
 def _row_to_record(row: dict[str, Any]) -> dict[str, Any]:
     return {
@@ -31,7 +34,7 @@ def convert_validation_set(dataset_set: str, output_path: str | Path | None = No
         raise RuntimeError("Dataset preparation requires: py -m pip install datasets pyarrow==19.0.1") from exc
     if pyarrow.__version__ == "19.0.0":
         raise RuntimeError("PyArrow 19.0.0 cannot read these Parquet files. Run: py -m pip install pyarrow==19.0.1")
-    rows = [_row_to_record(row) for row in load_dataset("parquet", data_files={"validation": source.parquet_url}, split="validation")]
+    rows = [_row_to_record(row) for row in load_dataset("parquet", data_files={"validation": source.parquet_url}, split="validation", revision="14f0ace3c3fac7bd86149c616b5b05d8282e5c6a")]
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_name(output.name + ".tmp")
     try:

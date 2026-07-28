@@ -11,20 +11,21 @@ from pathlib import Path
 from typing import Any
 
 from affect.affect_engine import DynamicAffectEngine
-from memory.maintenance.memory_importance import MemoryImportanceEngine
+from llm.llm_client import LLMClient
+from llm.provider import ProviderError
 from memory.maintenance.importance_types import MemoryAdmissionDecision
+from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
-from llm.llm_client import LLMClient
-from llm.provider import ProviderError
-from reflection.reflection_engine import ReflectionEngine
-from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
-from reasoning.config import reasoning_budget, reasoning_mode as configured_reasoning_mode
+from reasoning.config import reasoning_budget
+from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
 from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
+from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
+from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics

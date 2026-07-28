@@ -10,7 +10,13 @@ from memory.retrieval.retrieval_confidence import RetrievalConfidence
 from memory.retrieval.retrieval_controller import RetrievalResponse
 from memory.retrieval.retrieval_result import RetrievalResult
 from reasoning.controller import ReasoningController
-from reasoning.models import EvidenceState, InformationNeed, ReasoningBudget, ReasoningMode, ReasoningRequest, SufficiencyStatus
+from reasoning.models import (
+    EvidenceState,
+    ReasoningBudget,
+    ReasoningMode,
+    ReasoningRequest,
+    SufficiencyStatus,
+)
 from reasoning.stopping_policy import StoppingPolicy
 
 

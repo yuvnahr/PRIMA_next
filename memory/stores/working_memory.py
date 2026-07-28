@@ -1,7 +1,8 @@
+from typing import Any
+
+from memory.memory_repository import MemoryRepository
 from memory.memory_store import MemoryStore
 from memory.memory_types import MemoryLevel, MemoryType
-from memory.memory_repository import MemoryRepository
-from typing import Any
 
 
 class WorkingMemory(MemoryStore):

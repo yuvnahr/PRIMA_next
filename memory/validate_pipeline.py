@@ -1,7 +1,9 @@
 """Validate real production embedding constructors."""
 from __future__ import annotations
+
 import json
 from types import SimpleNamespace
+
 from memory.embedding_pipeline import current_embedding_metadata, get_embedding_pipeline
 from memory.event_memory.event_builder import EventMemoryBuilder
 from memory.event_memory.event_segmenter import EventSegment
@@ -14,6 +16,7 @@ from reflection.reflection_lineage import ReflectionLineage
 from reflection.reflection_memory import ReflectionMemory
 from reflection.reflection_signal import ReflectionSignal
 from reflection.reflection_types import ReflectionSignalType
+
 
 def main() -> int:
     meta=current_embedding_metadata(); pipeline=get_embedding_pipeline(); note=MemoryNote.create("Nathan is called Nate and he likes tea."); query=pipeline.embed_query("What does Nate like?")

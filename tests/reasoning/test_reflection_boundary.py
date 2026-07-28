@@ -7,7 +7,7 @@ from memory.retrieval.retrieval_controller import RetrievalResponse
 from memory.retrieval.retrieval_result import RetrievalResult
 from reasoning.controller import ReasoningController
 from reasoning.models import ReasoningBudget, ReasoningMode, ReasoningRequest, SufficiencyStatus
-from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice, ReflectionEvent
+from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice
 
 
 def _response(note_id: str, text: str, *, eligible: bool = True) -> RetrievalResponse:

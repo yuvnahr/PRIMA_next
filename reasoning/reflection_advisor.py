@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Protocol
 
+
 class ReflectionEvent(str, Enum):
     NO_NEW_EVIDENCE = "no_new_evidence"
     DUPLICATE_QUERY = "duplicate_query"

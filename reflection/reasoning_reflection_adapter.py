@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
+from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice, ReflectionEvent
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from reflection.reflection_types import FailureType
-from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice, ReflectionEvent
+
 
 @dataclass(slots=True)
 class ReasoningReflectionAdapter:

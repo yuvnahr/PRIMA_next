@@ -7,7 +7,13 @@ from memory.retrieval.retrieval_confidence import RetrievalConfidence
 from memory.retrieval.retrieval_controller import RetrievalResponse
 from memory.retrieval.retrieval_result import RetrievalResult
 from planning import Plan, PlanningContext, PlanningMemory, PlanningReflectionSignal, TaskPlanner
-from planning.planning_types import ActionStatus, ActionType, ExecutionIntentType, PlanStatus, ReplanReason
+from planning.planning_types import (
+    ActionStatus,
+    ActionType,
+    ExecutionIntentType,
+    PlanStatus,
+    ReplanReason,
+)
 from state.cognitive_state import CognitiveState
 
 

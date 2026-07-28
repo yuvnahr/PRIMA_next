@@ -1,8 +1,12 @@
 ﻿"""Rebuild stored vectors after an embedding-space change."""
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+
 from memory.embedding_pipeline import current_embedding_metadata, get_embedding_pipeline
 from memory.memory_repository import ChromaMemoryRepository
+
 
 def main(argv=None):
     p=argparse.ArgumentParser(); p.add_argument('--path',default='./memory_db'); p.add_argument('--dry-run',action='store_true'); p.add_argument('--force',action='store_true'); p.add_argument('--workers',type=int,default=1); p.add_argument('--batch-size',type=int,default=64); p.add_argument('--progress',action='store_true'); a=p.parse_args(argv)

@@ -1,4 +1,3 @@
-baseline: null
 exclude_dirs:
   - .git
   - .pytest_cache
@@ -8,3 +7,10 @@ exclude_dirs:
   - venv
   - .venv
   - tests
+  - pytest-cache-files-f0itneo_
+  - pytest-cache-files-v1ufsiq3
+  - pytest-tmp
+  - benchmarks\goemotions\external
+  - benchmarks\locomo\external
+  - benchmarks\locomo-v2\external
+  - benchmarks\hotpotqa\external

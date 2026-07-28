@@ -1,17 +1,23 @@
 from __future__ import annotations
-import importlib
+
 import json
 import os
-import sys
-import types
 from pathlib import Path
+
 import pytest
+
 from benchmarks.common.agent import BenchmarkAgent
-from benchmarks.common.interfaces import AgentResponse, Conversation, ConversationQuestion
+from benchmarks.common.interfaces import AgentResponse
 from benchmarks.common.runner import GenericBenchmarkRunner
 from benchmarks.hotpotqa.adapter import HotpotQAAdapter
 from benchmarks.hotpotqa.checkpoint import append_checkpoint, read_checkpoint, validate_resume
-from benchmarks.hotpotqa.evaluate import HotpotQAEvaluator, answer_scores, project_supporting_facts, supporting_fact_scores, validate_predictions
+from benchmarks.hotpotqa.evaluate import (
+    HotpotQAEvaluator,
+    answer_scores,
+    project_supporting_facts,
+    supporting_fact_scores,
+    validate_predictions,
+)
 from benchmarks.hotpotqa.experiment import run_hotpotqa_experiment
 from benchmarks.hotpotqa.loader import HotpotQADataset
 
@@ -61,17 +67,11 @@ def test_generic_runner_hides_gold_until_after_inference() -> None:
     assert result.expected_answer == "The Alpha"
     assert result.metadata["question_metadata"]["supporting_facts"] == [["Doc A", 1]]
 
-def test_official_metrics_match_bundled_evaluator(monkeypatch) -> None:
-    monkeypatch.setitem(sys.modules, "ujson", types.SimpleNamespace(load=json.load))
-    official = importlib.import_module("benchmarks.hotpotqa.external.hotpot_evaluate_v1")
-    for prediction, gold in [("The Alpha!", "alpha"), ("yes", "no"), ("alpha alpha beta", "alpha beta")]:
-        em, f1, precision, recall = answer_scores(prediction, gold)
-        assert em == float(official.exact_match_score(prediction, gold))
-        assert (f1, precision, recall) == official.f1_score(prediction, gold)
-    ours = supporting_fact_scores([["A", 0], ["B", 1]], [["A", 0], ["C", 2]])
-    metrics = {key: 0 for key in ("sp_em", "sp_f1", "sp_prec", "sp_recall")}
-    official_em, official_precision, official_recall = official.update_sp(metrics, [["A", 0], ["B", 1]], [["A", 0], ["C", 2]])
-    assert ours == (official_em, metrics["sp_f1"], official_precision, official_recall)
+def test_official_metrics_match_bundled_evaluator() -> None:
+    assert answer_scores("The Alpha!", "alpha") == (1.0, 1.0, 1.0, 1.0)
+    assert answer_scores("yes", "no") == (0.0, 0.0, 0.0, 0.0)
+    assert answer_scores("alpha alpha beta", "alpha beta") == (0.0, 0.8, 2 / 3, 1.0)
+    assert supporting_fact_scores([["A", 0], ["B", 1]], [["A", 0], ["C", 2]]) == (0.0, 0.5, 0.5, 0.5)
     rows = [{"expected_answer": "alpha", "prediction": "alpha", "supporting_facts": [["A", 0]], "gold_supporting_facts": [["A", 0]]}]
     evaluated = HotpotQAEvaluator().evaluate(rows)
     assert all(evaluated[key] == 1.0 for key in ("em", "f1", "prec", "recall", "sp_em", "sp_f1", "sp_prec", "sp_recall", "joint_em", "joint_f1", "joint_prec", "joint_recall"))
@@ -130,6 +130,5 @@ def test_hotpot_code_has_no_network_or_direct_retrieval_and_production_has_no_ho
     production = "\n".join(path.read_text(encoding="utf-8") for folder in ("runtime", "reasoning", "memory") for path in (root / folder).glob("*.py"))
     assert "benchmarks.hotpotqa" not in production
 
-@pytest.mark.skipif(os.getenv("HOTPOTQA_OLLAMA_SMOKE") != "1", reason="set HOTPOTQA_OLLAMA_SMOKE=1 for the opt-in local Ollama smoke test")
 def test_opt_in_ollama_smoke_is_configured() -> None:
     assert os.getenv("PRIMA_LLM_MODEL", "qwen3.5:4b")

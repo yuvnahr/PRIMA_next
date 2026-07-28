@@ -1,10 +1,13 @@
 """Plain-text terminal reporting for HotpotQA runs."""
 from __future__ import annotations
+
 import shutil
 import textwrap
 from collections import Counter
 from typing import Any
+
 from benchmarks.hotpotqa.evaluate import score_hotpot_record
+
 
 class HotpotQATerminalReporter:
     def __init__(self, *, quiet: bool = False, progress: bool = False) -> None:

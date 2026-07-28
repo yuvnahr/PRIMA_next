@@ -1,9 +1,12 @@
 """Supported HotpotQA validation/evaluation sources."""
 from __future__ import annotations
+
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
 from benchmarks.hotpotqa.config import CONTEXT_SOURCES, ROOT
+
 
 @dataclass(frozen=True)
 class HotpotQADataSource:
@@ -21,12 +24,12 @@ class HotpotQADataSource:
 DATA_SOURCES = {
     "distractor": HotpotQADataSource(
         "distractor", "Distractor validation/evaluation",
-        "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/main/distractor/validation-00000-of-00001.parquet",
+        "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/14f0ace3c3fac7bd86149c616b5b05d8282e5c6a/distractor/validation-00000-of-00001.parquet",
         "hotpot_dev_distractor_v1.json", "distractor", CONTEXT_SOURCES["distractor"],
     ),
     "fullwiki": HotpotQADataSource(
         "fullwiki", "Fullwiki validation/evaluation",
-        "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/main/fullwiki/validation-00000-of-00001.parquet",
+        "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/14f0ace3c3fac7bd86149c616b5b05d8282e5c6a/fullwiki/validation-00000-of-00001.parquet",
         "hotpot_dev_fullwiki_v1.json", "fullwiki", CONTEXT_SOURCES["fullwiki"],
     ),
 }

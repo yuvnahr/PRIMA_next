@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from dataclasses import dataclass
 
 from memory.retrieval.retrieval_confidence import RetrievalConfidence
 from reflection.failure_classifier import FailureClassifier
@@ -15,9 +16,6 @@ from reflection.reflection_result import ReflectionResult
 from reflection.reflection_signal import ReflectionSignal
 from reflection.reflection_types import FailureType, ReflectionSignalType, ReflectionSource
 from reflection.rule_extractor import RuleExtractor
-
-
-from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)

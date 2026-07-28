@@ -12,7 +12,10 @@ import numpy as np
 from evaluation.metrics.retrieval_metrics import (
     summarize_retrieval_metrics,
 )
-from evaluation.runners.retrieval_semantic_runner import SemanticRetrievalConfiguration, SemanticRetrievalRunner
+from evaluation.runners.retrieval_semantic_runner import (
+    SemanticRetrievalConfiguration,
+    SemanticRetrievalRunner,
+)
 from memory.memory_note import stable_embedding
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker

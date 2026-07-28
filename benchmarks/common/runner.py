@@ -7,7 +7,12 @@ from collections.abc import Iterable
 from pathlib import Path
 
 from benchmarks.common.agent import BenchmarkAgent
-from benchmarks.common.interfaces import BenchmarkResult, BenchmarkRunner, Conversation, ConversationQuestion
+from benchmarks.common.interfaces import (
+    BenchmarkResult,
+    BenchmarkRunner,
+    Conversation,
+    ConversationQuestion,
+)
 from benchmarks.common.utils import configure_benchmark_logger
 
 

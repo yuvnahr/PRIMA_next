@@ -1,4 +1,4 @@
-﻿"""LoCoMo retrieval-only scientific validation for Retrieval V2."""
+"""LoCoMo retrieval-only scientific validation for Retrieval V2."""
 
 from __future__ import annotations
 
@@ -11,13 +11,17 @@ import random
 import statistics
 import time
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
-from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, reciprocal_rank, summarize_retrieval_metrics
+from evaluation.metrics.retrieval_metrics import (
+    recall_at_k,
+    summarize_retrieval_metrics,
+)
 from memory.embedding_backend import embedding_backend_info
 from memory.event_memory import EventMemoryBuilder, EventSegmenter
 from memory.memory_note import MemoryNote, tokenize
@@ -298,7 +302,7 @@ def _confidence_validation(traces: list[dict[str, Any]]) -> dict[str, Any]:
         bins.append({"bin_start": lower, "bin_end": upper, "count": len(subset), "recall_at_5": metrics["recall_at_5"], "mrr": metrics["mrr"]})
     confidences = [float(trace.get("confidence", 0.0)) for trace in traces]
     correctness = [recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) for trace in traces]
-    mrrs = [reciprocal_rank(trace["expected_memory_ids"], trace["retrieved_memory_ids"]) for trace in traces]
+    mrrs = [_metrics([trace])["mrr"] for trace in traces]
     return {
         "histogram": bins,
         "curve": bins,
@@ -465,7 +469,6 @@ def _confidence_calibration(traces: list[dict[str, Any]]) -> dict[str, Any]:
     bins: list[dict[str, Any]] = []
     confidences = [float(trace.get("confidence", 0.0)) for trace in traces]
     successes = [1.0 if recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) > 0.0 else 0.0 for trace in traces]
-    mrrs = [reciprocal_rank(trace["expected_memory_ids"], trace["retrieved_memory_ids"]) for trace in traces]
     ece = 0.0
     for lower in [0.0, 0.2, 0.4, 0.6, 0.8]:
         upper = round(lower + 0.2, 1)
@@ -951,7 +954,7 @@ def _chunking_hypothesis_validation(records: list[dict[str, Any]], full_trace: l
         dense_ids = {str(candidate.get("id")) for candidate in trace.get("diagnostics", {}).get("dense_top30", [])}
         if not set(trace["expected_memory_ids"]) <= dense_ids:
             dense_failures.append(trace)
-    sample = random.Random(9).sample(dense_failures, min(sample_size, len(dense_failures))) if dense_failures else []
+    sample = random.Random(9).sample(dense_failures, min(sample_size, len(dense_failures))) if dense_failures else []  # nosec B311
     cases = []
     counts: Counter[str] = Counter()
     for trace in sample:

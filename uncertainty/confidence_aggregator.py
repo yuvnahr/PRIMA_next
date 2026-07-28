@@ -6,8 +6,18 @@ import math
 from dataclasses import dataclass
 
 from uncertainty.calibration import ConfidenceCalibrator
-from uncertainty.confidence_signal import ConfidenceSignal, DecisionProbability, OverallConfidence, clamp01
-from uncertainty.uncertainty_types import ConfidenceSource, ConfidenceTrend, DecisionType, UncertaintyBand
+from uncertainty.confidence_signal import (
+    ConfidenceSignal,
+    DecisionProbability,
+    OverallConfidence,
+    clamp01,
+)
+from uncertainty.uncertainty_types import (
+    ConfidenceSource,
+    ConfidenceTrend,
+    DecisionType,
+    UncertaintyBand,
+)
 
 
 @dataclass(frozen=True, slots=True)

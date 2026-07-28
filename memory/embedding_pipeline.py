@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any
 
 from memory.embedding_backend import embed_text, embedding_backend_config
-from memory.identity_normalization import IdentityNormalizer
-from memory.semantic_representation import SemanticMemoryRepresentation, build_semantic_representation
 from memory.experiment_config import EmbeddingExperimentConfig, configured_backend
+from memory.identity_normalization import IdentityNormalizer
+from memory.semantic_representation import (
+    SemanticMemoryRepresentation,
+    build_semantic_representation,
+)
 
 REPRESENTATION_VERSION = "semantic-v1"
 IDENTITY_VERSION = "identity-v1"
@@ -65,9 +69,10 @@ class CanonicalEmbeddingPipeline:
         if self.config.representation_mode == "raw":
             serialized = source
         elif self.config.representation_mode == "event":
+            from types import SimpleNamespace
+
             from memory.event_memory.event_builder import EventMemoryBuilder
             from memory.event_memory.event_segmenter import EventSegment
-            from types import SimpleNamespace
             turn = SimpleNamespace(turn_id="1", speaker=speaker or "user", text=source, session_id="experiment")
             serialized = EventMemoryBuilder().build(EventSegment("experiment", 1, (turn,))).embedding_text
         else:

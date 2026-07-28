@@ -7,11 +7,12 @@ lightweight and explicit about where secrets are read from.
 """
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -30,6 +31,9 @@ except Exception:
 def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None = None, timeout: int = 60) -> Any:
     """POST JSON using requests when available, otherwise urllib."""
 
+    if urlsplit(url).scheme not in {"http", "https"}:
+        raise ProviderError("Provider URL must use http or https")
+
     if requests is not None:
         response = requests.post(url, json=payload, headers=headers, timeout=timeout)
         try:
@@ -46,7 +50,7 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")

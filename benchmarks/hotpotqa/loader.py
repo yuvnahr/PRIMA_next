@@ -1,10 +1,13 @@
 ﻿"""Validated HotpotQA JSON loading."""
 from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Any
+
 from benchmarks.common.interfaces import BenchmarkDataset, Conversation
 from benchmarks.hotpotqa.adapter import HotpotQAAdapter
+
 
 class HotpotQADataset(BenchmarkDataset):
     def __init__(self, dataset_path: str | Path, mode: str = "distractor", adapter: HotpotQAAdapter | None = None) -> None:
