@@ -14,7 +14,10 @@ from typing import Any
 from memory.embedding_backend import embed_text, embedding_backend_config
 from memory.experiment_config import EmbeddingExperimentConfig, configured_backend
 from memory.identity_normalization import IdentityNormalizer
-from memory.semantic_representation import SemanticMemoryRepresentation, build_semantic_representation
+from memory.semantic_representation import (
+    SemanticMemoryRepresentation,
+    build_semantic_representation,
+)
 
 REPRESENTATION_VERSION = "semantic-v1"
 IDENTITY_VERSION = "identity-v1"

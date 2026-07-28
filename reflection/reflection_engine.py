@@ -68,9 +68,7 @@ class ReflectionEngine:
         signals = self._build_signals(context, failure_type)
         trigger_score = self.compute_trigger_score(context, signals)
         trigger_reasons = self.trigger_reasons(context, signals, trigger_score, failure_type)
-        should_reflect = trigger_score >= self.trigger_threshold and any(
-            bool(reason.get("triggered", False)) for reason in trigger_reasons
-        )
+        should_reflect = bool(context.failure_metadata.get("reasoning_event")) or (trigger_score >= self.trigger_threshold and any(bool(reason.get("triggered", False)) for reason in trigger_reasons))
         before_confidence = self._before_confidence(context)
 
         reflection_text = ""

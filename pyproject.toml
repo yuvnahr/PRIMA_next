@@ -11,6 +11,11 @@ target-version = "py310"
 exclude = [
     ".git",
     ".venv",
+    "venv",
+    ".pytest_cache",
+    "pytest-cache-files-*",
+    "pytest-tmp",
+    "benchmarks/**/external",
     "__pycache__",
 ]
 
@@ -21,6 +26,9 @@ ignore = [
     "S110", # optional dependency fallbacks intentionally continue silently
     "B904", # provider wrappers preserve concise user-facing request errors
     "E501", # this codebase permits long declarative lines
+    "E701", # this codebase permits compact guard clauses
+    "E702", # this codebase permits compact sequential statements
+    "E731", # this codebase permits tiny local callables in scripts/tests
 ]
 
 [tool.mypy]

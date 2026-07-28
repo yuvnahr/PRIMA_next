@@ -4,7 +4,12 @@ from uncertainty.calibration import CalibrationProfile, ConfidenceCalibrator
 from uncertainty.confidence_aggregator import ConfidenceAggregator
 from uncertainty.confidence_signal import ConfidenceSignal, OverallConfidence
 from uncertainty.uncertainty_estimator import UncertaintyEstimator
-from uncertainty.uncertainty_types import ConfidenceSource, ConfidenceTrend, DecisionType, UncertaintyBand
+from uncertainty.uncertainty_types import (
+    ConfidenceSource,
+    ConfidenceTrend,
+    DecisionType,
+    UncertaintyBand,
+)
 
 __all__ = [
     "CalibrationProfile",

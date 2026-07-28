@@ -35,6 +35,8 @@ class ReflectionMemory:
             context={
                 "type": "reflection_memory",
                 "source_failure": self.source_failure,
+                "retrieval_channel": "procedural",
+                "evidence_eligible": False,
                 "reflection_id": self.reflection_id,
                 "retrieval_context": self.retrieval_context,
             },
@@ -89,6 +91,8 @@ class Rule:
             context={
                 "type": "expel_rule",
                 "rule_id": self.rule_id,
+                "retrieval_channel": "procedural",
+                "evidence_eligible": False,
                 "source_failures": list(self.source_failures),
                 "applicability": list(self.applicability),
             },

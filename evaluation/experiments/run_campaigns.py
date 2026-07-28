@@ -17,7 +17,11 @@ from benchmarks.locomo.loader import LoCoMoDataset
 from benchmarks.locomo.loader import dataset_path as resolve_dataset_path
 from benchmarks.locomo.retrieval_validation import _expected_ids, _normalize_category
 from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, reciprocal_rank
-from memory.embedding_pipeline import CanonicalEmbeddingPipeline, current_embedding_metadata, use_embedding_pipeline
+from memory.embedding_pipeline import (
+    CanonicalEmbeddingPipeline,
+    current_embedding_metadata,
+    use_embedding_pipeline,
+)
 from memory.experiment_config import EmbeddingExperimentConfig
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType

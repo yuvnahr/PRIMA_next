@@ -1,6 +1,11 @@
 """PRIMA-NEXT symbolic world model."""
 
-from world.prediction_result import ActionPrediction, ConstraintPrediction, PredictionResult, StateTransition
+from world.prediction_result import (
+    ActionPrediction,
+    ConstraintPrediction,
+    PredictionResult,
+    StateTransition,
+)
 from world.predictive_model import SymbolicPredictiveModel
 from world.simulation_context import SimulationContext
 from world.state_simulator import StateSimulator

@@ -14,7 +14,10 @@ from evaluation.metrics.confidence_calibration import (
 )
 from evaluation.metrics.memory_formation import memory_formation_summary, memory_quality_comparison
 from evaluation.metrics.memory_metrics import memory_growth, retrieval_hit_counts
-from evaluation.metrics.reflection_accuracy import print_reflection_accuracy_report, reflection_accuracy_summary
+from evaluation.metrics.reflection_accuracy import (
+    print_reflection_accuracy_report,
+    reflection_accuracy_summary,
+)
 from evaluation.metrics.reflection_harm import reflection_harm_summary
 from evaluation.metrics.reflection_metrics import (
     affect_trigger_count,

@@ -11,7 +11,12 @@ from reflection.reflection_repository import ReflectionRepository
 from reflection.reflection_signal import ReflectionSignal
 from reflection.reflection_types import FailureType, ReflectionSignalType
 from reflection.rule_extractor import RuleExtractor
-from reflection.verifier_adapter import VerifierAdapter, fuzzy_match, is_answer_in_content, parse_action
+from reflection.verifier_adapter import (
+    VerifierAdapter,
+    fuzzy_match,
+    is_answer_in_content,
+    parse_action,
+)
 from state.cognitive_state import CognitiveState
 
 

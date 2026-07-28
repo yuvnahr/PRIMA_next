@@ -7,7 +7,14 @@ from typing import Any
 
 from planning.action_selector import ActionSelector
 from planning.goal_selector import GoalSelector
-from planning.plan import Plan, PlanAction, PlanConstraint, PlanEvaluation, PlanSimulation, stable_id
+from planning.plan import (
+    Plan,
+    PlanAction,
+    PlanConstraint,
+    PlanEvaluation,
+    PlanSimulation,
+    stable_id,
+)
 from planning.plan_evaluator import PlanEvaluator
 from planning.planning_context import PlanningContext
 from planning.planning_types import ActionType, ConstraintType

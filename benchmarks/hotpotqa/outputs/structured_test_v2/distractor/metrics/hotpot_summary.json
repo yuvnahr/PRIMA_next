@@ -1,0 +1,19 @@
+{
+  "completed": 1,
+  "failures": 0,
+  "context_source": "supplied_distractor_context",
+  "em": 1.0,
+  "f1": 1.0,
+  "prec": 1.0,
+  "recall": 1.0,
+  "sp_em": 0.0,
+  "sp_f1": 0.6666666666666666,
+  "sp_prec": 1.0,
+  "sp_recall": 0.5,
+  "joint_em": 0.0,
+  "joint_f1": 0.6666666666666666,
+  "joint_prec": 1.0,
+  "joint_recall": 0.5,
+  "total": 1,
+  "scored": 1
+}

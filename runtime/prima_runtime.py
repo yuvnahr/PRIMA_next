@@ -22,6 +22,11 @@ from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
+from reasoning.config import reasoning_budget
+from reasoning.config import reasoning_mode as configured_reasoning_mode
+from reasoning.controller import ReasoningController
+from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
+from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext
@@ -50,6 +55,9 @@ class PrimaRuntime:
             self.memory_repository,
             candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
         )
+        self.reasoning_controller = ReasoningController(
+            reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
+        )
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -70,6 +78,9 @@ class PrimaRuntime:
                 self.memory_repository,
                 candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
             )
+            self.reasoning_controller = ReasoningController(
+                reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
+            )
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
@@ -84,26 +95,95 @@ class PrimaRuntime:
         provider: str | None = None,
         model: str | None = None,
         max_context_tokens: int | None = None,
-    ) -> RuntimeResult:
-        """Answer a question from retrieved runtime memories instead of echoing input."""
+        session_id: str | None = None,
+        reasoning_mode: str | None = None,
+        max_hops: int | None = None,
+        diagnostics: bool = False,
+    ) -> AnswerResult:
+        """Answer through the canonical bounded evidence-acquisition controller."""
 
-        start = time.perf_counter()
+        started = time.perf_counter()
         top_k = int(top_k or os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
         max_context_tokens = int(max_context_tokens or os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
-        request = RetrievalRequest(query=question, top_k=top_k)
-        retrieval_response = self.retrieval_controller.retrieve(request)
-        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, retrieval_response.results)
+        mode = ReasoningMode.DIAGNOSTIC if diagnostics else configured_reasoning_mode(reasoning_mode)
+        request = ReasoningRequest(
+            question=question,
+            session_id=session_id or (context.session_id if context is not None else ""),
+            mode=mode,
+            budget=reasoning_budget(max_hops=max_hops, max_context_tokens=max_context_tokens),
+        )
+        result = self.reasoning_controller.answer(
+            request,
+            retrieve=lambda query: self.retrieval_controller.retrieve(RetrievalRequest(query=query, top_k=top_k)),
+            synthesize=lambda prompt, evidence: self._synthesize_evidence(
+                prompt, evidence, provider=provider, model=model, max_context_tokens=max_context_tokens
+            ),
+        )
+        result.answer_diagnostics.update(
+            {
+                "question": question,
+                "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
+                "retrieved_memories": [
+                    {
+                        "id": item.source_id,
+                        "text": item.text,
+                        "retrieval_score": item.retrieval_score,
+                    }
+                    for item in result.evidence_references
+                ],
+                "retrieval_scores": [item.retrieval_score for item in result.evidence_references],
+                "retrieval_confidence": result.confidence,
+                "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+                "errors": list(result.errors),
+                "embedding": current_embedding_metadata(),
+            }
+        )
+        if context is not None:
+            context.retrieved_memories = result.retrieved_memories
+            context.confidence_score = result.confidence
+        self._log_answer(question, {
+            "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
+            "context_length": result.answer_diagnostics.get("context_tokens", 0),
+            "llm_used": result.answer_diagnostics.get("llm_used", False),
+            "latency_ms": 0.0,
+            "reflection_used": False,
+            "provider": result.answer_diagnostics.get("provider", ""),
+            "model": result.answer_diagnostics.get("model", ""),
+            "errors": list(result.errors),
+        })
+        return result
+
+    def ingest_document(self, text: str, metadata: dict[str, Any] | None = None) -> MemoryNote:
+        """Store one caller-supplied document through the public runtime boundary."""
+        if not str(text).strip():
+            raise ValueError("Document text must not be empty.")
+        note = MemoryNote.create(content=str(text), memory_type=MemoryType.SEMANTIC, context={"source": "document_ingestion", **dict(metadata or {})})
+        return self.memory_repository.add(note)
+
+    def _synthesize_evidence(
+        self,
+        question: str,
+        evidence: tuple[Any, ...],
+        *,
+        provider: str | None,
+        model: str | None,
+        max_context_tokens: int,
+    ) -> tuple[str, bool, tuple[str, ...], dict[str, Any]]:
+        """Reuse the established bounded context and LLM answer path after acquisition."""
+
+        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, evidence)
         errors: list[str] = []
         llm_used = False
+        raw_model_response = ""
+        selected_memory_ids: list[str] = []
+        structured_answer_valid = False
         prompt: str | None = None
-        raw_response: str | None = None
         llm_metadata: dict[str, Any] = {}
         inference_settings = self._inference_settings(
             provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
             answer_context=answer_context,
         )
-
         if not answer_context.memories:
             answer = self._insufficient_information_answer(question, reason="no_retrieved_memories")
         else:
@@ -115,61 +195,103 @@ class PrimaRuntime:
                     model=str(inference_settings["model"]),
                     temperature=float(inference_settings["temperature"]),
                     max_tokens=int(inference_settings["num_predict"]),
+                    system_prompt=self._answer_system_prompt(),
+                    response_format=self._answer_response_schema(),
                 )
-                raw_response = llm_response.text
+                raw_model_response = llm_response.text.strip()
+                llm_used = bool(raw_model_response)
                 if isinstance(llm_response.raw, dict):
                     llm_metadata = {
                         key: llm_response.raw.get(key)
-                        for key in ("model", "thinking", "done", "done_reason", "total_duration", "load_duration", "prompt_eval_count", "eval_count")
+                        for key in (
+                            "model",
+                            "thinking",
+                            "done",
+                            "done_reason",
+                            "total_duration",
+                            "load_duration",
+                            "prompt_eval_count",
+                            "eval_count",
+                        )
                     }
                 if llm_metadata.get("done_reason") == "length":
                     errors.append("LLM answer was truncated at the generation limit.")
-                answer = extract_answer(raw_response)
-                llm_used = bool(answer)
-                if not answer:
-                    errors.append("LLM returned an empty answer.")
-                    answer = self._extractive_answer(answer_context)
-            except (ProviderError, RuntimeError, ValueError) as exc:
+                answer, selected_memory_ids = self._parse_structured_answer(raw_model_response, answer_context)
+                structured_answer_valid = True
+            except (json.JSONDecodeError, TypeError, KeyError, ProviderError, RuntimeError, ValueError) as exc:
                 errors.append(str(exc))
-                answer = self._extractive_answer(answer_context)
-
+                answer = self._parse_partial_answer(raw_model_response) if raw_model_response.startswith("{") else raw_model_response
+                if not answer:
+                    answer = self._extractive_answer(answer_context)
         if answer.strip() == question.strip():
             errors.append("Answer matched question text; replaced with insufficient-information response.")
             answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
+        return answer, llm_used, tuple(errors), {
+            "llm_used": llm_used,
+            "context_tokens": answer_context.token_count,
+            "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
+            "selected_memory_ids": selected_memory_ids,
+            "structured_answer_valid": structured_answer_valid,
+            "raw_model_response": raw_model_response,
+            "raw_response": raw_model_response or None,
+            "prompt": prompt,
+            "llm_metadata": llm_metadata,
+            "generation_settings": dict(inference_settings),
+            "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
+            "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+        }
 
-        latency_ms = round((time.perf_counter() - start) * 1000, 3)
-        diagnostics = self._answer_diagnostics(
-            question=question,
-            answer_context=answer_context,
-            retrieval_response=retrieval_response,
-            llm_used=llm_used,
-            latency_ms=latency_ms,
-            provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
-            model=model or os.getenv("PRIMA_LLM_MODEL", ""),
-            errors=tuple(errors),
-            inference_settings=inference_settings,
-            prompt=prompt,
-            raw_response=raw_response,
-            llm_metadata=llm_metadata,
+    def _parse_structured_answer(self, raw: str, answer_context: AnswerContext) -> tuple[str, list[str]]:
+        payload = json.loads(raw)
+        if not isinstance(payload, dict) or not isinstance(payload.get("insufficient_information"), bool):
+            raise ValueError("LLM returned an invalid structured answer.")
+        answer = payload.get("answer")
+        if payload["insufficient_information"]:
+            if answer is not None:
+                raise ValueError("Insufficient-information answer must be null.")
+            return self._insufficient_information_answer(answer_context.question, reason="model_abstention"), []
+        if not isinstance(answer, str) or not answer.strip():
+            raise ValueError("Structured answer must contain a non-empty answer string.")
+        labels = payload.get("evidence")
+        if not isinstance(labels, list) or not labels or any(not isinstance(label, str) for label in labels):
+            raise ValueError("Structured answer evidence must be a list of context labels.")
+        label_map = {f"M{index}": memory.memory_id for index, memory in enumerate(answer_context.memories, 1)}
+        unknown = [label for label in labels if label not in label_map]
+        if unknown:
+            raise ValueError(f"Structured answer cited unknown context labels: {', '.join(unknown)}")
+        return answer.strip(), list(dict.fromkeys(label_map[label] for label in labels))
+
+    @staticmethod
+    def _parse_partial_answer(raw: str) -> str:
+        key = raw.find('"answer"')
+        colon = raw.find(":", key + 8) if key >= 0 else -1
+        if colon < 0:
+            return ""
+        try:
+            answer, _ = json.JSONDecoder().raw_decode(raw[colon + 1:].lstrip())
+        except json.JSONDecodeError:
+            return ""
+        return answer.strip() if isinstance(answer, str) else ""
+
+    def _answer_system_prompt(self) -> str:
+        return (
+            "You are a factual question-answering engine. Return only JSON matching the supplied schema. "
+            "The answer must be the shortest exact answer span, normally one to eight words, never a sentence or explanation. "
+            "Use the canonical singular form for a category, profession, nationality, or type. "
+            "Cite the smallest sufficient set of [M#] labels; for comparisons or shared properties, cite evidence for each subject."
         )
-        result = RuntimeResult(
-            final_response=answer,
-            prediction_before_reflection=answer,
-            prediction_after_reflection=answer,
-            affect_state={},
-            retrieved_memories=retrieval_response.results,
-            memory_notes_created=(),
-            reflection_triggered=answer_context.reflection_used,
-            confidence_score=retrieval_response.confidence.confidence,
-            latency_ms=latency_ms,
-            errors=tuple(errors),
-            answer_diagnostics=diagnostics,
-        )
-        if context is not None:
-            context.retrieved_memories = retrieval_response.results
-            context.confidence_score = result.confidence_score
-        self._log_answer(question, diagnostics)
-        return result
+
+    def _answer_response_schema(self) -> dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "answer": {"type": ["string", "null"], "maxLength": 80},
+                "evidence": {"type": "array", "items": {"type": "string", "pattern": "^M[1-9][0-9]*$"}, "minItems": 1, "maxItems": 4},
+                "insufficient_information": {"type": "boolean"},
+            },
+            "required": ["answer", "evidence", "insufficient_information"],
+            "additionalProperties": False,
+        }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
         """Process one user input through the integrated workflow."""
@@ -318,14 +440,11 @@ class PrimaRuntime:
 
     def _build_answer_prompt(self, question: str, answer_context: AnswerContext) -> str:
         return (
-            "You are answering a benchmark question.\n"
-            "Use ONLY the retrieved memory context below.\n"
-            "Do not use outside knowledge.\n"
+            "Use only the retrieved context below.\n"
             f"Question: {question}\n\n"
-            f"Retrieved memory context:\n{answer_context.context_text}\n\n"
-            "Return exactly one JSON object and nothing else: {\"answer\": \"<short factual answer>\"}.\n"
-            "Use a date, name, list, or yes/no answer when possible; do not explain.\n"
-            "If the context is insufficient, return exactly: {\"answer\": null}."
+            f"Retrieved context:\n{answer_context.context_text}\n\n"
+            "Return JSON matching the supplied schema. Put only the shortest exact answer in `answer`; "
+            "use null only when the context is insufficient. Cite the smallest sufficient set of context labels in `evidence`."
         )
 
     def _extractive_answer(self, answer_context: AnswerContext) -> str:

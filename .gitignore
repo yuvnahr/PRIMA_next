@@ -72,6 +72,9 @@ evaluation/results/**/*failure_breakdown*.json
 evaluation/results/**/*dense_investigation*.json
 evaluation/results/**/*event*.json
 evaluation/results/**/*event*.md
+evaluation/results/reasoning_reflection_integration_validation.json
+evaluation/results/legacy_reflection_audit.json
+evaluation/results/procedural_memory_isolation_validation.json
 evaluation/results/**/*embedding_backend_audit*.json
 evaluation/results/**/*embedding_ablation*.json
 evaluation/results/**/*embedding_ablation*.csv
@@ -89,6 +92,23 @@ benchmarks/locomo/outputs/**/*event*.json
 benchmarks/locomo/outputs/**/*event*.md
 *.tmp.json
 *.tmp.csv
+# Request-local reasoning validation output
+evaluation/results/reasoning_controller_validation.json
+evaluation/results/reasoning_smoke_results.json
+
+benchmarks/hotpotqa/data/*.parquet
+
+# Large generated/data blobs
+evaluation/qa/raw/responses.json
+evaluation/goemotions/final/prima_qwen/raw/responses.json
+benchmarks/locomo/outputs/retrieval_trace.json
+benchmarks/hotpotqa/data/hotpot_dev_fullwiki_v1.json
+benchmarks/hotpotqa/data/hotpot_dev_distractor_v1.json
+evaluation/results/reflection_utility.json
+pytest-tmp/
+pytest-cache-files-*/
+benchmarks/goemotions/external/
+benchmarks/locomo-v2/external/
 
 # Generated large reports and documents
 evaluation/**/results/**/*.json

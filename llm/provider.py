@@ -14,7 +14,7 @@ import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.response_parser import parse_generic_response, parse_openai_response
@@ -31,8 +31,8 @@ except Exception:
 def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None = None, timeout: int = 60) -> Any:
     """POST JSON using requests when available, otherwise urllib."""
 
-    if urlparse(url).scheme not in {"http", "https"}:
-        raise ProviderError("Only HTTP(S) provider URLs are allowed")
+    if urlsplit(url).scheme not in {"http", "https"}:
+        raise ProviderError("Provider URL must use http or https")
 
     if requests is not None:
         try:
@@ -214,8 +214,11 @@ class OllamaProvider(OpenAICompatibleProvider):
                 "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
             },
         }
-        if request.response_schema is not None:
-            payload["format"] = request.response_schema
+        if request.system_prompt:
+            payload["system"] = request.system_prompt
+        response_format = request.response_schema if request.response_schema is not None else request.response_format
+        if response_format is not None:
+            payload["format"] = response_format
         timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
         retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
         last_error: ProviderError | None = None

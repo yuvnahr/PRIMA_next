@@ -18,7 +18,7 @@ from typing import Any
 
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
-from evaluation.metrics.retrieval_metrics import recall_at_k, reciprocal_rank, summarize_retrieval_metrics
+from evaluation.metrics.retrieval_metrics import recall_at_k, summarize_retrieval_metrics
 from memory.embedding_backend import embedding_backend_info
 from memory.event_memory import EventMemoryBuilder, EventSegmenter
 from memory.memory_note import MemoryNote, tokenize
@@ -299,7 +299,7 @@ def _confidence_validation(traces: list[dict[str, Any]]) -> dict[str, Any]:
         bins.append({"bin_start": lower, "bin_end": upper, "count": len(subset), "recall_at_5": metrics["recall_at_5"], "mrr": metrics["mrr"]})
     confidences = [float(trace.get("confidence", 0.0)) for trace in traces]
     correctness = [recall_at_k(trace["expected_memory_ids"], trace["retrieved_memory_ids"], 5) for trace in traces]
-    mrrs = [reciprocal_rank(trace["expected_memory_ids"], trace["retrieved_memory_ids"]) for trace in traces]
+    mrrs = [_metrics([trace])["mrr"] for trace in traces]
     return {
         "histogram": bins,
         "curve": bins,
