@@ -18,7 +18,8 @@ from typing import Any
 from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExample, load_examples, load_labels
 from benchmarks.goemotions.metrics import evaluate, probability_metrics, render_figures
 from benchmarks.goemotions.prompts import build_prompt
-from benchmarks.goemotions.systems import EncoderSystem, GoEmotionsSystem, HybridSystem, PrimaGoEmotionsSystem, PrimaQwenSystem, QwenSchemaSystem, QwenZeroShotSystem
+from benchmarks.goemotions.schemas import parse_label_response
+from benchmarks.goemotions.systems import EncoderSystem, GoEmotionsSystem, HybridSystem, PrimaGoEmotionsSystem, PrimaQwenSystem, QwenDefinitionsSystem, QwenSchemaSystem, QwenWithPrimaTelemetrySystem, QwenZeroShotSystem
 from llm.provider import ProviderError
 
 OUTPUT_PATH = Path("evaluation/goemotions")
@@ -86,10 +87,30 @@ def run_goemotions_experiment(
 
     gold = [frozenset(record["gold_labels"]) for record in records]
     predicted = [frozenset(record["predicted_labels"]) for record in records]
+    if active_system.name == "prima_qwen":
+        for record in records:
+            baseline = set(record.get("normalized_labels", []))
+            decision = record.get("prima_decision", {})
+            preserved = baseline == set(record["predicted_labels"])
+            if preserved != bool(decision.get("preserved_baseline")):
+                raise RuntimeError(f"PRIMA decision audit mismatch for {record['id']}.")
     metrics = evaluate(gold, predicted, labels)
     failures = [record for record in records if record["gold_labels"] != record["predicted_labels"]]
     metrics["parse_failure_count"] = sum(record["parse_error"] is not None for record in records)
     metrics["parse_failure_rate"] = round(metrics["parse_failure_count"] / len(records), 6) if records else 0.0
+    neutral_gold = [index for index, row in enumerate(gold) if "neutral" in row and len(row) > 1]
+    metrics["neutral_combination_count"] = len(neutral_gold)
+    metrics["neutral_combination_preserved_count"] = sum("neutral" in predicted[index] and len(predicted[index]) > 1 for index in neutral_gold)
+    metrics["neutral_combination_preservation_rate"] = round(metrics["neutral_combination_preserved_count"] / len(neutral_gold), 6) if neutral_gold else 1.0
+    metrics["prima_changed_prediction_count"] = sum(set(record.get("normalized_labels", [])) != set(record["predicted_labels"]) for record in records if "prima_decision" in record)
+    metrics["prima_changed_prediction_rate"] = round(metrics["prima_changed_prediction_count"] / len(records), 6) if records else 0.0
+    if active_system.name == "prima_qwen":
+        baseline_metrics = evaluate(gold, [frozenset(record["normalized_labels"]) for record in records], labels)
+        metrics["qwen_baseline_metrics"] = {
+            key: baseline_metrics[key]
+            for key in ("accuracy", "sample_f1", "macro_f1", "micro_f1", "label_cardinality", "prediction_cardinality")
+        }
+    metrics["qwen_parse_failure_count"] = sum(record.get("qwen_parse_error") is not None for record in records)
     probability_rows = [record["prediction"]["probabilities"] for record in records if isinstance(record.get("prediction"), dict)]
     metrics["probability_metrics"] = probability_metrics(gold, probability_rows, labels) if len(probability_rows) == len(records) else {"available": False, "reason": "This system emits label sets, not calibrated per-label probabilities."}
     metadata = {
@@ -108,7 +129,10 @@ def run_goemotions_experiment(
     _write_json(paths["answers"], [{key: record[key] for key in ("id", "gold_labels", "predicted_labels")} for record in records])
     _write_json(paths["prompts"], [{key: record[key] for key in ("id", "prompt")} for record in records])
     _write_json(paths["metrics"], metrics)
-    _write_json(paths["summary"], {key: metrics[key] for key in ("sample_count", "accuracy", "macro_f1", "micro_f1", "weighted_f1")})
+    summary = {key: metrics[key] for key in ("sample_count", "accuracy", "sample_f1", "macro_f1", "micro_f1", "weighted_f1", "label_cardinality", "parse_failure_count", "neutral_combination_preservation_rate", "prima_changed_prediction_rate")}
+    if "qwen_baseline_metrics" in metrics:
+        summary["qwen_baseline_metrics"] = metrics["qwen_baseline_metrics"]
+    _write_json(paths["summary"], summary)
     _write_json(paths["metadata"], metadata)
     render_figures(metrics, labels, str(paths["confusion"]), str(paths["labels"]), str(paths["predictions"]))
     paths["report"].write_text(_report(metadata, metrics, failures), encoding="utf-8")
@@ -116,8 +140,8 @@ def run_goemotions_experiment(
 
 
 def _classify(example: GoEmotionsExample, labels: list[str], system: GoEmotionsSystem) -> dict[str, Any]:
-    prompt = build_prompt(example.text, labels)
     raw_response, metadata = system.predict(example.text, labels)
+    prompt = str(metadata.get("benchmark_prompt") or build_prompt(example.text, labels))
     return _classify_response(example, labels, raw_response, metadata, prompt)
 
 
@@ -127,13 +151,13 @@ def _classify_response(example: GoEmotionsExample, labels: list[str], raw_respon
 
 
 def _preflight_provider(provider: str, system: str, model: str) -> None:
-    if provider.lower() != "ollama" or system not in {"qwen_zero_shot", "qwen_schema", "prima_qwen", "goemotions_hybrid"}:
+    if provider.lower() != "ollama" or system not in {"qwen_zero_shot", "qwen_definitions", "qwen_schema", "qwen_with_prima_telemetry", "prima_qwen", "goemotions_hybrid"}:
         return
     base = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
     try:
         with urllib.request.urlopen(f"{base}/api/tags", timeout=5) as response:  # nosec B310
             payload = json.loads(response.read().decode("utf-8"))
-    except (OSError, urllib.error.URLError, TimeoutError) as exc:
+    except (OSError, urllib.error.URLError, TimeoutError):
         raise ProviderError(f"Ollama is not reachable at {base}. Start it with: ollama serve") from None
     names = {item.get("name") for item in payload.get("models", []) if isinstance(item, dict)}
     if model not in names:
@@ -142,8 +166,12 @@ def _preflight_provider(provider: str, system: str, model: str) -> None:
 def _system(name: str, provider: str, model: str, device: str, batch_size: int, thresholds: Path | None = None, calibration: Path | None = None) -> GoEmotionsSystem:
     if name == "qwen_zero_shot":
         return QwenZeroShotSystem(provider, model)
+    if name == "qwen_definitions":
+        return QwenDefinitionsSystem(provider, model)
     if name == "qwen_schema":
         return QwenSchemaSystem(provider, model)
+    if name == "qwen_with_prima_telemetry":
+        return QwenWithPrimaTelemetrySystem(provider, model)
     if name == "prima_qwen":
         return PrimaQwenSystem(provider, model)
     if name == "prima_goemotions":
@@ -157,20 +185,7 @@ def _system(name: str, provider: str, model: str, device: str, batch_size: int, 
 
 
 def _parse_labels(response: str, labels: list[str]) -> tuple[frozenset[str], str | None]:
-    try:
-        payload = json.loads(response.removeprefix("```json").removeprefix("```").removesuffix("```").strip())
-        values = payload.get("labels") if isinstance(payload, dict) else None
-        if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
-            raise ValueError("Response must contain a string labels list.")
-        unknown = sorted(set(values) - set(labels))
-        if unknown:
-            raise ValueError(f"Unknown labels: {', '.join(unknown)}")
-        parsed = frozenset(values)
-        if "neutral" in parsed and len(parsed) > 1:
-            raise ValueError("neutral cannot coexist with non-neutral labels")
-        return parsed, None
-    except (json.JSONDecodeError, ValueError) as exc:
-        return frozenset(), str(exc)
+    return parse_label_response(response, labels)
 
 
 def _examples_from_manifest(examples: list[GoEmotionsExample], dataset_path: Path, manifest_path: Path) -> list[GoEmotionsExample]:
@@ -201,7 +216,9 @@ def _artifact_paths(root: Path) -> dict[str, Path]:
 
 def _report(metadata: dict[str, Any], metrics: dict[str, Any], failures: list[dict[str, Any]]) -> str:
     rows = "\n".join(f"| {label} | {values['precision']:.6f} | {values['recall']:.6f} | {values['f1']:.6f} | {values['support']} |" for label, values in metrics["per_class"].items())
-    return f"# GoEmotions Report\n\n## Configuration\n\n```json\n{json.dumps(metadata, indent=2, sort_keys=True)}\n```\n\n## Metrics\n\n- Accuracy: `{metrics['accuracy']:.6f}`\n- Macro F1: `{metrics['macro_f1']:.6f}`\n- Micro F1: `{metrics['micro_f1']:.6f}`\n- Weighted F1: `{metrics['weighted_f1']:.6f}`\n\n## Per-class metrics\n\n| Label | Precision | Recall | F1 | Support |\n| --- | ---: | ---: | ---: | ---: |\n{rows}\n\n## Failure analysis\n\n- Exact-set failures: `{len(failures)}`\n- Parse failures: `{sum(record['parse_error'] is not None for record in failures)}`\n- The confusion figure is a gold-label/predicted-label co-occurrence diagnostic for this multilabel task.\n"
+    baseline = metrics.get("qwen_baseline_metrics")
+    comparison = "" if baseline is None else f"\n## Same-response Qwen baseline\n\n- Exact-set accuracy: `{baseline['accuracy']:.6f}`\n- Sample F1: `{baseline['sample_f1']:.6f}`\n- Macro F1: `{baseline['macro_f1']:.6f}`\n- Micro F1: `{baseline['micro_f1']:.6f}`\n- Prediction cardinality: `{baseline['prediction_cardinality']:.6f}`\n"
+    return f"# GoEmotions Report\n\n## Configuration\n\n```json\n{json.dumps(metadata, indent=2, sort_keys=True)}\n```\n\n## Metrics\n\n- Exact-set accuracy: `{metrics['accuracy']:.6f}`\n- Sample F1: `{metrics['sample_f1']:.6f}`\n- Macro F1: `{metrics['macro_f1']:.6f}`\n- Micro F1: `{metrics['micro_f1']:.6f}`\n- Weighted F1: `{metrics['weighted_f1']:.6f}`\n- Gold label cardinality: `{metrics['label_cardinality']:.6f}`\n- Prediction cardinality: `{metrics['prediction_cardinality']:.6f}`\n- Parse failures: `{metrics['parse_failure_count']}`\n- Qwen parse failures: `{metrics['qwen_parse_failure_count']}`\n- Neutral-combination preservation: `{metrics['neutral_combination_preservation_rate']:.6f}`\n- Predictions changed by PRIMA: `{metrics['prima_changed_prediction_rate']:.6f}`\n{comparison}\n## Per-class metrics\n\n| Label | Precision | Recall | F1 | Support |\n| --- | ---: | ---: | ---: | ---: |\n{rows}\n\n## Failure analysis\n\n- Exact-set failures: `{len(failures)}`\n- The confusion figure is a gold-label/predicted-label co-occurrence diagnostic for this multilabel task.\n"
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -255,7 +272,7 @@ def main() -> None:
     parser.add_argument("--parallel-workers", type=int, default=1)
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--system", choices=("qwen_zero_shot", "qwen_schema", "prima_qwen", "prima_goemotions", "goemotions_pretrained", "goemotions_deberta", "goemotions_hybrid"), default="qwen_zero_shot")
+    parser.add_argument("--system", choices=("qwen_zero_shot", "qwen_definitions", "qwen_schema", "qwen_with_prima_telemetry", "prima_qwen", "prima_goemotions", "goemotions_pretrained", "goemotions_deberta", "goemotions_hybrid"), default="qwen_zero_shot")
     parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
     parser.add_argument("--sample-manifest", type=Path)
     parser.add_argument("--write-sample-manifest", type=Path)

@@ -12,7 +12,7 @@ def test_goemotions_dataset_and_metrics() -> None:
     assert len(labels) == 28 and labels[-1] == "neutral"
     assert len(examples) == 1
     prediction, error = _parse_labels('{"labels": ["joy", "neutral"]}', labels)
-    assert prediction == set() and error == "neutral cannot coexist with non-neutral labels"
+    assert prediction == {"joy", "neutral"} and error is None
     metrics = evaluate([examples[0].labels], [prediction], labels)
     assert metrics["sample_count"] == 1
     assert set(metrics["per_class"]) == set(labels)
