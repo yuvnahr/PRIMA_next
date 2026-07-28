@@ -1,33 +1,59 @@
-# PRIMA Experimental Campaign Summary — Subset Validation
-
-## Status
-
-**PASS as preliminary subset validation; not final full-dataset evidence.**
-
-## Methodology
-
-All three campaigns used one LoCoMo conversation with 197 answerable queries. Memories were created through `CanonicalEmbeddingPipeline.create_memory_note()`, queries through `RetrievalRequest`, and candidate generation through the existing dense retrieval strategy. No retrieval algorithm or metric implementation was changed.
-
-## Controlled variables
-
-Dataset subset, memory construction, query set, dense retrieval, `TOP_K=30`, software environment, and hardware were held constant within each campaign. Each campaign changed exactly one configuration variable.
-
-## Independent variables
-
-- Campaign I: embedding backend.
-- Campaign II: representation mode.
-- Campaign III: identity normalization enabled/disabled.
-
-## Findings
-
-- Best embedding backend on this subset: **Nomic**.
-- Best representation on this subset: **Raw**.
-- Identity normalization: **mixed impact**; Recall@1 rose slightly, while broader ranking and candidate metrics declined.
-
-## Runtime and reproducibility
-
-Python 3.10.11; Windows; NVIDIA GeForce GTX 1650; CUDA-enabled Torch 2.13.0+cu126; seed 13; `TOP_K=30`. Result files record execution times, configuration, and backend fingerprints.
-
-## Limitations and readiness
-
-The subset contains one of ten LoCoMo conversations. These results are not sufficient for final scientific claims, statistical significance, or final LoCoMo evaluation. Full-dataset reruns are required before publication or model-selection decisions.
+{
+  "best_embedding_backend": "nomic",
+  "best_representation": "raw",
+  "configuration": {
+    "conversation_count": 10,
+    "dataset_path": "benchmarks/locomo/external/data/locomo10.json",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "seed": 13,
+    "subset_validation": false,
+    "top_k": 30
+  },
+  "identity_rows": [
+    {
+      "backend": "nomic",
+      "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+      "candidate_generation_success": 0.734209,
+      "candidate_miss_rate": 0.265791,
+      "embedding_time_seconds": 274.194135,
+      "entity_resolution_success": 0.0,
+      "execution_time_seconds": 385.092674,
+      "expected_rank": 13.055584,
+      "identity_enabled": false,
+      "mrr": 0.326786,
+      "ndcg_at_5": 0.314753,
+      "query_count": 1979,
+      "recall_at_1": 0.186345,
+      "recall_at_10": 0.515587,
+      "recall_at_5": 0.409464,
+      "representation": "raw",
+      "retrieval_time_seconds": 110.641954,
+      "similarity_margin": -0.503195,
+      "status": "completed"
+    },
+    {
+      "backend": "nomic",
+      "backend_fingerprint": "2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a",
+      "candidate_generation_success": 0.715513,
+      "candidate_miss_rate": 0.284487,
+      "embedding_time_seconds": 275.16113,
+      "entity_resolution_success": 0.0,
+      "execution_time_seconds": 384.230325,
+      "expected_rank": 13.611925,
+      "identity_enabled": true,
+      "mrr": 0.313333,
+      "ndcg_at_5": 0.30085,
+      "query_count": 1979,
+      "recall_at_1": 0.176657,
+      "recall_at_10": 0.495895,
+      "recall_at_5": 0.392039,
+      "representation": "raw",
+      "retrieval_time_seconds": 108.827956,
+      "similarity_margin": -0.53704,
+      "status": "completed"
+    }
+  ],
+  "status": "PASS"
+}

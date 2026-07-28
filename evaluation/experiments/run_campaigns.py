@@ -14,6 +14,7 @@ from typing import Any
 
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
+from benchmarks.locomo.loader import dataset_path as resolve_dataset_path
 from benchmarks.locomo.retrieval_validation import _expected_ids, _normalize_category
 from evaluation.metrics.retrieval_metrics import ndcg_at_k, recall_at_k, reciprocal_rank
 from memory.embedding_pipeline import (
@@ -109,7 +110,7 @@ def _write_rows(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def run(dataset_path: str | Path = DATASET_PATH, output_root: str | Path = "evaluation", max_conversations: int | None = None) -> dict[str, Any]:
+def run(dataset_path: str | Path = DATASET_PATH, output_root: str | Path = "evaluation", max_conversations: int | None = None, benchmark_name: str = "locomo", benchmark_version: str = "1") -> dict[str, Any]:
     conversations = list(LoCoMoDataset(Path(dataset_path)).conversations())
     if max_conversations is not None:
         conversations = conversations[:max_conversations]
@@ -126,7 +127,7 @@ def run(dataset_path: str | Path = DATASET_PATH, output_root: str | Path = "eval
             traces = []
         embedding_rows.append(row)
         embedding_traces[backend] = traces
-    run_metadata = {**_metadata(), "dataset_path": str(dataset_path), "conversation_count": len(conversations), "subset_validation": max_conversations is not None}
+    run_metadata = {**_metadata(), "benchmark_name": benchmark_name, "benchmark_version": benchmark_version, "dataset_path": str(dataset_path), "conversation_count": len(conversations), "subset_validation": max_conversations is not None}
     _write(results / "embedding_ablation_results.json", {"configuration": run_metadata, "rows": embedding_rows, "traces": embedding_traces})
     _write_rows(results / "embedding_ablation.csv", embedding_rows)
     completed = [row for row in embedding_rows if row.get("status") == "completed"]
@@ -170,11 +171,15 @@ def run(dataset_path: str | Path = DATASET_PATH, output_root: str | Path = "eval
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset-path", default=str(DATASET_PATH))
-    parser.add_argument("--output-root", default="evaluation")
+    parser.add_argument("--dataset", choices=("locomo", "locomo-v2"), default="locomo")
+    parser.add_argument("--dataset-path", default=None)
+    parser.add_argument("--output-root", default=None)
     parser.add_argument("--max-conversations", type=int, default=None)
     args = parser.parse_args()
-    print(json.dumps(run(args.dataset_path, args.output_root, args.max_conversations), indent=2, sort_keys=True))
+    path = Path(args.dataset_path) if args.dataset_path else resolve_dataset_path(args.dataset)
+    output = args.output_root or str(Path("evaluation") / args.dataset)
+    version = "2.1.0-stable" if args.dataset == "locomo-v2" else "1"
+    print(json.dumps(run(path, output, args.max_conversations, args.dataset, version), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

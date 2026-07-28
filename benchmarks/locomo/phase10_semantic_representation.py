@@ -180,7 +180,7 @@ def _identity_validation(conversations: list[Any]) -> dict[str, Any]:
         raw_trace = _evaluate_records(raw_records)
         normalized_trace = _evaluate_records(normalized_records)
     changes = []
-    for before, after in zip(raw_trace, normalized_trace):
+    for before, after in zip(raw_trace, normalized_trace, strict=True):
         if before["retrieved_memory_ids"] != after["retrieved_memory_ids"]:
             changes.append(
                 {

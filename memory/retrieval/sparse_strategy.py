@@ -1,4 +1,4 @@
-﻿"""Sparse lexical retrieval strategy."""
+"""Sparse lexical retrieval strategy."""
 
 from __future__ import annotations
 

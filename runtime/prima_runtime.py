@@ -1,4 +1,4 @@
-﻿"""Integrated PRIMA-NEXT runtime."""
+"""Integrated PRIMA-NEXT runtime."""
 
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ from typing import Any
 from affect.affect_engine import DynamicAffectEngine
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
+from llm.response_parser import extract_answer
+from memory.embedding_pipeline import current_embedding_metadata
 from memory.maintenance.importance_types import MemoryAdmissionDecision
 from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_note import MemoryNote
@@ -49,8 +51,13 @@ class PrimaRuntime:
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
-        self.retrieval_controller = RetrievalController(self.memory_repository)
-        self.reasoning_controller = ReasoningController(reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine))
+        self.retrieval_controller = RetrievalController(
+            self.memory_repository,
+            candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+        )
+        self.reasoning_controller = ReasoningController(
+            reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
+        )
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -67,8 +74,13 @@ class PrimaRuntime:
         if mode == "isolated" and not preserve_repository:
             self.memory_repository = InMemoryMemoryRepository()
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
-            self.retrieval_controller = RetrievalController(self.memory_repository)
-            self.reasoning_controller = ReasoningController(reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine))
+            self.retrieval_controller = RetrievalController(
+                self.memory_repository,
+                candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+            )
+            self.reasoning_controller = ReasoningController(
+                reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
+            )
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
@@ -90,6 +102,7 @@ class PrimaRuntime:
     ) -> AnswerResult:
         """Answer through the canonical bounded evidence-acquisition controller."""
 
+        started = time.perf_counter()
         top_k = int(top_k or os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
         max_context_tokens = int(max_context_tokens or os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
         mode = ReasoningMode.DIAGNOSTIC if diagnostics else configured_reasoning_mode(reasoning_mode)
@@ -105,6 +118,25 @@ class PrimaRuntime:
             synthesize=lambda prompt, evidence: self._synthesize_evidence(
                 prompt, evidence, provider=provider, model=model, max_context_tokens=max_context_tokens
             ),
+        )
+        result.answer_diagnostics.update(
+            {
+                "question": question,
+                "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
+                "retrieved_memories": [
+                    {
+                        "id": item.source_id,
+                        "text": item.text,
+                        "retrieval_score": item.retrieval_score,
+                    }
+                    for item in result.evidence_references
+                ],
+                "retrieval_scores": [item.retrieval_score for item in result.evidence_references],
+                "retrieval_confidence": result.confidence,
+                "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+                "errors": list(result.errors),
+                "embedding": current_embedding_metadata(),
+            }
         )
         if context is not None:
             context.retrieved_memories = result.retrieved_memories
@@ -145,6 +177,8 @@ class PrimaRuntime:
         raw_model_response = ""
         selected_memory_ids: list[str] = []
         structured_answer_valid = False
+        prompt: str | None = None
+        llm_metadata: dict[str, Any] = {}
         inference_settings = self._inference_settings(
             provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             model=model or os.getenv("PRIMA_LLM_MODEL", ""),
@@ -166,6 +200,22 @@ class PrimaRuntime:
                 )
                 raw_model_response = llm_response.text.strip()
                 llm_used = bool(raw_model_response)
+                if isinstance(llm_response.raw, dict):
+                    llm_metadata = {
+                        key: llm_response.raw.get(key)
+                        for key in (
+                            "model",
+                            "thinking",
+                            "done",
+                            "done_reason",
+                            "total_duration",
+                            "load_duration",
+                            "prompt_eval_count",
+                            "eval_count",
+                        )
+                    }
+                if llm_metadata.get("done_reason") == "length":
+                    errors.append("LLM answer was truncated at the generation limit.")
                 answer, selected_memory_ids = self._parse_structured_answer(raw_model_response, answer_context)
                 structured_answer_valid = True
             except (json.JSONDecodeError, TypeError, KeyError, ProviderError, RuntimeError, ValueError) as exc:
@@ -183,6 +233,10 @@ class PrimaRuntime:
             "selected_memory_ids": selected_memory_ids,
             "structured_answer_valid": structured_answer_valid,
             "raw_model_response": raw_model_response,
+            "raw_response": raw_model_response or None,
+            "prompt": prompt,
+            "llm_metadata": llm_metadata,
+            "generation_settings": dict(inference_settings),
             "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
             "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
         }
@@ -218,6 +272,7 @@ class PrimaRuntime:
         except json.JSONDecodeError:
             return ""
         return answer.strip() if isinstance(answer, str) else ""
+
     def _answer_system_prompt(self) -> str:
         return (
             "You are a factual question-answering engine. Return only JSON matching the supplied schema. "
@@ -255,7 +310,7 @@ class PrimaRuntime:
 
         try:
             execution_context = await self.workflow.run(user_input, execution_context)
-            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context)
+            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context, runtime_context)
         except Exception as exc:
             errors.append(str(exc))
             execution_context.workflow_state.errors.append(str(exc))
@@ -287,6 +342,7 @@ class PrimaRuntime:
         self,
         user_input: str,
         execution_context: ExecutionContext,
+        runtime_context: RuntimeContext,
     ) -> tuple[tuple[MemoryNote, ...], MemoryAdmissionDecision]:
         admission_decision = self.memory_importance_engine.decide(
             user_input,
@@ -300,9 +356,15 @@ class PrimaRuntime:
             content=user_input,
             memory_type=MemoryType.EPISODIC,
             affective_state=(affect_update.to_dict() if (affect_update is not None and hasattr(affect_update, "to_dict")) else {}),
-            context={"source": "prima_runtime", "execution_id": execution_context.execution_id},
+            context={
+                "source": "prima_runtime",
+                "execution_id": execution_context.execution_id,
+                "source_session_id": runtime_context.session_id,
+                "source_turn_id": runtime_context.turn_id,
+            },
             state_snapshot=getattr(execution_context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+            timestamp=runtime_context.timestamp,
         )
         return (self.memory_repository.add(note),), admission_decision
 
@@ -367,6 +429,8 @@ class PrimaRuntime:
         payload: dict[str, Any] = {
             "input": user_input,
             "retrieval_count": metrics.retrieval_count,
+            "memory_creation_count": metrics.memory_creation_count,
+            "memory_admission": dict(result.memory_admission),
             "reflection_events": metrics.reflection_trigger_count,
             "confidence_score": metrics.confidence_score,
             "latency_ms": metrics.latency_ms,
@@ -414,7 +478,11 @@ class PrimaRuntime:
         model: str,
         errors: tuple[str, ...],
         inference_settings: dict[str, Any],
+        prompt: str | None,
+        raw_response: str | None,
+        llm_metadata: dict[str, Any],
     ) -> dict[str, Any]:
+        retrieval_diagnostics = dict(getattr(retrieval_response, "diagnostics", {}))
         diagnostics = {
             "question": question,
             "retrieved_memory_ids": [memory.memory_id for memory in answer_context.memories],
@@ -438,22 +506,33 @@ class PrimaRuntime:
             "importance_scores": [memory.importance_score for memory in answer_context.memories],
             "retrieval_confidence": retrieval_response.confidence.confidence,
             "retrieval_confidence_components": retrieval_response.confidence.to_dict(),
-            "retrieval_trace": dict(getattr(retrieval_response, "diagnostics", {})),
-            "expanded_query": dict(getattr(retrieval_response, "diagnostics", {}).get("expanded_query", {})),
-            "entities": list(getattr(retrieval_response, "diagnostics", {}).get("entities", [])),
-            "relations": list(getattr(retrieval_response, "diagnostics", {}).get("relations", [])),
-            "temporal_constraints": list(getattr(retrieval_response, "diagnostics", {}).get("temporal_constraints", [])),
-            "dense_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("dense_candidates", [])),
-            "sparse_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("sparse_candidates", [])),
-            "reranked_candidates": list(getattr(retrieval_response, "diagnostics", {}).get("reranked_candidates", [])),
+            "expanded_query": dict(retrieval_diagnostics.get("expanded_query", {})),
+            "entities": list(retrieval_diagnostics.get("entities", [])),
+            "relations": list(retrieval_diagnostics.get("relations", [])),
+            "temporal_constraints": list(retrieval_diagnostics.get("temporal_constraints", [])),
+            "retrieval_stages": {
+                stage: _compact_candidates(retrieval_diagnostics.get(stage, ()))
+                for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
+            },
+            "stored_source_turn_ids": sorted(
+                {
+                    str(note.context["source_turn_id"])
+                    for note in self.memory_repository.list()
+                    if note.context.get("source_turn_id")
+                }
+            ),
+            "embedding": current_embedding_metadata(),
             "context_tokens": answer_context.token_count,
             "provider": provider,
             "model": model,
             "errors": list(errors),
+            "prompt": prompt,
+            "raw_response": raw_response,
+            "parsed_answer": extract_answer(raw_response) if raw_response is not None else None,
+            "llm_metadata": llm_metadata,
+            "generation_settings": dict(inference_settings),
         }
         diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
-        if self._debug_inference_enabled():
-            diagnostics["generation_settings"] = dict(inference_settings)
         return diagnostics
 
 
@@ -463,18 +542,6 @@ class PrimaRuntime:
         retrieved = diagnostics.get("retrieved_memory_ids", [])
         if not retrieved:
             return "retrieval_miss"
-        trace = diagnostics.get("retrieval_trace", {})
-        entities = set(str(item).lower() for item in trace.get("entities", [])) if isinstance(trace, dict) else set()
-        temporal = trace.get("temporal_constraints", []) if isinstance(trace, dict) else []
-        confidence = diagnostics.get("retrieval_confidence_components", {})
-        if entities and float(confidence.get("entity_overlap_score", 0.0) or 0.0) <= 0.0:
-            return "entity_resolution_failure"
-        if temporal and float(confidence.get("temporal_agreement_score", 0.0) or 0.0) < 0.5:
-            return "temporal_failure"
-        if diagnostics.get("context_tokens", 0) >= int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600")):
-            return "context_truncation"
-        if float(diagnostics.get("retrieval_confidence", 0.0) or 0.0) < 0.35:
-            return "retrieval_partial"
         if not llm_used:
             return "generation_error"
         return None
@@ -507,7 +574,8 @@ class PrimaRuntime:
             "top_p": self._env_float("PRIMA_ANSWER_TOP_P", 0.8),
             "top_k": self._env_int("PRIMA_ANSWER_TOP_K", 40),
             "repeat_penalty": self._env_float("PRIMA_ANSWER_REPEAT_PENALTY", 1.1),
-            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 64),
+            "seed": self._env_int("PRIMA_ANSWER_SEED", 13),
+            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 128),
             "context_tokens": answer_context.token_count,
             "retrieved_memories": len(answer_context.memories),
         }
@@ -542,5 +610,18 @@ class PrimaRuntime:
             handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(handler)
         return logger
+
+
+def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": item.get("id"),
+            "source_session_id": item.get("source_session_id"),
+            "source_turn_id": item.get("source_turn_id"),
+            "score": item.get("score"),
+            "strategy_scores": dict(item.get("strategy_scores", {})),
+        }
+        for item in candidates
+    ]
 
 

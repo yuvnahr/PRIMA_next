@@ -100,7 +100,7 @@ def select_conversations(conversations: list[Any], sampling: str, seed: int | No
     if sampling == "random":
         if seed is None:
             raise ValueError("Random sampling requires a resolved seed")
-        random.Random(seed).shuffle(selected)  # nosec B311
+        random.Random(seed).shuffle(selected)  # noqa: S311  # nosec B311
     return selected[offset:offset + max_samples if max_samples else None]
 
 def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str, model: str, reasoning_mode: str, top_k: int, max_hops: int, workers: int, configured_seed: int | None, resolved_seed: int | None, sampling: str, offset: int, max_samples: int, sample_ids: list[str], resume: bool) -> dict[str, Any]:

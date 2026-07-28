@@ -12,6 +12,7 @@ class LLMRequest:
     metadata: dict[str, Any] | None = None
     system_prompt: str | None = None
     response_format: dict[str, Any] | str | None = None
+    response_schema: dict[str, Any] | None = None
 
 
 @dataclass

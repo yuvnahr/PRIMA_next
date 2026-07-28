@@ -13,7 +13,7 @@ from memory.retrieval.retrieval_result import RetrievalResult
 
 class ReasoningMode(str, Enum):
     BYPASS = "bypass"
-    SINGLE_PASS = "single_pass"  # nosec B105
+    SINGLE_PASS = "single_pass"  # noqa: S105  # nosec B105
     ADAPTIVE = "adaptive"
     DELIBERATIVE = "deliberative"
     DIAGNOSTIC = "diagnostic"
@@ -21,7 +21,7 @@ class ReasoningMode(str, Enum):
 
 class Route(str, Enum):
     BYPASS = "bypass"
-    SINGLE_PASS = "single_pass"  # nosec B105
+    SINGLE_PASS = "single_pass"  # noqa: S105  # nosec B105
     ADAPTIVE = "adaptive"
     CLARIFY = "clarify"
 

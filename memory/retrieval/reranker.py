@@ -1,4 +1,4 @@
-﻿"""Optional cross-encoder reranker with deterministic local fallback."""
+"""Optional cross-encoder reranker with deterministic local fallback."""
 
 from __future__ import annotations
 

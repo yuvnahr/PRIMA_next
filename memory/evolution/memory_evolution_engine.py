@@ -1,4 +1,4 @@
-﻿"""Memory evolution pipeline."""
+"""Memory evolution pipeline."""
 
 from __future__ import annotations
 

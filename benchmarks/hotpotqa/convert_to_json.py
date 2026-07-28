@@ -14,8 +14,8 @@ def _row_to_record(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "_id": row["id"], "question": row["question"], "answer": row["answer"],
         "type": row["type"], "level": row["level"],
-        "context": [[title, sentences] for title, sentences in zip(row["context"]["title"], row["context"]["sentences"])],
-        "supporting_facts": [[title, int(sentence_id)] for title, sentence_id in zip(row["supporting_facts"]["title"], row["supporting_facts"]["sent_id"])],
+        "context": [[title, sentences] for title, sentences in zip(row["context"]["title"], row["context"]["sentences"], strict=True)],
+        "supporting_facts": [[title, int(sentence_id)] for title, sentence_id in zip(row["supporting_facts"]["title"], row["supporting_facts"]["sent_id"], strict=True)],
     }
 
 def convert_validation_set(dataset_set: str, output_path: str | Path | None = None, force: bool = False) -> Path:

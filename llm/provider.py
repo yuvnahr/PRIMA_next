@@ -12,9 +12,9 @@ import logging
 import os
 import urllib.error
 import urllib.request
-from urllib.parse import urlsplit
 from abc import ABC, abstractmethod
 from typing import Any
+from urllib.parse import urlsplit
 
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.response_parser import parse_generic_response, parse_openai_response
@@ -35,22 +35,22 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
         raise ProviderError("Provider URL must use http or https")
 
     if requests is not None:
-        response = requests.post(url, json=payload, headers=headers, timeout=timeout)
         try:
+            response = requests.post(url, json=payload, headers=headers, timeout=timeout)
             response.raise_for_status()
-        except Exception as exc:
-            raise ProviderError(f"HTTP request failed: {exc} - {response.text}") from exc
-        return response.json()
+            return response.json()
+        except requests.exceptions.RequestException as exc:
+            raise ProviderError(f"HTTP request failed: {exc}") from exc
 
     data = json.dumps(payload).encode("utf-8")
-    request = urllib.request.Request(
+    request = urllib.request.Request(  # noqa: S310
         url,
         data=data,
         headers=headers or {"Content-Type": "application/json"},
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
@@ -123,6 +123,8 @@ class OpenAICompatibleProvider(Provider):
             "messages": [{"role": "user", "content": request.prompt}],
             "temperature": request.temperature,
         }
+        if request.response_schema is not None:
+            payload["response_format"] = {"type": "json_schema", "json_schema": {"name": "response", "schema": request.response_schema}}
         if request.max_tokens is not None:
             payload["max_tokens"] = int(request.max_tokens)
 
@@ -204,6 +206,7 @@ class OllamaProvider(OpenAICompatibleProvider):
             "stream": False,
             "think": False,
             "options": {
+                "seed": env_int("PRIMA_ANSWER_SEED", 13),
                 "temperature": env_float("PRIMA_ANSWER_TEMPERATURE", request.temperature),
                 "top_p": env_float("PRIMA_ANSWER_TOP_P", 0.8),
                 "top_k": env_int("PRIMA_ANSWER_TOP_K", 40),
@@ -213,12 +216,18 @@ class OllamaProvider(OpenAICompatibleProvider):
         }
         if request.system_prompt:
             payload["system"] = request.system_prompt
-        if request.response_format:
-            payload["format"] = request.response_format
-        try:
-            return parse_generic_response(post_json(url, payload, timeout=180), provider="ollama")
-        except ProviderError as exc:
-            raise ProviderError(f"Ollama request failed: {exc}") from exc
+        response_format = request.response_schema if request.response_schema is not None else request.response_format
+        if response_format is not None:
+            payload["format"] = response_format
+        timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
+        retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
+        last_error: ProviderError | None = None
+        for _ in range(retries + 1):
+            try:
+                return parse_generic_response(post_json(url, payload, timeout=timeout), provider="ollama")
+            except ProviderError as exc:
+                last_error = exc
+        raise ProviderError(f"Ollama request failed after {retries + 1} attempts: {last_error}") from last_error
 
 
 class LMStudioProvider(OpenAICompatibleProvider):

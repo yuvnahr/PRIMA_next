@@ -1,4 +1,4 @@
-﻿"""Memory note model and backward-compatible ingestion helpers."""
+"""Memory note model and backward-compatible ingestion helpers."""
 
 from __future__ import annotations
 
@@ -179,6 +179,7 @@ class MemoryNote:
         retention_score: float = 1.0,
         note_id: str | None = None,
         embedding_text: str | None = None,
+        timestamp: datetime | None = None,
     ) -> MemoryNote:
         from memory.embedding_pipeline import get_embedding_pipeline
         keywords = extract_dominant_context_chain(content)
@@ -189,7 +190,7 @@ class MemoryNote:
             embedding_metadata = embedded.metadata
         return cls(
             id=note_id or f"mem_{uuid.uuid4()}", memory_type=memory_type, memory_level=memory_level,
-            content=content, embedding=tuple(embedding), affective_state=affective_state or {}, context=context or {},
+            content=content, embedding=tuple(embedding), timestamp=timestamp or datetime.now(timezone.utc), affective_state=affective_state or {}, context=context or {},
             retrieval_metadata={"keywords": keywords, "dominant_context_chain": keywords, **embedding_metadata},
             state_snapshot=state_snapshot or StateSnapshot(), salience_score=salience_score, retention_score=retention_score,
         )
@@ -203,7 +204,8 @@ class MemoryNote:
             embedding = stable_embedding(str(record.get("document", "")))
         retrieval_metadata = dict(metadata.get("retrieval_metadata", {"keywords": metadata.get("keywords", [])}))
         for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version", "backend_fingerprint"):
-            if metadata.get(key) is not None: retrieval_metadata.setdefault(key, metadata[key])
+            if metadata.get(key) is not None:
+                retrieval_metadata.setdefault(key, metadata[key])
         return cls(
             id=str(record.get("id") or metadata.get("id")), memory_type=MemoryType(metadata.get("memory_type", MemoryType.EPISODIC.value)),
             memory_level=MemoryLevel(metadata.get("memory_level", MemoryLevel.EPISODIC_EVENT.value)),

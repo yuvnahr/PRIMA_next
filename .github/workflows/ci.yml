@@ -44,21 +44,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-          pip install \
-            pytest \
-            pytest-cov \
-            ruff \
-            mypy \
-            bandit
-
       - name: Run Pytest
         run: pytest -v
 
       - name: Run Ruff
         run: ruff check .
 
+      - name: Run Xenon
+        run: python scripts/run_xenon.py
+
       - name: Run MyPy
         run: mypy .
 
       - name: Run Bandit
-        run: bandit -c .bandit -r .
+        run: bandit -q -c bandit.yaml -r .

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import datetime, timezone
 from pathlib import Path
 from time import perf_counter
 from typing import Any
@@ -51,6 +52,8 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         context = self._context()
         context.session_id = turn.session_id or context.session_id
         context.turn_id = turn.turn_id or context.turn_id
+        if turn.timestamp:
+            context.timestamp = datetime.strptime(turn.timestamp, "%I:%M %p on %d %B, %Y").replace(tzinfo=timezone.utc)
 
         started = perf_counter()
         result = runtime.ingest_document(self._format_turn(turn), metadata=turn.metadata) if self.document_ingestion else runtime.process(self._format_turn(turn), context=context)

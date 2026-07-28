@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover - fall back to pydantic if pydantic-settin
 
 
 class Settings(BaseSettingsCls):
-    model_config = {"env_file": ".env", "env_prefix": ""}
+    model_config = {"env_file": ".env", "env_prefix": "", "extra": "ignore"}
 
     default_provider: str = "openai"
     default_model: str = "gpt-4o"
@@ -35,7 +35,6 @@ class Settings(BaseSettingsCls):
     anthropic_api_key: str | None = None
     ollama_url: str = "http://localhost:11434"
     rate_limit_per_minute: int = 60
-
 
 _SETTINGS: Settings | None = None
 

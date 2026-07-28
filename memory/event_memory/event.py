@@ -1,4 +1,4 @@
-﻿"""Event-level memory model."""
+"""Event-level memory model."""
 
 from __future__ import annotations
 
