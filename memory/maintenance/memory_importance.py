@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
+from memory.embedding_pipeline import get_embedding_pipeline
 from memory.maintenance.importance_score import ImportanceScore, clamp_score
 from memory.maintenance.importance_types import ImportanceWeights, MemoryAdmissionDecision, MemoryImportanceConfig
-from memory.embedding_pipeline import get_embedding_pipeline
 from memory.memory_note import extract_dominant_context_chain
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
-
 
 DEFAULT_CONFIG_PATH = Path("config/memory_importance.yaml")
 

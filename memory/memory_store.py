@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import builtins
 from collections.abc import Iterable
-from typing import Any, List
+from typing import Any
 
 from memory.memory_note import MemoryNote
 from memory.memory_repository import MemoryRepository
@@ -38,8 +39,8 @@ class MemoryStore:
     def get(self, note_id: str) -> MemoryNote | None:
         return self.repository.get(note_id, self.memory_type)
 
-    def list(self) -> List[MemoryNote]:
+    def list(self) -> builtins.list[MemoryNote]:
         return self.repository.list(self.memory_type)
 
-    def query(self, embedding: Iterable[float], limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         return self.repository.query(embedding, self.memory_type, limit)

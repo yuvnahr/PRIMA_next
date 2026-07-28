@@ -13,6 +13,7 @@ except Exception:
 
 from typing import Any
 
+
 # default then attempt to load real settings provider
 def get_settings() -> Any:
     return None

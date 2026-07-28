@@ -6,7 +6,6 @@ import subprocess  # nosec B404
 import sys
 from pathlib import Path
 
-
 SOURCE_ROOTS = (
     "main.py",
     "action",
@@ -85,7 +84,7 @@ def main() -> int:
     command = build_command(root)
     print("Running Xenon on first-party source roots only:")
     print(" ".join(command))
-    return subprocess.run(command, cwd=root, check=False).returncode  # nosec B603
+    return subprocess.run(command, cwd=root, check=False).returncode  # noqa: S603  # nosec B603
 
 
 if __name__ == "__main__":

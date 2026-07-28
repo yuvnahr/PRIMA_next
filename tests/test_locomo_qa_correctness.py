@@ -3,12 +3,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from benchmarks.common.agent import BenchmarkAgent
-from benchmarks.common.interfaces import AgentResponse, BenchmarkResult
-from benchmarks.common.interfaces import Conversation, ConversationQuestion
+from benchmarks.common.interfaces import AgentResponse, BenchmarkResult, Conversation, ConversationQuestion
 from benchmarks.common.runner import GenericBenchmarkRunner
 from benchmarks.common.utils import configure_benchmark_logger
 from benchmarks.locomo.adapter import LoCoMoAdapter
-from benchmarks.locomo.evaluate import evidence_summary, exact_match_score, f1_score, localized_failure_type, rouge_l_score
+from benchmarks.locomo.evaluate import (
+    evidence_summary,
+    exact_match_score,
+    f1_score,
+    localized_failure_type,
+    rouge_l_score,
+)
 from llm import provider as provider_module
 from llm.llm_types import LLMRequest
 from llm.provider import OllamaProvider, ProviderError

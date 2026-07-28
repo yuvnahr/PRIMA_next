@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from memory.memory_repository import MemoryRepository
 from memory.retrieval.dense_strategy import DenseRetrievalStrategy
-from memory.retrieval.hybrid_fusion import HybridFusion
-from memory.retrieval.hybrid_fusion import HybridFusionConfig
+from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.query_analysis import QueryAnalyzer, temporal_agreement
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_confidence import RetrievalConfidence, RetrievalConfidenceEstimator

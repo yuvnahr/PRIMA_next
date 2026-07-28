@@ -11,17 +11,17 @@ from pathlib import Path
 from typing import Any
 
 from affect.affect_engine import DynamicAffectEngine
-from memory.maintenance.memory_importance import MemoryImportanceEngine
-from memory.maintenance.importance_types import MemoryAdmissionDecision
+from llm.llm_client import LLMClient
+from llm.provider import ProviderError
+from llm.response_parser import extract_answer
 from memory.embedding_pipeline import current_embedding_metadata
+from memory.maintenance.importance_types import MemoryAdmissionDecision
+from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
-from llm.llm_client import LLMClient
-from llm.provider import ProviderError
-from llm.response_parser import extract_answer
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.runtime_context import RuntimeContext

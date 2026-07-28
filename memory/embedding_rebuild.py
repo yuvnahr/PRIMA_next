@@ -1,8 +1,10 @@
 """Rebuild stored vectors after an embedding-space change."""
 
 from __future__ import annotations
+
 import argparse
 import json
+
 from memory.embedding_pipeline import current_embedding_metadata, get_embedding_pipeline
 from memory.memory_repository import ChromaMemoryRepository
 

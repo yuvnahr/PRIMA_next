@@ -1,4 +1,3 @@
----
 exclude_dirs:
   - .git
   - .pytest_cache
@@ -10,4 +9,5 @@ exclude_dirs:
   - tests
   - benchmarks/locomo-v2/external
   - benchmarks/locomo/external
+  - benchmarks/goemotions/external
   - external

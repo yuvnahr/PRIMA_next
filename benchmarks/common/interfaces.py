@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Iterable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from benchmarks.common.agent import BenchmarkAgent
@@ -86,7 +87,7 @@ class BenchmarkRunner(ABC):
     """Interface for benchmark-agnostic runners."""
 
     @abstractmethod
-    def run(self, agent: "BenchmarkAgent", conversations: Iterable[Conversation]) -> Sequence[BenchmarkResult]:
+    def run(self, agent: BenchmarkAgent, conversations: Iterable[Conversation]) -> Sequence[BenchmarkResult]:
         """Run an agent over normalized benchmark conversations."""
 
 

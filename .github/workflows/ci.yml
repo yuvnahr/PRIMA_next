@@ -44,13 +44,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-          pip install \
-            pytest \
-            pytest-cov \
-            ruff \
-            mypy \
-            bandit
-
       - name: Run Pytest
         run: pytest -v
 
@@ -64,4 +57,4 @@ jobs:
         run: mypy .
 
       - name: Run Bandit
-        run: bandit -c .bandit -r .
+        run: git ls-files -z -- '*.py' ':(exclude)tests/**' | xargs -0 bandit -c bandit.yaml

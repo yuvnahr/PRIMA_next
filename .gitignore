@@ -6,6 +6,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .codex_pycache/
+.codex_deps/
 .coverage
 htmlcov/
 
@@ -13,6 +14,7 @@ htmlcov/
 .venv/
 venv/
 env/
+.goemotions-venv/
 
 # Local configuration and model/data caches
 .env
@@ -30,6 +32,18 @@ Thumbs.db
 cleanup_reports/
 
 # Generated benchmark/debug artifacts
+benchmarks/*/external/
+evaluation/goemotions/raw/
+evaluation/goemotions/parsed/
+evaluation/goemotions/answers/
+evaluation/goemotions/prompts/
+evaluation/goemotions/metrics/
+evaluation/goemotions/logs/
+evaluation/goemotions/figures/
+evaluation/goemotions/reports/
+evaluation/goemotions/models/
+evaluation/goemotions/smoke/
+evaluation/goemotions/final/
 benchmarks/locomo/outputs/debug_*/
 benchmarks/locomo/outputs/tmp_*/
 benchmarks/locomo/outputs/**/*.log

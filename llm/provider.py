@@ -7,8 +7,8 @@ lightweight and explicit about where secrets are read from.
 """
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
@@ -35,22 +35,22 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
         raise ProviderError("Only HTTP(S) provider URLs are allowed")
 
     if requests is not None:
-        response = requests.post(url, json=payload, headers=headers, timeout=timeout)
         try:
+            response = requests.post(url, json=payload, headers=headers, timeout=timeout)
             response.raise_for_status()
-        except Exception as exc:
-            raise ProviderError(f"HTTP request failed: {exc} - {response.text}") from exc
-        return response.json()
+            return response.json()
+        except requests.exceptions.RequestException as exc:
+            raise ProviderError(f"HTTP request failed: {exc}") from exc
 
     data = json.dumps(payload).encode("utf-8")
-    request = urllib.request.Request(
+    request = urllib.request.Request(  # noqa: S310
         url,
         data=data,
         headers=headers or {"Content-Type": "application/json"},
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
@@ -123,6 +123,8 @@ class OpenAICompatibleProvider(Provider):
             "messages": [{"role": "user", "content": request.prompt}],
             "temperature": request.temperature,
         }
+        if request.response_schema is not None:
+            payload["response_format"] = {"type": "json_schema", "json_schema": {"name": "response", "schema": request.response_schema}}
         if request.max_tokens is not None:
             payload["max_tokens"] = int(request.max_tokens)
 
@@ -212,6 +214,8 @@ class OllamaProvider(OpenAICompatibleProvider):
                 "num_predict": env_int("PRIMA_ANSWER_MAX_TOKENS", int(request.max_tokens or 64)),
             },
         }
+        if request.response_schema is not None:
+            payload["format"] = request.response_schema
         timeout = env_int("PRIMA_LLM_TIMEOUT_SECONDS", 180)
         retries = max(0, env_int("PRIMA_LLM_RETRIES", 2))
         last_error: ProviderError | None = None

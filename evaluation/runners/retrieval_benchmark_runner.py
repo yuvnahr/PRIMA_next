@@ -22,7 +22,6 @@ from memory.retrieval.retrieval_strategy import RetrievalStrategy
 from memory.retrieval.sparse_strategy import SparseRetrievalStrategy
 from memory.retrieval.temporal_strategy import TemporalRetrievalStrategy
 
-
 DEFAULT_GOLD_PATH = Path("evaluation/datasets/retrieval_gold.json")
 DEFAULT_RESULTS_PATH = Path("evaluation/results/retrieval_benchmark_results.json")
 DEFAULT_TRACE_PATH = Path("evaluation/results/retrieval_trace.json")

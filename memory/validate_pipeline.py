@@ -1,8 +1,10 @@
 """Validate real production embedding constructors."""
 
 from __future__ import annotations
+
 import json
 from types import SimpleNamespace
+
 from memory.embedding_pipeline import current_embedding_metadata, get_embedding_pipeline
 from memory.event_memory.event_builder import EventMemoryBuilder
 from memory.event_memory.event_segmenter import EventSegment

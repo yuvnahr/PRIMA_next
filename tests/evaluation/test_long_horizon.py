@@ -17,7 +17,6 @@ from evaluation.runners.long_horizon_runner import (
     _get_dominant_emotion,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helper probe utilities
 # ---------------------------------------------------------------------------

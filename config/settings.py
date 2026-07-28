@@ -6,19 +6,19 @@ variables; sensitive values (API keys) should not be checked into source.
 """
 
 import logging
-from typing import Any, Type, cast
+from typing import Any, cast
 
 # Use a runtime variable holding the base settings class. This avoids
 # reassigning a class name which mypy flags as a redefinition.
-BaseSettingsCls: Type[Any] = type("_FallbackBaseSettings", (), {})
+BaseSettingsCls: type[Any] = type("_FallbackBaseSettings", (), {})
 
 try:
     from pydantic_settings import BaseSettings as _PS_BaseSettings
-    BaseSettingsCls = cast(Type[Any], _PS_BaseSettings)
+    BaseSettingsCls = cast(type[Any], _PS_BaseSettings)
 except Exception:  # pragma: no cover - fall back to pydantic if pydantic-settings isn't installed
     try:
         from pydantic import BaseSettings as _PD_BaseSettings
-        BaseSettingsCls = cast(Type[Any], _PD_BaseSettings)
+        BaseSettingsCls = cast(type[Any], _PD_BaseSettings)
     except Exception as exc:
         # keep the fallback class
         logging.getLogger(__name__).debug(

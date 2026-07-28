@@ -15,8 +15,8 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from benchmarks.common.runtime_adapter import PrimaRuntimeAdapter
 from benchmarks.common.interfaces import BenchmarkResult
+from benchmarks.common.runtime_adapter import PrimaRuntimeAdapter
 from benchmarks.common.utils import configure_benchmark_logger
 from benchmarks.locomo.config import (
     LOG_LEVEL,
@@ -54,7 +54,7 @@ def run_locomo_experiment(
     log_path = artifact_root / "logs"
     configure_benchmark_logger("benchmarks.locomo.loader", log_path, LOG_LEVEL)
     conversations = list(dataset.conversations())
-    random.Random(seed).shuffle(conversations)  # nosec B311
+    random.Random(seed).shuffle(conversations)  # noqa: S311  # nosec B311
     max_conversations = MAX_CONVERSATIONS if max_conversations is None else max_conversations
     max_questions = MAX_QUESTIONS if max_questions is None else max_questions
     if max_conversations > 0:
