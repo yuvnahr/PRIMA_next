@@ -6,10 +6,10 @@ import argparse
 import json
 from pathlib import Path
 
-from benchmarks.goemotions.training.config import TrainingConfig
-from benchmarks.goemotions.training.trainer import smoke_train, train
-from benchmarks.goemotions.training.thresholds import fit_thresholds_from_dev
 from benchmarks.goemotions.training.calibration import fit_calibration_from_dev
+from benchmarks.goemotions.training.config import TrainingConfig
+from benchmarks.goemotions.training.thresholds import fit_thresholds_from_dev
+from benchmarks.goemotions.training.trainer import smoke_train, train
 
 
 def main() -> None:

@@ -14,11 +14,11 @@ from affect.affect_evolution import (
 )
 from affect.affect_types import AffectUpdate
 from affect.classifier_factory import create_affect_classifier
-from affect.interfaces import EmotionClassifier
 from affect.emotion_history import EmotionHistory
 from affect.emotion_prediction import EmotionPrediction
 from affect.emotion_profile import EmotionProfile
 from affect.emotional_memory_adapter import EmotionalMemoryAdapter
+from affect.interfaces import EmotionClassifier
 from affect.pad_model import PADState
 from affect.reflection_triggers import generate_reflection_signals
 from affect.retrieval_priors import generate_retrieval_priors

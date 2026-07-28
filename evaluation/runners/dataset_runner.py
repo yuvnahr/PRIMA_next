@@ -12,15 +12,15 @@ from evaluation.metrics.confidence_calibration import (
     confidence_calibration_summary,
     print_confidence_calibration_report,
 )
-from evaluation.metrics.memory_metrics import memory_growth, retrieval_hit_counts
 from evaluation.metrics.memory_formation import memory_formation_summary, memory_quality_comparison
+from evaluation.metrics.memory_metrics import memory_growth, retrieval_hit_counts
 from evaluation.metrics.reflection_accuracy import print_reflection_accuracy_report, reflection_accuracy_summary
 from evaluation.metrics.reflection_harm import reflection_harm_summary
 from evaluation.metrics.reflection_metrics import (
     affect_trigger_count,
+    contradiction_trigger_count,
     correction_frequency,
     correction_rate,
-    contradiction_trigger_count,
     reflection_rate,
     retrieval_trigger_count,
     trigger_distribution,
@@ -39,7 +39,6 @@ from reflection.reflection_acceptance import (
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from runtime.prima_runtime import PrimaRuntime
-
 
 DEFAULT_DATASET_PATH = Path("evaluation/datasets/inputs_100.json")
 DEFAULT_RESULTS_PATH = Path("evaluation/results/runtime_results.json")

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any
 
 from affect.emotion_classifier import CANONICAL_EMOTION_ALIASES, FALLBACK_LEXICON
-
 
 Outcome = str
 

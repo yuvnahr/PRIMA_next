@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Sequence
-from typing import Any
-import json
 from pathlib import Path
+from typing import Any
 
-from benchmarks.goemotions.training.data import load_split, validate_splits, multi_hot
+from benchmarks.goemotions.training.data import load_split, multi_hot, validate_splits
 
 
 def fit_temperature(logits: Sequence[Sequence[float]], targets: Sequence[Sequence[float]], candidates: Sequence[float] = tuple(i / 20 for i in range(10, 81))) -> dict[str, Any]:

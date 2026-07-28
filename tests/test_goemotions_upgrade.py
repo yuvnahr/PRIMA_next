@@ -1,9 +1,9 @@
 import json
 
-from affect.classifiers.goemotions_adapter import GoEmotionsProfileAdapter
 from affect.affect_engine import DynamicAffectEngine
-from affect.emotion_prediction import EmotionPrediction
 from affect.affect_perception import GoEmotionsDecisionController
+from affect.classifiers.goemotions_adapter import GoEmotionsProfileAdapter
+from affect.emotion_prediction import EmotionPrediction
 from affect.taxonomies.goemotions import LABELS, PRIMA_CORE_MAP, validate_taxonomy
 from benchmarks.goemotions.schemas import GOEMOTIONS_RESPONSE_SCHEMA
 from benchmarks.goemotions.systems import PrimaQwenSystem, QwenWithPrimaTelemetrySystem

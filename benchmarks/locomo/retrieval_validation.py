@@ -11,9 +11,10 @@ import random
 import statistics
 import time
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
@@ -490,7 +491,7 @@ def _confidence_calibration(traces: list[dict[str, Any]]) -> dict[str, Any]:
                 "mrr": metrics["mrr"],
             }
         )
-    brier = _average_values((confidence - success) ** 2 for confidence, success in zip(confidences, successes))
+    brier = _average_values((confidence - success) ** 2 for confidence, success in zip(confidences, successes, strict=True))
     return {
         "bins": bins,
         "pearson_correlation": _pearson(confidences, successes),
@@ -844,7 +845,7 @@ def _rank_all_dense(record: dict[str, Any], query_embedding: tuple[float, ...]) 
 def _cosine(left: Any, right: Any) -> float:
     left_values = [float(value) for value in left]
     right_values = [float(value) for value in right]
-    numerator = sum(x * y for x, y in zip(left_values, right_values))
+    numerator = sum(x * y for x, y in zip(left_values, right_values, strict=True))
     left_norm = math.sqrt(sum(x * x for x in left_values)) or 1.0
     right_norm = math.sqrt(sum(y * y for y in right_values)) or 1.0
     return numerator / (left_norm * right_norm)
@@ -950,7 +951,7 @@ def _chunking_hypothesis_validation(records: list[dict[str, Any]], full_trace: l
         dense_ids = {str(candidate.get("id")) for candidate in trace.get("diagnostics", {}).get("dense_top30", [])}
         if not set(trace["expected_memory_ids"]) <= dense_ids:
             dense_failures.append(trace)
-    sample = random.Random(9).sample(dense_failures, min(sample_size, len(dense_failures))) if dense_failures else []  # nosec B311
+    sample = random.Random(9).sample(dense_failures, min(sample_size, len(dense_failures))) if dense_failures else []  # noqa: S311  # nosec B311
     cases = []
     counts: Counter[str] = Counter()
     for trace in sample:
@@ -1206,7 +1207,7 @@ def _event_size_distribution(events: list[Any]) -> dict[str, Any]:
 
 def _event_overlap_analysis(events: list[Any]) -> dict[str, Any]:
     overlaps = []
-    for left, right in zip(events, events[1:]):
+    for left, right in zip(events, events[1:], strict=False):
         if left.conversation_id != right.conversation_id:
             continue
         left_terms = set(tokenize(left.embedding_text))
@@ -1329,7 +1330,7 @@ def _pearson(left: list[float], right: list[float]) -> float:
         return 0.0
     mean_left = sum(left) / len(left)
     mean_right = sum(right) / len(right)
-    numerator = sum((x - mean_left) * (y - mean_right) for x, y in zip(left, right))
+    numerator = sum((x - mean_left) * (y - mean_right) for x, y in zip(left, right, strict=True))
     left_den = math.sqrt(sum((x - mean_left) ** 2 for x in left))
     right_den = math.sqrt(sum((y - mean_right) ** 2 for y in right))
     if left_den == 0.0 or right_den == 0.0:

@@ -25,7 +25,7 @@ class GoEmotionsNaiveBayes:
     label_tokens: dict[str, Counter[str]] = field(default_factory=lambda: {label: Counter() for label in LABELS})
     thresholds: dict[str, float] = field(default_factory=lambda: {label: 0.5 for label in LABELS})
 
-    def fit(self, rows: list[GoEmotionsExample]) -> "GoEmotionsNaiveBayes":
+    def fit(self, rows: list[GoEmotionsExample]) -> GoEmotionsNaiveBayes:
         self.document_count = len(rows)
         for row in rows:
             tokens = Counter(_TOKEN.findall(row.text.lower()))

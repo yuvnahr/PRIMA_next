@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-
 BENCHMARK_ROOT = Path(__file__).resolve().parent
 DEFAULT_DATASET_PATH = BENCHMARK_ROOT / "external" / "goemotions" / "data" / "test.tsv"
 DEFAULT_LABEL_PATH = DEFAULT_DATASET_PATH.with_name("emotions.txt")

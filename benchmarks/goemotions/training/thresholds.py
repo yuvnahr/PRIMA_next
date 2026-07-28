@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import Any
 import json
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 from benchmarks.goemotions.training.data import load_split, validate_splits
 

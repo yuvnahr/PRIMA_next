@@ -7,8 +7,8 @@ lightweight and explicit about where secrets are read from.
 """
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
@@ -43,14 +43,14 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
             raise ProviderError(f"HTTP request failed: {exc}") from exc
 
     data = json.dumps(payload).encode("utf-8")
-    request = urllib.request.Request(
+    request = urllib.request.Request(  # noqa: S310
         url,
         data=data,
         headers=headers or {"Content-Type": "application/json"},
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")

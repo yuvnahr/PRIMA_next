@@ -7,9 +7,10 @@ import csv
 import json
 import os
 import time
+from collections.abc import Iterable
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from benchmarks.locomo.config import DATASET_PATH
 from benchmarks.locomo.loader import LoCoMoDataset
@@ -172,7 +173,7 @@ def _identity_validation(conversations: list[Any]) -> dict[str, Any]:
         raw_trace = _evaluate_records(raw_records)
         normalized_trace = _evaluate_records(normalized_records)
     changes = []
-    for before, after in zip(raw_trace, normalized_trace):
+    for before, after in zip(raw_trace, normalized_trace, strict=True):
         if before["retrieved_memory_ids"] != after["retrieved_memory_ids"]:
             changes.append(
                 {

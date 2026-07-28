@@ -42,7 +42,7 @@ class EmotionPrediction:
         object.__setattr__(self, "metadata", MappingProxyType(dict(self.metadata or {})))
 
     @classmethod
-    def from_probabilities(cls, probabilities: Mapping[str, float], thresholds: Mapping[str, float], model_id: str, model_revision: str | None = None, metadata: Mapping[str, object] | None = None, selected_labels: tuple[str, ...] | None = None) -> "EmotionPrediction":
+    def from_probabilities(cls, probabilities: Mapping[str, float], thresholds: Mapping[str, float], model_id: str, model_revision: str | None = None, metadata: Mapping[str, object] | None = None, selected_labels: tuple[str, ...] | None = None) -> EmotionPrediction:
         ordered = {label: float(probabilities[label]) for label in LABELS}
         selected = selected_labels if selected_labels is not None else tuple(label for label in LABELS if ordered[label] >= float(thresholds.get(label, 0.5)))
         selected = selected or ("neutral",)

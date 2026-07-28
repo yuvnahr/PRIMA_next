@@ -6,7 +6,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -255,7 +255,7 @@ def temporal_agreement(analysis: QueryAnalysis, timestamp: datetime | None) -> f
     return 0.25
 
 
-@lru_cache(maxsize=None)
+@cache
 def _resource(filename: str) -> dict[str, Any]:
     path = RESOURCE_DIR / filename
     if not path.exists():

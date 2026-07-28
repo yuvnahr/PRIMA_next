@@ -67,12 +67,12 @@ def load_frozen_model(path: Path) -> dict[str, Any]:
 
 def freeze_tfidf_candidate(data_dir: Path, source_thresholds: Path, output_dir: Path, *, features: str = "combined", balanced: bool = True, seed: int = 13) -> None:
     """Fit train-only selected model and package it with an already-dev-selected threshold file."""
+    import joblib
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import LogisticRegression
     from sklearn.multiclass import OneVsRestClassifier
     from sklearn.pipeline import FeatureUnion
     from sklearn.preprocessing import MultiLabelBinarizer
-    import joblib
 
     train = load_split(data_dir, "train")
     vectorizer = FeatureUnion([("word", TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=2, max_features=80_000)), ("char", TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True, min_df=2, max_features=100_000))])
@@ -144,8 +144,10 @@ def _prima_predictions(probabilities: list[dict[str, float]], thresholds: dict[s
         prediction = GoEmotionsDecisionController(thresholds).decide(row, model_id="tfidf-logreg")
         # Independent Reddit examples must not share emotional persistence.
         class Current:
+            value = prediction
+
             def predict(self, text: str) -> EmotionPrediction:
-                return prediction
+                return self.value
         update = DynamicAffectEngine(classifier=GoEmotionsProfileAdapter(Current())).process("classifier input")
         predictions.append(frozenset(prediction.selected_labels))
         updates.append(update)

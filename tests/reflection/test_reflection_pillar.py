@@ -6,8 +6,7 @@ from memory.retrieval.retrieval_confidence import RetrievalConfidence
 from reflection.adaptive_reflection_pipeline import AdaptiveReflectionPipeline
 from reflection.failure_classifier import FailureClassifier
 from reflection.reflection_context import ReflectionContext
-from reflection.reflection_engine import ReflectionEngine
-from reflection.reflection_engine import ReflectionTriggerWeights
+from reflection.reflection_engine import ReflectionEngine, ReflectionTriggerWeights
 from reflection.reflection_repository import ReflectionRepository
 from reflection.reflection_signal import ReflectionSignal
 from reflection.reflection_types import FailureType, ReflectionSignalType

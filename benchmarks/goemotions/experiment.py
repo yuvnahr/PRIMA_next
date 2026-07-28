@@ -18,7 +18,17 @@ from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExampl
 from benchmarks.goemotions.metrics import evaluate, probability_metrics, render_figures
 from benchmarks.goemotions.prompts import build_prompt
 from benchmarks.goemotions.schemas import parse_label_response
-from benchmarks.goemotions.systems import EncoderSystem, GoEmotionsSystem, HybridSystem, PrimaGoEmotionsSystem, PrimaQwenSystem, QwenDefinitionsSystem, QwenSchemaSystem, QwenWithPrimaTelemetrySystem, QwenZeroShotSystem
+from benchmarks.goemotions.systems import (
+    EncoderSystem,
+    GoEmotionsSystem,
+    HybridSystem,
+    PrimaGoEmotionsSystem,
+    PrimaQwenSystem,
+    QwenDefinitionsSystem,
+    QwenSchemaSystem,
+    QwenWithPrimaTelemetrySystem,
+    QwenZeroShotSystem,
+)
 from llm.provider import ProviderError
 
 OUTPUT_PATH = Path("evaluation/goemotions")
@@ -58,7 +68,7 @@ def run_goemotions_experiment(
     if sample_manifest:
         examples = _examples_from_manifest(examples, dataset_path, sample_manifest)
     elif max_samples > 0:
-        examples = random.Random(seed).sample(examples, min(max_samples, len(examples)))  # nosec B311
+        examples = random.Random(seed).sample(examples, min(max_samples, len(examples)))  # noqa: S311  # nosec B311
     if write_sample_manifest:
         _write_sample_manifest(examples, dataset_path, split, seed, write_sample_manifest)
     _preflight_provider(provider, system, model)
@@ -154,7 +164,7 @@ def _preflight_provider(provider: str, system: str, model: str) -> None:
         return
     base = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
     try:
-        with urllib.request.urlopen(f"{base}/api/tags", timeout=5) as response:  # nosec B310
+        with urllib.request.urlopen(f"{base}/api/tags", timeout=5) as response:  # noqa: S310  # nosec B310
             payload = json.loads(response.read().decode("utf-8"))
     except (OSError, urllib.error.URLError, TimeoutError):
         raise ProviderError(f"Ollama is not reachable at {base}. Start it with: ollama serve") from None

@@ -189,7 +189,7 @@ class RetrievalOptimizationRunner:
         diagnostics = []
         nearest_hits = 0
         all_notes = repository.list()
-        for record, trace_record in zip(records, trace):
+        for record, trace_record in zip(records, trace, strict=True):
             query_vector = np.array(stable_embedding(str(record["query"])), dtype="float32")
             expected_id = str(record["expected_memory_ids"][0])
             expected_note = repository.get(expected_id)

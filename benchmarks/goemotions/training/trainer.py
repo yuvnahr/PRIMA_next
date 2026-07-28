@@ -2,20 +2,21 @@
 
 from __future__ import annotations
 
-import random
-import json
 import hashlib
+import json
+import random
 from pathlib import Path
 from typing import Any
 
+from benchmarks.goemotions.metrics import evaluate
 from benchmarks.goemotions.training.config import TrainingConfig
 from benchmarks.goemotions.training.data import load_split, multi_hot, validate_splits
 from benchmarks.goemotions.training.losses import build_loss
-from benchmarks.goemotions.metrics import evaluate
 
 
-def smoke_train(data_dir: Path, output_dir: Path, config: TrainingConfig = TrainingConfig(), limit: int = 4) -> dict[str, Any]:
+def smoke_train(data_dir: Path, output_dir: Path, config: TrainingConfig | None = None, limit: int = 4) -> dict[str, Any]:
     """Run one real train and dev step, then save/reload a temporary model state."""
+    config = config or TrainingConfig()
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -58,8 +59,9 @@ def _device(torch, requested: str):
     return torch.device(requested)
 
 
-def train(data_dir: Path, output_dir: Path, config: TrainingConfig = TrainingConfig()) -> dict[str, Any]:
+def train(data_dir: Path, output_dir: Path, config: TrainingConfig | None = None) -> dict[str, Any]:
     """Train on train only, select the best checkpoint by development macro F1."""
+    config = config or TrainingConfig()
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 

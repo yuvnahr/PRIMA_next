@@ -37,7 +37,7 @@ class GoEmotionsEncoder:
     _temperature: float = field(default=1.0, init=False)
 
     @classmethod
-    def from_environment(cls, model_id: str) -> "GoEmotionsEncoder":
+    def from_environment(cls, model_id: str) -> GoEmotionsEncoder:
         return cls(
             model_id=model_id,
             revision=os.getenv("PRIMA_AFFECT_MODEL_REVISION") or None,
