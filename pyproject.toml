@@ -1,6 +1,9 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+filterwarnings = [
+    "ignore:SelectableGroups dict interface is deprecated\\. Use select\\.:DeprecationWarning:opentelemetry\\.util\\._importlib_metadata",
+]
 
 [tool.ruff]
 line-length = 120
@@ -29,6 +32,3 @@ exclude = [
     "__pycache__",
     "benchmarks/locomo-v2/external|benchmarks/locomo/external",
 ]
-
-[tool.bandit]
-exclude_dirs = ["tests", ".git", ".venv", "__pycache__"]

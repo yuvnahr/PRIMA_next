@@ -7,6 +7,7 @@ from affect.affect_perception import GoEmotionsDecisionController
 from affect.taxonomies.goemotions import LABELS, PRIMA_CORE_MAP, validate_taxonomy
 from benchmarks.goemotions.schemas import GOEMOTIONS_RESPONSE_SCHEMA
 from benchmarks.goemotions.systems import PrimaQwenSystem, QwenWithPrimaTelemetrySystem
+from benchmarks.goemotions.training.config import TrainingConfig
 from benchmarks.goemotions.training.thresholds import select_thresholds
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.provider import OllamaProvider
@@ -39,6 +40,15 @@ def test_schema_reaches_ollama_payload(monkeypatch) -> None:
     OllamaProvider().send(LLMRequest("qwen3.5:4b", "classify", response_schema=GOEMOTIONS_RESPONSE_SCHEMA))
     assert captured["format"] == GOEMOTIONS_RESPONSE_SCHEMA
     assert "allOf" not in GOEMOTIONS_RESPONSE_SCHEMA
+
+
+def test_training_revision_must_be_an_immutable_commit() -> None:
+    try:
+        TrainingConfig(revision="main")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Mutable Hugging Face revisions must be rejected.")
 
 
 def test_threshold_selection_uses_only_supplied_development_rows() -> None:

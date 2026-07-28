@@ -8,7 +8,6 @@ import json
 import os
 import platform
 import random
-import subprocess
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -234,9 +233,22 @@ def _restore_environment(name: str, previous: str | None) -> None:
 
 def _git_commit() -> str | None:
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    except (OSError, subprocess.CalledProcessError):
+        git_dir = Path(".git")
+        if git_dir.is_file():
+            git_dir = (git_dir.parent / git_dir.read_text(encoding="utf-8").strip().removeprefix("gitdir: ")).resolve()
+        head = (git_dir / "HEAD").read_text(encoding="utf-8").strip()
+        if not head.startswith("ref: "):
+            return head or None
+        reference = head.removeprefix("ref: ")
+        loose_ref = git_dir / reference
+        if loose_ref.is_file():
+            return loose_ref.read_text(encoding="utf-8").strip() or None
+        for line in (git_dir / "packed-refs").read_text(encoding="utf-8").splitlines():
+            if line.endswith(f" {reference}"):
+                return line.split(" ", 1)[0]
+    except OSError:
         return None
+    return None
 
 
 def _progress(items, total: int, *, enabled: bool):

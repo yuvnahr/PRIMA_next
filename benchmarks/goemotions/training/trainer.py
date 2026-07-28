@@ -27,8 +27,8 @@ def smoke_train(data_dir: Path, output_dir: Path, config: TrainingConfig = Train
     random.seed(config.seed)
     torch.manual_seed(config.seed)
     device = _device(torch, config.device)
-    tokenizer = AutoTokenizer.from_pretrained(config.model_id, trust_remote_code=False)
-    model = AutoModelForSequenceClassification.from_pretrained(config.model_id, num_labels=len(labels), problem_type="multi_label_classification", trust_remote_code=False).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(config.model_id, revision=config.revision, trust_remote_code=False)
+    model = AutoModelForSequenceClassification.from_pretrained(config.model_id, revision=config.revision, num_labels=len(labels), problem_type="multi_label_classification", trust_remote_code=False).to(device)
     model.train()
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     loss_fn = build_loss(config.loss)
@@ -71,9 +71,10 @@ def train(data_dir: Path, output_dir: Path, config: TrainingConfig = TrainingCon
     device = _device(torch, config.device)
     amp_enabled = config.mixed_precision and device.type == "cuda"
     scaler = torch.cuda.amp.GradScaler(enabled=amp_enabled)
-    tokenizer = AutoTokenizer.from_pretrained(config.model_id, trust_remote_code=False)
+    tokenizer = AutoTokenizer.from_pretrained(config.model_id, revision=config.revision, trust_remote_code=False)
     model = AutoModelForSequenceClassification.from_pretrained(
         config.model_id,
+        revision=config.revision,
         num_labels=len(labels),
         id2label=dict(enumerate(labels)),
         label2id={label: index for index, label in enumerate(labels)},

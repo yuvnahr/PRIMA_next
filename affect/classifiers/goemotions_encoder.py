@@ -13,6 +13,11 @@ from affect.emotion_prediction import EmotionPrediction
 from affect.emotion_profile import EmotionProfile
 from affect.taxonomies.goemotions import LABELS
 
+PINNED_MODEL_REVISIONS = {
+    "SamLowe/roberta-base-go_emotions": "d750483",
+    "microsoft/deberta-v3-small": "a59be8aa63396e73dbb45a1487e4cde4be98bfa4",
+}
+
 
 @dataclass(slots=True)
 class GoEmotionsEncoder:
@@ -76,9 +81,15 @@ class GoEmotionsEncoder:
         except ImportError as exc:
             raise RuntimeError("GoEmotions encoder requires requirements-goemotions.txt.") from exc
         self._device = self._resolve_device()
-        kwargs = {"revision": self.revision, "trust_remote_code": False, "local_files_only": os.getenv("PRIMA_AFFECT_LOCAL_FILES_ONLY", "false").lower() in {"1", "true", "yes"}}
-        self._tokenizer = AutoTokenizer.from_pretrained(self.model_id, **kwargs)
-        self._model = AutoModelForSequenceClassification.from_pretrained(self.model_id, **kwargs).to(self._device)
+        revision = self.revision or PINNED_MODEL_REVISIONS.get(self.model_id)
+        if revision is None:
+            raise ValueError("Custom Hugging Face models require PRIMA_AFFECT_MODEL_REVISION.")
+        if len(revision) < 7 or any(character not in "0123456789abcdefABCDEF" for character in revision):
+            raise ValueError("Hugging Face model revisions must be immutable commit hashes.")
+        self.revision = revision
+        kwargs = {"trust_remote_code": False, "local_files_only": os.getenv("PRIMA_AFFECT_LOCAL_FILES_ONLY", "false").lower() in {"1", "true", "yes"}}
+        self._tokenizer = AutoTokenizer.from_pretrained(self.model_id, revision=revision, **kwargs)
+        self._model = AutoModelForSequenceClassification.from_pretrained(self.model_id, revision=revision, **kwargs).to(self._device)
         self._model.eval()
         self._validate_label_order()
         self._thresholds = _load_thresholds(self.thresholds_path)

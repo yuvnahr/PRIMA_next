@@ -24,6 +24,7 @@ def main() -> None:
     parser.add_argument("--fit-thresholds", type=Path, metavar="DEV_PROBABILITIES_JSON")
     parser.add_argument("--fit-calibration", type=Path, metavar="DEV_LOGITS_JSON")
     parser.add_argument("--model-id", default="microsoft/deberta-v3-small")
+    parser.add_argument("--revision", default="a59be8aa63396e73dbb45a1487e4cde4be98bfa4", help="Immutable Hugging Face commit hash.")
     args = parser.parse_args()
     if args.fit_thresholds and args.fit_calibration:
         parser.error("Choose one of --fit-thresholds or --fit-calibration.")
@@ -32,7 +33,7 @@ def main() -> None:
     elif args.fit_calibration:
         result = fit_calibration_from_dev(args.data_dir, args.fit_calibration, args.output_dir / "calibration.json", model_id=args.model_id)
     else:
-        config = TrainingConfig(model_id=args.model_id, device=args.device, epochs=args.epochs, loss=args.loss)
+        config = TrainingConfig(model_id=args.model_id, revision=args.revision, device=args.device, epochs=args.epochs, loss=args.loss)
         result = train(args.data_dir, args.output_dir, config) if args.full else smoke_train(args.data_dir, args.output_dir, config, args.limit)
     print(json.dumps(result, indent=2, sort_keys=True))
 
