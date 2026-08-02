@@ -23,6 +23,14 @@ class WorkflowCancelledError(RuntimeError):
     """Raised when a workflow execution is cooperatively cancelled."""
 
 
+class WorkflowExecutionError(RuntimeError):
+    """Carry a failed execution context back to the canonical runtime."""
+
+    def __init__(self, context: ExecutionContext) -> None:
+        super().__init__("Workflow execution failed.")
+        self.context = context
+
+
 class OrchestrationEngine:
     """Owns the workflow execution lifecycle."""
 
@@ -67,7 +75,7 @@ class OrchestrationEngine:
                 context.workflow_state.current_phase,
                 {"error": str(exc)},
             )
-            raise
+            raise WorkflowExecutionError(context) from exc
         finally:
             context.touch()
 
@@ -111,14 +119,26 @@ class OrchestrationEngine:
             context.affect_update = result
         elif phase == WorkflowPhase.MEMORY_RETRIEVAL:
             context.retrieval_response = result
+        elif phase == WorkflowPhase.EVIDENCE_ACQUISITION:
+            context.reasoning_result = getattr(result, "answer_result", None)
+            context.retrieval_response = getattr(result, "latest_retrieval", None)
         elif phase == WorkflowPhase.PLANNING:
             context.plan = result
         elif phase == WorkflowPhase.REFLECTION:
             context.reflection_result = result
         elif phase == WorkflowPhase.ACTION:
             context.action_result = result
+        elif phase == WorkflowPhase.ANSWER_GENERATION:
+            context.generation_result = result
+        elif phase == WorkflowPhase.DOCUMENT_INGESTION:
+            context.ingestion_result = result
         elif phase == WorkflowPhase.OUTPUT:
             context.output = result
+        elif phase == WorkflowPhase.MEMORY_COMMIT:
+            if not isinstance(result, dict):
+                raise TypeError("Memory commit controller must return a dictionary.")
+            context.memory_notes_created = tuple(result.get("notes", ()))
+            context.memory_admission = result.get("decision")
         context.workflow_state.outputs[phase.value] = result
 
     async def _check_cancelled(self, context: ExecutionContext) -> None:

@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import json
+
+from llm.llm_types import LLMResponse
 from memory.memory_note import MemoryNote
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_confidence import RetrievalConfidence
 from memory.retrieval.retrieval_controller import RetrievalResponse
 from memory.retrieval.retrieval_result import RetrievalResult
 from runtime import PrimaRuntime
+from workflow.workflow_state import WorkflowPhase
 
 
 def _response(source_id: str, text: str) -> RetrievalResponse:
@@ -29,10 +33,19 @@ def test_runtime_uses_production_retrieval_for_every_adaptive_hop(tmp_path) -> N
             self.calls.append(request.query)
             return responses[request.query]
 
-    runtime = PrimaRuntime(log_path=tmp_path / "runtime.log")
+    class FakeClient:
+        provider_name = "test"
+
+        def chat(self, **_kwargs):
+            return LLMResponse(
+                json.dumps({"answer": "Bridge", "evidence": ["E1", "E2"], "insufficient_information": False})
+            )
+
+    runtime = PrimaRuntime(llm_client=FakeClient(), log_path=tmp_path / "runtime.log")
     fake = FakeRetrievalController()
     runtime.retrieval_controller = fake
-    runtime._synthesize_evidence = lambda _q, evidence, **_kwargs: (evidence[-1].note.content, False, (), {"llm_used": False})
+    acquisition = runtime.workflow.engine.registry.get(WorkflowPhase.EVIDENCE_ACQUISITION)
+    acquisition.retrieval_controller = fake
     result = runtime.answer_question("What fact is linked to Alpha?", reasoning_mode="adaptive", diagnostics=True)
 
     assert fake.calls == ["What fact is linked to Alpha?", "Bridge"]

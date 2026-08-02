@@ -38,6 +38,18 @@ class ExecutionStatus(Enum):
     NOT_IMPLEMENTED = "not_implemented"
     REJECTED = "rejected"
     FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class ExecutionOutcome(Enum):
+    """Typed request result independent of workflow lifecycle status."""
+
+    ANSWERED = "answered"
+    ABSTAINED = "abstained"
+    FAILED = "failed"
+    INGESTED = "ingested"
+    CLASSIFIED = "classified"
+    CANCELLED = "cancelled"
 
 
 class RuntimeComponent(Enum):
@@ -168,6 +180,7 @@ class PrimaResponse(ContractModel):
     task_kind: TaskKind
     profile: ExecutionProfile
     status: ExecutionStatus
+    outcome: ExecutionOutcome | None = None
     output_text: str | None = None
     output_data: dict[str, Any] = Field(default_factory=dict)
     state_delta: StateDelta = Field(default_factory=StateDelta)

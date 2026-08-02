@@ -3,6 +3,7 @@
 from runtime.contracts import (
     ComponentCapability,
     EvidenceReference,
+    ExecutionOutcome,
     ExecutionProfile,
     ExecutionStatus,
     PrimaRequest,
@@ -20,6 +21,7 @@ from runtime.runtime_result import RuntimeResult
 __all__ = [
     "ComponentCapability",
     "EvidenceReference",
+    "ExecutionOutcome",
     "ExecutionProfile",
     "ExecutionStatus",
     "InvalidRouteError",

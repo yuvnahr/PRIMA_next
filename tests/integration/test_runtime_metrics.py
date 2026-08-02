@@ -6,12 +6,20 @@ from evaluation.metrics.affect_metrics import emotion_frequency
 from evaluation.metrics.memory_metrics import memory_growth, retrieval_hit_counts
 from evaluation.metrics.reflection_metrics import trigger_frequency
 from evaluation.metrics.system_metrics import summarize_system_metrics
+from llm.llm_types import LLMResponse
 from runtime import PrimaRuntime
 from runtime.runtime_metrics import RuntimeMetrics
 
 
+class _ModelClient:
+    provider_name = "test"
+
+    def chat(self, **_kwargs: object) -> LLMResponse:
+        return LLMResponse("Generated metrics response.")
+
+
 def test_runtime_metrics_are_serializable() -> None:
-    runtime = PrimaRuntime()
+    runtime = PrimaRuntime(llm_client=_ModelClient())
     result = runtime.process("A calm morning in the garden helped me focus.")
     metrics = runtime.metrics_from_result(result)
 

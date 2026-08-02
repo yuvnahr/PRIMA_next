@@ -5,6 +5,7 @@ import asyncio
 import pytest
 from pydantic import ValidationError
 
+from llm.llm_types import LLMResponse
 from memory.memory_repository import InMemoryMemoryRepository
 from runtime.contracts import (
     ExecutionProfile,
@@ -16,6 +17,15 @@ from runtime.contracts import (
 )
 from runtime.prima_runtime import PrimaRuntime
 from runtime.route_profiles import InvalidRouteError, route_matrix, select_route
+from workflow.execution_context import ExecutionContext
+from workflow.task_router import TaskRouter
+
+
+class _ModelClient:
+    provider_name = "test"
+
+    def chat(self, **_kwargs) -> LLMResponse:
+        return LLMResponse("Generated response.")
 
 
 def test_contract_serialization_round_trip() -> None:
@@ -62,6 +72,23 @@ def test_all_task_profile_pairs_have_deterministic_decisions() -> None:
     assert valid == 9
 
 
+def test_every_valid_contract_route_has_a_workflow_phase_plan() -> None:
+    plans = []
+    for (task_kind, profile), route in route_matrix().items():
+        if route is None:
+            continue
+        plan = TaskRouter().route(
+            ExecutionContext(
+                user_input="route",
+                metadata={"task_kind": task_kind.value, "profile": profile.value},
+            )
+        )
+        assert plan.phases
+        assert len(plan.phases) == len(set(plan.phases))
+        plans.append(plan)
+    assert len(plans) == 9
+
+
 def test_short_routes_exclude_irrelevant_qa_components() -> None:
     affect = select_route(TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY)
     ingestion = select_route(TaskKind.DOCUMENT_INGESTION, ExecutionProfile.INGESTION_ONLY)
@@ -95,7 +122,11 @@ def test_invalid_request_and_route_configuration() -> None:
 
 
 def test_execute_reports_planned_executed_and_skipped_components(tmp_path) -> None:
-    runtime = PrimaRuntime(memory_repository=InMemoryMemoryRepository(), log_path=tmp_path / "runtime.log")
+    runtime = PrimaRuntime(
+        llm_client=_ModelClient(),
+        memory_repository=InMemoryMemoryRepository(),
+        log_path=tmp_path / "runtime.log",
+    )
     request = PrimaRequest(
         task_kind=TaskKind.CONVERSATION,
         profile=ExecutionProfile.MODEL_ONLY,
@@ -104,11 +135,12 @@ def test_execute_reports_planned_executed_and_skipped_components(tmp_path) -> No
 
     response = asyncio.run(runtime.execute(request))
 
-    assert response.status is ExecutionStatus.NOT_IMPLEMENTED
+    assert response.status is ExecutionStatus.COMPLETED
     assert response.diagnostics.planned_components
-    assert response.diagnostics.executed_components == (RuntimeComponent.POLICY_ROUTER,)
+    assert RuntimeComponent.POLICY_ROUTER in response.diagnostics.executed_components
+    assert RuntimeComponent.MODEL_EXECUTOR in response.diagnostics.executed_components
     assert RuntimeComponent.AFFECT_ENGINE in response.diagnostics.skipped_components
-    assert RuntimeComponent.MODEL_EXECUTOR in response.diagnostics.skipped_components
+    assert RuntimeComponent.MODEL_EXECUTOR not in response.diagnostics.skipped_components
     assert set(response.diagnostics.executed_components) | set(response.diagnostics.skipped_components) == set(
         RuntimeComponent
     )
@@ -116,7 +148,11 @@ def test_execute_reports_planned_executed_and_skipped_components(tmp_path) -> No
 
 
 def test_ingestion_and_emotion_use_short_canonical_routes(tmp_path) -> None:
-    runtime = PrimaRuntime(memory_repository=InMemoryMemoryRepository(), log_path=tmp_path / "runtime.log")
+    runtime = PrimaRuntime(
+        llm_client=_ModelClient(),
+        memory_repository=InMemoryMemoryRepository(),
+        log_path=tmp_path / "runtime.log",
+    )
     ingestion = asyncio.run(
         runtime.execute(
             PrimaRequest(
@@ -145,14 +181,18 @@ def test_ingestion_and_emotion_use_short_canonical_routes(tmp_path) -> None:
 
 
 def test_sync_wrapper_rejects_an_active_event_loop(tmp_path) -> None:
-    runtime = PrimaRuntime(memory_repository=InMemoryMemoryRepository(), log_path=tmp_path / "runtime.log")
+    runtime = PrimaRuntime(
+        llm_client=_ModelClient(),
+        memory_repository=InMemoryMemoryRepository(),
+        log_path=tmp_path / "runtime.log",
+    )
     request = PrimaRequest(
         task_kind=TaskKind.CONVERSATION,
         profile=ExecutionProfile.MODEL_ONLY,
         input_text="Hello",
     )
 
-    assert runtime.execute_sync(request).status is ExecutionStatus.NOT_IMPLEMENTED
+    assert runtime.execute_sync(request).status is ExecutionStatus.COMPLETED
 
     async def call_sync_inside_loop() -> None:
         with pytest.raises(RuntimeError, match=r"await PrimaRuntime\.execute"):

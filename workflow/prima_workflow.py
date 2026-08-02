@@ -8,13 +8,20 @@ from typing import Any
 
 from action import ActionContext, ActionExecutor, ExecutionPolicy
 from affect.affect_engine import DynamicAffectEngine
+from llm.llm_client import LLMClient
+from memory.maintenance.memory_importance import MemoryImportanceEngine
+from memory.memory_note import MemoryNote
+from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
 from planning import PlanningContext, TaskPlanner
 from planning.plan import Plan
+from reasoning.controller import ReasoningController
+from reasoning.models import AnswerResult, ReasoningBudget, ReasoningMode, ReasoningRequest
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
+from workflow.answer_generation import AnswerGenerationController, GenerationOutcome
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
@@ -63,6 +70,53 @@ class MemoryRetrievalController:
             affective_context={"retrieval_priors": affect_priors, "reflection_signal_count": len(affect_signals)},
         )
         return self.retrieval_controller.retrieve(request)
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceAcquisitionResult:
+    """Bounded reasoning output and its latest retrieval response."""
+
+    answer_result: AnswerResult
+    latest_retrieval: Any | None = None
+
+
+@dataclass(slots=True)
+class EvidenceAcquisitionController:
+    """Run the existing bounded ReasoningController inside the workflow."""
+
+    reasoning_controller: ReasoningController
+    retrieval_controller: RetrievalController
+    phase: WorkflowPhase = WorkflowPhase.EVIDENCE_ACQUISITION
+
+    async def execute(self, context: ExecutionContext) -> EvidenceAcquisitionResult:
+        """Acquire evidence without generating the final answer."""
+
+        latest_retrieval: Any | None = None
+
+        def retrieve(query: str) -> Any:
+            nonlocal latest_retrieval
+            latest_retrieval = self.retrieval_controller.retrieve(
+                RetrievalRequest(query=query, top_k=int(context.metadata.get("top_k", 5)))
+            )
+            return latest_retrieval
+
+        mode = ReasoningMode(str(context.metadata.get("reasoning_mode", ReasoningMode.ADAPTIVE.value)))
+        budget = ReasoningBudget(
+            max_hops=int(context.metadata.get("max_hops", 3)),
+            max_retrieval_calls=int(context.metadata.get("max_hops", 3)),
+            max_context_tokens=int(context.metadata.get("max_context_tokens", 1600)),
+        )
+        result = self.reasoning_controller.answer(
+            ReasoningRequest(
+                question=context.user_input,
+                session_id=str(context.metadata.get("session_id", "")),
+                mode=mode,
+                budget=budget,
+            ),
+            retrieve=retrieve,
+            synthesize=lambda _question, _evidence: ("", False, (), {}),
+        )
+        return EvidenceAcquisitionResult(result, latest_retrieval)
 
 
 @dataclass(slots=True)
@@ -171,6 +225,69 @@ class ActionController:
         return payload
 
 
+@dataclass(frozen=True, slots=True)
+class IngestionResult:
+    """Typed document indexing result."""
+
+    memory_id: str
+
+
+@dataclass(slots=True)
+class DocumentIngestionController:
+    """Validate and index a document without answer generation."""
+
+    repository: MemoryRepository
+    phase: WorkflowPhase = WorkflowPhase.DOCUMENT_INGESTION
+
+    async def execute(self, context: ExecutionContext) -> IngestionResult:
+        """Index one semantic document through the workflow."""
+
+        text = context.user_input.strip()
+        if not text:
+            raise ValueError("Document text must not be empty.")
+        note = MemoryNote.create(
+            content=text,
+            memory_type=MemoryType.SEMANTIC,
+            context={"source": "document_ingestion", **dict(context.metadata.get("document_metadata", {}))},
+        )
+        return IngestionResult(self.repository.add(note).id)
+
+
+@dataclass(slots=True)
+class MemoryCommitController:
+    """Commit an admitted conversational turn inside the workflow lifecycle."""
+
+    repository: MemoryRepository
+    importance_engine: MemoryImportanceEngine
+    phase: WorkflowPhase = WorkflowPhase.MEMORY_COMMIT
+
+    async def execute(self, context: ExecutionContext) -> dict[str, Any]:
+        """Apply admission scoring and optionally persist one episodic memory."""
+
+        decision = self.importance_engine.decide(
+            context.user_input,
+            affect_update=context.affect_update,
+            reflection_result=context.reflection_result,
+        )
+        if not decision.stored:
+            return {"notes": (), "decision": decision}
+        affect_update = context.affect_update
+        note = MemoryNote.create(
+            content=context.user_input,
+            memory_type=MemoryType.EPISODIC,
+            affective_state=affect_update.to_dict() if affect_update is not None else {},
+            context={
+                "source": "prima_runtime",
+                "execution_id": context.execution_id,
+                "source_session_id": str(context.metadata.get("session_id", "")),
+                "source_turn_id": str(context.metadata.get("turn_id", "")),
+            },
+            state_snapshot=getattr(context.cognitive_state, "state_snapshot", None),
+            salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+        )
+        return {"notes": (self.repository.add(note),), "decision": decision}
+
+
 @dataclass(slots=True)
 class OutputController:
     """Workflow controller for final output shaping."""
@@ -178,17 +295,39 @@ class OutputController:
     phase: WorkflowPhase = WorkflowPhase.OUTPUT
 
     async def execute(self, context: ExecutionContext) -> dict[str, Any]:
-        """Build final workflow output."""
+        """Shape an existing typed subsystem result without generating content."""
+
+        if context.generation_result is not None:
+            result = context.generation_result
+            return {
+                "text": result.text,
+                "outcome": result.outcome.value,
+                "generation": result.to_dict(),
+            }
+        if context.ingestion_result is not None:
+            return {
+                "text": None,
+                "outcome": "ingested",
+                "memory_id": context.ingestion_result.memory_id,
+            }
+        if str(context.metadata.get("task_kind")) == "emotion_classification" and context.affect_update is not None:
+            profile = context.affect_update.profile
+            return {
+                "text": None,
+                "outcome": "classified",
+                "classification": {
+                    "dominant_emotion": profile.dominant_emotion,
+                    "confidence": profile.confidence,
+                    "emotions": dict(profile.emotions),
+                },
+            }
+        if context.action_result is None:
+            raise RuntimeError("Output shaping requires a generation, ingestion, classification, or action result.")
         return {
-            "text": context.user_input,
+            "text": None,
+            "outcome": GenerationOutcome.ANSWERED.value,
+            "action": context.action_result,
             "execution_id": context.execution_id,
-            "dominant_emotion": getattr(context.affect_update.profile, "dominant_emotion", "neutral")
-            if context.affect_update
-            else "neutral",
-            "memory_count": len(getattr(context.retrieval_response, "results", ())) if context.retrieval_response else 0,
-            "plan_status": getattr(getattr(context.plan, "status", None), "value", None),
-            "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
-            "action_status": context.action_result.get("status") if isinstance(context.action_result, dict) else None,
         }
 
 
@@ -226,18 +365,30 @@ class PrimaWorkflow:
         affect_engine: DynamicAffectEngine,
         retrieval_controller: RetrievalController,
         reflection_engine: ReflectionEngine,
+        reasoning_controller: ReasoningController | None = None,
+        llm_client: LLMClient | None = None,
+        memory_repository: MemoryRepository | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
     ) -> PrimaWorkflow:
         """Create a workflow with default controller adapters."""
+        repository = memory_repository or retrieval_controller.repository
         registry = ControllerRegistry(
             controllers={
                 WorkflowPhase.AFFECT: AffectController(affect_engine),
                 WorkflowPhase.MEMORY_RETRIEVAL: MemoryRetrievalController(retrieval_controller),
+                WorkflowPhase.EVIDENCE_ACQUISITION: EvidenceAcquisitionController(
+                    reasoning_controller or ReasoningController(), retrieval_controller
+                ),
                 WorkflowPhase.PLANNING: PlanningController(),
                 WorkflowPhase.REFLECTION: ReflectionController(reflection_engine),
                 WorkflowPhase.ACTION: ActionController(),
+                WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(llm_client or LLMClient()),
+                WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),
+                WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(
+                    repository, MemoryImportanceEngine(repository)
+                ),
             }
         )
         return cls(registry=registry, event_bus=event_bus, retry_policy=retry_policy)

@@ -1,13 +1,13 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 02. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 03. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
-| ARCH-001 | Critical | Verified fact | Public execution was split across `process`, `answer_question` and `ingest_document`; `execute(PrimaRequest)` now exists but legacy callers are not migrated. | Phase 02 contract; later workflow migration | All task kinds execute through one workflow lifecycle; legacy methods are thin adapters. | In progress |
-| ARCH-002 | Critical | Verified fact | Workflow output echoes input (`workflow/prima_workflow.py:183`; `runtime/prima_runtime.py:386-388`). | Phase 03 — execution/output | A model-only workflow test proves output comes from the injected executor and differs from a sentinel input. | Open |
-| ARCH-003 | Critical | Verified fact | `answer_question` calls `ReasoningController` directly and never calls the workflow. | Phase 03 — execution/output | QA adapter test proves exactly one workflow lifecycle and one executor call. | Open |
-| ARCH-004 | High | Verified fact | `ingest_document` directly writes semantic memory and bypasses workflow/events. | Phase 02 — workflow routing | Ingestion test proves one public-boundary call, explicit skipped phases and a committed memory result. | Open |
+| ARCH-001 | Critical | Verified fact | Public execution was split; all four compatibility methods now delegate to `execute(PrimaRequest)`, which alone invokes `workflow.run`. | Phase 03 — workflow convergence | Adapter-spy tests prove conversation, async conversation, QA and ingestion each call `execute`. | Closed |
+| ARCH-002 | Critical | Verified fact | Workflow output echoed input; `OutputController` now shapes only typed generation/ingestion/classification/action results. | Phase 03 — execution/output | A model-only workflow test proves output comes from the injected executor and differs from a sentinel input. | Closed |
+| ARCH-003 | Critical | Verified fact | QA bypassed workflow; `ReasoningController` is now an evidence-acquisition controller followed by workflow-owned generation. | Phase 03 — execution/output | QA test proves evidence acquisition and answer generation phases complete in one workflow lifecycle. | Closed |
+| ARCH-004 | High | Verified fact | Ingestion bypassed workflow; semantic validation/indexing now runs in `DOCUMENT_INGESTION` and never selects generation. | Phase 03 — workflow routing | Ingestion test proves workflow traversal, committed memory and zero model calls. | Closed |
 | ROUTE-001 | High | Verified fact | Router had phase lists/untyped metadata, not typed task kinds or execution profiles. | Phase 02 — canonical contract | Tests cover all 25 task/profile decisions and explicit planned/executed/skipped components. | Closed |
 | REFL-001 | High | Verified fact | QA reflection adapter emits only `ABSTAIN` or `NO_ACTION`; controller accepts only revised-query actions (`reflection/reasoning_reflection_adapter.py:17-21`; `reasoning/controller.py:83-109`). | Phase 04 — bounded reasoning | A low-confidence test demonstrates one advised query and a bounded second retrieval. | Open |
 | REFL-002 | High | Verified fact | Workflow reflection records a decision but cannot retrieve/replan/correct. | Phase 04 — bounded reasoning | State-machine tests prove bounded retry, terminal success and retry exhaustion. | Open |
@@ -18,19 +18,21 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 02. `Open` means verified d
 | MEM-001 | Medium | Verified fact | Procedural memory is absent from `MemoryType`. | Phase 05 — memory/graph | Contract and repository tests prove procedural storage/retrieval, or the target is explicitly retired. | Open |
 | MEM-002 | High | Verified fact | Runtime defaults to `InMemoryMemoryRepository` (`runtime/prima_runtime.py:50`), despite persistence claims. | Phase 05 — memory/graph | Default/deployed configuration test proves the documented store; tests inject in-memory explicitly. | Open |
 | RETR-001 | Medium | Verified fact | Reranker defaults to lexical scoring; cross-encoder is optional and load failure silently falls back (`memory/retrieval/reranker.py:35-100`). | Phase 05 — memory/graph | Diagnostics contract test identifies requested/actual reranker and fallback reason. | Open |
-| DIAG-001 | High | Verified fact | Canonical results omit activated/skipped subsystems; richer QA diagnostics helper is unused; QA log hard-codes zero latency/false reflection. | Phase 06 — diagnostics | Every route returns schema-versioned phase/call/latency/fallback diagnostics verified against spies. | Open |
-| BENCH-001 | Critical | Verified fact | HotpotQA, LoCoMo and GoEmotions exercise different boundaries; GoEmotions never enters `PrimaRuntime`. | Phase 07 — benchmarks | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
+| DIAG-001 | High | Verified fact | Canonical results now identify planned/executed/skipped components, but complete per-phase latency/fallback proof remains absent. | Phase 06 — diagnostics | Every route returns schema-versioned phase/call/latency/fallback diagnostics verified against spies. | Open |
+| BENCH-001 | Critical | Verified fact | HotpotQA/LoCoMo compatibility calls now converge on `execute`; GoEmotions still uses benchmark-local classifier/LLM systems. | Phase 07 — benchmarks | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
 | BENCH-002 | Medium | Verified fact | Hotpot `checkpoint_every` is ignored, only Hotpot resumes, and checkpoint/manifest JSON lacks schema versions. | Phase 07 — benchmarks | Resume/cadence tests cover all supported runners and reject incompatible schema versions. | Open |
 | BENCH-003 | High | Verified fact | Current results cannot be attributed to one complete wrapper; Hotpot uses supplied context and GoEmotions classifier variants do not measure Qwen-wrapper uplift. | Phase 07 — benchmarks | Reports identify exact route/profile/components/data regime and prohibit unsupported attribution text. | Open |
 | CFG-001 | Medium | Verified fact | `pyproject.toml` targeted Python 3.10 and mypy used blanket `ignore_errors`. | Phase 01 — quality gates | CI/Ruff/mypy target 3.12; strict core modules pass without `ignore_errors`. | Closed |
 | DOC-001 | Medium | Verified fact | README’s single-workflow and persistence claims exceed current reachability/defaults. | Phase 08 — tooling/docs | Documentation assertions match executable architecture tests and deployed defaults. | Open |
 | GATE-001 | Medium | Verified fact | Literal `compileall -q .` traversed external/venv sources and failed outside owned code. | Phase 01 — quality gates | Python 3.12 owned-source compile gate explicitly excludes Git, venv and external trees and passes. | Closed |
 | GATE-002 | Medium | Verified fact | Raw `xenon .` descended into non-production trees and did not finish within three minutes; the existing runner also included benchmark/evaluation roots. | Phase 02 — quality gates | CI/rules use `scripts/run_xenon.py`; a test proves its allowlist contains only production PRIMA roots. | Closed |
+| GATE-003 | Medium | Verified fact | Long-horizon smoke tests hard-coded `PrimaRuntime()` and incurred unavailable-provider retries on every turn after real generation was enabled. | Phase 03 — workflow convergence | Evaluation runner accepts a runtime factory; smoke tests inject a deterministic client and complete without provider calls. | Closed |
 | DEP-001 | High | Verified fact | Runtime, development, benchmark, semantic-metric and encoder dependencies were mixed in one default requirements file. | Phase 01 — quality gates | Five explicit dependency groups exist; default install excludes semantic metrics and encoder/training extras. | Closed |
 | METRIC-001 | High | Verified fact | LoCoMo imported ROUGE and BERTScore packages during normal evaluation, making optional metrics implicit test requirements. | Phase 01 — quality gates | Internal ROUGE-L is deterministic; BERTScore is opt-in and missing packages return explicit status. | Closed |
 | HYGIENE-001 | Medium | Verified fact | Generated caches could pollute recursive gates; source-tracking policy was not executable. | Phase 01 — quality gates | Test proves cache paths are ignored and no cache artifact is tracked by the main repository. | Closed |
 | LINT-001 | Low | Verified fact | Ruff globally exempted silent exception handling, exception chaining and compact-statement rules. | Phase 01 — quality gates | Five broad exemptions are removed or narrowed; remaining Python-upgrade deferrals are documented by rule. | Closed |
 | CONTRACT-001 | Critical | Verified fact | No versioned typed canonical request/response API or serialization contract existed. | Phase 02 — canonical contract | Request/response JSON round trips; unknown/invalid input is rejected; async API returns typed response. | Closed |
+| OUTCOME-001 | High | Verified fact | Runtime results lacked typed semantic outcomes independent of lifecycle status. | Phase 03 — execution/output | Tests prove answered, abstained, failed, ingested, classified and cancelled outcomes. | Closed |
 | ROUTE-002 | High | Verified fact | No authoritative validity decision existed for every task/profile combination. | Phase 02 — canonical contract | Route matrix has 25 deterministic cells, nine valid plans and sixteen explicit rejections. | Closed |
 | SYNC-001 | High | Verified fact | Sync entry points could call `asyncio.run` without an explicit active-loop contract. | Phase 02 — canonical contract | `execute_sync` works without a loop and directs active-loop callers to await `execute`. | Closed |
 
@@ -38,10 +40,9 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 02. `Open` means verified d
 
 | Later phase | Finding IDs |
 |---|---|
-| Later workflow-migration phase | ARCH-001 closure, ARCH-004 |
 | Phase 01 — quality gates | CFG-001, GATE-001, DEP-001, METRIC-001, HYGIENE-001, LINT-001 |
 | Phase 02 — canonical contract | ARCH-001 (partial), ROUTE-001, CONTRACT-001, ROUTE-002, SYNC-001, GATE-002 |
-| Phase 03 — execution/output | ARCH-002, ARCH-003 |
+| Phase 03 — execution/output | ARCH-001, ARCH-002, ARCH-003, ARCH-004, OUTCOME-001, GATE-003 |
 | Phase 04 — bounded reasoning | REFL-001, REFL-002, SUBSYS-002, SUBSYS-003 |
 | Phase 05 — memory/graph | SUBSYS-001, SUBSYS-004, MEM-001, MEM-002, RETR-001 |
 | Phase 06 — diagnostics | DIAG-001 |

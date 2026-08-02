@@ -21,16 +21,23 @@ from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
-from memory.retrieval.retrieval_request import RetrievalRequest
-from reasoning.config import reasoning_budget
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
-from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
+from reasoning.models import (
+    AnswerResult,
+    EvidenceItem,
+    ReasoningBudget,
+    ReasoningMode,
+    SufficiencyStatus,
+)
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.contracts import (
     ComponentCapability,
+    EvidenceReference,
+    ExecutionOutcome,
+    ExecutionProfile,
     ExecutionStatus,
     PrimaRequest,
     PrimaResponse,
@@ -44,7 +51,9 @@ from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 from workflow.execution_context import ExecutionContext
+from workflow.orchestration_engine import WorkflowExecutionError
 from workflow.prima_workflow import PrimaWorkflow
+from workflow.workflow_state import WorkflowPhase, WorkflowStatus
 
 
 class PrimaRuntime:
@@ -56,6 +65,7 @@ class PrimaRuntime:
         memory_repository: MemoryRepository | None = None,
         affect_engine: DynamicAffectEngine | None = None,
         reflection_engine: ReflectionEngine | None = None,
+        llm_client: LLMClient | None = None,
         log_path: str | Path = "logs/runtime.log",
     ) -> None:
         self.memory_repository = memory_repository or InMemoryMemoryRepository()
@@ -69,21 +79,22 @@ class PrimaRuntime:
         self.reasoning_controller = ReasoningController(
             reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
         )
+        self.llm_client = llm_client or LLMClient(
+            provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama")
+        )
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
             reflection_engine=self.reflection_engine,
+            reasoning_controller=self.reasoning_controller,
+            llm_client=self.llm_client,
+            memory_repository=self.memory_repository,
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
 
     async def execute(self, request: PrimaRequest) -> PrimaResponse:
-        """Validate and route one canonical request through the typed boundary.
-
-        Phase 02 executes only the ingestion and affect-only short routes. Other
-        valid routes return ``NOT_IMPLEMENTED`` until workflow migration phases
-        can prove each selected component call.
-        """
+        """Execute one typed request through the workflow-owned lifecycle."""
 
         if not isinstance(request, PrimaRequest):
             raise TypeError("request must be a PrimaRequest")
@@ -95,64 +106,29 @@ class PrimaRuntime:
                 task_kind=request.task_kind,
                 profile=request.profile,
                 status=ExecutionStatus.REJECTED,
+                outcome=ExecutionOutcome.FAILED,
                 diagnostics=_invalid_route_diagnostics(str(exc)),
                 errors=(str(exc),),
             )
-
-        if request.task_kind is TaskKind.DOCUMENT_INGESTION:
-            note = self.ingest_document(request.input_text, metadata=request.metadata)
-            ingestion_executed = (
-                RuntimeComponent.POLICY_ROUTER,
-                RuntimeComponent.DOCUMENT_ENCODER,
-                RuntimeComponent.MEMORY_INDEX,
-                RuntimeComponent.MEMORY_COMMIT,
-                RuntimeComponent.STATE_COMMIT,
-                RuntimeComponent.OUTPUT_SHAPER,
-            )
-            return PrimaResponse(
-                request_id=request.request_id,
-                task_kind=request.task_kind,
-                profile=request.profile,
-                status=ExecutionStatus.COMPLETED,
-                output_data={"memory_id": note.id},
-                state_delta=StateDelta(changes={"memory_ids_added": [note.id]}),
-                diagnostics=_route_diagnostics(route, ingestion_executed),
-            )
-
-        if request.task_kind is TaskKind.EMOTION_CLASSIFICATION:
-            update = self.affect_engine.process(request.input_text)
-            profile = update.profile
-            emotion_executed = (
-                RuntimeComponent.POLICY_ROUTER,
-                RuntimeComponent.EMOTION_CLASSIFIER,
-                RuntimeComponent.AFFECT_ENGINE,
-                RuntimeComponent.STATE_COMMIT,
-                RuntimeComponent.OUTPUT_SHAPER,
-            )
-            return PrimaResponse(
-                request_id=request.request_id,
-                task_kind=request.task_kind,
-                profile=request.profile,
-                status=ExecutionStatus.COMPLETED,
-                output_data={
-                    "dominant_emotion": profile.dominant_emotion,
-                    "confidence": profile.confidence,
-                    "emotions": dict(profile.emotions),
-                },
-                state_delta=StateDelta(changes={"emotional_state": update.emotional_state.to_dict()}),
-                diagnostics=_route_diagnostics(route, emotion_executed),
-            )
-
-        return PrimaResponse(
-            request_id=request.request_id,
-            task_kind=request.task_kind,
-            profile=request.profile,
-            status=ExecutionStatus.NOT_IMPLEMENTED,
-            diagnostics=_route_diagnostics(
-                route,
-                (RuntimeComponent.POLICY_ROUTER,),
-                note="Execution migration is deferred; existing public methods remain operational.",
-            ),
+        started = time.perf_counter()
+        execution_context = ExecutionContext(
+            user_input=request.input_text,
+            metadata={
+                **request.metadata,
+                "task_kind": request.task_kind.value,
+                "profile": request.profile.value,
+                "session_id": request.session_id or "",
+            },
+        )
+        try:
+            execution_context = await self.workflow.run(request.input_text, execution_context)
+        except WorkflowExecutionError as exc:
+            execution_context = exc.context
+        return self._response_from_execution(
+            request,
+            route,
+            execution_context,
+            round((time.perf_counter() - started) * 1000, 3),
         )
 
     def execute_sync(self, request: PrimaRequest) -> PrimaResponse:
@@ -186,6 +162,9 @@ class PrimaRuntime:
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
                 reflection_engine=self.reflection_engine,
+                reasoning_controller=self.reasoning_controller,
+                llm_client=self.llm_client,
+                memory_repository=self.memory_repository,
             )
 
     def answer_question(
@@ -201,65 +180,51 @@ class PrimaRuntime:
         max_hops: int | None = None,
         diagnostics: bool = False,
     ) -> AnswerResult:
-        """Answer through the canonical bounded evidence-acquisition controller."""
+        """Compatibility adapter for factual QA through :meth:`execute`."""
 
-        started = time.perf_counter()
-        top_k = int(top_k) if top_k else int(os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
-        max_context_tokens = int(max_context_tokens) if max_context_tokens else int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
         mode = ReasoningMode.DIAGNOSTIC if diagnostics else configured_reasoning_mode(reasoning_mode)
-        request = ReasoningRequest(
-            question=question,
-            session_id=session_id or (context.session_id if context is not None else ""),
-            mode=mode,
-            budget=reasoning_budget(max_hops=max_hops, max_context_tokens=max_context_tokens),
+        response = self.execute_sync(
+            PrimaRequest(
+                task_kind=TaskKind.FACTUAL_QA,
+                profile=ExecutionProfile.PRIMA_FULL,
+                input_text=question,
+                session_id=session_id or (context.session_id if context is not None else None),
+                metadata={
+                    "top_k": int(top_k) if top_k is not None else int(os.getenv("PRIMA_RETRIEVAL_TOP_K", "5")),
+                    "provider": provider or "",
+                    "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+                    "max_context_tokens": (
+                        int(max_context_tokens)
+                        if max_context_tokens is not None
+                        else int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
+                    ),
+                    "max_hops": int(max_hops or 3),
+                    "reasoning_mode": mode.value,
+                },
+            )
         )
-        result = self.reasoning_controller.answer(
-            request,
-            retrieve=lambda query: self.retrieval_controller.retrieve(RetrievalRequest(query=query, top_k=top_k)),
-            synthesize=lambda prompt, evidence: self._synthesize_evidence(
-                prompt, evidence, provider=provider, model=model, max_context_tokens=max_context_tokens
-            ),
-        )
-        result.answer_diagnostics.update(
-            {
-                "question": question,
-                "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
-                "retrieved_memories": [
-                    {
-                        "id": item.source_id,
-                        "text": item.text,
-                        "retrieval_score": item.retrieval_score,
-                    }
-                    for item in result.evidence_references
-                ],
-                "retrieval_scores": [item.retrieval_score for item in result.evidence_references],
-                "retrieval_confidence": result.confidence,
-                "latency_ms": round((time.perf_counter() - started) * 1000, 3),
-                "errors": list(result.errors),
-                "embedding": current_embedding_metadata(),
-            }
-        )
+        result = self._answer_result_from_response(response)
         if context is not None:
             context.retrieved_memories = result.retrieved_memories
             context.confidence_score = result.confidence
-        self._log_answer(question, {
-            "retrieved_memory_ids": [item.source_id for item in result.evidence_references],
-            "context_length": result.answer_diagnostics.get("context_tokens", 0),
-            "llm_used": result.answer_diagnostics.get("llm_used", False),
-            "latency_ms": 0.0,
-            "reflection_used": False,
-            "provider": result.answer_diagnostics.get("provider", ""),
-            "model": result.answer_diagnostics.get("model", ""),
-            "errors": list(result.errors),
-        })
         return result
 
     def ingest_document(self, text: str, metadata: dict[str, Any] | None = None) -> MemoryNote:
-        """Store one caller-supplied document through the public runtime boundary."""
-        if not str(text).strip():
-            raise ValueError("Document text must not be empty.")
-        note = MemoryNote.create(content=str(text), memory_type=MemoryType.SEMANTIC, context={"source": "document_ingestion", **dict(metadata or {})})
-        return self.memory_repository.add(note)
+        """Compatibility adapter for workflow-owned document ingestion."""
+
+        response = self.execute_sync(
+            PrimaRequest(
+                task_kind=TaskKind.DOCUMENT_INGESTION,
+                profile=ExecutionProfile.INGESTION_ONLY,
+                input_text=text,
+                metadata={"document_metadata": dict(metadata or {})},
+            )
+        )
+        memory_id = str(response.output_data.get("memory_id", ""))
+        note = self.memory_repository.get(memory_id) if memory_id else None
+        if note is None:
+            raise RuntimeError("Document ingestion did not commit a memory.")
+        return note
 
     def _synthesize_evidence(
         self,
@@ -395,35 +360,206 @@ class PrimaRuntime:
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
-        """Process one user input through the integrated workflow."""
-        return asyncio.run(self.process_async(user_input=user_input, context=context))
+        """Compatibility adapter for a synchronous canonical conversation."""
+
+        response = self.execute_sync(self._conversation_request(user_input, context))
+        result = self._runtime_result_from_response(response)
+        self._update_compatibility_context(context, result)
+        return result
 
     async def process_async(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
-        """Async runtime entry point for callers that already own an event loop."""
-        start = time.perf_counter()
-        runtime_context = context or RuntimeContext()
-        errors: list[str] = []
-        execution_context = ExecutionContext(
-            user_input=user_input,
-            cognitive_state=runtime_context.cognitive_state,
-            metadata={"session_id": runtime_context.session_id, "turn_id": runtime_context.turn_id},
+        """Compatibility adapter for an asynchronous canonical conversation."""
+
+        response = await self.execute(self._conversation_request(user_input, context))
+        result = self._runtime_result_from_response(response)
+        self._update_compatibility_context(context, result)
+        return result
+
+    def _conversation_request(self, user_input: str, context: RuntimeContext | None) -> PrimaRequest:
+        return PrimaRequest(
+            task_kind=TaskKind.CONVERSATION,
+            profile=ExecutionProfile.PRIMA_FULL,
+            input_text=user_input,
+            session_id=context.session_id if context is not None else None,
+            metadata={
+                "turn_id": context.turn_id if context is not None else "",
+                "model": os.getenv("PRIMA_LLM_MODEL", ""),
+            },
         )
 
-        try:
-            execution_context = await self.workflow.run(user_input, execution_context)
-            created_notes, admission_decision = self._persist_turn_memory(user_input, execution_context, runtime_context)
-        except Exception as exc:
-            errors.append(str(exc))
-            execution_context.workflow_state.errors.append(str(exc))
-            created_notes = ()
-            admission_decision = None
+    def _response_from_execution(
+        self,
+        request: PrimaRequest,
+        route: RoutePlan,
+        context: ExecutionContext,
+        latency_ms: float,
+    ) -> PrimaResponse:
+        output = context.output if isinstance(context.output, dict) else {}
+        workflow_status = context.workflow_state.status
+        if workflow_status is WorkflowStatus.CANCELLED:
+            outcome = ExecutionOutcome.CANCELLED
+            status = ExecutionStatus.CANCELLED
+        elif workflow_status is WorkflowStatus.FAILED:
+            outcome = ExecutionOutcome.FAILED
+            status = ExecutionStatus.FAILED
+        else:
+            try:
+                outcome = ExecutionOutcome(str(output.get("outcome", "failed")))
+            except ValueError:
+                outcome = ExecutionOutcome.FAILED
+            status = ExecutionStatus.FAILED if outcome is ExecutionOutcome.FAILED else ExecutionStatus.COMPLETED
 
-        latency_ms = round((time.perf_counter() - start) * 1000, 3)
-        result = self._build_result(execution_context, created_notes, latency_ms, tuple(errors), admission_decision)
-        metrics = self.metrics_from_result(result, execution_context)
-        self._update_runtime_context(runtime_context, execution_context, result)
-        self._log_turn(user_input, result, metrics)
-        return result
+        reasoning = context.reasoning_result if isinstance(context.reasoning_result, AnswerResult) else None
+        evidence = tuple(
+            EvidenceReference(
+                source_id=item.source_id,
+                text=item.text,
+                score=item.retrieval_score,
+                metadata={"hop": item.hop, "query": item.query, "provenance": dict(item.provenance)},
+            )
+            for item in (reasoning.evidence_references if reasoning is not None else ())
+        )
+        affect_state = (
+            context.affect_update.profile.to_dict()
+            if context.affect_update is not None and hasattr(context.affect_update.profile, "to_dict")
+            else {}
+        )
+        created_ids = [note.id for note in context.memory_notes_created if isinstance(note, MemoryNote)]
+        generation = context.generation_result
+        generation_errors = tuple(str(error) for error in getattr(generation, "errors", ()))
+        errors = tuple(dict.fromkeys((*context.workflow_state.errors, *generation_errors)))
+        ingestion_id = str(getattr(context.ingestion_result, "memory_id", ""))
+        if ingestion_id:
+            created_ids.append(ingestion_id)
+        state_changes: dict[str, Any] = {}
+        if created_ids:
+            state_changes["memory_ids_added"] = created_ids
+        if context.affect_update is not None:
+            state_changes["emotional_state"] = context.affect_update.emotional_state.to_dict()
+        output_data: dict[str, Any] = {
+            "latency_ms": latency_ms,
+            "affect_state": affect_state,
+            "memory_ids_created": created_ids,
+            "memory_admission": (
+                context.memory_admission.to_log_record() if context.memory_admission is not None else {}
+            ),
+            "confidence": float(reasoning.confidence if reasoning is not None else self._confidence_score(context)),
+            "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
+            "reflection_reasons": [
+                dict(reason) for reason in getattr(context.reflection_result, "trigger_reasons", ())
+            ],
+            "generation": generation.to_dict() if generation is not None else {},
+        }
+        if reasoning is not None:
+            output_data.update(
+                {
+                    "sufficiency_status": reasoning.status.value,
+                    "hop_count": reasoning.hop_count,
+                    "stop_reason": reasoning.stop_reason,
+                    "effective_budget": reasoning.effective_budget.to_dict(),
+                    "reasoning_errors": list(reasoning.errors),
+                }
+            )
+        if ingestion_id:
+            output_data["memory_id"] = ingestion_id
+        if isinstance(output.get("classification"), dict):
+            output_data.update(output["classification"])
+        return PrimaResponse(
+            request_id=request.request_id,
+            task_kind=request.task_kind,
+            profile=request.profile,
+            status=status,
+            outcome=outcome,
+            output_text=str(output["text"]) if output.get("text") is not None else None,
+            output_data=output_data,
+            state_delta=StateDelta(changes=state_changes),
+            evidence=evidence,
+            diagnostics=_route_diagnostics(route, _executed_components(context)),
+            errors=errors,
+        )
+
+    def _answer_result_from_response(self, response: PrimaResponse) -> AnswerResult:
+        if response.outcome is ExecutionOutcome.FAILED:
+            sufficiency = SufficiencyStatus.ERROR
+        elif response.outcome is ExecutionOutcome.ABSTAINED:
+            sufficiency = SufficiencyStatus.UNANSWERABLE
+        else:
+            raw_status = str(response.output_data.get("sufficiency_status", SufficiencyStatus.SUFFICIENT.value))
+            sufficiency = SufficiencyStatus(raw_status)
+        items: list[EvidenceItem] = []
+        for index, evidence in enumerate(response.evidence):
+            note = self.memory_repository.get(evidence.source_id)
+            retrieval_result = None
+            if note is not None:
+                from memory.retrieval.retrieval_result import RetrievalResult
+
+                retrieval_result = RetrievalResult(note, float(evidence.score or 0.0))
+            items.append(
+                EvidenceItem(
+                    evidence_id=f"compat_{index}",
+                    text=evidence.text,
+                    source_id=evidence.source_id,
+                    source_type="memory",
+                    retrieval_score=float(evidence.score or 0.0),
+                    hop=int(evidence.metadata.get("hop", 0)),
+                    query=str(evidence.metadata.get("query", "")),
+                    provenance=dict(evidence.metadata.get("provenance", {})),
+                    result=retrieval_result,
+                )
+            )
+        budget_data = dict(response.output_data.get("effective_budget", {}))
+        budget = ReasoningBudget(
+            max_hops=int(budget_data.get("max_hops", 3)),
+            max_retrieval_calls=int(budget_data.get("max_retrieval_calls", 3)),
+            max_llm_calls=int(budget_data.get("max_llm_calls", 4)),
+            max_documents=int(budget_data.get("max_documents", 12)),
+            max_context_tokens=int(budget_data.get("max_context_tokens", 1600)),
+        )
+        return AnswerResult(
+            answer=response.output_text or "",
+            status=sufficiency,
+            confidence=float(response.output_data.get("confidence", 0.0)),
+            evidence_references=tuple(items),
+            hop_count=int(response.output_data.get("hop_count", 0)),
+            stop_reason=str(response.output_data.get("stop_reason", response.outcome.value if response.outcome else "failed")),
+            effective_budget=budget,
+            errors=response.errors,
+            answer_diagnostics={
+                **dict(response.output_data),
+                "runtime_diagnostics": response.diagnostics.model_dump(mode="json"),
+            },
+        )
+
+    def _runtime_result_from_response(self, response: PrimaResponse) -> RuntimeResult:
+        answer = self._answer_result_from_response(response)
+        created_notes = tuple(
+            note
+            for memory_id in response.output_data.get("memory_ids_created", [])
+            if (note := self.memory_repository.get(str(memory_id))) is not None
+        )
+        return RuntimeResult(
+            final_response=response.output_text or "",
+            prediction_before_reflection=response.output_text or "",
+            prediction_after_reflection=response.output_text or "",
+            affect_state=dict(response.output_data.get("affect_state", {})),
+            retrieved_memories=answer.retrieved_memories,
+            memory_notes_created=created_notes,
+            reflection_triggered=bool(response.output_data.get("reflection_triggered", False)),
+            confidence_score=float(response.output_data.get("confidence", 0.0)),
+            latency_ms=float(response.output_data.get("latency_ms", 0.0)),
+            errors=response.errors,
+            reflection_reasons=tuple(
+                dict(reason) for reason in response.output_data.get("reflection_reasons", [])
+            ),
+            memory_admission=dict(response.output_data.get("memory_admission", {})),
+            answer_diagnostics=answer.answer_diagnostics,
+        )
+
+    def _update_compatibility_context(self, context: RuntimeContext | None, result: RuntimeResult) -> None:
+        if context is None:
+            return
+        context.retrieved_memories = result.retrieved_memories
+        context.confidence_score = result.confidence_score
 
     def metrics_from_result(self, result: RuntimeResult, execution_context: ExecutionContext | None = None) -> RuntimeMetrics:
         """Create serializable metrics for a runtime result."""
@@ -484,9 +620,9 @@ class PrimaRuntime:
         confidence_score = self._confidence_score(execution_context)
         workflow_errors = tuple(str(error) for error in execution_context.workflow_state.errors)
         return RuntimeResult(
-            final_response=str(output.get("text") or execution_context.user_input),
-            prediction_before_reflection=str(output.get("text") or execution_context.user_input),
-            prediction_after_reflection=str(output.get("text") or execution_context.user_input),
+            final_response=str(output.get("text") or ""),
+            prediction_before_reflection=str(output.get("text") or ""),
+            prediction_after_reflection=str(output.get("text") or ""),
             affect_state=(affect_update.profile.to_dict() if (affect_update is not None and hasattr(affect_update, "profile") and hasattr(affect_update.profile, "to_dict")) else {}),
             retrieved_memories=tuple(getattr(retrieval_response, "results", ())),
             memory_notes_created=created_notes,
@@ -558,15 +694,8 @@ class PrimaRuntime:
         )
 
     def _insufficient_information_answer(self, question: str, reason: str) -> str:
-        return json.dumps(
-            {
-                "answer": None,
-                "insufficient_information": True,
-                "reason": reason,
-                "question": question,
-            },
-            sort_keys=True,
-        )
+        del question, reason
+        return "I do not have sufficient evidence to answer this question."
 
     def _answer_diagnostics(
         self,
@@ -728,8 +857,22 @@ def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
 
 _CANONICAL_AVAILABLE = {
     RuntimeComponent.INPUT_PARSER,
+    RuntimeComponent.TASK_SCHEDULER,
+    RuntimeComponent.STATE_MANAGER,
     RuntimeComponent.POLICY_ROUTER,
+    RuntimeComponent.EXECUTION_DISPATCHER,
     RuntimeComponent.AFFECT_ENGINE,
+    RuntimeComponent.QUERY_REWRITER,
+    RuntimeComponent.DENSE_RETRIEVAL,
+    RuntimeComponent.SPARSE_RETRIEVAL,
+    RuntimeComponent.TEMPORAL_RETRIEVAL,
+    RuntimeComponent.FUSION,
+    RuntimeComponent.RERANKER,
+    RuntimeComponent.CONFIDENCE_ESTIMATOR,
+    RuntimeComponent.PLANNER,
+    RuntimeComponent.REFLECTION,
+    RuntimeComponent.MODEL_EXECUTOR,
+    RuntimeComponent.OUTPUT_VALIDATOR,
     RuntimeComponent.DOCUMENT_ENCODER,
     RuntimeComponent.EMOTION_CLASSIFIER,
     RuntimeComponent.OUTPUT_SHAPER,
@@ -737,6 +880,50 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.MEMORY_INDEX,
     RuntimeComponent.MEMORY_COMMIT,
 }
+
+
+def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, ...]:
+    executed = {
+        RuntimeComponent.INPUT_PARSER,
+        RuntimeComponent.TASK_SCHEDULER,
+        RuntimeComponent.STATE_MANAGER,
+        RuntimeComponent.POLICY_ROUTER,
+        RuntimeComponent.EXECUTION_DISPATCHER,
+    }
+    completed = set(context.workflow_state.completed_phases)
+    if WorkflowPhase.AFFECT in completed:
+        executed.update((RuntimeComponent.EMOTION_CLASSIFIER, RuntimeComponent.AFFECT_ENGINE))
+    if WorkflowPhase.EVIDENCE_ACQUISITION in completed:
+        executed.update(
+            (
+                RuntimeComponent.QUERY_REWRITER,
+                RuntimeComponent.DENSE_RETRIEVAL,
+                RuntimeComponent.SPARSE_RETRIEVAL,
+                RuntimeComponent.TEMPORAL_RETRIEVAL,
+                RuntimeComponent.FUSION,
+                RuntimeComponent.RERANKER,
+                RuntimeComponent.CONFIDENCE_ESTIMATOR,
+            )
+        )
+    if WorkflowPhase.PLANNING in completed:
+        executed.add(RuntimeComponent.PLANNER)
+    if WorkflowPhase.REFLECTION in completed:
+        executed.add(RuntimeComponent.REFLECTION)
+    if WorkflowPhase.ANSWER_GENERATION in completed and bool(
+        getattr(context.generation_result, "llm_called", False)
+    ):
+        executed.update((RuntimeComponent.MODEL_EXECUTOR, RuntimeComponent.OUTPUT_VALIDATOR))
+    if WorkflowPhase.DOCUMENT_INGESTION in completed:
+        executed.update(
+            (RuntimeComponent.DOCUMENT_ENCODER, RuntimeComponent.MEMORY_INDEX, RuntimeComponent.MEMORY_COMMIT)
+        )
+    if WorkflowPhase.OUTPUT in completed:
+        executed.add(RuntimeComponent.OUTPUT_SHAPER)
+    if WorkflowPhase.MEMORY_COMMIT in completed:
+        executed.add(RuntimeComponent.MEMORY_COMMIT)
+    if completed:
+        executed.add(RuntimeComponent.STATE_COMMIT)
+    return tuple(component for component in RuntimeComponent if component in executed)
 
 
 def _route_diagnostics(

@@ -13,10 +13,14 @@ class WorkflowPhase(str, Enum):
     INPUT = "input"
     AFFECT = "affect"
     MEMORY_RETRIEVAL = "memory_retrieval"
+    EVIDENCE_ACQUISITION = "evidence_acquisition"
     PLANNING = "planning"
     REFLECTION = "reflection"
     ACTION = "action"
+    ANSWER_GENERATION = "answer_generation"
+    DOCUMENT_INGESTION = "document_ingestion"
     OUTPUT = "output"
+    MEMORY_COMMIT = "memory_commit"
 
 
 class WorkflowStatus(str, Enum):

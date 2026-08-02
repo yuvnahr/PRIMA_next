@@ -33,7 +33,8 @@ All public models live in `runtime/contracts.py` and reject unknown fields.
 | `PrimaResponse` | Versioned status, output, state delta, evidence, diagnostics and errors. |
 | `TaskKind` | Conversation, factual QA, document ingestion, emotion classification or tool request. |
 | `ExecutionProfile` | Model only, simple RAG, full PRIMA, affect only or ingestion only. |
-| `ExecutionStatus` | Completed, not implemented, rejected or failed. |
+| `ExecutionStatus` | Completed, not implemented, rejected, failed or cancelled lifecycle state. |
+| `ExecutionOutcome` | Answered, abstained, failed, ingested, classified or cancelled semantic result. |
 | `ComponentCapability` | Whether a component is callable through the canonical boundary and why. |
 | `StateDelta` | Serializable committed state changes. |
 | `EvidenceReference` | Runtime evidence only; never benchmark gold/supporting-fact data. |
@@ -72,9 +73,9 @@ Every one of the 25 combinations has a deterministic decision. `invalid` combina
 - Every component not actually called appears in `RuntimeDiagnostics.skipped_components`.
 - Benchmark packages may construct requests but production runtime packages never import benchmark modules.
 
-## Phase 02 migration state
+## Phase 03 migration state
 
-The canonical boundary currently executes only `ingestion_only` and `affect_only`, using the established memory and affect implementations. Other valid routes return `ExecutionStatus.NOT_IMPLEMENTED`; their diagnostics contain the route plan and record only policy routing as executed. This prevents the contract from overstating orchestration before later phases migrate it.
+All nine valid task/profile combinations now enter a workflow-owned route. Conversation and factual QA use the injected answer-generation controller; retrieval-enabled routes place `ReasoningController` inside the workflow as bounded evidence acquisition. Ingestion validates/indexes without generation, and affect-only classification skips QA phases. World simulation, uncertainty transitions, graph activation, bounded correction and maintenance-event consumers remain later-phase work and stay explicitly skipped in diagnostics.
 
 ## Final ownership of the target diagram
 
@@ -154,4 +155,4 @@ Arrow ownership is also fixed: synchronous/hot-path arrows are workflow calls; d
 - Invalid task/profile combinations fail deterministically before subsystem work.
 - A class existing or a route selecting it never counts as execution; diagnostics must record calls.
 - Full PRIMA, reflection loops, world simulation, uncertainty transitions and maintenance scheduling remain future phases.
-- Benchmark metrics and current benchmark adapters are unchanged in Phase 02.
+- Benchmark metrics remain unchanged in Phase 03; benchmark-specific adapter migration remains Phase 07.

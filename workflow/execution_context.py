@@ -21,9 +21,14 @@ class ExecutionContext:
     workflow_state: WorkflowState = field(default_factory=WorkflowState)
     affect_update: Any | None = None
     retrieval_response: Any | None = None
+    reasoning_result: Any | None = None
     plan: Any | None = None
     reflection_result: Any | None = None
     action_result: Any | None = None
+    generation_result: Any | None = None
+    ingestion_result: Any | None = None
+    memory_notes_created: tuple[Any, ...] = ()
+    memory_admission: Any | None = None
     output: Any | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
