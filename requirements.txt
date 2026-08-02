@@ -1,41 +1,5 @@
-numpy>=1.24
-chromadb>=0.5
-networkx>=3.2
-sentence-transformers>=2.7
-einops>=0.7
-spacy>=3.7
-
-# Optional compatibility/runtime dependencies for the legacy DistilBERT benchmark path:
-# pandas>=2.0
-# torch>=2.0
-# transformers>=4.40
-# scikit-learn>=1.4
-# faiss-cpu>=1.8
-
-# Optional legacy Reflexion benchmark dependencies:
-# langchain>=0.1.0
-# langchain-core>=0.1.0
-# langchain-community>=0.0.20
-# langchain-groq>=0.0.1
-# langgraph>=0.0.40
-# wikipedia>=1.4.0
-# beautifulsoup4>=4.12.0
-# python-dotenv>=1.0.0
-
-# Benchmark figures:
-matplotlib>=3.8
-
-# Development/rule-set checks:
-pytest==9.1.1
-ruff==0.15.18
-xenon==0.9.3
-mypy==2.1.0
-bandit==1.9.4
-requests>=2.28
-pydantic>=2.0
-pydantic-settings>=2.0
-bert-score>=0.3.13
-nltk>=3.8
-rouge>=1.0.1
-opentelemetry-api>=1.22.0
-opentelemetry-sdk>=1.22.0
+# Default contributor/CI environment. Optional metrics and encoder training are
+# intentionally excluded; install their requirement files only when needed.
+-r requirements-core.txt
+-r requirements-benchmark.txt
+-r requirements-dev.txt

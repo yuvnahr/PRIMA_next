@@ -13,7 +13,7 @@ class StoppingPolicy:
         if decision.status is SufficiencyStatus.SUFFICIENT:
             return "sufficient"
         if decision.status in {SufficiencyStatus.AMBIGUOUS, SufficiencyStatus.CONTRADICTORY, SufficiencyStatus.UNANSWERABLE, SufficiencyStatus.ERROR}:
-            return decision.status.value
+            return str(decision.status.value)
         if time() - state.started_at >= budget.time_budget_seconds:
             return "time_budget"
         if state.retrieval_calls >= budget.max_retrieval_calls:

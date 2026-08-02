@@ -18,10 +18,6 @@ jobs:
   quality-checks:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: ["3.10"]
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,13 +25,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -44,17 +40,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Report Optional Capabilities
+        run: python -m benchmarks.preflight --json
+
+      - name: Compile Owned Python Sources
+        run: python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
+
       - name: Run Pytest
-        run: pytest -v
+        run: python -m pytest -q
 
       - name: Run Ruff
-        run: ruff check .
+        run: python -m ruff check .
 
       - name: Run Xenon
         run: python scripts/run_xenon.py
 
       - name: Run MyPy
-        run: mypy .
+        run: python -m mypy .
 
       - name: Run Bandit
-        run: bandit -q -c bandit.yaml -r .
+        run: python -m bandit -q -c bandit.yaml -r .

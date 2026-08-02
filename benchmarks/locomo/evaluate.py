@@ -15,12 +15,16 @@ from typing import Any
 from benchmarks.common.interfaces import BenchmarkEvaluator, RunnerResult
 from benchmarks.common.metrics import mean
 from benchmarks.locomo.config import OUTPUT_PATH
+from benchmarks.preflight import missing_modules
 
 TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
 
 
 class LoCoMoEvaluator(BenchmarkEvaluator):
     """Compute lightweight LoCoMo metrics from runner results."""
+
+    def __init__(self, *, include_bertscore: bool = False) -> None:
+        self.include_bertscore = include_bertscore
 
     def evaluate(self, results: Iterable[RunnerResult]) -> dict[str, Any]:
         """Compute metrics without loading data or touching agent internals."""
@@ -31,10 +35,13 @@ class LoCoMoEvaluator(BenchmarkEvaluator):
         f1_scores = [f1_score(item.response.text, item.expected_answer or "") for item in answerable]
         bleu_scores = [bleu_score(item.response.text, item.expected_answer or "") for item in answerable]
         rouge_scores = [rouge_l_score(item.response.text, item.expected_answer or "") for item in answerable]
-        bert_scores = bert_scores_batch(
-            [item.response.text for item in answerable],
-            [item.expected_answer or "" for item in answerable],
-        )
+        bert_scores: list[float] = []
+        bertscore_status = "disabled"
+        if self.include_bertscore:
+            bert_scores, bertscore_status = bert_scores_batch(
+                [item.response.text for item in answerable],
+                [item.expected_answer or "" for item in answerable],
+            )
         diagnostics = [item.response.metadata.get("answer_diagnostics", {}) for item in items]
         latencies = [float(item.get("latency_ms", 0.0) or 0.0) for item in diagnostics]
         retrieved_counts = [len(item.get("retrieved_memory_ids", ())) for item in diagnostics]
@@ -52,7 +59,8 @@ class LoCoMoEvaluator(BenchmarkEvaluator):
             "f1": mean(f1_scores),
             "bleu": mean(bleu_scores),
             "rouge_l": mean(rouge_scores),
-            "bertscore": mean(bert_scores),
+            "bertscore": mean(bert_scores) if bert_scores else None,
+            "bertscore_status": bertscore_status,
             "latency_ms": mean(latencies),
             "average_retrieved_memories": mean(float(count) for count in retrieved_counts),
             "reflection_rate": mean(1.0 if flag else 0.0 for flag in reflection_flags),
@@ -325,22 +333,32 @@ def bleu_score(prediction: str, reference: str) -> float:
 
 
 def rouge_l_score(prediction: str, reference: str) -> float:
-    from rouge import Rouge
-
-    prediction = normalize_answer(prediction)
-    reference = normalize_answer(reference)
-    if not prediction or not reference:
+    pred_tokens = normalize_answer(prediction).split()
+    ref_tokens = normalize_answer(reference).split()
+    if not pred_tokens or not ref_tokens:
         return 0.0
-    return float(Rouge().get_scores(prediction, reference)[0]["rouge-l"]["f"])
+    previous = [0] * (len(ref_tokens) + 1)
+    for pred_token in pred_tokens:
+        current = [0]
+        for index, ref_token in enumerate(ref_tokens, start=1):
+            current.append(previous[index - 1] + 1 if pred_token == ref_token else max(previous[index], current[-1]))
+        previous = current
+    common = previous[-1]
+    precision = common / len(pred_tokens)
+    recall = common / len(ref_tokens)
+    return 2 * precision * recall / (precision + recall)
 
 
-def bert_scores_batch(predictions: list[str], references: list[str]) -> list[float]:
+def bert_scores_batch(predictions: list[str], references: list[str]) -> tuple[list[float], str]:
+    missing = missing_modules(("bert_score",))
+    if missing:
+        return [], f"unavailable: {', '.join(missing)}"
     if not predictions:
-        return []
+        return [], "available"
     from bert_score import score
 
     _, _, scores = score(predictions, references, lang="en", verbose=False, rescale_with_baseline=True, device="cpu")
-    return [max(0.0, float(value)) for value in scores]
+    return [max(0.0, float(value)) for value in scores], "available"
 
 
 def tokens(text: str) -> list[str]:

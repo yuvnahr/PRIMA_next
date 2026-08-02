@@ -203,8 +203,8 @@ def _sentence_transformers_available() -> bool:
 def _configured_dimensions() -> int:
     try:
         dimensions = int(os.getenv("PRIMA_EMBEDDING_DIMENSIONS", str(DEFAULT_DIMENSIONS)))
-    except ValueError:
-        raise ValueError("PRIMA_EMBEDDING_DIMENSIONS must be an integer")
+    except ValueError as exc:
+        raise ValueError("PRIMA_EMBEDDING_DIMENSIONS must be an integer") from exc
     if dimensions <= 0:
         raise ValueError("PRIMA_EMBEDDING_DIMENSIONS must be greater than zero")
     return dimensions

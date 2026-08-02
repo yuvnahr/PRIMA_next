@@ -46,6 +46,7 @@ def run_locomo_experiment(
     parallel_workers: int = PARALLEL_WORKERS,
     dataset_path: str | None = None,
     output_path: str | None = None,
+    include_bertscore: bool = False,
 ) -> dict[str, Any]:
     """Run LoCoMo at a configurable scale and write standard artifacts."""
 
@@ -98,7 +99,7 @@ def run_locomo_experiment(
         for conversation in conversations:
             results.extend(run_single_conversation(conversation, top_k, provider, model, log_path, report_progress))
 
-    metrics = LoCoMoEvaluator().evaluate(results)
+    metrics = LoCoMoEvaluator(include_bertscore=include_bertscore).evaluate(results)
     runtime_errors = sum(
         len(item.response.metadata.get("answer_diagnostics", {}).get("errors", ()))
         for item in results
@@ -173,6 +174,7 @@ def main() -> None:
     parser.add_argument("--dataset-path")
     parser.add_argument("--output-path", default=str(OUTPUT_PATH))
     parser.add_argument("--clean-output", action="store_true")
+    parser.add_argument("--bertscore", action="store_true", help="enable the optional BERTScore metric")
     args = parser.parse_args()
 
     output_path = Path(args.output_path)
@@ -189,6 +191,7 @@ def main() -> None:
         parallel_workers=args.parallel_workers,
         dataset_path=args.dataset_path,
         output_path=str(output_path),
+        include_bertscore=args.bertscore,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 

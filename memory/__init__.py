@@ -1,5 +1,7 @@
 """PRIMA-NEXT Hierarchical Memory Fabric."""
 
+from typing import Any
+
 __all__ = [
     "InMemoryMemoryRepository",
     "MemoryLevel",
@@ -11,7 +13,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> Any:
     if name in {"MemoryNote", "format_memory_note"}:
         from memory.memory_note import MemoryNote, format_memory_note
 

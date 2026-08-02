@@ -277,7 +277,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 python -m venv .venv
 . .venv/Scripts/Activate.ps1
 pip install -r requirements.txt
-python -m unittest discover
+python -m pytest -q
 ```
 
 Supervised affect evaluation:
@@ -294,9 +294,22 @@ Rule-set checks after installing development dependencies:
 python -m pytest -q
 python -m ruff check .
 python -m mypy .
-python -m bandit -r .
+python -m bandit -c bandit.yaml -r .
+python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
 ```
 
-Optional legacy benchmark dependencies are listed as comments in `requirements.txt` because this repo should remain lightweight by default.
+Dependencies are split into `requirements-core.txt`, `requirements-dev.txt`, and
+`requirements-benchmark.txt`. `requirements.txt` installs those three groups.
+Semantic metrics and encoder/training dependencies are opt-in through
+`requirements-semantic-metrics.txt` and `requirements-encoder.txt`.
+
+Check optional benchmark capabilities without installing or importing them:
+
+```powershell
+python -m benchmarks.preflight
+```
+
+LoCoMo uses its built-in deterministic ROUGE-L implementation by default.
+BERTScore is disabled unless the benchmark is run with `--bertscore`.
 
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

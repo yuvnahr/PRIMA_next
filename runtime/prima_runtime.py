@@ -8,7 +8,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from affect.affect_engine import DynamicAffectEngine
 from llm.llm_client import LLMClient
@@ -103,8 +103,8 @@ class PrimaRuntime:
         """Answer through the canonical bounded evidence-acquisition controller."""
 
         started = time.perf_counter()
-        top_k = int(top_k or os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
-        max_context_tokens = int(max_context_tokens or os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
+        top_k = int(top_k) if top_k else int(os.getenv("PRIMA_RETRIEVAL_TOP_K", "5"))
+        max_context_tokens = int(max_context_tokens) if max_context_tokens else int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
         mode = ReasoningMode.DIAGNOSTIC if diagnostics else configured_reasoning_mode(reasoning_mode)
         request = ReasoningRequest(
             question=question,
@@ -180,8 +180,8 @@ class PrimaRuntime:
         prompt: str | None = None
         llm_metadata: dict[str, Any] = {}
         inference_settings = self._inference_settings(
-            provider=provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
-            model=model or os.getenv("PRIMA_LLM_MODEL", ""),
+            provider=cast(str, provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama")),
+            model=cast(str, model or os.getenv("PRIMA_LLM_MODEL", "")),
             answer_context=answer_context,
         )
         if not answer_context.memories:

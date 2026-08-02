@@ -8,6 +8,7 @@ from benchmarks.common.runner import GenericBenchmarkRunner
 from benchmarks.common.utils import configure_benchmark_logger
 from benchmarks.locomo.adapter import LoCoMoAdapter
 from benchmarks.locomo.evaluate import (
+    LoCoMoEvaluator,
     evidence_summary,
     exact_match_score,
     f1_score,
@@ -39,7 +40,7 @@ def test_production_qa_correctness_contract() -> None:
     assert note.timestamp == timestamp
     assert exact_match_score("The Friday!", "friday") == 1.0
     assert f1_score("cats cats", "cats") == 2 / 3
-    assert rouge_l_score("finished screenplay", "she finished screenplay") > 0.7
+    assert rouge_l_score("finished screenplay", "she finished screenplay") == 0.8
 
     result = BenchmarkResult(
         conversation_id="conv",
@@ -78,6 +79,25 @@ def test_production_qa_correctness_contract() -> None:
     importance = MemoryImportanceEngine(repository)
     assert importance.novelty_score("Nate likes turtles") == 0.0
     assert importance.novelty_score("Joanna writes screenplays") == 1.0
+
+
+def test_bertscore_is_opt_in_and_reports_missing_capability(monkeypatch) -> None:
+    result = BenchmarkResult(
+        conversation_id="conv",
+        question_id="1",
+        prompt="question",
+        response=AgentResponse("answer"),
+        expected_answer="answer",
+    )
+
+    disabled = LoCoMoEvaluator().evaluate([result])
+    assert disabled["bertscore"] is None
+    assert disabled["bertscore_status"] == "disabled"
+
+    monkeypatch.setattr("benchmarks.locomo.evaluate.missing_modules", lambda _modules: ("bert_score",))
+    unavailable = LoCoMoEvaluator(include_bertscore=True).evaluate([result])
+    assert unavailable["bertscore"] is None
+    assert unavailable["bertscore_status"] == "unavailable: bert_score"
 
 
 def test_benchmark_logger_follows_output_path(tmp_path: Path) -> None:
