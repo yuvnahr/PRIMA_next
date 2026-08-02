@@ -37,7 +37,7 @@ EXECUTION
 1. Inspect affected code and callers.
 2. Add/update failing characterization tests when practical.
 3. Make the smallest coherent change.
-4. Run focused tests, full tests, compileall, Ruff, mypy, and Bandit when available; record exact commands/results.
+4. Run focused/full tests, compileall, Ruff, mypy, Bandit, and Xenon via scripts/run_xenon.py when available; record exact results. Never run Xenon on repository root.
 
 HANDOFF
 - List changed files, contract/behavior changes, exact commands/results, risks, and deferrals.

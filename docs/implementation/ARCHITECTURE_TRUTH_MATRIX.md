@@ -1,6 +1,6 @@
 # Architecture Truth Matrix
 
-Baseline: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-02.
+Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-02. Current-state entries are updated through Phase 02.
 
 `C:\PRIMA_integrated\Draft.png` is the target architecture, not the current call graph. The current code has multiple execution boundaries and no single end-to-end PRIMA path. In this document, “canonical production path” means the workflow path entered through `PrimaRuntime.process()` / `process_async()`; this is a baseline label, not an endorsement of the split.
 
@@ -41,9 +41,9 @@ Baseline: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-02.
 | Consolidation, abstraction and forgetting | implemented but disconnected | Maintenance/evolution engines are reached by validation scripts/tests, not production runtime. | Consume emitted maintenance events off the hot path. |
 | Maintenance event subscribers | missing | Repository search finds publishers/helpers and tests but no production maintenance subscriber. | Add explicit cold-path consumers. |
 | Procedural memory | missing | `memory/memory_types.py:8-34` has working, episodic, semantic and emotional only. | Add only when a phase defines storage/retrieval semantics. |
-| Typed task request/result contract | missing | Public methods accept unrelated primitives and return different types. | One boundary with typed task kind/profile/request/result/diagnostics. |
-| Explicit task/profile routing | target architecture only | Router uses phase lists or untyped `metadata["route"]`; no task/profile model exists. | Support specified task kinds and profiles without benchmark imports. |
-| Input parser boundary | target architecture only | Diagram component has no equivalent typed runtime stage. | Parse/validate before routing. |
+| Typed task request/result contract | active in canonical production path | `runtime/contracts.py`; `PrimaRuntime.execute` returns `PrimaResponse`. Legacy result types remain during migration. | Migrate every compatibility caller to the typed boundary. |
+| Explicit task/profile routing | active in canonical production path | `runtime/route_profiles.py` deterministically covers all 25 task/profile pairs. Workflow enforcement is deferred. | Make the selected plan own workflow execution. |
+| Input parser boundary | active in canonical production path | `PrimaRequest` validates versioned, extra-forbidding input before route selection. | Move any task-specific parsing behind workflow ownership. |
 | Bounded correction loop | target architecture only | Reflection records a decision but does not transition back to retrieval/planning. | Bound retries and expose them in diagnostics. |
 | Shared state/memory taxonomy in diagram | target architecture only | Current stores and runtime state do not implement the diagram’s complete taxonomy/links. | Introduce incrementally with evidence-backed activation. |
 | Cross-encoder reranking by default | implemented but disconnected | `memory/retrieval/reranker.py:35-100` defaults to lexical scoring unless cross-encoder is enabled and loads. | Make actual strategy explicit in diagnostics. |
@@ -56,4 +56,3 @@ All matrix state assignments are verified from call sites and repository search.
 - A cross-encoder should be the default reranker.
 - The complete diagram should run for every task; short task-appropriate routes are the target.
 - Existing benchmark scores measure the complete PRIMA wrapper or isolate Qwen improvement.
-

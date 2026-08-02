@@ -29,6 +29,17 @@ from reasoning.models import AnswerResult, ReasoningMode, ReasoningRequest
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
+from runtime.contracts import (
+    ComponentCapability,
+    ExecutionStatus,
+    PrimaRequest,
+    PrimaResponse,
+    RuntimeComponent,
+    RuntimeDiagnostics,
+    StateDelta,
+    TaskKind,
+)
+from runtime.route_profiles import InvalidRouteError, RoutePlan, select_route
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
@@ -65,6 +76,96 @@ class PrimaRuntime:
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
+
+    async def execute(self, request: PrimaRequest) -> PrimaResponse:
+        """Validate and route one canonical request through the typed boundary.
+
+        Phase 02 executes only the ingestion and affect-only short routes. Other
+        valid routes return ``NOT_IMPLEMENTED`` until workflow migration phases
+        can prove each selected component call.
+        """
+
+        if not isinstance(request, PrimaRequest):
+            raise TypeError("request must be a PrimaRequest")
+        try:
+            route = select_route(request.task_kind, request.profile)
+        except InvalidRouteError as exc:
+            return PrimaResponse(
+                request_id=request.request_id,
+                task_kind=request.task_kind,
+                profile=request.profile,
+                status=ExecutionStatus.REJECTED,
+                diagnostics=_invalid_route_diagnostics(str(exc)),
+                errors=(str(exc),),
+            )
+
+        if request.task_kind is TaskKind.DOCUMENT_INGESTION:
+            note = self.ingest_document(request.input_text, metadata=request.metadata)
+            ingestion_executed = (
+                RuntimeComponent.POLICY_ROUTER,
+                RuntimeComponent.DOCUMENT_ENCODER,
+                RuntimeComponent.MEMORY_INDEX,
+                RuntimeComponent.MEMORY_COMMIT,
+                RuntimeComponent.STATE_COMMIT,
+                RuntimeComponent.OUTPUT_SHAPER,
+            )
+            return PrimaResponse(
+                request_id=request.request_id,
+                task_kind=request.task_kind,
+                profile=request.profile,
+                status=ExecutionStatus.COMPLETED,
+                output_data={"memory_id": note.id},
+                state_delta=StateDelta(changes={"memory_ids_added": [note.id]}),
+                diagnostics=_route_diagnostics(route, ingestion_executed),
+            )
+
+        if request.task_kind is TaskKind.EMOTION_CLASSIFICATION:
+            update = self.affect_engine.process(request.input_text)
+            profile = update.profile
+            emotion_executed = (
+                RuntimeComponent.POLICY_ROUTER,
+                RuntimeComponent.EMOTION_CLASSIFIER,
+                RuntimeComponent.AFFECT_ENGINE,
+                RuntimeComponent.STATE_COMMIT,
+                RuntimeComponent.OUTPUT_SHAPER,
+            )
+            return PrimaResponse(
+                request_id=request.request_id,
+                task_kind=request.task_kind,
+                profile=request.profile,
+                status=ExecutionStatus.COMPLETED,
+                output_data={
+                    "dominant_emotion": profile.dominant_emotion,
+                    "confidence": profile.confidence,
+                    "emotions": dict(profile.emotions),
+                },
+                state_delta=StateDelta(changes={"emotional_state": update.emotional_state.to_dict()}),
+                diagnostics=_route_diagnostics(route, emotion_executed),
+            )
+
+        return PrimaResponse(
+            request_id=request.request_id,
+            task_kind=request.task_kind,
+            profile=request.profile,
+            status=ExecutionStatus.NOT_IMPLEMENTED,
+            diagnostics=_route_diagnostics(
+                route,
+                (RuntimeComponent.POLICY_ROUTER,),
+                note="Execution migration is deferred; existing public methods remain operational.",
+            ),
+        )
+
+    def execute_sync(self, request: PrimaRequest) -> PrimaResponse:
+        """Run :meth:`execute` only when the caller does not own an event loop."""
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self.execute(request))
+        raise RuntimeError(
+            "PrimaRuntime.execute_sync() cannot run inside an active event loop; "
+            "use 'await PrimaRuntime.execute(request)' instead."
+        )
 
     def reset(self, mode: str = "isolated", preserve_repository: bool = True) -> None:
         """Reset runtime conversation state without deleting long-term memory by default."""
@@ -623,5 +724,59 @@ def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
         }
         for item in candidates
     ]
+
+
+_CANONICAL_AVAILABLE = {
+    RuntimeComponent.INPUT_PARSER,
+    RuntimeComponent.POLICY_ROUTER,
+    RuntimeComponent.AFFECT_ENGINE,
+    RuntimeComponent.DOCUMENT_ENCODER,
+    RuntimeComponent.EMOTION_CLASSIFIER,
+    RuntimeComponent.OUTPUT_SHAPER,
+    RuntimeComponent.STATE_COMMIT,
+    RuntimeComponent.MEMORY_INDEX,
+    RuntimeComponent.MEMORY_COMMIT,
+}
+
+
+def _route_diagnostics(
+    route: RoutePlan,
+    executed: tuple[RuntimeComponent, ...],
+    note: str | None = None,
+) -> RuntimeDiagnostics:
+    capabilities = tuple(
+        ComponentCapability(
+            component=component,
+            available=component in _CANONICAL_AVAILABLE,
+            reason=(
+                None
+                if component in _CANONICAL_AVAILABLE
+                else "canonical execution integration deferred"
+                if component in route.components
+                else "not selected by route"
+            ),
+        )
+        for component in RuntimeComponent
+    )
+    return RuntimeDiagnostics(
+        route_name=route.name,
+        planned_components=route.components,
+        executed_components=executed,
+        skipped_components=tuple(component for component in RuntimeComponent if component not in executed),
+        capabilities=capabilities,
+        notes=(note,) if note else (),
+    )
+
+
+def _invalid_route_diagnostics(reason: str) -> RuntimeDiagnostics:
+    return RuntimeDiagnostics(
+        route_name="invalid",
+        skipped_components=tuple(RuntimeComponent),
+        capabilities=tuple(
+            ComponentCapability(component=component, available=False, reason="invalid task/profile combination")
+            for component in RuntimeComponent
+        ),
+        notes=(reason,),
+    )
 
 

@@ -1,4 +1,4 @@
-"""Run Xenon against PRIMA-NEXT's first-party Python source only."""
+"""Run Xenon against PRIMA-NEXT production Python source only."""
 
 from __future__ import annotations
 
@@ -10,15 +10,13 @@ SOURCE_ROOTS = (
     "main.py",
     "action",
     "affect",
-    "benchmarks/common",
-    "benchmarks/locomo",
     "config",
     "events",
-    "evaluation",
     "llm",
     "memory",
     "monitoring",
     "planning",
+    "reasoning",
     "reflection",
     "runtime",
     "security",
@@ -82,7 +80,7 @@ def build_command(root: Path) -> list[str]:
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     command = build_command(root)
-    print("Running Xenon on first-party source roots only:")
+    print("Running Xenon on PRIMA production source roots only:")
     print(" ".join(command))
     return subprocess.run(command, cwd=root, check=False).returncode  # noqa: S603  # nosec B603
 
