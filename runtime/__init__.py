@@ -1,5 +1,6 @@
 """PRIMA-NEXT runtime package."""
 
+from config.runtime_mode import RuntimeMode
 from runtime.contracts import (
     ComponentCapability,
     EvidenceReference,
@@ -33,6 +34,7 @@ __all__ = [
     "RuntimeDiagnostics",
     "RuntimeMetrics",
     "RuntimeResult",
+    "RuntimeMode",
     "StateDelta",
     "TaskKind",
     "select_route",

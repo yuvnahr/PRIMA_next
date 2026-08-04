@@ -150,8 +150,14 @@ def test_provider_failure_and_abstention_are_typed(tmp_path) -> None:
     assert failed.status is ExecutionStatus.FAILED
     assert failed.outcome is ExecutionOutcome.FAILED
     assert failed.errors == ("provider offline",)
+    assert failed.output_data["memory_admission"] == {
+        "stored": False,
+        "policy": "successful_answers_only",
+        "reason": "failed",
+    }
     assert abstained.outcome is ExecutionOutcome.ABSTAINED
     assert abstained.output_text and not abstained.output_text.lstrip().startswith("{")
+    assert abstained.output_data["memory_admission"]["policy"] == "qa_read_only"
 
 
 def test_classification_and_cancellation_have_typed_outcomes(tmp_path) -> None:
@@ -183,6 +189,7 @@ def test_classification_and_cancellation_have_typed_outcomes(tmp_path) -> None:
                 task_kind=TaskKind.CONVERSATION,
                 profile=ExecutionProfile.MODEL_ONLY,
                 input_text="Cancel this request.",
+                metadata={"route": ["answer_generation"]},
             )
         )
     )

@@ -10,6 +10,7 @@ from typing import Any
 
 from benchmarks.common.agent import BenchmarkAgent
 from benchmarks.common.interfaces import AgentResponse, ConversationQuestion, ConversationTurn
+from config.runtime_mode import RuntimeMode
 from runtime.prima_runtime import PrimaRuntime
 from runtime.runtime_context import RuntimeContext
 
@@ -38,7 +39,11 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
     def reset(self) -> None:
         """Create a fresh PRIMA runtime and context for one benchmark conversation."""
 
-        self.runtime = self.runtime_factory(log_path=self.log_path)
+        self.runtime = self.runtime_factory(
+            log_path=self.log_path,
+            mode=RuntimeMode.BENCHMARK,
+            memory_backend="in_memory",
+        )
         self.context = RuntimeContext()
         self.turn_count = 0
         self.question_count = 0
@@ -56,7 +61,11 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
             context.timestamp = datetime.strptime(turn.timestamp, "%I:%M %p on %d %B, %Y").replace(tzinfo=timezone.utc)
 
         started = perf_counter()
-        result = runtime.ingest_document(self._format_turn(turn), metadata=turn.metadata) if self.document_ingestion else runtime.process(self._format_turn(turn), context=context)
+        result = (
+            runtime.ingest_document(self._format_turn(turn), metadata=turn.metadata)
+            if self.document_ingestion
+            else runtime.process(self._format_turn(turn), context=context)
+        )
         self.ingestion_time += perf_counter() - started
         self.turn_count += 1
         return self._response_from_runtime(result)
@@ -84,6 +93,9 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
             "ingestion_time": self.ingestion_time,
             "reasoning_time": self.reasoning_time,
             "context": context,
+            "runtime_manifest": self.runtime.runtime_manifest()
+            if self.runtime is not None and hasattr(self.runtime, "runtime_manifest")
+            else {"schema_version": "1.0", "runtime_mode": "benchmark", "memory_repository": "in_memory"},
         }
 
     def close(self) -> None:

@@ -8,6 +8,8 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from config.runtime_mode import RuntimeMode
+
 SCHEMA_VERSION: Literal["1.0"] = "1.0"
 
 
@@ -127,6 +129,10 @@ class RuntimeDiagnostics(ContractModel):
     skipped_components: tuple[RuntimeComponent, ...] = ()
     capabilities: tuple[ComponentCapability, ...] = ()
     notes: tuple[str, ...] = ()
+    runtime_mode: RuntimeMode = RuntimeMode.TEST
+    memory_repository: str = "unconfigured"
+    memory_persistent: bool = False
+    state_version: int = 0
 
 
 class PrimaRequest(ContractModel):

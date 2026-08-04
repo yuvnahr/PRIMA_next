@@ -1,6 +1,6 @@
 # Architecture Truth Matrix
 
-Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-02. Current-state entries are updated through Phase 03.
+Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-02. Current-state entries are updated through Phase 04.
 
 `C:\PRIMA_integrated\Draft.png` is the target architecture, not the current call graph. “Canonical production path” now means a typed `PrimaRuntime.execute()` request followed by one workflow-owned task/profile route. The diagram still contains later-phase blocks that remain disconnected.
 
@@ -29,8 +29,10 @@ Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-0
 | Answer generation | active in canonical production path | `workflow.answer_generation.AnswerGenerationController` calls the injected `LLMClient` and returns `GenerationResult`. | Keep model invocation workflow-owned and typed. |
 | Output controller | active in canonical production path | Shapes existing typed generation, ingestion, classification or action results; it has no input fallback. | Remain result shaping only. |
 | Episodic turn admission | active in canonical production path | `MemoryCommitController` runs as the final conversation workflow phase. | Add maintenance-event emission later. |
+| Versioned cognitive state ownership | active in canonical production path | Every canonical task route begins with `STATE_LOAD`; task-appropriate successful/abstained routes finish with optimistic `STATE_COMMIT`. | Keep state transitions workflow-owned; add bounded reasoning deltas later. |
+| Runtime/storage mode policy | active in canonical production path | `RuntimeMode` plus `select_memory_repository` exposes test/benchmark/production selection and rejects ephemeral production storage. | Production source of truth remains configured ChromaDB; no fallback. |
 | Phase lifecycle events | active in canonical production path | `workflow/prima_workflow.py` publishes phase events. | Extend to typed maintenance events. |
-| QA evidence acquisition and LLM synthesis | active in canonical production path | Workflow routes `EVIDENCE_ACQUISITION` through `ReasoningController`, then `ANSWER_GENERATION`; `answer_question` only converts the typed response. | Add bounded reflect/retrieve/replan behavior in Phase 04. |
+| QA evidence acquisition and LLM synthesis | active in canonical production path | Workflow routes `EVIDENCE_ACQUISITION` through `ReasoningController`, then `ANSWER_GENERATION`; `answer_question` only converts the typed response. | Add bounded reflect/retrieve/replan behavior in a future bounded-reasoning phase. |
 | Document ingestion | active in canonical production path | Workflow selects `DOCUMENT_INGESTION → OUTPUT`; the compatibility method delegates to `execute`. | Emit maintenance events later; never generate by default. |
 | HotpotQA execution | benchmark-only | `benchmarks/hotpotqa/experiment.py:136-174` combines direct ingestion with separate QA. | Thin adapter to typed runtime requests. |
 | LoCoMo execution | benchmark-only | `benchmarks/locomo/experiment.py:39-153` combines workflow turns with separate QA. | Thin adapter to typed runtime requests. |
@@ -46,7 +48,7 @@ Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-0
 | Explicit task/profile routing | active in canonical production path | `runtime/route_profiles.py` validates all 25 pairs; `workflow.task_router` enforces the nine valid ordered routes. | Keep route plans synchronized with component diagnostics. |
 | Input parser boundary | active in canonical production path | `PrimaRequest` validates versioned, extra-forbidding input before route selection. | Move any task-specific parsing behind workflow ownership. |
 | Bounded correction loop | target architecture only | Reflection records a decision but does not transition back to retrieval/planning. | Bound retries and expose them in diagnostics. |
-| Shared state/memory taxonomy in diagram | target architecture only | Current stores and runtime state do not implement the diagram’s complete taxonomy/links. | Introduce incrementally with evidence-backed activation. |
+| Shared state/memory taxonomy in diagram | target architecture only | Cognitive state sections and current memory types are owned, but procedural memory and complete diagram links remain absent. | Introduce incrementally with evidence-backed activation. |
 | Cross-encoder reranking by default | implemented but disconnected | `memory/retrieval/reranker.py:35-100` defaults to lexical scoring unless cross-encoder is enabled and loads. | Make actual strategy explicit in diagnostics. |
 
 ## Verified facts versus hypotheses

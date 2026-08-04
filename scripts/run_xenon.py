@@ -52,6 +52,7 @@ IGNORED_DIRECTORIES = (
 )
 
 IGNORED_FILES = "*generated*.py,*.pyc"
+XENON_TIMEOUT_SECONDS = 30
 
 
 def build_command(root: Path) -> list[str]:
@@ -82,7 +83,16 @@ def main() -> int:
     command = build_command(root)
     print("Running Xenon on PRIMA production source roots only:")
     print(" ".join(command))
-    return subprocess.run(command, cwd=root, check=False).returncode  # noqa: S603  # nosec B603
+    try:
+        return subprocess.run(  # noqa: S603  # nosec B603
+            command,
+            cwd=root,
+            check=False,
+            timeout=XENON_TIMEOUT_SECONDS,
+        ).returncode
+    except subprocess.TimeoutExpired:
+        print(f"Xenon exceeded {XENON_TIMEOUT_SECONDS}s and was terminated.", file=sys.stderr)
+        return 124
 
 
 if __name__ == "__main__":

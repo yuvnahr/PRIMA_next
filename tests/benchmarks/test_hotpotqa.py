@@ -102,7 +102,7 @@ class FakeDocument:
     def to_dict(self): return {}
 class FakeRuntime:
     instances = []
-    def __init__(self, log_path=None): self.docs = []; self.__class__.instances.append(self)
+    def __init__(self, log_path=None, **_runtime_config): self.docs = []; self.__class__.instances.append(self)
     def ingest_document(self, text, metadata=None): self.docs.append((text, metadata)); return FakeDocument()
     def answer_question(self, question, **options):
         if any(text.endswith(": FAIL") for text, _ in self.docs): raise RuntimeError("synthetic failure")

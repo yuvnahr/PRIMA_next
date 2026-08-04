@@ -11,6 +11,7 @@ class WorkflowPhase(str, Enum):
     """Ordered cognitive workflow phases."""
 
     INPUT = "input"
+    STATE_LOAD = "state_load"
     AFFECT = "affect"
     MEMORY_RETRIEVAL = "memory_retrieval"
     EVIDENCE_ACQUISITION = "evidence_acquisition"
@@ -20,6 +21,7 @@ class WorkflowPhase(str, Enum):
     ANSWER_GENERATION = "answer_generation"
     DOCUMENT_INGESTION = "document_ingestion"
     OUTPUT = "output"
+    STATE_COMMIT = "state_commit"
     MEMORY_COMMIT = "memory_commit"
 
 

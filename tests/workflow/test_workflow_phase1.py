@@ -7,6 +7,7 @@ from memory.memory_types import MemoryType
 from memory.retrieval.retrieval_controller import RetrievalController
 from planning import Plan
 from reflection.reflection_engine import ReflectionEngine
+from state.state_manager import InMemoryStateManager
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
@@ -124,6 +125,7 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
             retrieval_controller=RetrievalController(repository),
             reflection_engine=ReflectionEngine(),
             event_bus=WorkflowEventBus(),
+            state_manager=InMemoryStateManager(),
         )
 
         context = await workflow.run("I am nervous about sourdough bread tomorrow")

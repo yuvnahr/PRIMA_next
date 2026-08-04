@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
+from state.cognitive_state import CognitiveState
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.task_router import TaskRouter
@@ -115,7 +116,11 @@ class OrchestrationEngine:
                 )
 
     def _route_phase_output(self, context: ExecutionContext, phase: WorkflowPhase, result: object) -> None:
-        if phase == WorkflowPhase.AFFECT:
+        if phase == WorkflowPhase.STATE_LOAD:
+            if not isinstance(result, CognitiveState):
+                raise TypeError("State load controller must return CognitiveState.")
+            context.cognitive_state = result
+        elif phase == WorkflowPhase.AFFECT:
             context.affect_update = result
         elif phase == WorkflowPhase.MEMORY_RETRIEVAL:
             context.retrieval_response = result
@@ -134,11 +139,16 @@ class OrchestrationEngine:
             context.ingestion_result = result
         elif phase == WorkflowPhase.OUTPUT:
             context.output = result
+        elif phase == WorkflowPhase.STATE_COMMIT:
+            if not isinstance(result, dict):
+                raise TypeError("State commit controller must return a dictionary.")
+            context.cognitive_state = result["state"]
+            context.metadata["state_committed"] = bool(result["committed"])
         elif phase == WorkflowPhase.MEMORY_COMMIT:
             if not isinstance(result, dict):
                 raise TypeError("Memory commit controller must return a dictionary.")
             context.memory_notes_created = tuple(result.get("notes", ()))
-            context.memory_admission = result.get("decision")
+            context.memory_admission = result.get("admission")
         context.workflow_state.outputs[phase.value] = result
 
     async def _check_cancelled(self, context: ExecutionContext) -> None:

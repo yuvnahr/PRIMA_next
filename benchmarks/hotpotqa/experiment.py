@@ -105,6 +105,7 @@ def select_conversations(conversations: list[Any], sampling: str, seed: int | No
 
 def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str, model: str, reasoning_mode: str, top_k: int, max_hops: int, workers: int, configured_seed: int | None, resolved_seed: int | None, sampling: str, offset: int, max_samples: int, sample_ids: list[str], resume: bool) -> dict[str, Any]:
     return {
+        "schema_version": "1.0", "runtime_mode": "benchmark", "memory_repository": "in_memory",
         "benchmark_name": "HotpotQA", "benchmark_mode": mode, "context_source": CONTEXT_SOURCES[mode],
         "dataset_set": dataset_set, "dataset_path": str(dataset_path.resolve()), "dataset_fingerprint": fingerprint(dataset_path),
         "sample_count": len(sample_ids), "selected_sample_ids": sample_ids, "sampling_strategy": sampling,

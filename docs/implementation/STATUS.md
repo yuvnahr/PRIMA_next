@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 03. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 04. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -9,14 +9,18 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 03. `Open` means verified d
 | ARCH-003 | Critical | Verified fact | QA bypassed workflow; `ReasoningController` is now an evidence-acquisition controller followed by workflow-owned generation. | Phase 03 — execution/output | QA test proves evidence acquisition and answer generation phases complete in one workflow lifecycle. | Closed |
 | ARCH-004 | High | Verified fact | Ingestion bypassed workflow; semantic validation/indexing now runs in `DOCUMENT_INGESTION` and never selects generation. | Phase 03 — workflow routing | Ingestion test proves workflow traversal, committed memory and zero model calls. | Closed |
 | ROUTE-001 | High | Verified fact | Router had phase lists/untyped metadata, not typed task kinds or execution profiles. | Phase 02 — canonical contract | Tests cover all 25 task/profile decisions and explicit planned/executed/skipped components. | Closed |
-| REFL-001 | High | Verified fact | QA reflection adapter emits only `ABSTAIN` or `NO_ACTION`; controller accepts only revised-query actions (`reflection/reasoning_reflection_adapter.py:17-21`; `reasoning/controller.py:83-109`). | Phase 04 — bounded reasoning | A low-confidence test demonstrates one advised query and a bounded second retrieval. | Open |
-| REFL-002 | High | Verified fact | Workflow reflection records a decision but cannot retrieve/replan/correct. | Phase 04 — bounded reasoning | State-machine tests prove bounded retry, terminal success and retry exhaustion. | Open |
+| REFL-001 | High | Verified fact | QA reflection adapter emits only `ABSTAIN` or `NO_ACTION`; controller accepts only revised-query actions (`reflection/reasoning_reflection_adapter.py:17-21`; `reasoning/controller.py:83-109`). | Future bounded-reasoning phase | A low-confidence test demonstrates one advised query and a bounded second retrieval. | Open |
+| REFL-002 | High | Verified fact | Workflow reflection records a decision but cannot retrieve/replan/correct. | Future bounded-reasoning phase | State-machine tests prove bounded retry, terminal success and retry exhaustion. | Open |
 | SUBSYS-001 | Medium | Verified fact | Graph traversal is absent from runtime retrieval defaults; graph reasoning is not production-reachable. | Phase 05 — memory/graph | A profile test proves graph calls when enabled and an explicit skip when disabled. | Open |
-| SUBSYS-002 | High | Verified fact | World model exists but no workflow stage invokes it; action only reads unset metadata. | Phase 04 — bounded reasoning | Full-profile test proves world simulation output reaches uncertainty/action diagnostics. | Open |
-| SUBSYS-003 | High | Verified fact | Uncertainty estimator exists but no workflow stage invokes it. | Phase 04 — bounded reasoning | Threshold tests prove execute versus reflect transitions and bounded termination. | Open |
+| SUBSYS-002 | High | Verified fact | World model exists but no workflow stage invokes it; action only reads unset metadata. | Future bounded-reasoning phase | Full-profile test proves world simulation output reaches uncertainty/action diagnostics. | Open |
+| SUBSYS-003 | High | Verified fact | Uncertainty estimator exists but no workflow stage invokes it. | Future bounded-reasoning phase | Threshold tests prove execute versus reflect transitions and bounded termination. | Open |
 | SUBSYS-004 | Medium | Verified fact | Consolidation/abstraction/forgetting exist without production scheduling or event subscribers. | Phase 05 — memory/graph | Commit emits versioned events; maintenance consumer tests prove each configured handler call. | Open |
 | MEM-001 | Medium | Verified fact | Procedural memory is absent from `MemoryType`. | Phase 05 — memory/graph | Contract and repository tests prove procedural storage/retrieval, or the target is explicitly retired. | Open |
-| MEM-002 | High | Verified fact | Runtime defaults to `InMemoryMemoryRepository` (`runtime/prima_runtime.py:50`), despite persistence claims. | Phase 05 — memory/graph | Default/deployed configuration test proves the documented store; tests inject in-memory explicitly. | Open |
+| MEM-002 | High | Verified fact | Repository selection is mode-enforced: test may use in-memory, benchmark declares its choice, and production requires configured valid ChromaDB without fallback. | Phase 04 — state/memory ownership | Tests prove production preflight, benchmark declaration/isolation, diagnostics visibility and no silent ephemeral fallback. | Closed |
+| STATE-001 | Critical | Verified fact | `CognitiveState` was an unversioned dictionary placeholder; it now owns typed goal, emotional, task, confidence and environment sections plus metadata/version/timestamps. | Phase 04 — state/memory ownership | Typed serialization round-trip and compatibility tests pass. | Closed |
+| STATE-002 | Critical | Verified fact | Requests created fresh state and QA did not share conversation session ownership; every canonical route now loads and conditionally commits through workflow state phases. | Phase 04 — state/memory ownership | Conversation followed by QA reaches state version 2 for one session while another session remains isolated. | Closed |
+| STATE-003 | High | Verified fact | No optimistic concurrency guard existed; state managers now reject stale expected versions. | Phase 04 — state/memory ownership | Stale-save test raises `StateVersionConflict`; JSON persistence survives manager restart. | Closed |
+| STATE-004 | High | Verified fact | Memory writes lacked a task/outcome policy; ingestion records semantic admission, admitted conversations write user/assistant episodic outcomes, and failed/abstained/read-only routes report explicit no-write decisions. | Phase 04 — state/memory ownership | Focused policy tests verify semantic, episodic-pair and failed/abstained decisions. | Closed |
 | RETR-001 | Medium | Verified fact | Reranker defaults to lexical scoring; cross-encoder is optional and load failure silently falls back (`memory/retrieval/reranker.py:35-100`). | Phase 05 — memory/graph | Diagnostics contract test identifies requested/actual reranker and fallback reason. | Open |
 | DIAG-001 | High | Verified fact | Canonical results now identify planned/executed/skipped components, but complete per-phase latency/fallback proof remains absent. | Phase 06 — diagnostics | Every route returns schema-versioned phase/call/latency/fallback diagnostics verified against spies. | Open |
 | BENCH-001 | Critical | Verified fact | HotpotQA/LoCoMo compatibility calls now converge on `execute`; GoEmotions still uses benchmark-local classifier/LLM systems. | Phase 07 — benchmarks | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
@@ -43,8 +47,9 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 03. `Open` means verified d
 | Phase 01 — quality gates | CFG-001, GATE-001, DEP-001, METRIC-001, HYGIENE-001, LINT-001 |
 | Phase 02 — canonical contract | ARCH-001 (partial), ROUTE-001, CONTRACT-001, ROUTE-002, SYNC-001, GATE-002 |
 | Phase 03 — execution/output | ARCH-001, ARCH-002, ARCH-003, ARCH-004, OUTCOME-001, GATE-003 |
-| Phase 04 — bounded reasoning | REFL-001, REFL-002, SUBSYS-002, SUBSYS-003 |
-| Phase 05 — memory/graph | SUBSYS-001, SUBSYS-004, MEM-001, MEM-002, RETR-001 |
+| Phase 04 — state/memory ownership | MEM-002, STATE-001, STATE-002, STATE-003, STATE-004 |
+| Future bounded-reasoning phase | REFL-001, REFL-002, SUBSYS-002, SUBSYS-003 |
+| Phase 05 — memory/graph | SUBSYS-001, SUBSYS-004, MEM-001, RETR-001 |
 | Phase 06 — diagnostics | DIAG-001 |
 | Phase 07 — benchmarks | BENCH-001, BENCH-002, BENCH-003 |
 | Phase 08 — tooling/docs | DOC-001 |

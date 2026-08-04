@@ -77,6 +77,10 @@ Every one of the 25 combinations has a deterministic decision. `invalid` combina
 
 All nine valid task/profile combinations now enter a workflow-owned route. Conversation and factual QA use the injected answer-generation controller; retrieval-enabled routes place `ReasoningController` inside the workflow as bounded evidence acquisition. Ingestion validates/indexes without generation, and affect-only classification skips QA phases. World simulation, uncertainty transitions, graph activation, bounded correction and maintenance-event consumers remain later-phase work and stay explicitly skipped in diagnostics.
 
+## Phase 04 state and memory ownership
+
+Every canonical route now loads versioned session state through an injected `StateManager` and commits task-appropriate successful/abstained state with an expected-version check. Conversation and factual QA use the same session key. Runtime mode is explicit in diagnostics: tests may use deterministic memory, benchmarks declare their repository in runtime/run manifests, and production preflight requires persistent ChromaDB plus persistent JSON cognitive state. Failed/cancelled responses do not commit cognitive state; memory admission decisions are explicit for every task outcome.
+
 ## Final ownership of the target diagram
 
 The following table assigns every named block in `Draft.png`. “Final owner” is the intended package/layer, not proof that the block is currently connected.

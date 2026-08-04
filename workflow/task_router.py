@@ -29,17 +29,22 @@ class TaskRouter:
 
     ROUTES = {
         ("conversation", "model_only"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.ANSWER_GENERATION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
         ),
         ("conversation", "simple_rag"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.EVIDENCE_ACQUISITION,
             WorkflowPhase.ANSWER_GENERATION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
         ),
         ("conversation", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.AFFECT,
             WorkflowPhase.EVIDENCE_ACQUISITION,
             WorkflowPhase.PLANNING,
@@ -47,15 +52,24 @@ class TaskRouter:
             WorkflowPhase.ACTION,
             WorkflowPhase.ANSWER_GENERATION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
         ),
-        ("factual_qa", "model_only"): (WorkflowPhase.ANSWER_GENERATION, WorkflowPhase.OUTPUT),
+        ("factual_qa", "model_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+        ),
         ("factual_qa", "simple_rag"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.EVIDENCE_ACQUISITION,
             WorkflowPhase.ANSWER_GENERATION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
         ),
         ("factual_qa", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.AFFECT,
             WorkflowPhase.EVIDENCE_ACQUISITION,
             WorkflowPhase.PLANNING,
@@ -63,17 +77,27 @@ class TaskRouter:
             WorkflowPhase.ACTION,
             WorkflowPhase.ANSWER_GENERATION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
         ),
         ("document_ingestion", "ingestion_only"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.DOCUMENT_INGESTION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
         ),
-        ("emotion_classification", "affect_only"): (WorkflowPhase.AFFECT, WorkflowPhase.OUTPUT),
+        ("emotion_classification", "affect_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.AFFECT,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+        ),
         ("tool_request", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
             WorkflowPhase.AFFECT,
             WorkflowPhase.PLANNING,
             WorkflowPhase.ACTION,
             WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
         ),
     }
 

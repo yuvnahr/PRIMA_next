@@ -21,6 +21,8 @@ from reasoning.controller import ReasoningController
 from reasoning.models import AnswerResult, ReasoningBudget, ReasoningMode, ReasoningRequest
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
+from state.cognitive_state import CognitiveState
+from state.state_manager import StateManager
 from workflow.answer_generation import AnswerGenerationController, GenerationOutcome
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
@@ -28,6 +30,37 @@ from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
 from workflow.task_router import TaskRouter
 from workflow.workflow_events import WorkflowEventBus
 from workflow.workflow_state import WorkflowPhase
+
+
+@dataclass(slots=True)
+class StateLoadController:
+    """Load session state at the start of every workflow route."""
+
+    state_manager: StateManager
+    phase: WorkflowPhase = WorkflowPhase.STATE_LOAD
+
+    async def execute(self, context: ExecutionContext) -> CognitiveState:
+        """Load isolated state for the request session."""
+        return self.state_manager.load(str(context.metadata["state_session_id"]))
+
+
+@dataclass(slots=True)
+class StateCommitController:
+    """Commit successful workflow state with optimistic concurrency."""
+
+    state_manager: StateManager
+    phase: WorkflowPhase = WorkflowPhase.STATE_COMMIT
+
+    async def execute(self, context: ExecutionContext) -> dict[str, Any]:
+        """Persist state unless the shaped outcome failed or was cancelled."""
+        output = context.output if isinstance(context.output, dict) else {}
+        outcome = str(output.get("outcome", "failed"))
+        if outcome in {"failed", "cancelled"}:
+            return {"state": context.cognitive_state, "committed": False}
+        state = self.state_manager.save(
+            str(context.metadata["state_session_id"]), context.cognitive_state, context.cognitive_state.version
+        )
+        return {"state": state, "committed": True}
 
 
 @dataclass(slots=True)
@@ -153,7 +186,9 @@ class ReflectionController:
         """Run reflection using only workflow-routed subsystem outputs."""
         retrieval_confidence = getattr(context.retrieval_response, "confidence", None)
         retrieved_memories = tuple(getattr(context.retrieval_response, "results", ()))
-        affect_signals = tuple(getattr(context.affect_update, "reflection_signals", ())) if context.affect_update else ()
+        affect_signals = (
+            tuple(getattr(context.affect_update, "reflection_signals", ())) if context.affect_update else ()
+        )
         failure_metadata = {
             "reason": "routine workflow reflection checkpoint",
             "severity": 0.15,
@@ -262,7 +297,12 @@ class MemoryCommitController:
     phase: WorkflowPhase = WorkflowPhase.MEMORY_COMMIT
 
     async def execute(self, context: ExecutionContext) -> dict[str, Any]:
-        """Apply admission scoring and optionally persist one episodic memory."""
+        """Apply outcome-aware admission and persist an episodic exchange."""
+
+        output = context.output if isinstance(context.output, dict) else {}
+        outcome = str(output.get("outcome", "failed"))
+        if outcome in {"failed", "cancelled", "abstained"}:
+            return {"notes": (), "admission": {"stored": False, "policy": "successful_answers_only", "reason": outcome}}
 
         decision = self.importance_engine.decide(
             context.user_input,
@@ -270,14 +310,15 @@ class MemoryCommitController:
             reflection_result=context.reflection_result,
         )
         if not decision.stored:
-            return {"notes": (), "decision": decision}
+            return {"notes": (), "admission": {**decision.to_log_record(), "policy": "importance_threshold"}}
         affect_update = context.affect_update
-        note = MemoryNote.create(
+        user_note = MemoryNote.create(
             content=context.user_input,
             memory_type=MemoryType.EPISODIC,
             affective_state=affect_update.to_dict() if affect_update is not None else {},
             context={
                 "source": "prima_runtime",
+                "role": "user",
                 "execution_id": context.execution_id,
                 "source_session_id": str(context.metadata.get("session_id", "")),
                 "source_turn_id": str(context.metadata.get("turn_id", "")),
@@ -285,7 +326,22 @@ class MemoryCommitController:
             state_snapshot=getattr(context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
         )
-        return {"notes": (self.repository.add(note),), "decision": decision}
+        assistant_note = MemoryNote.create(
+            content=str(output.get("text", "")),
+            memory_type=MemoryType.EPISODIC,
+            context={
+                "source": "prima_runtime",
+                "role": "assistant",
+                "execution_id": context.execution_id,
+                "source_session_id": str(context.metadata.get("session_id", "")),
+                "source_turn_id": str(context.metadata.get("turn_id", "")),
+            },
+        )
+        notes = (self.repository.add(user_note), self.repository.add(assistant_note))
+        return {
+            "notes": notes,
+            "admission": {**decision.to_log_record(), "policy": "importance_threshold", "record_count": 2},
+        }
 
 
 @dataclass(slots=True)
@@ -368,13 +424,17 @@ class PrimaWorkflow:
         reasoning_controller: ReasoningController | None = None,
         llm_client: LLMClient | None = None,
         memory_repository: MemoryRepository | None = None,
+        state_manager: StateManager | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
     ) -> PrimaWorkflow:
         """Create a workflow with default controller adapters."""
         repository = memory_repository or retrieval_controller.repository
+        if state_manager is None:
+            raise ValueError("PrimaWorkflow requires an injected StateManager.")
         registry = ControllerRegistry(
             controllers={
+                WorkflowPhase.STATE_LOAD: StateLoadController(state_manager),
                 WorkflowPhase.AFFECT: AffectController(affect_engine),
                 WorkflowPhase.MEMORY_RETRIEVAL: MemoryRetrievalController(retrieval_controller),
                 WorkflowPhase.EVIDENCE_ACQUISITION: EvidenceAcquisitionController(
@@ -386,9 +446,8 @@ class PrimaWorkflow:
                 WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(llm_client or LLMClient()),
                 WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),
-                WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(
-                    repository, MemoryImportanceEngine(repository)
-                ),
+                WorkflowPhase.STATE_COMMIT: StateCommitController(state_manager),
+                WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(repository, MemoryImportanceEngine(repository)),
             }
         )
         return cls(registry=registry, event_bus=event_bus, retry_policy=retry_policy)

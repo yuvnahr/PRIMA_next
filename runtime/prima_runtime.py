@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from affect.affect_engine import DynamicAffectEngine
+from config.runtime_mode import RuntimeMode
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
 from llm.response_parser import extract_answer
@@ -20,6 +21,7 @@ from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
+from memory.repository_factory import RepositorySelection, select_memory_repository
 from memory.retrieval.retrieval_controller import RetrievalController
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
@@ -50,6 +52,7 @@ from runtime.route_profiles import InvalidRouteError, RoutePlan, select_route
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
+from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import WorkflowExecutionError
 from workflow.prima_workflow import PrimaWorkflow
@@ -67,8 +70,26 @@ class PrimaRuntime:
         reflection_engine: ReflectionEngine | None = None,
         llm_client: LLMClient | None = None,
         log_path: str | Path = "logs/runtime.log",
+        mode: RuntimeMode | str = RuntimeMode.TEST,
+        memory_backend: str | None = None,
+        memory_path: str | None = None,
+        state_manager: StateManager | None = None,
+        state_path: str | Path | None = None,
     ) -> None:
-        self.memory_repository = memory_repository or InMemoryMemoryRepository()
+        self.mode = RuntimeMode(mode)
+        self.memory_repository, self.repository_selection = select_memory_repository(
+            self.mode, memory_repository, backend=memory_backend, path=memory_path
+        )
+        if state_manager is not None:
+            if self.mode is RuntimeMode.PRODUCTION and type(state_manager) is InMemoryStateManager:
+                raise RuntimeError("Production mode requires configured persistent cognitive state storage.")
+            self.state_manager = state_manager
+        elif self.mode is RuntimeMode.PRODUCTION:
+            if state_path is None:
+                raise RuntimeError("Production preflight requires a configured state_path.")
+            self.state_manager = JsonStateManager(state_path)
+        else:
+            self.state_manager = InMemoryStateManager()
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
@@ -79,9 +100,7 @@ class PrimaRuntime:
         self.reasoning_controller = ReasoningController(
             reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
         )
-        self.llm_client = llm_client or LLMClient(
-            provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama")
-        )
+        self.llm_client = llm_client or LLMClient(provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama"))
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -89,6 +108,7 @@ class PrimaRuntime:
             reasoning_controller=self.reasoning_controller,
             llm_client=self.llm_client,
             memory_repository=self.memory_repository,
+            state_manager=self.state_manager,
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
@@ -107,7 +127,7 @@ class PrimaRuntime:
                 profile=request.profile,
                 status=ExecutionStatus.REJECTED,
                 outcome=ExecutionOutcome.FAILED,
-                diagnostics=_invalid_route_diagnostics(str(exc)),
+                diagnostics=_invalid_route_diagnostics(str(exc), self.mode, self.repository_selection),
                 errors=(str(exc),),
             )
         started = time.perf_counter()
@@ -118,6 +138,7 @@ class PrimaRuntime:
                 "task_kind": request.task_kind.value,
                 "profile": request.profile.value,
                 "session_id": request.session_id or "",
+                "state_session_id": request.session_id or request.request_id,
             },
         )
         try:
@@ -149,7 +170,12 @@ class PrimaRuntime:
         if mode not in {"isolated", "persistent"}:
             raise ValueError("Runtime reset mode must be 'isolated' or 'persistent'.")
         if mode == "isolated" and not preserve_repository:
+            if self.mode is not RuntimeMode.TEST:
+                raise RuntimeError("Only test mode may replace memory with an ephemeral repository.")
+        self.state_manager.reset()
+        if mode == "isolated" and not preserve_repository:
             self.memory_repository = InMemoryMemoryRepository()
+            self.repository_selection = RepositorySelection("in_memory", False)
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
             self.retrieval_controller = RetrievalController(
                 self.memory_repository,
@@ -165,6 +191,7 @@ class PrimaRuntime:
                 reasoning_controller=self.reasoning_controller,
                 llm_client=self.llm_client,
                 memory_repository=self.memory_repository,
+                state_manager=self.state_manager,
             )
 
     def answer_question(
@@ -207,6 +234,8 @@ class PrimaRuntime:
         if context is not None:
             context.retrieved_memories = result.retrieved_memories
             context.confidence_score = result.confidence
+            context.cognitive_state = self.state_manager.load(context.session_id)
+            context.emotional_state = context.cognitive_state.emotional_state
         return result
 
     def ingest_document(self, text: str, metadata: dict[str, Any] | None = None) -> MemoryNote:
@@ -225,6 +254,18 @@ class PrimaRuntime:
         if note is None:
             raise RuntimeError("Document ingestion did not commit a memory.")
         return note
+
+    def runtime_manifest(self) -> dict[str, Any]:
+        """Return schema-versioned runtime/storage configuration for benchmark manifests."""
+
+        return {
+            "schema_version": "1.0",
+            "runtime_mode": self.mode.value,
+            "memory_repository": self.repository_selection.backend,
+            "memory_persistent": self.repository_selection.persistent,
+            "memory_path": self.repository_selection.path,
+            "state_repository": "json" if isinstance(self.state_manager, JsonStateManager) else "in_memory",
+        }
 
     def _synthesize_evidence(
         self,
@@ -286,26 +327,35 @@ class PrimaRuntime:
                 structured_answer_valid = True
             except (json.JSONDecodeError, TypeError, KeyError, ProviderError, RuntimeError, ValueError) as exc:
                 errors.append(str(exc))
-                answer = self._parse_partial_answer(raw_model_response) if raw_model_response.startswith("{") else raw_model_response
+                answer = (
+                    self._parse_partial_answer(raw_model_response)
+                    if raw_model_response.startswith("{")
+                    else raw_model_response
+                )
                 if not answer:
                     answer = self._extractive_answer(answer_context)
         if answer.strip() == question.strip():
             errors.append("Answer matched question text; replaced with insufficient-information response.")
             answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
-        return answer, llm_used, tuple(errors), {
-            "llm_used": llm_used,
-            "context_tokens": answer_context.token_count,
-            "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
-            "selected_memory_ids": selected_memory_ids,
-            "structured_answer_valid": structured_answer_valid,
-            "raw_model_response": raw_model_response,
-            "raw_response": raw_model_response or None,
-            "prompt": prompt,
-            "llm_metadata": llm_metadata,
-            "generation_settings": dict(inference_settings),
-            "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
-            "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
-        }
+        return (
+            answer,
+            llm_used,
+            tuple(errors),
+            {
+                "llm_used": llm_used,
+                "context_tokens": answer_context.token_count,
+                "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
+                "selected_memory_ids": selected_memory_ids,
+                "structured_answer_valid": structured_answer_valid,
+                "raw_model_response": raw_model_response,
+                "raw_response": raw_model_response or None,
+                "prompt": prompt,
+                "llm_metadata": llm_metadata,
+                "generation_settings": dict(inference_settings),
+                "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
+                "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+            },
+        )
 
     def _parse_structured_answer(self, raw: str, answer_context: AnswerContext) -> tuple[str, list[str]]:
         payload = json.loads(raw)
@@ -334,7 +384,7 @@ class PrimaRuntime:
         if colon < 0:
             return ""
         try:
-            answer, _ = json.JSONDecoder().raw_decode(raw[colon + 1:].lstrip())
+            answer, _ = json.JSONDecoder().raw_decode(raw[colon + 1 :].lstrip())
         except json.JSONDecodeError:
             return ""
         return answer.strip() if isinstance(answer, str) else ""
@@ -352,7 +402,12 @@ class PrimaRuntime:
             "type": "object",
             "properties": {
                 "answer": {"type": ["string", "null"], "maxLength": 80},
-                "evidence": {"type": "array", "items": {"type": "string", "pattern": "^M[1-9][0-9]*$"}, "minItems": 1, "maxItems": 4},
+                "evidence": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^M[1-9][0-9]*$"},
+                    "minItems": 1,
+                    "maxItems": 4,
+                },
                 "insufficient_information": {"type": "boolean"},
             },
             "required": ["answer", "evidence", "insufficient_information"],
@@ -436,12 +491,16 @@ class PrimaRuntime:
             state_changes["memory_ids_added"] = created_ids
         if context.affect_update is not None:
             state_changes["emotional_state"] = context.affect_update.emotional_state.to_dict()
+        state_changes["version"] = context.cognitive_state.version
+        state_changes["committed"] = bool(context.metadata.get("state_committed", False))
         output_data: dict[str, Any] = {
             "latency_ms": latency_ms,
             "affect_state": affect_state,
             "memory_ids_created": created_ids,
             "memory_admission": (
-                context.memory_admission.to_log_record() if context.memory_admission is not None else {}
+                dict(context.memory_admission)
+                if isinstance(context.memory_admission, dict)
+                else _default_memory_admission(request.task_kind, outcome, bool(ingestion_id))
             ),
             "confidence": float(reasoning.confidence if reasoning is not None else self._confidence_score(context)),
             "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
@@ -474,7 +533,13 @@ class PrimaRuntime:
             output_data=output_data,
             state_delta=StateDelta(changes=state_changes),
             evidence=evidence,
-            diagnostics=_route_diagnostics(route, _executed_components(context)),
+            diagnostics=_route_diagnostics(
+                route,
+                _executed_components(context),
+                self.mode,
+                self.repository_selection,
+                context.cognitive_state.version,
+            ),
             errors=errors,
         )
 
@@ -521,7 +586,9 @@ class PrimaRuntime:
             confidence=float(response.output_data.get("confidence", 0.0)),
             evidence_references=tuple(items),
             hop_count=int(response.output_data.get("hop_count", 0)),
-            stop_reason=str(response.output_data.get("stop_reason", response.outcome.value if response.outcome else "failed")),
+            stop_reason=str(
+                response.output_data.get("stop_reason", response.outcome.value if response.outcome else "failed")
+            ),
             effective_budget=budget,
             errors=response.errors,
             answer_diagnostics={
@@ -548,9 +615,7 @@ class PrimaRuntime:
             confidence_score=float(response.output_data.get("confidence", 0.0)),
             latency_ms=float(response.output_data.get("latency_ms", 0.0)),
             errors=response.errors,
-            reflection_reasons=tuple(
-                dict(reason) for reason in response.output_data.get("reflection_reasons", [])
-            ),
+            reflection_reasons=tuple(dict(reason) for reason in response.output_data.get("reflection_reasons", [])),
             memory_admission=dict(response.output_data.get("memory_admission", {})),
             answer_diagnostics=answer.answer_diagnostics,
         )
@@ -560,8 +625,12 @@ class PrimaRuntime:
             return
         context.retrieved_memories = result.retrieved_memories
         context.confidence_score = result.confidence_score
+        context.cognitive_state = self.state_manager.load(context.session_id)
+        context.emotional_state = context.cognitive_state.emotional_state
 
-    def metrics_from_result(self, result: RuntimeResult, execution_context: ExecutionContext | None = None) -> RuntimeMetrics:
+    def metrics_from_result(
+        self, result: RuntimeResult, execution_context: ExecutionContext | None = None
+    ) -> RuntimeMetrics:
         """Create serializable metrics for a runtime result."""
         plan = execution_context.plan if execution_context is not None else None
         plan_status = getattr(getattr(plan, "status", None), "value", None)
@@ -592,7 +661,9 @@ class PrimaRuntime:
         note = MemoryNote.create(
             content=user_input,
             memory_type=MemoryType.EPISODIC,
-            affective_state=(affect_update.to_dict() if (affect_update is not None and hasattr(affect_update, "to_dict")) else {}),
+            affective_state=(
+                affect_update.to_dict() if (affect_update is not None and hasattr(affect_update, "to_dict")) else {}
+            ),
             context={
                 "source": "prima_runtime",
                 "execution_id": execution_context.execution_id,
@@ -623,7 +694,15 @@ class PrimaRuntime:
             final_response=str(output.get("text") or ""),
             prediction_before_reflection=str(output.get("text") or ""),
             prediction_after_reflection=str(output.get("text") or ""),
-            affect_state=(affect_update.profile.to_dict() if (affect_update is not None and hasattr(affect_update, "profile") and hasattr(affect_update.profile, "to_dict")) else {}),
+            affect_state=(
+                affect_update.profile.to_dict()
+                if (
+                    affect_update is not None
+                    and hasattr(affect_update, "profile")
+                    and hasattr(affect_update.profile, "to_dict")
+                )
+                else {}
+            ),
             retrieved_memories=tuple(getattr(retrieval_response, "results", ())),
             memory_notes_created=created_notes,
             reflection_triggered=bool(getattr(reflection_result, "should_reflect", False)),
@@ -642,7 +721,9 @@ class PrimaRuntime:
         plan_evaluation = getattr(getattr(execution_context.plan, "evaluation", None), "confidence", None)
         if plan_evaluation is not None:
             return round(float(plan_evaluation), 6)
-        retrieval_confidence = getattr(getattr(execution_context.retrieval_response, "confidence", None), "confidence", None)
+        retrieval_confidence = getattr(
+            getattr(execution_context.retrieval_response, "confidence", None), "confidence", None
+        )
         if retrieval_confidence is not None:
             return round(float(retrieval_confidence), 6)
         affect_confidence = getattr(getattr(execution_context.affect_update, "profile", None), "confidence", None)
@@ -688,10 +769,7 @@ class PrimaRuntime:
         if not answer_context.memories:
             return self._insufficient_information_answer(answer_context.question, reason="no_context")
         best = max(answer_context.memories, key=lambda memory: memory.retrieval_score)
-        return (
-            "Based on retrieved memory: "
-            f"{best.text}"
-        )
+        return f"Based on retrieved memory: {best.text}"
 
     def _insufficient_information_answer(self, question: str, reason: str) -> str:
         del question, reason
@@ -765,8 +843,9 @@ class PrimaRuntime:
         diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
         return diagnostics
 
-
-    def _classify_answer_failure(self, diagnostics: dict[str, Any], errors: tuple[str, ...], llm_used: bool) -> str | None:
+    def _classify_answer_failure(
+        self, diagnostics: dict[str, Any], errors: tuple[str, ...], llm_used: bool
+    ) -> str | None:
         if errors:
             return "generation_error"
         retrieved = diagnostics.get("retrieved_memory_ids", [])
@@ -859,6 +938,7 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.INPUT_PARSER,
     RuntimeComponent.TASK_SCHEDULER,
     RuntimeComponent.STATE_MANAGER,
+    RuntimeComponent.PERSISTENT_STATE,
     RuntimeComponent.POLICY_ROUTER,
     RuntimeComponent.EXECUTION_DISPATCHER,
     RuntimeComponent.AFFECT_ENGINE,
@@ -886,11 +966,12 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
     executed = {
         RuntimeComponent.INPUT_PARSER,
         RuntimeComponent.TASK_SCHEDULER,
-        RuntimeComponent.STATE_MANAGER,
         RuntimeComponent.POLICY_ROUTER,
         RuntimeComponent.EXECUTION_DISPATCHER,
     }
     completed = set(context.workflow_state.completed_phases)
+    if WorkflowPhase.STATE_LOAD in completed:
+        executed.update((RuntimeComponent.STATE_MANAGER, RuntimeComponent.PERSISTENT_STATE))
     if WorkflowPhase.AFFECT in completed:
         executed.update((RuntimeComponent.EMOTION_CLASSIFIER, RuntimeComponent.AFFECT_ENGINE))
     if WorkflowPhase.EVIDENCE_ACQUISITION in completed:
@@ -909,9 +990,7 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.PLANNER)
     if WorkflowPhase.REFLECTION in completed:
         executed.add(RuntimeComponent.REFLECTION)
-    if WorkflowPhase.ANSWER_GENERATION in completed and bool(
-        getattr(context.generation_result, "llm_called", False)
-    ):
+    if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
         executed.update((RuntimeComponent.MODEL_EXECUTOR, RuntimeComponent.OUTPUT_VALIDATOR))
     if WorkflowPhase.DOCUMENT_INGESTION in completed:
         executed.update(
@@ -921,7 +1000,7 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.OUTPUT_SHAPER)
     if WorkflowPhase.MEMORY_COMMIT in completed:
         executed.add(RuntimeComponent.MEMORY_COMMIT)
-    if completed:
+    if WorkflowPhase.STATE_COMMIT in completed and bool(context.metadata.get("state_committed", False)):
         executed.add(RuntimeComponent.STATE_COMMIT)
     return tuple(component for component in RuntimeComponent if component in executed)
 
@@ -929,6 +1008,9 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
 def _route_diagnostics(
     route: RoutePlan,
     executed: tuple[RuntimeComponent, ...],
+    mode: RuntimeMode,
+    repository: RepositorySelection,
+    state_version: int,
     note: str | None = None,
 ) -> RuntimeDiagnostics:
     capabilities = tuple(
@@ -952,10 +1034,16 @@ def _route_diagnostics(
         skipped_components=tuple(component for component in RuntimeComponent if component not in executed),
         capabilities=capabilities,
         notes=(note,) if note else (),
+        runtime_mode=mode,
+        memory_repository=repository.backend,
+        memory_persistent=repository.persistent,
+        state_version=state_version,
     )
 
 
-def _invalid_route_diagnostics(reason: str) -> RuntimeDiagnostics:
+def _invalid_route_diagnostics(
+    reason: str, mode: RuntimeMode, repository: RepositorySelection
+) -> RuntimeDiagnostics:
     return RuntimeDiagnostics(
         route_name="invalid",
         skipped_components=tuple(RuntimeComponent),
@@ -964,6 +1052,17 @@ def _invalid_route_diagnostics(reason: str) -> RuntimeDiagnostics:
             for component in RuntimeComponent
         ),
         notes=(reason,),
+        runtime_mode=mode,
+        memory_repository=repository.backend,
+        memory_persistent=repository.persistent,
     )
 
 
+def _default_memory_admission(task: TaskKind, outcome: ExecutionOutcome, ingested: bool) -> dict[str, Any]:
+    if task is TaskKind.DOCUMENT_INGESTION:
+        return {"stored": ingested, "policy": "semantic_source_record", "reason": outcome.value}
+    if task is TaskKind.FACTUAL_QA:
+        return {"stored": False, "policy": "qa_read_only", "reason": outcome.value}
+    if task is TaskKind.EMOTION_CLASSIFICATION:
+        return {"stored": False, "policy": "classification_read_only", "reason": outcome.value}
+    return {"stored": False, "policy": "successful_answers_only", "reason": outcome.value}

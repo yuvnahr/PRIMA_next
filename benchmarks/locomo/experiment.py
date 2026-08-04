@@ -125,6 +125,12 @@ def run_locomo_experiment(
             },
             "seed": seed,
             "benchmark_version": "locomo10",
+            "runtime": {
+                "schema_version": "1.0",
+                "runtime_mode": "benchmark",
+                "memory_repository": "in_memory",
+                "memory_persistent": False,
+            },
             "max_conversations": max_conversations,
             "max_questions": max_questions,
         },
