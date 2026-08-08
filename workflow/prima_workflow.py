@@ -23,6 +23,14 @@ from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from state.cognitive_state import CognitiveState
 from state.state_manager import StateManager
+from uncertainty import (
+    ConfidenceSignal,
+    ConfidenceSource,
+    ExecutionDecision,
+    OverallConfidence,
+    UncertaintyEstimator,
+    UncertaintyGate,
+)
 from workflow.answer_generation import AnswerGenerationController, GenerationOutcome
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
@@ -30,6 +38,7 @@ from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
 from workflow.task_router import TaskRouter
 from workflow.workflow_events import WorkflowEventBus
 from workflow.workflow_state import WorkflowPhase
+from world import PredictionResult, SimulationContext, StateSimulator
 
 
 @dataclass(slots=True)
@@ -176,6 +185,110 @@ class PlanningController:
 
 
 @dataclass(slots=True)
+class WorldSimulationController:
+    """Run the existing deterministic symbolic world model inside the workflow."""
+
+    simulator: StateSimulator = field(default_factory=StateSimulator)
+    phase: WorkflowPhase = WorkflowPhase.WORLD_SIMULATION
+
+    async def execute(self, context: ExecutionContext) -> PredictionResult:
+        """Predict the selected plan under current state and execution policy."""
+        policy = context.metadata.get("execution_policy")
+        if not isinstance(policy, ExecutionPolicy):
+            policy = ExecutionPolicy()
+        intent = getattr(context.plan, "execution_intent", None)
+        constraints = ["Unsupported claims must not proceed when uncertainty is high."]
+        if not policy.allow_external_actions:
+            constraints.append("Must not execute external tools without explicit policy permission.")
+        if policy.require_sandbox:
+            constraints.append("External actions must use the configured sandbox.")
+        simulation = SimulationContext.from_inputs(
+            cognitive_state=context.cognitive_state,
+            plan=context.plan,
+            constraints=tuple(constraints),
+            metadata={
+                "intended_action": getattr(getattr(intent, "intent_type", None), "value", "unknown"),
+                "execution_target": (
+                    "tool" if bool(getattr(intent, "requires_external_tool", False)) else "llm"
+                ),
+                "policy": policy.to_dict(),
+                "symbolic": True,
+                "learned_prediction": False,
+            },
+        )
+        return self.simulator.simulate(simulation)
+
+
+@dataclass(slots=True)
+class UncertaintyController:
+    """Aggregate workflow subsystem signals into one uncertainty estimate."""
+
+    estimator: UncertaintyEstimator = field(default_factory=UncertaintyEstimator)
+    phase: WorkflowPhase = WorkflowPhase.UNCERTAINTY_ESTIMATION
+
+    async def execute(self, context: ExecutionContext) -> OverallConfidence:
+        """Estimate uncertainty from evidence, plan, affect, state, and policy."""
+        return self.estimator.estimate_from_subsystem_outputs(
+            retrieval_response=context.retrieval_response,
+            reflection_result=context.reflection_result,
+            affect_update=context.affect_update,
+            plan=context.plan,
+            extra_signals=self._extra_signals(context),
+        )
+
+    def _extra_signals(self, context: ExecutionContext) -> tuple[ConfidenceSignal, ...]:
+        signals: list[ConfidenceSignal] = []
+        state_confidence = context.cognitive_state.confidence.get("overall_confidence")
+        if state_confidence is not None:
+            value = max(0.0, min(1.0, float(state_confidence)))
+            signals.append(ConfidenceSignal(ConfidenceSource.STATE, value, 1.0 - value))
+
+        policy = context.metadata.get("execution_policy")
+        if not isinstance(policy, ExecutionPolicy):
+            policy = ExecutionPolicy()
+        intent = getattr(context.plan, "execution_intent", None)
+        requires_tool = bool(getattr(intent, "requires_external_tool", False))
+        tool_name = getattr(intent, "tool_name", None)
+        allowed = not requires_tool or (
+            policy.allow_external_actions and tool_name is not None and tool_name in policy.allowed_tools
+        )
+        signals.append(
+            ConfidenceSignal(
+                ConfidenceSource.POLICY,
+                0.95 if allowed else 0.05,
+                0.05 if allowed else 0.95,
+                metadata={"allowed": allowed, "requires_external_tool": requires_tool, "tool_name": tool_name},
+            )
+        )
+        return tuple(signals)
+
+
+@dataclass(slots=True)
+class ExecutionDecisionController:
+    """Apply the typed uncertainty gate before action or model execution."""
+
+    gate: UncertaintyGate = field(default_factory=UncertaintyGate)
+    phase: WorkflowPhase = WorkflowPhase.EXECUTION_DECISION
+
+    async def execute(self, context: ExecutionContext) -> Any:
+        """Return the deterministic gate decision for this execution."""
+        if not isinstance(context.uncertainty, OverallConfidence):
+            raise TypeError("Execution decision requires an OverallConfidence estimate.")
+        if not isinstance(context.world_prediction, PredictionResult):
+            raise TypeError("Execution decision requires a symbolic PredictionResult.")
+        result = self.gate.evaluate(
+            context.uncertainty,
+            context.world_prediction,
+            retrieval_retry_count=int(context.metadata.get("retrieval_retry_count", 0)),
+            clarification_required=bool(context.metadata.get("clarification_required", False)),
+        )
+        history = context.metadata.setdefault("execution_decision_history", [])
+        if isinstance(history, list):
+            history.append(result.to_dict())
+        return result
+
+
+@dataclass(slots=True)
 class ReflectionController:
     """Workflow controller for adaptive reflection."""
 
@@ -246,8 +359,8 @@ class ActionController:
         action_context = ActionContext(
             plan=context.plan,
             cognitive_state=context.cognitive_state,
-            world_prediction=context.metadata.get("world_prediction"),
-            uncertainty=context.metadata.get("uncertainty"),
+            world_prediction=context.world_prediction,
+            uncertainty=context.uncertainty,
             policy=policy,
             metadata={"execution_id": context.execution_id},
         )
@@ -353,6 +466,24 @@ class OutputController:
     async def execute(self, context: ExecutionContext) -> dict[str, Any]:
         """Shape an existing typed subsystem result without generating content."""
 
+        gate_result = context.execution_decision
+        decision = getattr(gate_result, "decision", None)
+        if gate_result is not None and decision is ExecutionDecision.ASK_FOR_CLARIFICATION:
+            return {
+                "text": "Please clarify the request before I continue.",
+                "outcome": GenerationOutcome.ABSTAINED.value,
+                "execution_decision": gate_result.to_dict(),
+            }
+        if gate_result is not None and decision in {
+            ExecutionDecision.ABSTAIN,
+            ExecutionDecision.RETRY_RETRIEVAL,
+        }:
+            return {
+                "text": "I cannot safely complete this request with the available evidence.",
+                "outcome": GenerationOutcome.ABSTAINED.value,
+                "execution_decision": gate_result.to_dict(),
+            }
+
         if context.generation_result is not None:
             result = context.generation_result
             return {
@@ -425,6 +556,10 @@ class PrimaWorkflow:
         llm_client: LLMClient | None = None,
         memory_repository: MemoryRepository | None = None,
         state_manager: StateManager | None = None,
+        state_simulator: StateSimulator | None = None,
+        uncertainty_estimator: UncertaintyEstimator | None = None,
+        uncertainty_gate: UncertaintyGate | None = None,
+        action_executor: ActionExecutor | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
     ) -> PrimaWorkflow:
@@ -441,8 +576,15 @@ class PrimaWorkflow:
                     reasoning_controller or ReasoningController(), retrieval_controller
                 ),
                 WorkflowPhase.PLANNING: PlanningController(),
+                WorkflowPhase.WORLD_SIMULATION: WorldSimulationController(state_simulator or StateSimulator()),
+                WorkflowPhase.UNCERTAINTY_ESTIMATION: UncertaintyController(
+                    uncertainty_estimator or UncertaintyEstimator()
+                ),
+                WorkflowPhase.EXECUTION_DECISION: ExecutionDecisionController(
+                    uncertainty_gate or UncertaintyGate()
+                ),
                 WorkflowPhase.REFLECTION: ReflectionController(reflection_engine),
-                WorkflowPhase.ACTION: ActionController(),
+                WorkflowPhase.ACTION: ActionController(action_executor or ActionExecutor()),
                 WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(llm_client or LLMClient()),
                 WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),

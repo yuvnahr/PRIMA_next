@@ -21,7 +21,7 @@ ENGINEERING
 - Workflow owns orchestration; event bus owns async communication; ChromaDB is memory source of truth.
 - No independent QA/classification/ingestion pipelines or direct subsystem coupling.
 - Thin compatibility adapters are allowed; defective architecture is not preserved.
-- Python 3.12; strict typing; documented public APIs/types; dataclasses/Pydantic; dependency injection; async-compatible; security-first; no circular dependencies.
+- Python 3.10; strict typing; documented public APIs/types; dataclasses/Pydantic; dependency injection; async-compatible; security-first; no circular dependencies.
 - No global mutable config, singletons/model clients, hidden environment mutation, blanket exceptions/type ignores, silent fallbacks, skipped tests, or weakened assertions.
 - Never expose gold answers/labels/supporting facts/evidence IDs/evaluation results to prompts, retrieval, routing, or reflection.
 - Never modify benchmark gold data or historical results. Production must not import benchmarks.

@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 04. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 05. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -12,8 +12,8 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 04. `Open` means verified d
 | REFL-001 | High | Verified fact | QA reflection adapter emits only `ABSTAIN` or `NO_ACTION`; controller accepts only revised-query actions (`reflection/reasoning_reflection_adapter.py:17-21`; `reasoning/controller.py:83-109`). | Future bounded-reasoning phase | A low-confidence test demonstrates one advised query and a bounded second retrieval. | Open |
 | REFL-002 | High | Verified fact | Workflow reflection records a decision but cannot retrieve/replan/correct. | Future bounded-reasoning phase | State-machine tests prove bounded retry, terminal success and retry exhaustion. | Open |
 | SUBSYS-001 | Medium | Verified fact | Graph traversal is absent from runtime retrieval defaults; graph reasoning is not production-reachable. | Phase 05 — memory/graph | A profile test proves graph calls when enabled and an explicit skip when disabled. | Open |
-| SUBSYS-002 | High | Verified fact | World model exists but no workflow stage invokes it; action only reads unset metadata. | Future bounded-reasoning phase | Full-profile test proves world simulation output reaches uncertainty/action diagnostics. | Open |
-| SUBSYS-003 | High | Verified fact | Uncertainty estimator exists but no workflow stage invokes it. | Future bounded-reasoning phase | Threshold tests prove execute versus reflect transitions and bounded termination. | Open |
+| SUBSYS-002 | High | Verified fact | Full profiles now invoke the existing deterministic symbolic world model after planning and pass its typed prediction to the uncertainty gate and action executor. | Phase 05 — world/uncertainty | Full-profile tests prove world simulation output reaches action context and diagnostics. | Closed |
+| SUBSYS-003 | High | Verified fact | Full profiles now aggregate available subsystem confidence signals and apply a configurable typed gate before execution. | Phase 05 — world/uncertainty | Tests prove continue, reflect, retry, clarification and high-risk denial with deterministic thresholds. | Closed |
 | SUBSYS-004 | Medium | Verified fact | Consolidation/abstraction/forgetting exist without production scheduling or event subscribers. | Phase 05 — memory/graph | Commit emits versioned events; maintenance consumer tests prove each configured handler call. | Open |
 | MEM-001 | Medium | Verified fact | Procedural memory is absent from `MemoryType`. | Phase 05 — memory/graph | Contract and repository tests prove procedural storage/retrieval, or the target is explicitly retired. | Open |
 | MEM-002 | High | Verified fact | Repository selection is mode-enforced: test may use in-memory, benchmark declares its choice, and production requires configured valid ChromaDB without fallback. | Phase 04 — state/memory ownership | Tests prove production preflight, benchmark declaration/isolation, diagnostics visibility and no silent ephemeral fallback. | Closed |
@@ -26,9 +26,9 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 04. `Open` means verified d
 | BENCH-001 | Critical | Verified fact | HotpotQA/LoCoMo compatibility calls now converge on `execute`; GoEmotions still uses benchmark-local classifier/LLM systems. | Phase 07 — benchmarks | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
 | BENCH-002 | Medium | Verified fact | Hotpot `checkpoint_every` is ignored, only Hotpot resumes, and checkpoint/manifest JSON lacks schema versions. | Phase 07 — benchmarks | Resume/cadence tests cover all supported runners and reject incompatible schema versions. | Open |
 | BENCH-003 | High | Verified fact | Current results cannot be attributed to one complete wrapper; Hotpot uses supplied context and GoEmotions classifier variants do not measure Qwen-wrapper uplift. | Phase 07 — benchmarks | Reports identify exact route/profile/components/data regime and prohibit unsupported attribution text. | Open |
-| CFG-001 | Medium | Verified fact | `pyproject.toml` targeted Python 3.10 and mypy used blanket `ignore_errors`. | Phase 01 — quality gates | CI/Ruff/mypy target 3.12; strict core modules pass without `ignore_errors`. | Closed |
+| CFG-001 | Medium | Verified fact | Python 3.10 is now the explicit project, Ruff, mypy and CI target; strict core-module typing remains enabled without blanket `ignore_errors`. | Phase 05 — environment alignment | CI, Ruff and mypy target 3.10 and all quality gates pass. | Closed |
 | DOC-001 | Medium | Verified fact | README’s single-workflow and persistence claims exceed current reachability/defaults. | Phase 08 — tooling/docs | Documentation assertions match executable architecture tests and deployed defaults. | Open |
-| GATE-001 | Medium | Verified fact | Literal `compileall -q .` traversed external/venv sources and failed outside owned code. | Phase 01 — quality gates | Python 3.12 owned-source compile gate explicitly excludes Git, venv and external trees and passes. | Closed |
+| GATE-001 | Medium | Verified fact | Literal `compileall -q .` traversed external/venv sources and failed outside owned code. | Phase 01 — quality gates | Python 3.10 owned-source compile gate explicitly excludes Git, venv and external trees and passes. | Closed |
 | GATE-002 | Medium | Verified fact | Raw `xenon .` descended into non-production trees and did not finish within three minutes; the existing runner also included benchmark/evaluation roots. | Phase 02 — quality gates | CI/rules use `scripts/run_xenon.py`; a test proves its allowlist contains only production PRIMA roots. | Closed |
 | GATE-003 | Medium | Verified fact | Long-horizon smoke tests hard-coded `PrimaRuntime()` and incurred unavailable-provider retries on every turn after real generation was enabled. | Phase 03 — workflow convergence | Evaluation runner accepts a runtime factory; smoke tests inject a deterministic client and complete without provider calls. | Closed |
 | DEP-001 | High | Verified fact | Runtime, development, benchmark, semantic-metric and encoder dependencies were mixed in one default requirements file. | Phase 01 — quality gates | Five explicit dependency groups exist; default install excludes semantic metrics and encoder/training extras. | Closed |
@@ -48,7 +48,8 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 04. `Open` means verified d
 | Phase 02 — canonical contract | ARCH-001 (partial), ROUTE-001, CONTRACT-001, ROUTE-002, SYNC-001, GATE-002 |
 | Phase 03 — execution/output | ARCH-001, ARCH-002, ARCH-003, ARCH-004, OUTCOME-001, GATE-003 |
 | Phase 04 — state/memory ownership | MEM-002, STATE-001, STATE-002, STATE-003, STATE-004 |
-| Future bounded-reasoning phase | REFL-001, REFL-002, SUBSYS-002, SUBSYS-003 |
+| Future bounded-reasoning phase | REFL-001, REFL-002 |
+| Phase 05 — world/uncertainty | SUBSYS-002, SUBSYS-003 |
 | Phase 05 — memory/graph | SUBSYS-001, SUBSYS-004, MEM-001, RETR-001 |
 | Phase 06 — diagnostics | DIAG-001 |
 | Phase 07 — benchmarks | BENCH-001, BENCH-002, BENCH-003 |

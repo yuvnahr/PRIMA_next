@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 from typing import Any, cast
 
+from action import ActionExecutor
 from affect.affect_engine import DynamicAffectEngine
 from config.runtime_mode import RuntimeMode
 from llm.llm_client import LLMClient
@@ -53,10 +54,12 @@ from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
+from uncertainty import UncertaintyEstimator, UncertaintyGate, UncertaintyGatePolicy
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import WorkflowExecutionError
 from workflow.prima_workflow import PrimaWorkflow
 from workflow.workflow_state import WorkflowPhase, WorkflowStatus
+from world import StateSimulator
 
 
 class PrimaRuntime:
@@ -75,6 +78,10 @@ class PrimaRuntime:
         memory_path: str | None = None,
         state_manager: StateManager | None = None,
         state_path: str | Path | None = None,
+        state_simulator: StateSimulator | None = None,
+        uncertainty_estimator: UncertaintyEstimator | None = None,
+        uncertainty_policy: UncertaintyGatePolicy | None = None,
+        action_executor: ActionExecutor | None = None,
     ) -> None:
         self.mode = RuntimeMode(mode)
         self.memory_repository, self.repository_selection = select_memory_repository(
@@ -101,6 +108,10 @@ class PrimaRuntime:
             reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
         )
         self.llm_client = llm_client or LLMClient(provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama"))
+        self.state_simulator = state_simulator or StateSimulator()
+        self.uncertainty_estimator = uncertainty_estimator or UncertaintyEstimator()
+        self.uncertainty_gate = UncertaintyGate(uncertainty_policy or UncertaintyGatePolicy())
+        self.action_executor = action_executor or ActionExecutor()
         self.workflow = workflow or PrimaWorkflow.from_controllers(
             affect_engine=self.affect_engine,
             retrieval_controller=self.retrieval_controller,
@@ -109,6 +120,10 @@ class PrimaRuntime:
             llm_client=self.llm_client,
             memory_repository=self.memory_repository,
             state_manager=self.state_manager,
+            state_simulator=self.state_simulator,
+            uncertainty_estimator=self.uncertainty_estimator,
+            uncertainty_gate=self.uncertainty_gate,
+            action_executor=self.action_executor,
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
@@ -192,6 +207,10 @@ class PrimaRuntime:
                 llm_client=self.llm_client,
                 memory_repository=self.memory_repository,
                 state_manager=self.state_manager,
+                state_simulator=self.state_simulator,
+                uncertainty_estimator=self.uncertainty_estimator,
+                uncertainty_gate=self.uncertainty_gate,
+                action_executor=self.action_executor,
             )
 
     def answer_question(
@@ -508,6 +527,15 @@ class PrimaRuntime:
                 dict(reason) for reason in getattr(context.reflection_result, "trigger_reasons", ())
             ],
             "generation": generation.to_dict() if generation is not None else {},
+            "world_prediction": (
+                context.world_prediction.to_dict() if context.world_prediction is not None else {}
+            ),
+            "uncertainty": context.uncertainty.to_dict() if context.uncertainty is not None else {},
+            "execution_decision": (
+                context.execution_decision.to_dict() if context.execution_decision is not None else {}
+            ),
+            "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
+            "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
         }
         if reasoning is not None:
             output_data.update(
@@ -535,7 +563,7 @@ class PrimaRuntime:
             evidence=evidence,
             diagnostics=_route_diagnostics(
                 route,
-                _executed_components(context),
+                context,
                 self.mode,
                 self.repository_selection,
                 context.cognitive_state.version,
@@ -950,6 +978,8 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.RERANKER,
     RuntimeComponent.CONFIDENCE_ESTIMATOR,
     RuntimeComponent.PLANNER,
+    RuntimeComponent.WORLD_MODEL,
+    RuntimeComponent.UNCERTAINTY_ESTIMATOR,
     RuntimeComponent.REFLECTION,
     RuntimeComponent.MODEL_EXECUTOR,
     RuntimeComponent.OUTPUT_VALIDATOR,
@@ -988,6 +1018,10 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         )
     if WorkflowPhase.PLANNING in completed:
         executed.add(RuntimeComponent.PLANNER)
+    if WorkflowPhase.WORLD_SIMULATION in completed:
+        executed.add(RuntimeComponent.WORLD_MODEL)
+    if WorkflowPhase.UNCERTAINTY_ESTIMATION in completed:
+        executed.add(RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     if WorkflowPhase.REFLECTION in completed:
         executed.add(RuntimeComponent.REFLECTION)
     if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
@@ -1007,12 +1041,13 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
 
 def _route_diagnostics(
     route: RoutePlan,
-    executed: tuple[RuntimeComponent, ...],
+    context: ExecutionContext,
     mode: RuntimeMode,
     repository: RepositorySelection,
     state_version: int,
     note: str | None = None,
 ) -> RuntimeDiagnostics:
+    executed = _executed_components(context)
     capabilities = tuple(
         ComponentCapability(
             component=component,
@@ -1027,6 +1062,25 @@ def _route_diagnostics(
         )
         for component in RuntimeComponent
     )
+    gate_result = context.execution_decision
+    full_profile = route.profile is ExecutionProfile.PRIMA_FULL
+    replacement_rule = "uncertainty_gate" if full_profile else "profile_direct_execution"
+    component_details = {
+        component.value: (
+            {
+                "status": "executed" if component in executed else "enabled_not_executed",
+                "reason": "selected by prima_full profile",
+                "replacement_decision_rule": replacement_rule,
+            }
+            if full_profile
+            else {
+                "status": "disabled",
+                "reason": f"disabled by execution profile '{route.profile.value}'",
+                "replacement_decision_rule": replacement_rule,
+            }
+        )
+        for component in (RuntimeComponent.WORLD_MODEL, RuntimeComponent.UNCERTAINTY_ESTIMATOR)
+    }
     return RuntimeDiagnostics(
         route_name=route.name,
         planned_components=route.components,
@@ -1038,6 +1092,11 @@ def _route_diagnostics(
         memory_repository=repository.backend,
         memory_persistent=repository.persistent,
         state_version=state_version,
+        execution_decision=getattr(getattr(gate_result, "decision", None), "value", None),
+        decision_rule=getattr(gate_result, "rule", replacement_rule),
+        decision_thresholds=dict(getattr(gate_result, "thresholds", {})),
+        decision_history=tuple(context.metadata.get("execution_decision_history", ())),
+        component_details=component_details,
     )
 
 

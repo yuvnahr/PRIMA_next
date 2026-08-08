@@ -23,6 +23,9 @@ class ExecutionContext:
     retrieval_response: Any | None = None
     reasoning_result: Any | None = None
     plan: Any | None = None
+    world_prediction: Any | None = None
+    uncertainty: Any | None = None
+    execution_decision: Any | None = None
     reflection_result: Any | None = None
     action_result: Any | None = None
     generation_result: Any | None = None

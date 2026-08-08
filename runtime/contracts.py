@@ -133,6 +133,11 @@ class RuntimeDiagnostics(ContractModel):
     memory_repository: str = "unconfigured"
     memory_persistent: bool = False
     state_version: int = 0
+    execution_decision: str | None = None
+    decision_rule: str | None = None
+    decision_thresholds: dict[str, float | int] = Field(default_factory=dict)
+    decision_history: tuple[dict[str, Any], ...] = ()
+    component_details: dict[str, dict[str, Any]] = Field(default_factory=dict)
 
 
 class PrimaRequest(ContractModel):

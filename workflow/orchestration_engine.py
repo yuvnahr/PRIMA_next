@@ -6,6 +6,7 @@ import asyncio
 from dataclasses import dataclass
 
 from state.cognitive_state import CognitiveState
+from uncertainty.execution_gate import ExecutionDecision
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.task_router import TaskRouter
@@ -52,13 +53,30 @@ class OrchestrationEngine:
         context.workflow_state.status = WorkflowStatus.RUNNING
         await self._publish(context, WorkflowEventType.WORKFLOW_STARTED)
         try:
-            for phase in self.router.route(context).phases:
+            phases = list(self.router.route(context).phases)
+            index = 0
+            while index < len(phases):
+                phase = phases[index]
+                index += 1
+                if self._skip_phase(context, phase):
+                    continue
                 await self._check_cancelled(context)
                 context.workflow_state.current_phase = phase
                 await self._publish(context, WorkflowEventType.PHASE_STARTED, phase)
                 await self._execute_phase_with_retries(context, phase)
                 context.workflow_state.mark_phase_complete(phase)
                 await self._publish(context, WorkflowEventType.PHASE_COMPLETED, phase)
+                if phase is WorkflowPhase.EXECUTION_DECISION and self._requests_retrieval_retry(context):
+                    context.metadata["retrieval_retry_count"] = int(
+                        context.metadata.get("retrieval_retry_count", 0)
+                    ) + 1
+                    phases[index:index] = [
+                        WorkflowPhase.EVIDENCE_ACQUISITION,
+                        WorkflowPhase.PLANNING,
+                        WorkflowPhase.WORLD_SIMULATION,
+                        WorkflowPhase.UNCERTAINTY_ESTIMATION,
+                        WorkflowPhase.EXECUTION_DECISION,
+                    ]
 
             context.workflow_state.status = WorkflowStatus.COMPLETED
             await self._publish(context, WorkflowEventType.WORKFLOW_COMPLETED)
@@ -129,6 +147,12 @@ class OrchestrationEngine:
             context.retrieval_response = getattr(result, "latest_retrieval", None)
         elif phase == WorkflowPhase.PLANNING:
             context.plan = result
+        elif phase == WorkflowPhase.WORLD_SIMULATION:
+            context.world_prediction = result
+        elif phase == WorkflowPhase.UNCERTAINTY_ESTIMATION:
+            context.uncertainty = result
+        elif phase == WorkflowPhase.EXECUTION_DECISION:
+            context.execution_decision = result
         elif phase == WorkflowPhase.REFLECTION:
             context.reflection_result = result
         elif phase == WorkflowPhase.ACTION:
@@ -150,6 +174,25 @@ class OrchestrationEngine:
             context.memory_notes_created = tuple(result.get("notes", ()))
             context.memory_admission = result.get("admission")
         context.workflow_state.outputs[phase.value] = result
+
+    def _requests_retrieval_retry(self, context: ExecutionContext) -> bool:
+        decision = getattr(context.execution_decision, "decision", None)
+        thresholds = getattr(context.execution_decision, "thresholds", {})
+        maximum = int(thresholds.get("max_retrieval_retries", 0))
+        current = int(context.metadata.get("retrieval_retry_count", 0))
+        return decision is ExecutionDecision.RETRY_RETRIEVAL and current < maximum
+
+    def _skip_phase(self, context: ExecutionContext, phase: WorkflowPhase) -> bool:
+        decision = getattr(context.execution_decision, "decision", None)
+        if phase is WorkflowPhase.REFLECTION:
+            return context.execution_decision is not None and decision is not ExecutionDecision.REFLECT
+        if phase in {WorkflowPhase.ACTION, WorkflowPhase.ANSWER_GENERATION}:
+            return decision in {
+                ExecutionDecision.ASK_FOR_CLARIFICATION,
+                ExecutionDecision.ABSTAIN,
+                ExecutionDecision.RETRY_RETRIEVAL,
+            }
+        return False
 
     async def _check_cancelled(self, context: ExecutionContext) -> None:
         if context.cancellation_requested:

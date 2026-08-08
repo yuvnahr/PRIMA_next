@@ -3,6 +3,12 @@
 from uncertainty.calibration import CalibrationProfile, ConfidenceCalibrator
 from uncertainty.confidence_aggregator import ConfidenceAggregator
 from uncertainty.confidence_signal import ConfidenceSignal, OverallConfidence
+from uncertainty.execution_gate import (
+    ExecutionDecision,
+    ExecutionGateResult,
+    UncertaintyGate,
+    UncertaintyGatePolicy,
+)
 from uncertainty.uncertainty_estimator import UncertaintyEstimator
 from uncertainty.uncertainty_types import (
     ConfidenceSource,
@@ -19,7 +25,11 @@ __all__ = [
     "ConfidenceSource",
     "ConfidenceTrend",
     "DecisionType",
+    "ExecutionDecision",
+    "ExecutionGateResult",
     "OverallConfidence",
     "UncertaintyBand",
     "UncertaintyEstimator",
+    "UncertaintyGate",
+    "UncertaintyGatePolicy",
 ]
