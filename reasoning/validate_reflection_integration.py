@@ -22,7 +22,13 @@ def _response(note_id: str, text: str, eligible: bool = True) -> RetrievalRespon
 
 class _Advisor:
     def advise(self, event, _state, **_kwargs):
-        return ReflectionAdvice(True, event, ReflectionAction.BROADEN_QUERY, 0.9, "Bridge details")
+        return ReflectionAdvice(
+            trigger=True,
+            action=ReflectionAction.BROADEN_QUERY,
+            suggested_query="Bridge details",
+            confidence=0.9,
+            event=event,
+        )
 
 
 def main() -> int:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from action import ActionContext, ActionExecutor, ExecutionPolicy
@@ -19,6 +19,8 @@ from planning import PlanningContext, TaskPlanner
 from planning.plan import Plan
 from reasoning.controller import ReasoningController
 from reasoning.models import AnswerResult, ReasoningBudget, ReasoningMode, ReasoningRequest
+from reasoning.reflection_advisor import ReflectionAdvisor, ReflectionEvent
+from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
 from state.cognitive_state import CognitiveState
@@ -33,8 +35,10 @@ from uncertainty import (
 )
 from workflow.answer_generation import AnswerGenerationController, GenerationOutcome
 from workflow.controller_registry import ControllerRegistry
+from workflow.correction_loop import CorrectionBudget, CorrectionLoop
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
+from workflow.output_validation import OutputValidationController
 from workflow.task_router import TaskRouter
 from workflow.workflow_events import WorkflowEventBus
 from workflow.workflow_state import WorkflowPhase
@@ -142,6 +146,7 @@ class EvidenceAcquisitionController:
             )
             return latest_retrieval
 
+        active_query = str(context.metadata.get("retrieval_query_override", context.user_input))
         mode = ReasoningMode(str(context.metadata.get("reasoning_mode", ReasoningMode.ADAPTIVE.value)))
         budget = ReasoningBudget(
             max_hops=int(context.metadata.get("max_hops", 3)),
@@ -150,7 +155,7 @@ class EvidenceAcquisitionController:
         )
         result = self.reasoning_controller.answer(
             ReasoningRequest(
-                question=context.user_input,
+                question=active_query,
                 session_id=str(context.metadata.get("session_id", "")),
                 mode=mode,
                 budget=budget,
@@ -178,7 +183,7 @@ class PlanningController:
             reflection_signals=tuple(context.metadata.get("reflection_signals", ())),
             metadata={"execution_id": context.execution_id},
         )
-        replan_reason = context.metadata.get("replan_reason")
+        replan_reason = context.metadata.pop("replan_reason", None)
         if isinstance(context.plan, Plan) and replan_reason:
             return self.planner.replan(planning_context, context.plan, str(replan_reason))
         return self.planner.create_plan(planning_context)
@@ -293,6 +298,7 @@ class ReflectionController:
     """Workflow controller for adaptive reflection."""
 
     reflection_engine: ReflectionEngine
+    reflection_advisor: ReflectionAdvisor | None = None
     phase: WorkflowPhase = WorkflowPhase.REFLECTION
 
     async def execute(self, context: ExecutionContext) -> Any:
@@ -337,7 +343,31 @@ class ReflectionController:
             failure_metadata=failure_metadata,
             affect_signals=affect_signals,
         )
-        return self.reflection_engine.evaluate(reflection_context)
+        result = self.reflection_engine.evaluate(reflection_context)
+        if not result.should_reflect or self.reflection_advisor is None:
+            return result
+        event = self._event(context)
+        query = str(context.metadata.get("retrieval_query_override", context.user_input))
+        adapter_method = getattr(self.reflection_advisor, "advice_for_result", None)
+        if callable(adapter_method):
+            advice = adapter_method(event, result, query=query, stop_reason=event.value)
+        else:
+            advice = self.reflection_advisor.advise(event, context, query=query, stop_reason=event.value)
+        return replace(result, advice=advice)
+
+    def _event(self, context: ExecutionContext) -> ReflectionEvent:
+        stop_reason = str(getattr(context.reasoning_result, "stop_reason", ""))
+        mapped = {
+            "no_new_evidence": ReflectionEvent.NO_NEW_EVIDENCE,
+            "duplicate_query": ReflectionEvent.DUPLICATE_QUERY,
+            "contradictory": ReflectionEvent.CONTRADICTORY_EVIDENCE,
+        }.get(stop_reason)
+        if mapped is not None:
+            return mapped
+        constraints = tuple(getattr(context.world_prediction, "constraint_predictions", ()))
+        if any(float(getattr(item, "violation_probability", 0.0)) >= 0.55 for item in constraints):
+            return ReflectionEvent.PLAN_CONSTRAINT_VIOLATION
+        return ReflectionEvent.LOW_CONFIDENCE
 
     def _audit_sample(self, text: str) -> bool:
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -468,6 +498,19 @@ class OutputController:
 
         gate_result = context.execution_decision
         decision = getattr(gate_result, "decision", None)
+        correction_terminal = str(context.metadata.get("correction_terminal_action", ""))
+        if correction_terminal == "ask_user":
+            return {
+                "text": "Please clarify the request before I continue.",
+                "outcome": GenerationOutcome.ABSTAINED.value,
+                "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
+            }
+        if correction_terminal == "abstain":
+            return {
+                "text": "I cannot safely complete this request.",
+                "outcome": GenerationOutcome.ABSTAINED.value,
+                "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
+            }
         if gate_result is not None and decision is ExecutionDecision.ASK_FOR_CLARIFICATION:
             return {
                 "text": "Please clarify the request before I continue.",
@@ -527,12 +570,14 @@ class PrimaWorkflow:
         router: TaskRouter | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
+        correction_loop: CorrectionLoop | None = None,
     ) -> None:
         self.engine = OrchestrationEngine(
             registry=registry,
             router=router,
             event_bus=event_bus,
             retry_policy=retry_policy,
+            correction_loop=correction_loop,
         )
 
     async def run(self, user_input: str, context: ExecutionContext | None = None) -> ExecutionContext:
@@ -560,6 +605,8 @@ class PrimaWorkflow:
         uncertainty_estimator: UncertaintyEstimator | None = None,
         uncertainty_gate: UncertaintyGate | None = None,
         action_executor: ActionExecutor | None = None,
+        reflection_advisor: ReflectionAdvisor | None = None,
+        correction_budget: CorrectionBudget | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
     ) -> PrimaWorkflow:
@@ -583,13 +630,22 @@ class PrimaWorkflow:
                 WorkflowPhase.EXECUTION_DECISION: ExecutionDecisionController(
                     uncertainty_gate or UncertaintyGate()
                 ),
-                WorkflowPhase.REFLECTION: ReflectionController(reflection_engine),
+                WorkflowPhase.REFLECTION: ReflectionController(
+                    reflection_engine,
+                    reflection_advisor or ReasoningReflectionAdapter(reflection_engine),
+                ),
                 WorkflowPhase.ACTION: ActionController(action_executor or ActionExecutor()),
                 WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(llm_client or LLMClient()),
+                WorkflowPhase.OUTPUT_VALIDATION: OutputValidationController(),
                 WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),
                 WorkflowPhase.STATE_COMMIT: StateCommitController(state_manager),
                 WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(repository, MemoryImportanceEngine(repository)),
             }
         )
-        return cls(registry=registry, event_bus=event_bus, retry_policy=retry_policy)
+        return cls(
+            registry=registry,
+            event_bus=event_bus,
+            retry_policy=retry_policy,
+            correction_loop=CorrectionLoop(correction_budget or CorrectionBudget()),
+        )

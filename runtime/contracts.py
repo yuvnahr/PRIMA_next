@@ -138,6 +138,8 @@ class RuntimeDiagnostics(ContractModel):
     decision_thresholds: dict[str, float | int] = Field(default_factory=dict)
     decision_history: tuple[dict[str, Any], ...] = ()
     component_details: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    correction_budget: dict[str, float | int] = Field(default_factory=dict)
+    correction_attempts: tuple[dict[str, Any], ...] = ()
 
 
 class PrimaRequest(ContractModel):

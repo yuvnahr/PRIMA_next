@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from state.cognitive_state import CognitiveState
+from workflow.correction_loop import CorrectionAttempt
 from workflow.workflow_state import WorkflowState
 
 
@@ -29,9 +30,11 @@ class ExecutionContext:
     reflection_result: Any | None = None
     action_result: Any | None = None
     generation_result: Any | None = None
+    output_validation: Any | None = None
     ingestion_result: Any | None = None
     memory_notes_created: tuple[Any, ...] = ()
     memory_admission: Any | None = None
+    correction_attempts: list[CorrectionAttempt] = field(default_factory=list)
     output: Any | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

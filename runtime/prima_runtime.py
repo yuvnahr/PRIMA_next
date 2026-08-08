@@ -33,6 +33,7 @@ from reasoning.models import (
     ReasoningMode,
     SufficiencyStatus,
 )
+from reasoning.reflection_advisor import ReflectionAdvisor
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
 from runtime.context_builder import AnswerContext, RuntimeContextBuilder
@@ -55,6 +56,7 @@ from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
 from uncertainty import UncertaintyEstimator, UncertaintyGate, UncertaintyGatePolicy
+from workflow.correction_loop import CorrectionBudget
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import WorkflowExecutionError
 from workflow.prima_workflow import PrimaWorkflow
@@ -82,6 +84,8 @@ class PrimaRuntime:
         uncertainty_estimator: UncertaintyEstimator | None = None,
         uncertainty_policy: UncertaintyGatePolicy | None = None,
         action_executor: ActionExecutor | None = None,
+        reflection_advisor: ReflectionAdvisor | None = None,
+        correction_budget: CorrectionBudget | None = None,
     ) -> None:
         self.mode = RuntimeMode(mode)
         self.memory_repository, self.repository_selection = select_memory_repository(
@@ -104,9 +108,9 @@ class PrimaRuntime:
             self.memory_repository,
             candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
         )
-        self.reasoning_controller = ReasoningController(
-            reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
-        )
+        self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
+        self.correction_budget = correction_budget or CorrectionBudget()
+        self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
         self.llm_client = llm_client or LLMClient(provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama"))
         self.state_simulator = state_simulator or StateSimulator()
         self.uncertainty_estimator = uncertainty_estimator or UncertaintyEstimator()
@@ -124,6 +128,8 @@ class PrimaRuntime:
             uncertainty_estimator=self.uncertainty_estimator,
             uncertainty_gate=self.uncertainty_gate,
             action_executor=self.action_executor,
+            reflection_advisor=self.reflection_advisor,
+            correction_budget=self.correction_budget,
         )
         self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
@@ -154,6 +160,7 @@ class PrimaRuntime:
                 "profile": request.profile.value,
                 "session_id": request.session_id or "",
                 "state_session_id": request.session_id or request.request_id,
+                "correction_budget": self.correction_budget.to_dict(),
             },
         )
         try:
@@ -196,9 +203,7 @@ class PrimaRuntime:
                 self.memory_repository,
                 candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
             )
-            self.reasoning_controller = ReasoningController(
-                reflection_advisor=ReasoningReflectionAdapter(self.reflection_engine)
-            )
+            self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
@@ -211,6 +216,8 @@ class PrimaRuntime:
                 uncertainty_estimator=self.uncertainty_estimator,
                 uncertainty_gate=self.uncertainty_gate,
                 action_executor=self.action_executor,
+                reflection_advisor=self.reflection_advisor,
+                correction_budget=self.correction_budget,
             )
 
     def answer_question(
@@ -522,7 +529,9 @@ class PrimaRuntime:
                 else _default_memory_admission(request.task_kind, outcome, bool(ingestion_id))
             ),
             "confidence": float(reasoning.confidence if reasoning is not None else self._confidence_score(context)),
-            "reflection_triggered": bool(getattr(context.reflection_result, "should_reflect", False)),
+            "reflection_triggered": bool(context.correction_attempts) or bool(
+                getattr(context.reflection_result, "should_reflect", False)
+            ),
             "reflection_reasons": [
                 dict(reason) for reason in getattr(context.reflection_result, "trigger_reasons", ())
             ],
@@ -536,6 +545,8 @@ class PrimaRuntime:
             ),
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
+            "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
+            "correction_count": sum(attempt.accepted for attempt in context.correction_attempts),
         }
         if reasoning is not None:
             output_data.update(
@@ -545,6 +556,9 @@ class PrimaRuntime:
                     "stop_reason": reasoning.stop_reason,
                     "effective_budget": reasoning.effective_budget.to_dict(),
                     "reasoning_errors": list(reasoning.errors),
+                    "reasoning_reflection_attempts": list(
+                        reasoning.answer_diagnostics.get("reflection_attempts", ())
+                    ),
                 }
             )
         if ingestion_id:
@@ -632,10 +646,13 @@ class PrimaRuntime:
             for memory_id in response.output_data.get("memory_ids_created", [])
             if (note := self.memory_repository.get(str(memory_id))) is not None
         )
+        attempts = tuple(response.output_data.get("correction_attempts", ()))
+        before_answer = str(attempts[0].get("before_answer", "")) if attempts else response.output_text or ""
+        after_answer = str(attempts[-1].get("after_answer", "")) if attempts else response.output_text or ""
         return RuntimeResult(
             final_response=response.output_text or "",
-            prediction_before_reflection=response.output_text or "",
-            prediction_after_reflection=response.output_text or "",
+            prediction_before_reflection=before_answer,
+            prediction_after_reflection=after_answer,
             affect_state=dict(response.output_data.get("affect_state", {})),
             retrieved_memories=answer.retrieved_memories,
             memory_notes_created=created_notes,
@@ -644,6 +661,10 @@ class PrimaRuntime:
             latency_ms=float(response.output_data.get("latency_ms", 0.0)),
             errors=response.errors,
             reflection_reasons=tuple(dict(reason) for reason in response.output_data.get("reflection_reasons", [])),
+            reflection_before_confidence=float(attempts[0].get("before_confidence", 0.0)) if attempts else 0.0,
+            reflection_after_confidence=float(attempts[-1].get("after_confidence", 0.0)) if attempts else 0.0,
+            reflection_utility_score=max((float(item.get("utility", 0.0)) for item in attempts), default=0.0),
+            correction_count=int(response.output_data.get("correction_count", 0)),
             memory_admission=dict(response.output_data.get("memory_admission", {})),
             answer_diagnostics=answer.answer_diagnostics,
         )
@@ -720,8 +741,16 @@ class PrimaRuntime:
         workflow_errors = tuple(str(error) for error in execution_context.workflow_state.errors)
         return RuntimeResult(
             final_response=str(output.get("text") or ""),
-            prediction_before_reflection=str(output.get("text") or ""),
-            prediction_after_reflection=str(output.get("text") or ""),
+            prediction_before_reflection=(
+                execution_context.correction_attempts[0].before_answer
+                if execution_context.correction_attempts
+                else str(output.get("text") or "")
+            ),
+            prediction_after_reflection=(
+                execution_context.correction_attempts[-1].after_answer
+                if execution_context.correction_attempts
+                else str(output.get("text") or "")
+            ),
             affect_state=(
                 affect_update.profile.to_dict()
                 if (
@@ -741,7 +770,7 @@ class PrimaRuntime:
             reflection_before_confidence=float(getattr(reflection_result, "before_confidence", 0.0) or 0.0),
             reflection_after_confidence=float(getattr(reflection_result, "after_confidence", 0.0) or 0.0),
             reflection_utility_score=float(getattr(reflection_result, "utility_score", 0.0) or 0.0),
-            correction_count=1 if bool(getattr(reflection_result, "correction_applied", False)) else 0,
+            correction_count=sum(attempt.accepted for attempt in execution_context.correction_attempts),
             memory_admission=admission_decision.to_log_record() if admission_decision is not None else {},
         )
 
@@ -1025,7 +1054,9 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
     if WorkflowPhase.REFLECTION in completed:
         executed.add(RuntimeComponent.REFLECTION)
     if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
-        executed.update((RuntimeComponent.MODEL_EXECUTOR, RuntimeComponent.OUTPUT_VALIDATOR))
+        executed.add(RuntimeComponent.MODEL_EXECUTOR)
+    if WorkflowPhase.OUTPUT_VALIDATION in completed:
+        executed.add(RuntimeComponent.OUTPUT_VALIDATOR)
     if WorkflowPhase.DOCUMENT_INGESTION in completed:
         executed.update(
             (RuntimeComponent.DOCUMENT_ENCODER, RuntimeComponent.MEMORY_INDEX, RuntimeComponent.MEMORY_COMMIT)
@@ -1097,6 +1128,8 @@ def _route_diagnostics(
         decision_thresholds=dict(getattr(gate_result, "thresholds", {})),
         decision_history=tuple(context.metadata.get("execution_decision_history", ())),
         component_details=component_details,
+        correction_budget=dict(context.metadata.get("correction_budget", {})),
+        correction_attempts=tuple(attempt.to_dict() for attempt in context.correction_attempts),
     )
 
 

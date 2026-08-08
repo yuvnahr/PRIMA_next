@@ -22,6 +22,7 @@ class WorkflowPhase(str, Enum):
     REFLECTION = "reflection"
     ACTION = "action"
     ANSWER_GENERATION = "answer_generation"
+    OUTPUT_VALIDATION = "output_validation"
     DOCUMENT_INGESTION = "document_ingestion"
     OUTPUT = "output"
     STATE_COMMIT = "state_commit"

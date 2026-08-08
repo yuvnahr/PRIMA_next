@@ -85,26 +85,97 @@ class ReasoningController:
         budget = state.request.budget
         if event is None or self.reflection_advisor is None or state.reflection_interventions >= budget.max_reflection_interventions:
             if event is not None:
-                state.add_trace("ReflectionSuppressed", hop, reason_code="disabled_or_budget")
+                state.add_trace(
+                    "ReflectionSuppressed",
+                    hop,
+                    reason_code="disabled_or_budget",
+                    before_query=query,
+                    after_query=query,
+                    before_plan=None,
+                    after_plan=None,
+                    before_answer="",
+                    after_answer="",
+                    confidence_delta=0.0,
+                    utility=0.0,
+                )
             return None
         state.add_trace("ReflectionRequested", hop, event=event.value)
         state.reflection_interventions += 1
         try:
             advice = self.reflection_advisor.advise(event, state, query=query, stop_reason=stop_reason)
         except Exception as exc:
-            state.add_trace("ReflectionRejected", hop, reason_code="advisor_error", error_category=type(exc).__name__)
+            state.add_trace(
+                "ReflectionRejected",
+                hop,
+                reason_code="advisor_error",
+                error_category=type(exc).__name__,
+                before_query=query,
+                after_query=query,
+                before_plan=None,
+                after_plan=None,
+                before_answer="",
+                after_answer="",
+                confidence_delta=0.0,
+                utility=0.0,
+            )
             return None
         state.last_reflection_advice = advice.action.value
         state.reflection_advice_confidence = advice.confidence
         state.add_trace("ReflectionGenerated", hop, action=advice.action.value, confidence=round(advice.confidence, 6))
         candidate = " ".join(advice.suggested_query.split())
-        rejected = (not advice.should_intervene or advice.action not in {ReflectionAction.CONTINUE_WITH_REVISED_QUERY, ReflectionAction.BROADEN_QUERY, ReflectionAction.PIVOT_ENTITY, ReflectionAction.RETRY_TRANSIENT_FAILURE} or not candidate or advice.confidence < budget.reflection_confidence_threshold or any(token in f"{advice.metadata} {advice.reason_code}".lower() for token in ("gold", "ground_truth", "expected_answer", "retrieval scoring", "rerank")))
+        rejected = (
+            not advice.trigger
+            or advice.action
+            not in {
+                ReflectionAction.REVISE_QUERY,
+                ReflectionAction.BROADEN_QUERY,
+                ReflectionAction.PIVOT_ENTITY,
+                ReflectionAction.RETRY_TRANSIENT_FAILURE,
+            }
+            or not candidate
+            or advice.confidence < budget.reflection_confidence_threshold
+            or advice.contains_evaluation_leakage()
+        )
         attempted = {" ".join(item.lower().split()) for item in state.attempted_queries}
         exceeds_budget = state.retrieval_calls + 1 > budget.max_retrieval_calls or len(state.attempted_queries) + 1 > budget.max_hops
-        if rejected or candidate.lower() in attempted or exceeds_budget:
-            state.add_trace("ReflectionRejected", hop, reason_code="invalid_advice")
+        rejection_reason = (
+            "invalid_advice"
+            if rejected
+            else "duplicate_advice"
+            if candidate.lower() in attempted
+            else "budget_exhausted"
+            if exceeds_budget
+            else ""
+        )
+        if rejection_reason:
+            state.add_trace(
+                "ReflectionRejected",
+                hop,
+                reason_code=rejection_reason,
+                before_query=query,
+                after_query=candidate or query,
+                before_plan=None,
+                after_plan=None,
+                before_answer="",
+                after_answer="",
+                confidence_delta=0.0,
+                utility=0.0,
+            )
             return None
-        state.add_trace("ReflectionAccepted", hop, action=advice.action.value, query=candidate)
+        state.add_trace(
+            "ReflectionAccepted",
+            hop,
+            action=advice.action.value,
+            before_query=query,
+            after_query=candidate,
+            before_plan=None,
+            after_plan=None,
+            before_answer="",
+            after_answer="",
+            decision_reason="accepted",
+            confidence_delta=round(advice.confidence - state.confidence, 6),
+            utility=round(max(0.0, advice.confidence - state.confidence), 6),
+        )
         state.add_trace("ReflectionApplied", hop + 1, action=advice.action.value, query=candidate)
         return candidate
 
@@ -134,11 +205,17 @@ class ReasoningController:
                         hop_count=len(state.attempted_queries), budget_usage={
                             "retrieval_calls": state.retrieval_calls, "llm_calls": state.llm_calls, "context_tokens": state.context_tokens,
                         })
+        result_diagnostics = dict(diagnostics or {})
+        result_diagnostics["reflection_attempts"] = [
+            event.to_dict()
+            for event in state.trace
+            if event.event_type in {"ReflectionAccepted", "ReflectionRejected", "ReflectionSuppressed"}
+        ]
         return AnswerResult(
             answer=answer, status=status, confidence=round(state.confidence, 6), evidence_references=tuple(state.evidence_items),
             hop_count=len(state.attempted_queries), stop_reason=stop_reason, effective_budget=state.request.budget,
             trace_summary=tuple(state.trace) if state.request.mode.value == "diagnostic" else tuple(state.trace[-1:]),
-            errors=errors, answer_diagnostics=diagnostics or {},
+            errors=errors, answer_diagnostics=result_diagnostics,
         )
 
     def _abstention(self, question: str, reason: str) -> str:

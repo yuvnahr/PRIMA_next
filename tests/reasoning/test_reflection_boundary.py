@@ -26,7 +26,13 @@ class _Advisor:
 
     def advise(self, event, _state, **_kwargs):
         self.calls += 1
-        return ReflectionAdvice(True, event, ReflectionAction.BROADEN_QUERY, 0.9, self.query)
+        return ReflectionAdvice(
+            trigger=True,
+            action=ReflectionAction.BROADEN_QUERY,
+            suggested_query=self.query,
+            confidence=0.9,
+            event=event,
+        )
 
 
 def test_one_reflection_intervention_is_bounded_and_applied() -> None:

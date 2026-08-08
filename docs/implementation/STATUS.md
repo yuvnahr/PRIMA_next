@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 05. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 06. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -9,8 +9,8 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 05. `Open` means verified d
 | ARCH-003 | Critical | Verified fact | QA bypassed workflow; `ReasoningController` is now an evidence-acquisition controller followed by workflow-owned generation. | Phase 03 — execution/output | QA test proves evidence acquisition and answer generation phases complete in one workflow lifecycle. | Closed |
 | ARCH-004 | High | Verified fact | Ingestion bypassed workflow; semantic validation/indexing now runs in `DOCUMENT_INGESTION` and never selects generation. | Phase 03 — workflow routing | Ingestion test proves workflow traversal, committed memory and zero model calls. | Closed |
 | ROUTE-001 | High | Verified fact | Router had phase lists/untyped metadata, not typed task kinds or execution profiles. | Phase 02 — canonical contract | Tests cover all 25 task/profile decisions and explicit planned/executed/skipped components. | Closed |
-| REFL-001 | High | Verified fact | QA reflection adapter emits only `ABSTAIN` or `NO_ACTION`; controller accepts only revised-query actions (`reflection/reasoning_reflection_adapter.py:17-21`; `reasoning/controller.py:83-109`). | Future bounded-reasoning phase | A low-confidence test demonstrates one advised query and a bounded second retrieval. | Open |
-| REFL-002 | High | Verified fact | Workflow reflection records a decision but cannot retrieve/replan/correct. | Future bounded-reasoning phase | State-machine tests prove bounded retry, terminal success and retry exhaustion. | Open |
+| REFL-001 | High | Verified fact | The reflection adapter now emits accepted typed query-revision advice and the reasoning controller records accepted/rejected attempts with leakage, duplicate and budget checks. | Phase 06 — correction loop | A low-confidence synthetic test demonstrates a revised query and new evidence retrieval. | Closed |
+| REFL-002 | High | Verified fact | Workflow reflection and post-execution validation now route accepted advice to retrieval, replanning, retry, regeneration, clarification or abstention under hard budgets. | Phase 06 — correction loop | State-machine tests prove changed output, real snapshots, rejection reasons and bounded termination. | Closed |
 | SUBSYS-001 | Medium | Verified fact | Graph traversal is absent from runtime retrieval defaults; graph reasoning is not production-reachable. | Phase 05 — memory/graph | A profile test proves graph calls when enabled and an explicit skip when disabled. | Open |
 | SUBSYS-002 | High | Verified fact | Full profiles now invoke the existing deterministic symbolic world model after planning and pass its typed prediction to the uncertainty gate and action executor. | Phase 05 — world/uncertainty | Full-profile tests prove world simulation output reaches action context and diagnostics. | Closed |
 | SUBSYS-003 | High | Verified fact | Full profiles now aggregate available subsystem confidence signals and apply a configurable typed gate before execution. | Phase 05 — world/uncertainty | Tests prove continue, reflect, retry, clarification and high-risk denial with deterministic thresholds. | Closed |
@@ -48,7 +48,7 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 05. `Open` means verified d
 | Phase 02 — canonical contract | ARCH-001 (partial), ROUTE-001, CONTRACT-001, ROUTE-002, SYNC-001, GATE-002 |
 | Phase 03 — execution/output | ARCH-001, ARCH-002, ARCH-003, ARCH-004, OUTCOME-001, GATE-003 |
 | Phase 04 — state/memory ownership | MEM-002, STATE-001, STATE-002, STATE-003, STATE-004 |
-| Future bounded-reasoning phase | REFL-001, REFL-002 |
+| Phase 06 — correction loop | REFL-001, REFL-002 |
 | Phase 05 — world/uncertainty | SUBSYS-002, SUBSYS-003 |
 | Phase 05 — memory/graph | SUBSYS-001, SUBSYS-004, MEM-001, RETR-001 |
 | Phase 06 — diagnostics | DIAG-001 |

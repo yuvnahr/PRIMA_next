@@ -24,7 +24,7 @@ Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-0
 | Affect update | active in canonical production path | `workflow/prima_workflow.py:25-35`. | Select by execution profile. |
 | Dense, sparse and temporal retrieval | active in canonical production path | `runtime/prima_runtime.py:54-57`; `memory/retrieval/retrieval_controller.py:45-49`. | Keep behind workflow ownership. |
 | Planning | active in canonical production path | `workflow/prima_workflow.py:68-88`. | Keep in bounded lifecycle. |
-| Reflection evaluation | active in canonical production path | `workflow/prima_workflow.py:91-138`. | Add bounded correction/retrieve/replan transitions. |
+| Reflection evaluation | active in canonical production path | Workflow reflection emits typed advice; the orchestration engine accepts or rejects it under explicit budgets and routes corrections without direct subsystem coupling. | Calibrate advice confidence and utility using production observations. |
 | Action selection/execution | active in canonical production path | `workflow/prima_workflow.py:145-171`. | Execute the selected LLM/tool action and validate output. |
 | Answer generation | active in canonical production path | `workflow.answer_generation.AnswerGenerationController` calls the injected `LLMClient` and returns `GenerationResult`. | Keep model invocation workflow-owned and typed. |
 | Output controller | active in canonical production path | Shapes existing typed generation, ingestion, classification or action results; it has no input fallback. | Remain result shaping only. |
@@ -47,7 +47,7 @@ Baseline audit: `dev` at `8e45914e1b4b0ce66236be3b4c041001fb1fc5e8` on 2026-08-0
 | Typed task request/result contract | active in canonical production path | `runtime/contracts.py`; `PrimaRuntime.execute` returns `PrimaResponse`. Legacy result types remain during migration. | Migrate every compatibility caller to the typed boundary. |
 | Explicit task/profile routing | active in canonical production path | `runtime/route_profiles.py` validates all 25 pairs; `workflow.task_router` enforces the nine valid ordered routes. | Keep route plans synchronized with component diagnostics. |
 | Input parser boundary | active in canonical production path | `PrimaRequest` validates versioned, extra-forbidding input before route selection. | Move any task-specific parsing behind workflow ownership. |
-| Bounded correction loop | target architecture only | Reflection records a decision but does not transition back to retrieval/planning. | Bound retries and expose them in diagnostics. |
+| Bounded correction loop | active in canonical production path | Accepted advice routes to retrieval, replanning, action retry or regeneration; every attempt records real before/after snapshots and explicit budget decisions. | Later phases may add richer validators without changing ownership. |
 | Shared state/memory taxonomy in diagram | target architecture only | Cognitive state sections and current memory types are owned, but procedural memory and complete diagram links remain absent. | Introduce incrementally with evidence-backed activation. |
 | Cross-encoder reranking by default | implemented but disconnected | `memory/retrieval/reranker.py:35-100` defaults to lexical scoring unless cross-encoder is enabled and loads. | Make actual strategy explicit in diagnostics. |
 
