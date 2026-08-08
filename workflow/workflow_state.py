@@ -27,6 +27,7 @@ class WorkflowPhase(str, Enum):
     OUTPUT = "output"
     STATE_COMMIT = "state_commit"
     MEMORY_COMMIT = "memory_commit"
+    MAINTENANCE_ENQUEUE = "maintenance_enqueue"
 
 
 class WorkflowStatus(str, Enum):

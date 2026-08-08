@@ -73,9 +73,9 @@ Every one of the 25 combinations has a deterministic decision. `invalid` combina
 - Every component not actually called appears in `RuntimeDiagnostics.skipped_components`.
 - Benchmark packages may construct requests but production runtime packages never import benchmark modules.
 
-## Phase 03 migration state
+## Current migration state
 
-All nine valid task/profile combinations now enter a workflow-owned route. Conversation and factual QA use the injected answer-generation controller; retrieval-enabled routes place `ReasoningController` inside the workflow as bounded evidence acquisition. Ingestion validates/indexes without generation, and affect-only classification skips QA phases. World simulation, uncertainty transitions, graph activation, bounded correction and maintenance-event consumers remain later-phase work and stay explicitly skipped in diagnostics.
+All nine valid task/profile combinations enter a workflow-owned route. Conversation and factual QA use injected answer generation; ingestion validates/indexes without generation; affect-only classification skips QA phases. Full profiles invoke graph retrieval, symbolic world simulation, uncertainty decisions, and bounded correction. Routes that admit memory finish with a non-blocking maintenance-enqueue phase; a local bounded supervisor performs cold-path work and exposes calls, skips, queue state, retries, and failures in diagnostics.
 
 ## Phase 04 state and memory ownership
 
@@ -121,7 +121,7 @@ The following table assigns every named block in `Draft.png`. “Final owner” 
 | Working Memory | `memory.stores` working store. |
 | Episodic Memory | `memory.stores` episodic store. |
 | Semantic Memory | `memory.stores` semantic store. |
-| Procedural Memory | Future `memory` type/store; currently missing and tracked as `MEM-001`. |
+| Procedural Memory | `memory.memory_types`; admitted only from verified successful tool procedures or explicit imports. |
 | Emotional Memory | `memory.stores` emotional store fed by typed affect metadata. |
 | Task Planner | `planning.TaskPlanner`, invoked only by workflow. |
 | Goal Selection | `planning.goal_selector`. |
@@ -145,9 +145,9 @@ The following table assigns every named block in `Draft.png`. “Final owner” 
 | Experience Stream | Typed committed runtime/memory events owned by `events`; maintenance consumes them. |
 | Memory Encoder | `memory.embedding_pipeline`/configured embedding backend. |
 | Salience Scoring | `memory.maintenance.salience_manager` and importance policy. |
-| Short-Term Buffer | Working-memory store under `memory.stores`. |
+| Short-Term Buffer | Bounded `MaintenancePipeline.short_term_buffer`, populated only by admitted-memory events. |
 | Consolidation | `memory.maintenance.consolidation_engine`. |
-| Semantic Abstraction | `memory.evolution.semantic_abstraction`. |
+| Semantic Abstraction | `memory.evolution.semantic_abstraction_engine`. |
 | Long-Term Compression | Future maintenance policy under `memory.maintenance`; must be event-driven and tested. |
 | Forgetting / Decay | `memory.maintenance.forgetting_policy`; soft retention changes, not hidden deletion. |
 
@@ -158,5 +158,5 @@ Arrow ownership is also fixed: synchronous/hot-path arrows are workflow calls; d
 - Callers have one stable typed target while legacy methods can be migrated incrementally.
 - Invalid task/profile combinations fail deterministically before subsystem work.
 - A class existing or a route selecting it never counts as execution; diagnostics must record calls.
-- Full PRIMA, reflection loops, world simulation, uncertainty transitions and maintenance scheduling remain future phases.
+- Dedicated long-term compression remains deferred; the implemented cold path currently covers encoding, salience, bounded buffering, consolidation, semantic abstraction/evolution, graph refresh, retention decay, and soft forgetting.
 - Benchmark metrics remain unchanged in Phase 03; benchmark-specific adapter migration remains Phase 07.

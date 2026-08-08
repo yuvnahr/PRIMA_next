@@ -140,6 +140,7 @@ class RuntimeDiagnostics(ContractModel):
     component_details: dict[str, dict[str, Any]] = Field(default_factory=dict)
     correction_budget: dict[str, float | int] = Field(default_factory=dict)
     correction_attempts: tuple[dict[str, Any], ...] = ()
+    maintenance: dict[str, Any] = Field(default_factory=dict)
 
 
 class PrimaRequest(ContractModel):

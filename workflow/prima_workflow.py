@@ -9,7 +9,12 @@ from typing import Any
 from action import ActionContext, ActionExecutor, ExecutionPolicy
 from action.execution_result import ActionExecutionStatus, ExecutionResult
 from affect.affect_engine import DynamicAffectEngine
+from events.event_bus import EventBus
+from events.event_types import EventType
+from events.maintenance_events import maintenance_event
 from llm.llm_client import LLMClient
+from memory.maintenance.background_supervisor import BackgroundMaintenanceSupervisor
+from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_index import MemoryIndex
 from memory.memory_note import MemoryNote
@@ -592,6 +597,53 @@ class MemoryCommitController:
 
 
 @dataclass(slots=True)
+class MaintenanceEnqueueController:
+    """Publish admitted memories to the bounded cold-path queue without waiting."""
+
+    repository: MemoryRepository
+    supervisor: BackgroundMaintenanceSupervisor
+    phase: WorkflowPhase = WorkflowPhase.MAINTENANCE_ENQUEUE
+
+    async def execute(self, context: ExecutionContext) -> dict[str, Any]:
+        """Enqueue maintenance events and return immediately."""
+
+        notes = [note for note in context.memory_notes_created if isinstance(note, MemoryNote)]
+        ingestion_id = str(getattr(context.ingestion_result, "memory_id", ""))
+        if ingestion_id:
+            ingested = self.repository.get(ingestion_id)
+            if ingested is not None:
+                notes.append(ingested)
+        queued_ids: list[str] = []
+        for note in notes:
+            admission = dict(context.memory_admission) if isinstance(context.memory_admission, dict) else {}
+            event = maintenance_event(
+                EventType.MEMORY_ADMITTED,
+                memory_id=note.id,
+                source="prima_workflow",
+                execution_id=context.execution_id,
+                payload={key: value for key, value in admission.items() if isinstance(value, (str, int, float, bool))},
+            )
+            await self.supervisor.event_bus.publish(event)
+            if self.supervisor.enqueue(event):
+                queued_ids.append(event.event_id)
+        return {
+            "schema_version": "1.0",
+            "queued_count": len(queued_ids),
+            "event_ids": queued_ids,
+            "reason": (
+                "queued"
+                if queued_ids
+                else "maintenance_disabled"
+                if not self.supervisor.enabled
+                else "queue_saturated_or_duplicate"
+                if notes
+                else "no_admitted_memory"
+            ),
+            **self.supervisor.diagnostics(),
+        }
+
+
+@dataclass(slots=True)
 class OutputController:
     """Workflow controller for final output shaping."""
 
@@ -713,6 +765,7 @@ class PrimaWorkflow:
         context_compressor: ContextCompressor | None = None,
         reflection_advisor: ReflectionAdvisor | None = None,
         correction_budget: CorrectionBudget | None = None,
+        maintenance_supervisor: BackgroundMaintenanceSupervisor | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
     ) -> PrimaWorkflow:
@@ -723,6 +776,12 @@ class PrimaWorkflow:
             repository = controller_index if isinstance(controller_index, MemoryIndex) else MemoryIndex(repository)
         if state_manager is None:
             raise ValueError("PrimaWorkflow requires an injected StateManager.")
+        if maintenance_supervisor is None:
+            maintenance_bus = EventBus()
+            maintenance_supervisor = BackgroundMaintenanceSupervisor(
+                MaintenancePipeline(repository, maintenance_bus).handle,
+                event_bus=maintenance_bus,
+            )
         registry = ControllerRegistry(
             controllers={
                 WorkflowPhase.STATE_LOAD: StateLoadController(state_manager),
@@ -752,6 +811,9 @@ class PrimaWorkflow:
                 WorkflowPhase.OUTPUT: OutputController(),
                 WorkflowPhase.STATE_COMMIT: StateCommitController(state_manager),
                 WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(repository, MemoryImportanceEngine(repository)),
+                WorkflowPhase.MAINTENANCE_ENQUEUE: MaintenanceEnqueueController(
+                    repository, maintenance_supervisor
+                ),
             }
         )
         return cls(

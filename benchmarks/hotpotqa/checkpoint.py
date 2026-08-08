@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-COMPATIBILITY_FIELDS = ("dataset_fingerprint", "dataset_set", "benchmark_mode", "provider", "model", "reasoning_mode", "top_k", "max_hops", "sampling_strategy", "resolved_seed", "offset", "max_samples", "selected_sample_ids")
+COMPATIBILITY_FIELDS = ("dataset_fingerprint", "dataset_set", "benchmark_mode", "provider", "model", "reasoning_mode", "top_k", "max_hops", "sampling_strategy", "resolved_seed", "offset", "max_samples", "selected_sample_ids", "maintenance_mode")
 
 def validate_resume(existing: dict[str, Any], current: dict[str, Any]) -> None:
     mismatches = [field for field in COMPATIBILITY_FIELDS if existing.get(field) != current.get(field)]

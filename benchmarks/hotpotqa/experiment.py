@@ -41,6 +41,7 @@ from benchmarks.hotpotqa.evaluate import (
 )
 from benchmarks.hotpotqa.loader import HotpotQADataset
 from benchmarks.hotpotqa.runner import HotpotQARunner
+from memory.maintenance.background_supervisor import MaintenanceMode
 from runtime.prima_runtime import PrimaRuntime
 
 
@@ -103,7 +104,7 @@ def select_conversations(conversations: list[Any], sampling: str, seed: int | No
         random.Random(seed).shuffle(selected)  # noqa: S311  # nosec B311
     return selected[offset:offset + max_samples if max_samples else None]
 
-def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str, model: str, reasoning_mode: str, top_k: int, max_hops: int, workers: int, configured_seed: int | None, resolved_seed: int | None, sampling: str, offset: int, max_samples: int, sample_ids: list[str], resume: bool) -> dict[str, Any]:
+def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str, model: str, reasoning_mode: str, top_k: int, max_hops: int, workers: int, configured_seed: int | None, resolved_seed: int | None, sampling: str, offset: int, max_samples: int, sample_ids: list[str], resume: bool, maintenance_mode: MaintenanceMode) -> dict[str, Any]:
     return {
         "schema_version": "1.0", "runtime_mode": "benchmark", "memory_repository": "in_memory",
         "benchmark_name": "HotpotQA", "benchmark_mode": mode, "context_source": CONTEXT_SOURCES[mode],
@@ -114,6 +115,7 @@ def manifest_for(dataset_path: Path, dataset_set: str, mode: str, provider: str,
         "reasoning_mode": reasoning_mode, "max_hops": max_hops, "top_k": top_k, "parallel_workers": workers,
         "python_version": sys.version, "platform": platform.platform(), "git_commit": git_commit(),
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "resume_status": bool(resume),
+        "maintenance_mode": maintenance_mode.value,
     }
 
 def failure_category(record: dict[str, Any]) -> str | None:
@@ -134,11 +136,11 @@ def failure_category(record: dict[str, Any]) -> str | None:
         return "ANSWER_SYNTHESIS_FAILURE"
     return None
 
-def run_sample(conversation: Any, output_dir: Path, provider: str, model: str, top_k: int, reasoning_mode: str, max_hops: int, runtime_factory: Callable[..., PrimaRuntime]) -> dict[str, Any]:
+def run_sample(conversation: Any, output_dir: Path, provider: str, model: str, top_k: int, reasoning_mode: str, max_hops: int, runtime_factory: Callable[..., PrimaRuntime], maintenance_mode: MaintenanceMode) -> dict[str, Any]:
     started = time.perf_counter()
     question = conversation.questions[0]
     try:
-        agent = PrimaRuntimeAdapter(runtime_factory=runtime_factory, log_path=output_dir / "logs" / "prima_runtime_adapter.log", document_ingestion=True)
+        agent = PrimaRuntimeAdapter(runtime_factory=runtime_factory, log_path=output_dir / "logs" / "prima_runtime_adapter.log", document_ingestion=True, maintenance_mode=maintenance_mode)
         agent.answer_options = {"provider": provider, "model": model, "top_k": top_k, "reasoning_mode": reasoning_mode, "max_hops": max_hops}
         result = HotpotQARunner(output_dir / "logs").run(agent, [conversation])[0]
         response = dict(result.response.metadata)
@@ -198,11 +200,12 @@ def write_artifacts(records: list[dict[str, Any]], output_dir: Path, manifest: d
     artifacts = {"predictions": str(prediction_path), "metrics": str(metrics_path), "manifest": str(manifest_path), "checkpoint": str(raw / "hotpot_results.jsonl"), "logs": str(logs)}
     return artifacts, metrics
 
-def run_hotpotqa_experiment(*, mode: str | None = None, dataset_path: str | Path | None = None, dataset_set: str | None = None, refresh_data: bool = False, output_path: str | Path = OUTPUT_PATH, max_samples: int = 0, offset: int = 0, seed: int | None = SEED, sampling: str = "random", provider: str = PROVIDER, model: str = MODEL, top_k: int = TOP_K, reasoning_mode: str = REASONING_MODE, max_hops: int = MAX_HOPS, parallel_workers: int = PARALLEL_WORKERS, progress: bool = False, quiet: bool = False, resume: bool = False, checkpoint_every: int = 1, runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime) -> dict[str, Any]:
+def run_hotpotqa_experiment(*, mode: str | None = None, dataset_path: str | Path | None = None, dataset_set: str | None = None, refresh_data: bool = False, output_path: str | Path = OUTPUT_PATH, max_samples: int = 0, offset: int = 0, seed: int | None = SEED, sampling: str = "random", provider: str = PROVIDER, model: str = MODEL, top_k: int = TOP_K, reasoning_mode: str = REASONING_MODE, max_hops: int = MAX_HOPS, parallel_workers: int = PARALLEL_WORKERS, progress: bool = False, quiet: bool = False, resume: bool = False, checkpoint_every: int = 1, runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime, maintenance_mode: MaintenanceMode | str = MaintenanceMode.DISABLED) -> dict[str, Any]:
     if checkpoint_every < 1 or parallel_workers < 1 or offset < 0 or max_samples < 0:
         raise ValueError("Counts must be non-negative and workers/checkpoint interval must be positive.")
     if sampling not in {"random", "sequential"}:
         raise ValueError("sampling must be 'random' or 'sequential'")
+    maintenance_mode = MaintenanceMode(maintenance_mode)
     explicit_path = dataset_path is not None
     dataset_set, dataset = resolve_dataset(dataset_set, dataset_path, refresh_data)
     mode = resolve_mode(mode, dataset_set, explicit_path)
@@ -217,7 +220,7 @@ def run_hotpotqa_experiment(*, mode: str | None = None, dataset_path: str | Path
         resolved_seed = existing_manifest.get("resolved_seed") if existing_manifest else secrets.randbits(63)
     conversations = select_conversations(list(HotpotQADataset(dataset, mode).conversations()), sampling, resolved_seed, offset, max_samples)
     sample_ids = [item.id for item in conversations]
-    manifest = manifest_for(dataset, dataset_set, mode, provider, model, reasoning_mode, top_k, max_hops, parallel_workers, configured_seed, resolved_seed, sampling, offset, max_samples, sample_ids, resume)
+    manifest = manifest_for(dataset, dataset_set, mode, provider, model, reasoning_mode, top_k, max_hops, parallel_workers, configured_seed, resolved_seed, sampling, offset, max_samples, sample_ids, resume, maintenance_mode)
     existing = read_checkpoint(checkpoint) if resume else []
     if resume:
         validate_resume(existing_manifest, manifest)
@@ -232,7 +235,7 @@ def run_hotpotqa_experiment(*, mode: str | None = None, dataset_path: str | Path
     reporter.header(report_config)
     started = time.perf_counter()
     def execute(item: Any) -> dict[str, Any]:
-        return run_sample(item, output_dir, provider, model, top_k, reasoning_mode, max_hops, runtime_factory)
+        return run_sample(item, output_dir, provider, model, top_k, reasoning_mode, max_hops, runtime_factory, maintenance_mode)
     records = list(existing)
     if parallel_workers == 1:
         iterator = map(execute, pending)
@@ -254,6 +257,7 @@ def main() -> None:
     parser.add_argument("--provider", default=PROVIDER); parser.add_argument("--model", default=MODEL); parser.add_argument("--top-k", type=int, default=TOP_K)
     parser.add_argument("--reasoning-mode", default=REASONING_MODE); parser.add_argument("--max-hops", type=int, default=MAX_HOPS); parser.add_argument("--parallel-workers", type=int, default=PARALLEL_WORKERS)
     parser.add_argument("--progress", action="store_true"); parser.add_argument("--quiet", action="store_true"); parser.add_argument("--json-summary", action="store_true"); parser.add_argument("--resume", action="store_true"); parser.add_argument("--checkpoint-every", type=int, default=1)
+    parser.add_argument("--maintenance-mode", choices=tuple(mode.value for mode in MaintenanceMode), default=MaintenanceMode.DISABLED.value)
     args = parser.parse_args()
     if args.dataset_set is None and args.dataset_path is None:
         try:

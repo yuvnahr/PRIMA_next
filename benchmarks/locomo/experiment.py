@@ -33,6 +33,7 @@ from benchmarks.locomo.evaluate import LoCoMoEvaluator, write_locomo_artifacts
 from benchmarks.locomo.loader import LoCoMoDataset
 from benchmarks.locomo.runner import LoCoMoRunner
 from memory.embedding_pipeline import current_embedding_metadata
+from memory.maintenance.background_supervisor import MaintenanceMode
 from memory.retrieval.hybrid_fusion import HybridFusionConfig
 
 
@@ -47,9 +48,11 @@ def run_locomo_experiment(
     dataset_path: str | None = None,
     output_path: str | None = None,
     include_bertscore: bool = False,
+    maintenance_mode: MaintenanceMode | str = MaintenanceMode.DISABLED,
 ) -> dict[str, Any]:
     """Run LoCoMo at a configurable scale and write standard artifacts."""
 
+    maintenance_mode = MaintenanceMode(maintenance_mode)
     dataset = LoCoMoDataset(Path(dataset_path) if dataset_path else None) if dataset_path else LoCoMoDataset()
     artifact_root = Path(output_path) if output_path else OUTPUT_PATH
     log_path = artifact_root / "logs"
@@ -68,7 +71,9 @@ def run_locomo_experiment(
         with ThreadPoolExecutor(max_workers=parallel_workers) as executor:
             batches = list(
                 executor.map(
-                    lambda conversation: run_single_conversation(conversation, top_k, provider, model, log_path),
+                    lambda conversation: run_single_conversation(
+                        conversation, top_k, provider, model, log_path, maintenance_mode=maintenance_mode
+                    ),
                     conversations,
                 )
             )
@@ -97,7 +102,17 @@ def run_locomo_experiment(
             )
 
         for conversation in conversations:
-            results.extend(run_single_conversation(conversation, top_k, provider, model, log_path, report_progress))
+            results.extend(
+                run_single_conversation(
+                    conversation,
+                    top_k,
+                    provider,
+                    model,
+                    log_path,
+                    report_progress,
+                    maintenance_mode,
+                )
+            )
 
     metrics = LoCoMoEvaluator(include_bertscore=include_bertscore).evaluate(results)
     runtime_errors = sum(
@@ -130,6 +145,7 @@ def run_locomo_experiment(
                 "runtime_mode": "benchmark",
                 "memory_repository": "in_memory",
                 "memory_persistent": False,
+                "maintenance_mode": maintenance_mode.value,
             },
             "max_conversations": max_conversations,
             "max_questions": max_questions,
@@ -152,10 +168,14 @@ def run_single_conversation(
     model: str,
     log_path: Path,
     on_question_completed: Callable[[BenchmarkResult], None] | None = None,
+    maintenance_mode: MaintenanceMode = MaintenanceMode.DISABLED,
 ) -> list[Any]:
     """Run one conversation with one isolated runtime instance."""
 
-    agent = PrimaRuntimeAdapter(log_path=log_path / "prima_runtime_adapter.log")
+    agent = PrimaRuntimeAdapter(
+        log_path=log_path / "prima_runtime_adapter.log",
+        maintenance_mode=maintenance_mode,
+    )
     agent.answer_options = {"top_k": top_k, "provider": provider, "model": model}
     return LoCoMoRunner(log_path).run(agent, [conversation], on_question_completed)
 
@@ -181,6 +201,11 @@ def main() -> None:
     parser.add_argument("--output-path", default=str(OUTPUT_PATH))
     parser.add_argument("--clean-output", action="store_true")
     parser.add_argument("--bertscore", action="store_true", help="enable the optional BERTScore metric")
+    parser.add_argument(
+        "--maintenance-mode",
+        choices=tuple(mode.value for mode in MaintenanceMode),
+        default=MaintenanceMode.DISABLED.value,
+    )
     args = parser.parse_args()
 
     output_path = Path(args.output_path)
@@ -198,6 +223,7 @@ def main() -> None:
         dataset_path=args.dataset_path,
         output_path=str(output_path),
         include_bertscore=args.bertscore,
+        maintenance_mode=args.maintenance_mode,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 

@@ -11,6 +11,7 @@ from typing import Any
 from benchmarks.common.agent import BenchmarkAgent
 from benchmarks.common.interfaces import AgentResponse, ConversationQuestion, ConversationTurn
 from config.runtime_mode import RuntimeMode
+from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
 from runtime.prima_runtime import PrimaRuntime
 from runtime.runtime_context import RuntimeContext
 
@@ -23,12 +24,14 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
         runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime,
         log_path: str | Path | None = None,
         document_ingestion: bool = False,
+        maintenance_mode: MaintenanceMode | str = MaintenanceMode.DISABLED,
     ) -> None:
         self.runtime_factory = runtime_factory
         self.log_path = Path(log_path or "logs/prima_runtime_adapter.log")
         self.runtime: PrimaRuntime | None = None
         self.context: RuntimeContext | None = None
         self.document_ingestion = document_ingestion
+        self.maintenance_mode = MaintenanceMode(maintenance_mode)
         self.answer_options: dict[str, Any] = {}
         self.turn_count = 0
         self.question_count = 0
@@ -43,6 +46,7 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
             log_path=self.log_path,
             mode=RuntimeMode.BENCHMARK,
             memory_backend="in_memory",
+            maintenance_enabled=self.maintenance_mode is not MaintenanceMode.DISABLED,
         )
         self.context = RuntimeContext()
         self.turn_count = 0
@@ -96,7 +100,17 @@ class PrimaRuntimeAdapter(BenchmarkAgent):
             "runtime_manifest": self.runtime.runtime_manifest()
             if self.runtime is not None and hasattr(self.runtime, "runtime_manifest")
             else {"schema_version": "1.0", "runtime_mode": "benchmark", "memory_repository": "in_memory"},
+            "maintenance_mode": self.maintenance_mode.value,
         }
+
+    def maintenance_barrier(self, barrier: str) -> bool:
+        """Apply the configured deterministic maintenance barrier."""
+
+        runtime = self._runtime()
+        method = getattr(runtime, "apply_maintenance_barrier_sync", None)
+        if method is None:
+            return False
+        return bool(method(self.maintenance_mode, MaintenanceBarrier(barrier)))
 
     def close(self) -> None:
         """Release references to the active runtime and context."""

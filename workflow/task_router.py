@@ -35,6 +35,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("conversation", "simple_rag"): (
             WorkflowPhase.STATE_LOAD,
@@ -44,6 +45,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("conversation", "prima_full"): (
             WorkflowPhase.STATE_LOAD,
@@ -60,6 +62,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("factual_qa", "model_only"): (
             WorkflowPhase.STATE_LOAD,
@@ -67,6 +70,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT_VALIDATION,
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("factual_qa", "simple_rag"): (
             WorkflowPhase.STATE_LOAD,
@@ -75,6 +79,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT_VALIDATION,
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("factual_qa", "prima_full"): (
             WorkflowPhase.STATE_LOAD,
@@ -90,12 +95,14 @@ class TaskRouter:
             WorkflowPhase.OUTPUT_VALIDATION,
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("document_ingestion", "ingestion_only"): (
             WorkflowPhase.STATE_LOAD,
             WorkflowPhase.DOCUMENT_INGESTION,
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
         ("emotion_classification", "affect_only"): (
             WorkflowPhase.STATE_LOAD,
@@ -117,6 +124,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
             WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
         ),
     }
 

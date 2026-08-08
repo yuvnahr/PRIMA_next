@@ -60,6 +60,7 @@ class Event:
     def to_dict(self) -> dict[str, Any]:
         """Serialize the event into plain Python values."""
         return {
+            "schema_version": "1.0",
             "event_id": self.event_id,
             "event_type": self.event_type.value,
             "source": self.source,

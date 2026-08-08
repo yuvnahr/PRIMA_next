@@ -188,6 +188,10 @@ class OrchestrationEngine:
                 raise TypeError("Memory commit controller must return a dictionary.")
             context.memory_notes_created = tuple(result.get("notes", ()))
             context.memory_admission = result.get("admission")
+        elif phase == WorkflowPhase.MAINTENANCE_ENQUEUE:
+            if not isinstance(result, dict):
+                raise TypeError("Maintenance enqueue controller must return a dictionary.")
+            context.maintenance_result = result
         context.workflow_state.outputs[phase.value] = result
 
     def _requests_retrieval_retry(self, context: ExecutionContext) -> bool:

@@ -47,10 +47,10 @@ It converts plans into bounded execution results. It validates arguments, enforc
 The event layer provides in-process asynchronous communication:
 
 ```text
-Subsystem Output -> Event Publisher -> Async Event Bus -> Filtered Subscribers -> Event Store
+Workflow Memory Commit -> Typed Event -> Bounded Maintenance Supervisor -> Cold-Path Engines -> Event Store
 ```
 
-It replaces direct module coupling with typed events such as memory creation, reflection triggers, state changes, plan failures, and tool execution. It uses asyncio and an in-memory store; no external broker is required.
+Memory admission is published without awaiting encoding, salience, consolidation, abstraction, graph refresh, or decay. One local asyncio supervisor owns bounded queueing, retries, cancellation, idempotency by event ID, deterministic flush barriers, and failure diagnostics. Production failures are appended to a versioned JSONL store; no external broker is required.
 
 ## Package Layout
 
@@ -259,7 +259,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 - Retrieval priors and reflection signals are emitted as data, not acted on directly.
 - Memory fabric preserves dominant context chain extraction, smart keyword overlap boosting, hybrid retrieval, graph clustering, semantic evolution, and lineage.
 - ChromaDB is the intended persistence source of truth; an in-memory repository is included for deterministic tests and local development.
-- Forgetting is soft: maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
+- Forgetting is soft: background maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
 - Reflection preserves verifier-driven retry behavior, fuzzy answer matching, grounding validation, rejected-action feedback, and ExpeL rule extraction.
 - Reflection consumes affect signals and retrieval confidence as data; it does not call affect or retrieval internals.
 - Planning consumes workflow-routed state, retrieved memory summaries, affective priors, and reflection signals as data.
@@ -269,7 +269,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 - Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
 - Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
-- Events are local and async: the shared bus uses `asyncio`, filtered subscribers, typed event envelopes, and an injected in-memory event store. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope for now.
+- Events are local and async. Async applications explicitly start/flush/stop the runtime maintenance lifecycle; benchmark adapters select `disabled`, `eventual`, or a named deterministic flush barrier. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope.
 
 ## Setup
 

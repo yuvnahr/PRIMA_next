@@ -27,6 +27,11 @@ class BenchmarkAgent(ABC):
     def get_state(self) -> dict[str, Any]:
         """Return a serializable snapshot of the agent bridge state."""
 
+    def maintenance_barrier(self, barrier: str) -> bool:
+        """Apply an optional runtime maintenance barrier."""
+
+        return False
+
     @abstractmethod
     def close(self) -> None:
         """Release resources held by the agent bridge."""

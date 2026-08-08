@@ -39,8 +39,10 @@ class GenericBenchmarkRunner(BenchmarkRunner):
                     self.logger.info("Conversation %s turn %s processed", conversation.id, turn_index)
 
                 self.logger.info("Conversation %s replay complete", conversation.id)
+                agent.maintenance_barrier("after_conversation")
                 if conversation.questions:
                     for question_index, question in enumerate(conversation.questions, start=1):
+                        agent.maintenance_barrier("before_question")
                         response = agent.answer_question(ConversationQuestion(question=question.question, question_id=question.question_id, category=question.category))
                         self.logger.info("Conversation %s question %s answered", conversation.id, question_index)
                         result = BenchmarkResult(
@@ -63,6 +65,7 @@ class GenericBenchmarkRunner(BenchmarkRunner):
                     continue
                 self.logger.info("Conversation %s has no questions; no result emitted", conversation.id)
         finally:
+            agent.maintenance_barrier("before_finalization")
             agent.close()
 
         return results

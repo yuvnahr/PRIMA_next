@@ -13,11 +13,20 @@ from typing import Any, cast
 from action import ActionExecutor
 from affect.affect_engine import DynamicAffectEngine
 from config.runtime_mode import RuntimeMode
+from events.event_bus import EventBus
 from llm.llm_client import LLMClient
 from llm.provider import ProviderError
 from llm.response_parser import extract_answer
 from memory.embedding_pipeline import current_embedding_metadata
+from memory.maintenance.background_supervisor import (
+    BackgroundMaintenanceSupervisor,
+    InMemoryMaintenanceFailureStore,
+    JsonlMaintenanceFailureStore,
+    MaintenanceBarrier,
+    MaintenanceMode,
+)
 from memory.maintenance.importance_types import MemoryAdmissionDecision
+from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_index import MemoryIndex
 from memory.memory_note import MemoryNote
@@ -87,12 +96,24 @@ class PrimaRuntime:
         action_executor: ActionExecutor | None = None,
         reflection_advisor: ReflectionAdvisor | None = None,
         correction_budget: CorrectionBudget | None = None,
+        maintenance_supervisor: BackgroundMaintenanceSupervisor | None = None,
+        maintenance_enabled: bool = True,
+        maintenance_queue_size: int = 128,
+        maintenance_max_retries: int = 2,
+        maintenance_failure_path: str | Path | None = None,
     ) -> None:
+        self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
         self.memory_repository, self.repository_selection = select_memory_repository(
             self.mode, memory_repository, backend=memory_backend, path=memory_path
         )
         self.memory_index = MemoryIndex.for_repository(self.memory_repository)
+        self._owns_maintenance_supervisor = maintenance_supervisor is None
+        self._maintenance_enabled = maintenance_enabled
+        self._maintenance_queue_size = maintenance_queue_size
+        self._maintenance_max_retries = maintenance_max_retries
+        self._maintenance_failure_path = Path(maintenance_failure_path) if maintenance_failure_path else None
+        self.maintenance_supervisor = maintenance_supervisor or self._create_maintenance_supervisor()
         if state_manager is not None:
             if self.mode is RuntimeMode.PRODUCTION and type(state_manager) is InMemoryStateManager:
                 raise RuntimeError("Production mode requires configured persistent cognitive state storage.")
@@ -132,8 +153,8 @@ class PrimaRuntime:
             action_executor=self.action_executor,
             reflection_advisor=self.reflection_advisor,
             correction_budget=self.correction_budget,
+            maintenance_supervisor=self.maintenance_supervisor,
         )
-        self.log_path = Path(log_path)
         self.logger = self._build_logger(self.log_path)
 
     async def execute(self, request: PrimaRequest) -> PrimaResponse:
@@ -176,6 +197,50 @@ class PrimaRuntime:
             round((time.perf_counter() - started) * 1000, 3),
         )
 
+    async def start_maintenance(self) -> None:
+        """Start the local cold-path worker for an async application lifecycle."""
+
+        await self.maintenance_supervisor.start()
+
+    async def flush_maintenance(self) -> None:
+        """Wait for a deterministic maintenance barrier."""
+
+        await self.maintenance_supervisor.flush()
+
+    async def stop_maintenance(self, *, graceful: bool = True) -> None:
+        """Stop the local cold-path worker and optionally drain queued work."""
+
+        await self.maintenance_supervisor.stop(graceful=graceful)
+
+    async def apply_maintenance_barrier(
+        self,
+        mode: MaintenanceMode | str,
+        barrier: MaintenanceBarrier | str,
+    ) -> bool:
+        """Apply a consistency barrier without importing benchmark concepts."""
+
+        return await self.maintenance_supervisor.apply_barrier(
+            MaintenanceMode(mode), MaintenanceBarrier(barrier)
+        )
+
+    def apply_maintenance_barrier_sync(
+        self,
+        mode: MaintenanceMode | str,
+        barrier: MaintenanceBarrier | str,
+    ) -> bool:
+        """Apply a barrier and close its temporary sync-loop worker."""
+
+        async def apply_and_stop() -> bool:
+            flushed = await self.apply_maintenance_barrier(mode, barrier)
+            await self.stop_maintenance(graceful=flushed)
+            return flushed
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(apply_and_stop())
+        raise RuntimeError("Use 'await PrimaRuntime.apply_maintenance_barrier(...)' inside an active event loop.")
+
     def execute_sync(self, request: PrimaRequest) -> PrimaResponse:
         """Run :meth:`execute` only when the caller does not own an event loop."""
 
@@ -200,6 +265,8 @@ class PrimaRuntime:
         if mode == "isolated" and not preserve_repository:
             self.memory_repository = InMemoryMemoryRepository()
             self.memory_index = MemoryIndex.for_repository(self.memory_repository)
+            if self._owns_maintenance_supervisor:
+                self.maintenance_supervisor = self._create_maintenance_supervisor()
             self.repository_selection = RepositorySelection("in_memory", False)
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
             self.retrieval_controller = RetrievalController(
@@ -221,7 +288,28 @@ class PrimaRuntime:
                 action_executor=self.action_executor,
                 reflection_advisor=self.reflection_advisor,
                 correction_budget=self.correction_budget,
+                maintenance_supervisor=self.maintenance_supervisor,
             )
+
+    def _create_maintenance_supervisor(self) -> BackgroundMaintenanceSupervisor:
+        event_bus = EventBus()
+        pipeline = MaintenancePipeline(self.memory_index, event_bus)
+        failure_store = (
+            JsonlMaintenanceFailureStore(
+                self._maintenance_failure_path
+                or self.log_path.with_name("maintenance_failures.jsonl")
+            )
+            if self.mode is RuntimeMode.PRODUCTION
+            else InMemoryMaintenanceFailureStore()
+        )
+        return BackgroundMaintenanceSupervisor(
+            pipeline.handle,
+            event_bus=event_bus,
+            failure_store=failure_store,
+            max_queue_size=self._maintenance_queue_size,
+            max_retries=self._maintenance_max_retries,
+            enabled=self._maintenance_enabled,
+        )
 
     def answer_question(
         self,
@@ -294,6 +382,7 @@ class PrimaRuntime:
             "memory_persistent": self.repository_selection.persistent,
             "memory_path": self.repository_selection.path,
             "state_repository": "json" if isinstance(self.state_manager, JsonStateManager) else "in_memory",
+            "maintenance": self.maintenance_supervisor.diagnostics(),
         }
 
     def _synthesize_evidence(
@@ -554,6 +643,7 @@ class PrimaRuntime:
             ),
             "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
             "correction_count": sum(attempt.accepted for attempt in context.correction_attempts),
+            "maintenance": self.maintenance_supervisor.diagnostics(),
         }
         if reasoning is not None:
             output_data.update(
@@ -593,6 +683,7 @@ class PrimaRuntime:
                 self.mode,
                 self.repository_selection,
                 context.cognitive_state.version,
+                self.maintenance_supervisor.diagnostics(),
             ),
             errors=errors,
         )
@@ -1051,6 +1142,7 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.STATE_COMMIT,
     RuntimeComponent.MEMORY_INDEX,
     RuntimeComponent.MEMORY_COMMIT,
+    RuntimeComponent.MAINTENANCE_EVENTS,
 }
 
 
@@ -1113,6 +1205,11 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.OUTPUT_SHAPER)
     if WorkflowPhase.MEMORY_COMMIT in completed:
         executed.add(RuntimeComponent.MEMORY_COMMIT)
+    if (
+        WorkflowPhase.MAINTENANCE_ENQUEUE in completed
+        and int(context.maintenance_result.get("queued_count", 0)) > 0
+    ):
+        executed.add(RuntimeComponent.MAINTENANCE_EVENTS)
     if WorkflowPhase.STATE_COMMIT in completed and bool(context.metadata.get("state_committed", False)):
         executed.add(RuntimeComponent.STATE_COMMIT)
     return tuple(component for component in RuntimeComponent if component in executed)
@@ -1124,6 +1221,7 @@ def _route_diagnostics(
     mode: RuntimeMode,
     repository: RepositorySelection,
     state_version: int,
+    maintenance: dict[str, Any],
     note: str | None = None,
 ) -> RuntimeDiagnostics:
     executed = _executed_components(context)
@@ -1201,6 +1299,15 @@ def _route_diagnostics(
             "reason": "route has no evidence context",
         }
     component_details[RuntimeComponent.MEMORY_INDEX.value] = index_capabilities
+    component_details[RuntimeComponent.MAINTENANCE_EVENTS.value] = {
+        **maintenance,
+        "status": "executed" if RuntimeComponent.MAINTENANCE_EVENTS in executed else "disabled",
+        "reason": (
+            "admitted-memory event enqueued"
+            if RuntimeComponent.MAINTENANCE_EVENTS in executed
+            else str(context.maintenance_result.get("reason", "not selected by route"))
+        ),
+    }
     return RuntimeDiagnostics(
         route_name=route.name,
         planned_components=route.components,
@@ -1219,6 +1326,7 @@ def _route_diagnostics(
         component_details=component_details,
         correction_budget=dict(context.metadata.get("correction_budget", {})),
         correction_attempts=tuple(attempt.to_dict() for attempt in context.correction_attempts),
+        maintenance=maintenance,
     )
 
 

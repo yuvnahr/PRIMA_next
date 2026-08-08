@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 07. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 08. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,10 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 07. `Open` means verified d
 | SUBSYS-001 | Medium | Verified fact | `prima_full` now invokes graph traversal and centrality reasoning through the profile-driven retrieval controller; unavailable/disabled graph capability is explicit. | Phase 07 — retrieval alignment | A profile spy proves graph reasoning calls when enabled and diagnostics prove explicit skips. | Closed |
 | SUBSYS-002 | High | Verified fact | Full profiles now invoke the existing deterministic symbolic world model after planning and pass its typed prediction to the uncertainty gate and action executor. | Phase 05 — world/uncertainty | Full-profile tests prove world simulation output reaches action context and diagnostics. | Closed |
 | SUBSYS-003 | High | Verified fact | Full profiles now aggregate available subsystem confidence signals and apply a configurable typed gate before execution. | Phase 05 — world/uncertainty | Tests prove continue, reflect, retry, clarification and high-risk denial with deterministic thresholds. | Closed |
-| SUBSYS-004 | Medium | Verified fact | Consolidation/abstraction/forgetting exist without production scheduling or event subscribers. | Phase 05 — memory/graph | Commit emits versioned events; maintenance consumer tests prove each configured handler call. | Open |
+| SUBSYS-004 | Medium | Verified fact | Workflow admission now enqueues typed cold-path events; the bounded supervisor reaches encoding, salience, consolidation, abstraction/evolution, graph refresh, decay and soft forgetting. | Phase 08 — background maintenance | Runtime ingestion test proves every configured cold-path stage emits a causally linked event. | Closed |
+| MAINT-001 | High | Verified fact | The local maintenance supervisor now bounds queue size/retries, rejects duplicate event IDs, preserves cancelled work for restart and supports deterministic flush. | Phase 08 — background maintenance | Queue, retry, duplicate, cancellation, restart and cross-event-loop tests pass. | Closed |
+| MAINT-002 | High | Verified fact | Maintenance failures now produce typed failure events, durable production JSONL records and runtime diagnostic visibility. | Phase 08 — background maintenance | Failure restart and later-response diagnostic tests pass. | Closed |
+| MAINT-003 | High | Verified fact | Benchmarks now declare maintenance mode and invoke task-appropriate barriers before questions/finalization; disabled remains the compatibility default. | Phase 08 — background maintenance | Generic runner ordering test proves finalization barrier precedes close. | Closed |
 | MEM-001 | Medium | Verified fact | Procedural memory now has verified producer/import rules, lifecycle indexing, tool-only retrieval and planner consumption semantics. | Phase 07 — retrieval alignment | Tests reject unverified procedures, reject failed executions and prove procedure IDs change a tool plan. | Closed |
 | MEM-002 | High | Verified fact | Repository selection is mode-enforced: test may use in-memory, benchmark declares its choice, and production requires configured valid ChromaDB without fallback. | Phase 04 — state/memory ownership | Tests prove production preflight, benchmark declaration/isolation, diagnostics visibility and no silent ephemeral fallback. | Closed |
 | STATE-001 | Critical | Verified fact | `CognitiveState` was an unversioned dictionary placeholder; it now owns typed goal, emotional, task, confidence and environment sections plus metadata/version/timestamps. | Phase 04 — state/memory ownership | Typed serialization round-trip and compatibility tests pass. | Closed |
@@ -30,7 +33,7 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 07. `Open` means verified d
 | BENCH-002 | Medium | Verified fact | Hotpot `checkpoint_every` is ignored, only Hotpot resumes, and checkpoint/manifest JSON lacks schema versions. | Future benchmark migration phase | Resume/cadence tests cover all supported runners and reject incompatible schema versions. | Open |
 | BENCH-003 | High | Verified fact | Current results cannot be attributed to one complete wrapper; Hotpot uses supplied context and GoEmotions classifier variants do not measure Qwen-wrapper uplift. | Future benchmark migration phase | Reports identify exact route/profile/components/data regime and prohibit unsupported attribution text. | Open |
 | CFG-001 | Medium | Verified fact | Python 3.10 is now the explicit project, Ruff, mypy and CI target; strict core-module typing remains enabled without blanket `ignore_errors`. | Phase 05 — environment alignment | CI, Ruff and mypy target 3.10 and all quality gates pass. | Closed |
-| DOC-001 | Medium | Verified fact | README’s single-workflow and persistence claims exceed current reachability/defaults. | Phase 08 — tooling/docs | Documentation assertions match executable architecture tests and deployed defaults. | Open |
+| DOC-001 | Medium | Verified fact | README and canonical ADR now distinguish the connected local cold path, explicit lifecycle/defaults and still-deferred long-term compression from the target diagram. | Phase 08 — tooling/docs | Documentation assertions match executable architecture tests and deployed defaults. | Closed |
 | GATE-001 | Medium | Verified fact | Literal `compileall -q .` traversed external/venv sources and failed outside owned code. | Phase 01 — quality gates | Python 3.10 owned-source compile gate explicitly excludes Git, venv and external trees and passes. | Closed |
 | GATE-002 | Medium | Verified fact | Raw `xenon .` descended into non-production trees and did not finish within three minutes; the existing runner also included benchmark/evaluation roots. | Phase 02 — quality gates | CI/rules use `scripts/run_xenon.py`; a test proves its allowlist contains only production PRIMA roots. | Closed |
 | GATE-003 | Medium | Verified fact | Long-horizon smoke tests hard-coded `PrimaRuntime()` and incurred unavailable-provider retries on every turn after real generation was enabled. | Phase 03 — workflow convergence | Evaluation runner accepts a runtime factory; smoke tests inject a deterministic client and complete without provider calls. | Closed |
@@ -54,7 +57,6 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 07. `Open` means verified d
 | Phase 06 — correction loop | REFL-001, REFL-002 |
 | Phase 05 — world/uncertainty | SUBSYS-002, SUBSYS-003 |
 | Phase 07 — retrieval alignment | SUBSYS-001, MEM-001, MEM-003, RETR-001, RETR-002, RETR-003 |
-| Phase 05 — memory/graph | SUBSYS-004 |
+| Phase 08 — background maintenance | SUBSYS-004, MAINT-001, MAINT-002, MAINT-003, DOC-001 |
 | Phase 06 — diagnostics | DIAG-001 |
 | Future benchmark migration phase | BENCH-001, BENCH-002, BENCH-003 |
-| Phase 08 — tooling/docs | DOC-001 |

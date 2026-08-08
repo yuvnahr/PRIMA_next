@@ -35,6 +35,7 @@ class ExecutionContext:
     ingestion_result: Any | None = None
     memory_notes_created: tuple[Any, ...] = ()
     memory_admission: Any | None = None
+    maintenance_result: dict[str, Any] = field(default_factory=dict)
     correction_attempts: list[CorrectionAttempt] = field(default_factory=list)
     output: Any | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
