@@ -106,6 +106,7 @@ class TaskRouter:
         ("tool_request", "prima_full"): (
             WorkflowPhase.STATE_LOAD,
             WorkflowPhase.AFFECT,
+            WorkflowPhase.MEMORY_RETRIEVAL,
             WorkflowPhase.PLANNING,
             WorkflowPhase.WORLD_SIMULATION,
             WorkflowPhase.UNCERTAINTY_ESTIMATION,
@@ -115,6 +116,7 @@ class TaskRouter:
             WorkflowPhase.OUTPUT_VALIDATION,
             WorkflowPhase.OUTPUT,
             WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MEMORY_COMMIT,
         ),
     }
 

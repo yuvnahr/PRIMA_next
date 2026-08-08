@@ -7,12 +7,15 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from action import ActionContext, ActionExecutor, ExecutionPolicy
+from action.execution_result import ActionExecutionStatus, ExecutionResult
 from affect.affect_engine import DynamicAffectEngine
 from llm.llm_client import LLMClient
 from memory.maintenance.memory_importance import MemoryImportanceEngine
+from memory.memory_index import MemoryIndex
 from memory.memory_note import MemoryNote
 from memory.memory_repository import MemoryRepository
-from memory.memory_types import MemoryType
+from memory.memory_types import MemoryLevel, MemoryType
+from memory.retrieval.context_compressor import ContextCompressor
 from memory.retrieval.retrieval_controller import RetrievalController
 from memory.retrieval.retrieval_request import RetrievalRequest
 from planning import PlanningContext, TaskPlanner
@@ -105,7 +108,11 @@ class MemoryRetrievalController:
             affect_signals = tuple(getattr(context.affect_update, "reflection_signals", ()))
         request = RetrievalRequest(
             query=context.user_input,
-            memory_types=tuple(MemoryType),
+            memory_types=(
+                (MemoryType.PROCEDURAL,)
+                if str(context.metadata.get("task_kind")) == "tool_request"
+                else tuple(item for item in MemoryType if item is not MemoryType.PROCEDURAL)
+            ),
             top_k=self.top_k,
             state_filter={
                 "goal_state": context.cognitive_state.goal_state,
@@ -114,6 +121,9 @@ class MemoryRetrievalController:
                 "environment_state": context.cognitive_state.environment_state,
             },
             affective_context={"retrieval_priors": affect_priors, "reflection_signal_count": len(affect_signals)},
+            profile=str(context.metadata.get("profile", "prima_full")),
+            task_kind=str(context.metadata.get("task_kind", "conversation")),
+            required_reranker_backend=context.metadata.get("required_reranker_backend"),
         )
         return self.retrieval_controller.retrieve(request)
 
@@ -132,6 +142,7 @@ class EvidenceAcquisitionController:
 
     reasoning_controller: ReasoningController
     retrieval_controller: RetrievalController
+    context_compressor: ContextCompressor = field(default_factory=ContextCompressor)
     phase: WorkflowPhase = WorkflowPhase.EVIDENCE_ACQUISITION
 
     async def execute(self, context: ExecutionContext) -> EvidenceAcquisitionResult:
@@ -142,7 +153,14 @@ class EvidenceAcquisitionController:
         def retrieve(query: str) -> Any:
             nonlocal latest_retrieval
             latest_retrieval = self.retrieval_controller.retrieve(
-                RetrievalRequest(query=query, top_k=int(context.metadata.get("top_k", 5)))
+                RetrievalRequest(
+                    query=query,
+                    top_k=int(context.metadata.get("top_k", 5)),
+                    memory_types=tuple(item for item in MemoryType if item is not MemoryType.PROCEDURAL),
+                    profile=str(context.metadata.get("profile", "prima_full")),
+                    task_kind=str(context.metadata.get("task_kind", "factual_qa")),
+                    required_reranker_backend=context.metadata.get("required_reranker_backend"),
+                )
             )
             return latest_retrieval
 
@@ -162,6 +180,17 @@ class EvidenceAcquisitionController:
             ),
             retrieve=retrieve,
             synthesize=lambda _question, _evidence: ("", False, (), {}),
+        )
+        compression_enabled = context.metadata.get("context_compression_enabled", True)
+        if not isinstance(compression_enabled, bool):
+            raise TypeError("context_compression_enabled must be a boolean.")
+        compressor = replace(self.context_compressor, enabled=compression_enabled)
+        compressed = compressor.compress(result.evidence_references, budget.max_context_tokens)
+        context.compressed_context = compressed
+        result = replace(
+            result,
+            evidence_references=compressed.evidence,
+            answer_diagnostics={**result.answer_diagnostics, "context_compression": compressed.to_dict()},
         )
         return EvidenceAcquisitionResult(result, latest_retrieval)
 
@@ -408,6 +437,7 @@ class IngestionResult:
     """Typed document indexing result."""
 
     memory_id: str
+    memory_type: MemoryType
 
 
 @dataclass(slots=True)
@@ -418,17 +448,31 @@ class DocumentIngestionController:
     phase: WorkflowPhase = WorkflowPhase.DOCUMENT_INGESTION
 
     async def execute(self, context: ExecutionContext) -> IngestionResult:
-        """Index one semantic document through the workflow."""
+        """Index one semantic source or explicitly imported procedure."""
 
         text = context.user_input.strip()
         if not text:
             raise ValueError("Document text must not be empty.")
+        document_metadata = dict(context.metadata.get("document_metadata", {}))
+        explicit_type = str(document_metadata.pop("memory_type", MemoryType.SEMANTIC.value))
+        if explicit_type not in {MemoryType.SEMANTIC.value, MemoryType.PROCEDURAL.value}:
+            raise ValueError("Document imports may create only semantic or procedural memory.")
+        memory_type = MemoryType(explicit_type)
         note = MemoryNote.create(
             content=text,
-            memory_type=MemoryType.SEMANTIC,
-            context={"source": "document_ingestion", **dict(context.metadata.get("document_metadata", {}))},
+            memory_type=memory_type,
+            memory_level=(
+                MemoryLevel.VERIFIED_PROCEDURE
+                if memory_type is MemoryType.PROCEDURAL
+                else MemoryLevel.SEMANTIC_ABSTRACTION
+            ),
+            context={
+                "source": "document_ingestion",
+                "explicit_import": memory_type is MemoryType.PROCEDURAL,
+                **document_metadata,
+            },
         )
-        return IngestionResult(self.repository.add(note).id)
+        return IngestionResult(self.repository.add(note).id, memory_type)
 
 
 @dataclass(slots=True)
@@ -446,6 +490,8 @@ class MemoryCommitController:
         outcome = str(output.get("outcome", "failed"))
         if outcome in {"failed", "cancelled", "abstained"}:
             return {"notes": (), "admission": {"stored": False, "policy": "successful_answers_only", "reason": outcome}}
+        if str(context.metadata.get("task_kind")) == "tool_request":
+            return self._commit_procedure(context)
 
         decision = self.importance_engine.decide(
             context.user_input,
@@ -484,6 +530,64 @@ class MemoryCommitController:
         return {
             "notes": notes,
             "admission": {**decision.to_log_record(), "policy": "importance_threshold", "record_count": 2},
+        }
+
+    def _commit_procedure(self, context: ExecutionContext) -> dict[str, Any]:
+        action = context.action_result if isinstance(context.action_result, dict) else {}
+        result = action.get("execution_result")
+        if not isinstance(result, ExecutionResult) or result.status is not ActionExecutionStatus.SUCCESS:
+            return {
+                "notes": (),
+                "admission": {
+                    "stored": False,
+                    "policy": "verified_successful_procedures_only",
+                    "reason": "not_successful",
+                },
+            }
+        tool_count = int(result.metadata.get("tool_invocation_count", 0))
+        if tool_count < 1:
+            return {
+                "notes": (),
+                "admission": {
+                    "stored": False,
+                    "policy": "verified_successful_procedures_only",
+                    "reason": "no_tool_execution",
+                },
+            }
+        tool_names = tuple(
+            str(step.metadata.get("tool_name"))
+            for step in result.steps
+            if step.metadata.get("tool_name")
+        )
+        procedure_steps = tuple(
+            f"{step.action_id}:{step.message}"
+            for step in result.steps
+            if step.status is ActionExecutionStatus.SUCCESS
+        )
+        note = MemoryNote.create(
+            content=(
+                f"Verified successful procedure for: {context.user_input}. "
+                f"Steps: {'; '.join(procedure_steps) or 'verified tool execution'}."
+            ),
+            memory_type=MemoryType.PROCEDURAL,
+            memory_level=MemoryLevel.VERIFIED_PROCEDURE,
+            context={
+                "source": "verified_tool_execution",
+                "verified_success": True,
+                "execution_id": context.execution_id,
+                "plan_id": str(getattr(context.plan, "plan_id", "")),
+                "tool_invocation_count": tool_count,
+                "tool_names": list(tool_names),
+            },
+        )
+        saved = self.repository.add(note)
+        return {
+            "notes": (saved,),
+            "admission": {
+                "stored": True,
+                "policy": "verified_successful_procedures_only",
+                "record_count": 1,
+            },
         }
 
 
@@ -539,6 +643,7 @@ class OutputController:
                 "text": None,
                 "outcome": "ingested",
                 "memory_id": context.ingestion_result.memory_id,
+                "memory_type": context.ingestion_result.memory_type.value,
             }
         if str(context.metadata.get("task_kind")) == "emotion_classification" and context.affect_update is not None:
             profile = context.affect_update.profile
@@ -605,6 +710,7 @@ class PrimaWorkflow:
         uncertainty_estimator: UncertaintyEstimator | None = None,
         uncertainty_gate: UncertaintyGate | None = None,
         action_executor: ActionExecutor | None = None,
+        context_compressor: ContextCompressor | None = None,
         reflection_advisor: ReflectionAdvisor | None = None,
         correction_budget: CorrectionBudget | None = None,
         event_bus: WorkflowEventBus | None = None,
@@ -612,6 +718,9 @@ class PrimaWorkflow:
     ) -> PrimaWorkflow:
         """Create a workflow with default controller adapters."""
         repository = memory_repository or retrieval_controller.repository
+        if not isinstance(repository, MemoryIndex):
+            controller_index = getattr(retrieval_controller, "memory_index", None)
+            repository = controller_index if isinstance(controller_index, MemoryIndex) else MemoryIndex(repository)
         if state_manager is None:
             raise ValueError("PrimaWorkflow requires an injected StateManager.")
         registry = ControllerRegistry(
@@ -620,7 +729,9 @@ class PrimaWorkflow:
                 WorkflowPhase.AFFECT: AffectController(affect_engine),
                 WorkflowPhase.MEMORY_RETRIEVAL: MemoryRetrievalController(retrieval_controller),
                 WorkflowPhase.EVIDENCE_ACQUISITION: EvidenceAcquisitionController(
-                    reasoning_controller or ReasoningController(), retrieval_controller
+                    reasoning_controller or ReasoningController(),
+                    retrieval_controller,
+                    context_compressor or ContextCompressor(),
                 ),
                 WorkflowPhase.PLANNING: PlanningController(),
                 WorkflowPhase.WORLD_SIMULATION: WorldSimulationController(state_simulator or StateSimulator()),

@@ -29,14 +29,25 @@ class ActionSelector:
         ]
 
         if context.retrieved_memories:
+            procedural_ids = tuple(
+                memory.memory_id for memory in context.retrieved_memories
+                if memory.memory_type == "procedural"
+            )
             actions.append(
                 PlanAction.create(
                     ActionType.INTEGRATE_MEMORY,
-                    "Integrate retrieved memories as grounding context for the selected goal.",
+                    (
+                        "Apply verified procedural memory before executing the selected goal."
+                        if procedural_ids
+                        else "Integrate retrieved memories as grounding context for the selected goal."
+                    ),
                     tuple(memory.memory_id for memory in context.retrieved_memories),
                     "memory_grounding",
                     _constraint_ids_by_type(constraints, ConstraintType.MEMORY),
-                    metadata={"memory_count": len(context.retrieved_memories)},
+                    metadata={
+                        "memory_count": len(context.retrieved_memories),
+                        "procedural_memory_ids": list(procedural_ids),
+                    },
                 )
             )
         else:

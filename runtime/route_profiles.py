@@ -40,16 +40,21 @@ CONTROL = (
     RuntimeComponent.EXECUTION_DISPATCHER,
     RuntimeComponent.PERSISTENT_STATE,
 )
-RETRIEVAL = (
+SIMPLE_RETRIEVAL = (
     RuntimeComponent.QUERY_REWRITER,
+    RuntimeComponent.MEMORY_INDEX,
     RuntimeComponent.DENSE_RETRIEVAL,
     RuntimeComponent.SPARSE_RETRIEVAL,
-    RuntimeComponent.TEMPORAL_RETRIEVAL,
     RuntimeComponent.FUSION,
     RuntimeComponent.RERANKER,
     RuntimeComponent.CONFIDENCE_ESTIMATOR,
     RuntimeComponent.CONTEXT_COMPRESSOR,
 )
+FULL_RETRIEVAL = SIMPLE_RETRIEVAL[:4] + (
+    RuntimeComponent.TEMPORAL_RETRIEVAL,
+    RuntimeComponent.GRAPH_TRAVERSAL,
+    RuntimeComponent.GRAPH_REASONING,
+) + SIMPLE_RETRIEVAL[4:]
 COMMIT = (
     RuntimeComponent.OUTPUT_VALIDATOR,
     RuntimeComponent.OUTPUT_SHAPER,
@@ -58,13 +63,10 @@ COMMIT = (
     RuntimeComponent.MAINTENANCE_EVENTS,
 )
 MODEL_ONLY = CONTROL + (RuntimeComponent.MODEL_EXECUTOR,) + COMMIT
-SIMPLE_RAG = CONTROL + RETRIEVAL + (RuntimeComponent.MODEL_EXECUTOR,) + COMMIT
+SIMPLE_RAG = CONTROL + SIMPLE_RETRIEVAL + (RuntimeComponent.MODEL_EXECUTOR,) + COMMIT
 PRIMA_FULL = CONTROL + (
     RuntimeComponent.AFFECT_ENGINE,
-) + RETRIEVAL[:4] + (
-    RuntimeComponent.GRAPH_TRAVERSAL,
-    RuntimeComponent.GRAPH_REASONING,
-) + RETRIEVAL[4:] + (
+) + FULL_RETRIEVAL + (
     RuntimeComponent.PLANNER,
     RuntimeComponent.WORLD_MODEL,
     RuntimeComponent.UNCERTAINTY_ESTIMATOR,
@@ -87,6 +89,7 @@ AFFECT_ONLY = CONTROL + (
 )
 TOOL_FULL = CONTROL + (
     RuntimeComponent.AFFECT_ENGINE,
+) + FULL_RETRIEVAL + (
     RuntimeComponent.PLANNER,
     RuntimeComponent.WORLD_MODEL,
     RuntimeComponent.UNCERTAINTY_ESTIMATOR,

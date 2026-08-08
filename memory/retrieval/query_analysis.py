@@ -77,6 +77,25 @@ class ExpandedQuery:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class QueryRewrite:
+    """Typed query-rewriter output consumed by retrieval strategies."""
+
+    original_query: str
+    analysis: QueryAnalysis
+    rewritten_query: str
+    provenance: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize query analysis, rewrite, and provenance."""
+        return {
+            "original_query": self.original_query,
+            "analysis": self.analysis.to_dict(),
+            "rewritten_query": self.rewritten_query,
+            "provenance": dict(self.provenance),
+        }
+
+
 class QueryAnalyzer:
     """Rule-based semantic parser kept independent of benchmark code."""
 
@@ -134,6 +153,22 @@ class QueryAnalyzer:
         expansion_terms = _limited_unique((term for values in expansion_map.values() for term in values), MAX_TOTAL_EXPANSION_TERMS)
         expanded_text = " ".join((query, *expansion_terms)).strip()
         return ExpandedQuery(text=expanded_text, terms=expansion_terms, expansion_map=expansion_map)
+
+    def rewrite(self, query: str, entity_context: dict[str, Any] | None = None) -> QueryRewrite:
+        """Analyze and deterministically expand one query with explicit provenance."""
+        analysis = self.analyze(query, entity_context)
+        expanded = self.expand(query, analysis)
+        return QueryRewrite(
+            original_query=query,
+            analysis=analysis,
+            rewritten_query=expanded.text,
+            provenance={
+                "component": "query_analyzer",
+                "method": "resource_backed_deterministic_expansion",
+                "expansion_terms": list(expanded.terms),
+                "expansion_map": {key: list(value) for key, value in expanded.expansion_map.items()},
+            },
+        )
 
     def _detect_intents(self, lower_query: str, token_set: set[str]) -> tuple[str, ...]:
         matches: list[str] = []

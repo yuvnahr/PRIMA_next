@@ -19,6 +19,7 @@ from llm.response_parser import extract_answer
 from memory.embedding_pipeline import current_embedding_metadata
 from memory.maintenance.importance_types import MemoryAdmissionDecision
 from memory.maintenance.memory_importance import MemoryImportanceEngine
+from memory.memory_index import MemoryIndex
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
@@ -91,6 +92,7 @@ class PrimaRuntime:
         self.memory_repository, self.repository_selection = select_memory_repository(
             self.mode, memory_repository, backend=memory_backend, path=memory_path
         )
+        self.memory_index = MemoryIndex.for_repository(self.memory_repository)
         if state_manager is not None:
             if self.mode is RuntimeMode.PRODUCTION and type(state_manager) is InMemoryStateManager:
                 raise RuntimeError("Production mode requires configured persistent cognitive state storage.")
@@ -103,9 +105,9 @@ class PrimaRuntime:
             self.state_manager = InMemoryStateManager()
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
-        self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
+        self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
         self.retrieval_controller = RetrievalController(
-            self.memory_repository,
+            self.memory_index,
             candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
         )
         self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
@@ -122,7 +124,7 @@ class PrimaRuntime:
             reflection_engine=self.reflection_engine,
             reasoning_controller=self.reasoning_controller,
             llm_client=self.llm_client,
-            memory_repository=self.memory_repository,
+            memory_repository=self.memory_index,
             state_manager=self.state_manager,
             state_simulator=self.state_simulator,
             uncertainty_estimator=self.uncertainty_estimator,
@@ -197,10 +199,11 @@ class PrimaRuntime:
         self.state_manager.reset()
         if mode == "isolated" and not preserve_repository:
             self.memory_repository = InMemoryMemoryRepository()
+            self.memory_index = MemoryIndex.for_repository(self.memory_repository)
             self.repository_selection = RepositorySelection("in_memory", False)
-            self.memory_importance_engine = MemoryImportanceEngine(self.memory_repository)
+            self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
             self.retrieval_controller = RetrievalController(
-                self.memory_repository,
+                self.memory_index,
                 candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
             )
             self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
@@ -210,7 +213,7 @@ class PrimaRuntime:
                 reflection_engine=self.reflection_engine,
                 reasoning_controller=self.reasoning_controller,
                 llm_client=self.llm_client,
-                memory_repository=self.memory_repository,
+                memory_repository=self.memory_index,
                 state_manager=self.state_manager,
                 state_simulator=self.state_simulator,
                 uncertainty_estimator=self.uncertainty_estimator,
@@ -545,6 +548,10 @@ class PrimaRuntime:
             ),
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
+            "retrieval": _retrieval_audit(context.retrieval_response),
+            "context_compression": (
+                context.compressed_context.to_dict() if context.compressed_context is not None else {}
+            ),
             "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
             "correction_count": sum(attempt.accepted for attempt in context.correction_attempts),
         }
@@ -563,6 +570,11 @@ class PrimaRuntime:
             )
         if ingestion_id:
             output_data["memory_id"] = ingestion_id
+            output_data["memory_type"] = getattr(
+                getattr(context.ingestion_result, "memory_type", MemoryType.SEMANTIC),
+                "value",
+                MemoryType.SEMANTIC.value,
+            )
         if isinstance(output.get("classification"), dict):
             output_data.update(output["classification"])
         return PrimaResponse(
@@ -991,6 +1003,24 @@ def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
     ]
 
 
+def _retrieval_audit(response: Any) -> dict[str, Any]:
+    diagnostics = dict(getattr(response, "diagnostics", {}))
+    return {
+        key: diagnostics[key]
+        for key in (
+            "query_rewrite",
+            "profile",
+            "task_kind",
+            "executed_strategies",
+            "skipped_strategies",
+            "graph_reasoning_invoked",
+            "memory_index",
+            "reranker",
+        )
+        if key in diagnostics
+    }
+
+
 _CANONICAL_AVAILABLE = {
     RuntimeComponent.INPUT_PARSER,
     RuntimeComponent.TASK_SCHEDULER,
@@ -1003,9 +1033,12 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.DENSE_RETRIEVAL,
     RuntimeComponent.SPARSE_RETRIEVAL,
     RuntimeComponent.TEMPORAL_RETRIEVAL,
+    RuntimeComponent.GRAPH_TRAVERSAL,
+    RuntimeComponent.GRAPH_REASONING,
     RuntimeComponent.FUSION,
     RuntimeComponent.RERANKER,
     RuntimeComponent.CONFIDENCE_ESTIMATOR,
+    RuntimeComponent.CONTEXT_COMPRESSOR,
     RuntimeComponent.PLANNER,
     RuntimeComponent.WORLD_MODEL,
     RuntimeComponent.UNCERTAINTY_ESTIMATOR,
@@ -1033,18 +1066,33 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.update((RuntimeComponent.STATE_MANAGER, RuntimeComponent.PERSISTENT_STATE))
     if WorkflowPhase.AFFECT in completed:
         executed.update((RuntimeComponent.EMOTION_CLASSIFIER, RuntimeComponent.AFFECT_ENGINE))
-    if WorkflowPhase.EVIDENCE_ACQUISITION in completed:
+    if completed & {WorkflowPhase.EVIDENCE_ACQUISITION, WorkflowPhase.MEMORY_RETRIEVAL}:
+        retrieval_diagnostics = dict(getattr(context.retrieval_response, "diagnostics", {}))
+        strategies = set(retrieval_diagnostics.get("executed_strategies", ()))
         executed.update(
             (
                 RuntimeComponent.QUERY_REWRITER,
-                RuntimeComponent.DENSE_RETRIEVAL,
-                RuntimeComponent.SPARSE_RETRIEVAL,
-                RuntimeComponent.TEMPORAL_RETRIEVAL,
+                RuntimeComponent.MEMORY_INDEX,
                 RuntimeComponent.FUSION,
                 RuntimeComponent.RERANKER,
                 RuntimeComponent.CONFIDENCE_ESTIMATOR,
             )
         )
+        strategy_components = {
+            "dense": RuntimeComponent.DENSE_RETRIEVAL,
+            "sparse": RuntimeComponent.SPARSE_RETRIEVAL,
+            "temporal": RuntimeComponent.TEMPORAL_RETRIEVAL,
+            "graph": RuntimeComponent.GRAPH_TRAVERSAL,
+        }
+        executed.update(component for name, component in strategy_components.items() if name in strategies)
+        if retrieval_diagnostics.get("graph_reasoning_invoked"):
+            executed.add(RuntimeComponent.GRAPH_REASONING)
+    if (
+        WorkflowPhase.EVIDENCE_ACQUISITION in completed
+        and context.compressed_context is not None
+        and bool(context.compressed_context.enabled)
+    ):
+        executed.add(RuntimeComponent.CONTEXT_COMPRESSOR)
     if WorkflowPhase.PLANNING in completed:
         executed.add(RuntimeComponent.PLANNER)
     if WorkflowPhase.WORLD_SIMULATION in completed:
@@ -1079,13 +1127,22 @@ def _route_diagnostics(
     note: str | None = None,
 ) -> RuntimeDiagnostics:
     executed = _executed_components(context)
+    retrieval_diagnostics = dict(getattr(context.retrieval_response, "diagnostics", {}))
+    index_capabilities = dict(retrieval_diagnostics.get("memory_index", {}))
+    unavailable = (
+        {RuntimeComponent.GRAPH_TRAVERSAL, RuntimeComponent.GRAPH_REASONING}
+        if index_capabilities and not bool(index_capabilities.get("graph", False))
+        else set()
+    )
     capabilities = tuple(
         ComponentCapability(
             component=component,
-            available=component in _CANONICAL_AVAILABLE,
+            available=component in _CANONICAL_AVAILABLE and component not in unavailable,
             reason=(
                 None
-                if component in _CANONICAL_AVAILABLE
+                if component in _CANONICAL_AVAILABLE and component not in unavailable
+                else "memory-index capability unavailable"
+                if component in unavailable
                 else "canonical execution integration deferred"
                 if component in route.components
                 else "not selected by route"
@@ -1112,6 +1169,38 @@ def _route_diagnostics(
         )
         for component in (RuntimeComponent.WORLD_MODEL, RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     }
+    skipped_strategies = dict(retrieval_diagnostics.get("skipped_strategies", {}))
+    for name, component in {
+        "dense": RuntimeComponent.DENSE_RETRIEVAL,
+        "sparse": RuntimeComponent.SPARSE_RETRIEVAL,
+        "temporal": RuntimeComponent.TEMPORAL_RETRIEVAL,
+        "graph": RuntimeComponent.GRAPH_TRAVERSAL,
+    }.items():
+        component_details[component.value] = {
+            "status": "executed" if component in executed else "disabled",
+            "reason": skipped_strategies.get(name, "selected and invoked" if component in executed else "not selected"),
+        }
+    component_details[RuntimeComponent.GRAPH_REASONING.value] = {
+        "status": "executed" if RuntimeComponent.GRAPH_REASONING in executed else "disabled",
+        "reason": (
+            "centrality reasoning invoked by graph traversal"
+            if RuntimeComponent.GRAPH_REASONING in executed
+            else skipped_strategies.get("graph", "graph retrieval not selected")
+        ),
+    }
+    component_details[RuntimeComponent.RERANKER.value] = dict(retrieval_diagnostics.get("reranker", {}))
+    if context.compressed_context is not None:
+        component_details[RuntimeComponent.CONTEXT_COMPRESSOR.value] = {
+            **context.compressed_context.to_dict(),
+            "status": "executed" if context.compressed_context.enabled else "disabled",
+            "reason": "token budget applied" if context.compressed_context.enabled else "no-compression ablation",
+        }
+    else:
+        component_details[RuntimeComponent.CONTEXT_COMPRESSOR.value] = {
+            "status": "disabled",
+            "reason": "route has no evidence context",
+        }
+    component_details[RuntimeComponent.MEMORY_INDEX.value] = index_capabilities
     return RuntimeDiagnostics(
         route_name=route.name,
         planned_components=route.components,

@@ -22,6 +22,7 @@ class ExecutionContext:
     workflow_state: WorkflowState = field(default_factory=WorkflowState)
     affect_update: Any | None = None
     retrieval_response: Any | None = None
+    compressed_context: Any | None = None
     reasoning_result: Any | None = None
     plan: Any | None = None
     world_prediction: Any | None = None

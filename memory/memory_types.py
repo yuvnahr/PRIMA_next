@@ -10,6 +10,7 @@ class MemoryType(str, Enum):
     EPISODIC = "episodic"
     SEMANTIC = "semantic"
     EMOTIONAL = "emotional"
+    PROCEDURAL = "procedural"
 
 
 class MemoryLevel(str, Enum):
@@ -17,6 +18,7 @@ class MemoryLevel(str, Enum):
     EPISODIC_EVENT = "episodic_event"
     SEMANTIC_ABSTRACTION = "semantic_abstraction"
     EMOTIONAL_TRACE = "emotional_trace"
+    VERIFIED_PROCEDURE = "verified_procedure"
 
 
 class RetrievalWindow(str, Enum):
@@ -31,4 +33,5 @@ COLLECTION_BY_TYPE = {
     MemoryType.EPISODIC: "episodic_memory",
     MemoryType.SEMANTIC: "semantic_memory",
     MemoryType.EMOTIONAL: "emotional_memory",
+    MemoryType.PROCEDURAL: "procedural_memory",
 }

@@ -6,10 +6,13 @@ import re
 from dataclasses import dataclass, field, replace
 from typing import Any
 
+from memory.memory_index import MemoryIndex
 from memory.memory_repository import MemoryRepository
+from memory.memory_types import MemoryType
 from memory.retrieval.dense_strategy import DenseRetrievalStrategy
+from memory.retrieval.graph_strategy import GraphTraversalStrategy
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
-from memory.retrieval.query_analysis import QueryAnalyzer, temporal_agreement
+from memory.retrieval.query_analysis import ExpandedQuery, QueryAnalyzer, temporal_agreement
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_confidence import RetrievalConfidence, RetrievalConfidenceEstimator
 from memory.retrieval.retrieval_request import RetrievalRequest
@@ -38,18 +41,19 @@ class RetrievalController:
         confidence_estimator: RetrievalConfidenceEstimator | None = None,
         reranker: Reranker | None = None,
         query_analyzer: QueryAnalyzer | None = None,
+        memory_index: MemoryIndex | None = None,
         candidate_pool_multiplier: int = 6,
         candidate_pool_size: int = 30,
     ) -> None:
-        self.repository = repository
-        self.strategies = strategies or [
-            DenseRetrievalStrategy(),
-            SparseRetrievalStrategy(),
-            TemporalRetrievalStrategy(),
-        ]
+        self.memory_index = memory_index or (
+            repository if isinstance(repository, MemoryIndex) else MemoryIndex(repository)
+        )
+        self.repository = self.memory_index
+        self.strategies = strategies
         self.fusion = fusion or HybridFusion(HybridFusionConfig.from_file())
         self.confidence_estimator = confidence_estimator or RetrievalConfidenceEstimator()
         self.reranker = reranker or Reranker()
+        self.reranker.preflight()
         self.query_analyzer = query_analyzer or QueryAnalyzer()
         self.candidate_pool_multiplier = max(1, candidate_pool_multiplier)
         self.candidate_pool_size = max(1, candidate_pool_size)
@@ -58,9 +62,10 @@ class RetrievalController:
         request = self._prepare_request(request)
         candidate_top_k = max(request.top_k, self.candidate_pool_size, request.top_k * self.candidate_pool_multiplier)
         candidate_request = replace(request, top_k=candidate_top_k)
+        active_strategies, skipped = self._strategies_for(request.profile)
         by_strategy = {
             strategy.name: strategy.retrieve(candidate_request, self.repository)
-            for strategy in self.strategies
+            for strategy in active_strategies
         }
         fused = self.fusion.fuse(by_strategy, top_k=candidate_request.top_k)
         fused = self._apply_state_filter(fused, request)
@@ -75,13 +80,60 @@ class RetrievalController:
             reranked_pool=reranked_pool,
             final_results=reranked,
             confidence=confidence,
+            skipped_strategies=skipped,
         )
         return RetrievalResponse(results=tuple(reranked), confidence=confidence, diagnostics=diagnostics)
 
     def _prepare_request(self, request: RetrievalRequest) -> RetrievalRequest:
-        analysis = request.analyzed_query or self.query_analyzer.analyze(request.query, request.affective_context)
-        expanded = request.expanded_query or self.query_analyzer.expand(request.query, analysis)
-        return replace(request, analyzed_query=analysis, expanded_query=expanded)
+        rewrite = request.query_rewrite or self.query_analyzer.rewrite(request.query, request.affective_context)
+        analysis = request.analyzed_query or rewrite.analysis
+        expanded = request.expanded_query or ExpandedQuery(
+            text=rewrite.rewritten_query,
+            terms=tuple(rewrite.provenance.get("expansion_terms", ())),
+            expansion_map={
+                str(key): tuple(str(item) for item in value)
+                for key, value in dict(rewrite.provenance.get("expansion_map", {})).items()
+            },
+        )
+        memory_types = request.memory_types
+        if request.task_kind != "tool_request":
+            memory_types = tuple(item for item in memory_types if item is not MemoryType.PROCEDURAL)
+        return replace(
+            request,
+            analyzed_query=analysis,
+            expanded_query=expanded,
+            query_rewrite=rewrite,
+            memory_types=memory_types,
+        )
+
+    def _strategies_for(self, profile: str) -> tuple[tuple[RetrievalStrategy, ...], dict[str, str]]:
+        available: dict[str, RetrievalStrategy] = {
+            "dense": DenseRetrievalStrategy(),
+            "sparse": SparseRetrievalStrategy(),
+            "temporal": TemporalRetrievalStrategy(),
+        }
+        if self.memory_index.graph_repository is not None:
+            available["graph"] = GraphTraversalStrategy(self.memory_index.graph_repository)
+        if self.strategies is not None:
+            available = {strategy.name: strategy for strategy in self.strategies}
+        selected = {
+            "model_only": (),
+            "simple_rag": ("dense", "sparse"),
+            "prima_full": ("dense", "sparse", "temporal", "graph"),
+        }.get(profile)
+        if selected is None:
+            raise ValueError(f"Unsupported retrieval profile: {profile!r}.")
+        active = tuple(available[name] for name in selected if name in available)
+        skipped = {
+            name: (
+                f"disabled by execution profile '{profile}'"
+                if name not in selected
+                else "capability unavailable"
+            )
+            for name in ("dense", "sparse", "temporal", "graph")
+            if name not in {strategy.name for strategy in active}
+        }
+        return active, skipped
 
     def _apply_state_filter(self, results: list[RetrievalResult], request: RetrievalRequest) -> list[RetrievalResult]:
         if not request.state_filter:
@@ -148,12 +200,15 @@ class RetrievalController:
         reranked_pool: list[RetrievalResult],
         final_results: list[RetrievalResult],
         confidence: RetrievalConfidence,
+        skipped_strategies: dict[str, str],
     ) -> dict[str, Any]:
         analysis = request.analyzed_query
         expanded = request.expanded_query
+        strategy_names = tuple(by_strategy)
         return {
             "question": request.query,
             "expanded_query": expanded.to_dict() if expanded is not None else {"text": request.query, "terms": [], "expansion_map": {}},
+            "query_rewrite": request.query_rewrite.to_dict() if request.query_rewrite is not None else {},
             "query_analysis": analysis.to_dict() if analysis is not None else {},
             "entities": list(analysis.entities) if analysis is not None else [],
             "relations": list(analysis.relations) if analysis is not None else [],
@@ -175,6 +230,13 @@ class RetrievalController:
             "reranked_candidates": self._serialize_results(reranked_pool),
             "final_candidates": self._serialize_results(final_results),
             "retrieval_confidence": confidence.to_dict(),
+            "profile": request.profile,
+            "task_kind": request.task_kind,
+            "executed_strategies": list(strategy_names),
+            "skipped_strategies": dict(skipped_strategies),
+            "graph_reasoning_invoked": "graph" in strategy_names,
+            "memory_index": dict(self.memory_index.capabilities),
+            "reranker": self.reranker.diagnostics(),
         }
 
     def _serialize_results(self, results: Any) -> list[dict[str, Any]]:

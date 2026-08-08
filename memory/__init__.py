@@ -5,6 +5,7 @@ from typing import Any
 __all__ = [
     "InMemoryMemoryRepository",
     "MemoryLevel",
+    "MemoryIndex",
     "MemoryNote",
     "MemoryRepository",
     "MemoryStore",
@@ -26,6 +27,10 @@ def __getattr__(name: str) -> Any:
         from memory.memory_store import MemoryStore
 
         return MemoryStore
+    if name == "MemoryIndex":
+        from memory.memory_index import MemoryIndex
+
+        return MemoryIndex
     if name in {"MemoryLevel", "MemoryType"}:
         from memory.memory_types import MemoryLevel, MemoryType
 
