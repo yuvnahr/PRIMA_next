@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 13. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 14. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -68,6 +68,10 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 13. `Open` means verified d
 | OUTCOME-001 | High | Verified fact | Runtime results lacked typed semantic outcomes independent of lifecycle status. | Phase 03 — execution/output | Tests prove answered, abstained, failed, ingested, classified and cancelled outcomes. | Closed |
 | ROUTE-002 | High | Verified fact | No authoritative validity decision existed for every task/profile combination. | Phase 02 — canonical contract | Route matrix has 25 deterministic cells, nine valid plans and sixteen explicit rejections. | Closed |
 | SYNC-001 | High | Verified fact | Sync entry points could call `asyncio.run` without an explicit active-loop contract. | Phase 02 — canonical contract | `execute_sync` works without a loop and directs active-loop callers to await `execute`. | Closed |
+| CAMPAIGN-001 | Critical | Verified fact | GoEmotions, HotpotQA, and LoCoMo now execute under one root campaign with one injected provider client and one campaign-wide bounded inference semaphore. | Phase 14 — unified campaign | The fixture campaign runs all three public-runtime benchmarks and observes no more than the configured active inference bound. | Closed |
+| CAMPAIGN-002 | High | Verified fact | Campaign configuration, environment placeholders, dataset hashes, provider capabilities/resources, scheduling policy, and comparison invariants are validated before or at the paired boundary. | Phase 14 — campaign validation | Tests reject unresolved production placeholders and mismatched paired seeds; child manifests validate identical selected IDs/order and generation settings. | Closed |
+| CAMPAIGN-003 | High | Verified fact | Root and child manifests retain independent benchmark/mode status; terminal item checkpoints suppress duplicates during resume and isolated mode failures do not corrupt sibling results. | Phase 14 — campaign resume | Smoke resume retains one campaign ID and one record per case; injected failure leaves the other two modes complete. | Closed |
+| CAMPAIGN-004 | Medium | Verified fact | Validated complete/partial modes aggregate into JSON and Markdown with provider/request/host telemetry; invalid pairs are explicitly refused and telemetry collection is non-fatal. | Phase 14 — aggregation and telemetry | Campaign tests cover bound telemetry and refusal; reports expose latency percentiles, tokens, throughput, retries/timeouts, CPU/RAM, and optional observed GPU memory. | Closed |
 
 ## Phase ownership map
 
@@ -86,3 +90,4 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 13. `Open` means verified d
 | Phase 11 — HotpotQA migration | BENCH-001 (Hotpot), BENCH-002 (Hotpot), BENCH-003 (Hotpot), HOTPOT-001, HOTPOT-002, HOTPOT-003, HOTPOT-004, HOTPOT-005 |
 | Phase 12 — LoCoMo migration | BENCH-001 (LoCoMo), BENCH-002 (LoCoMo), BENCH-003 (LoCoMo), LOCOMO-001, LOCOMO-002, LOCOMO-003, LOCOMO-004, LOCOMO-005 |
 | Phase 13 — GoEmotions migration | BENCH-001, BENCH-002, BENCH-003, GOEMOTIONS-001, GOEMOTIONS-002, GOEMOTIONS-003, GOEMOTIONS-004, GOEMOTIONS-005 |
+| Phase 14 — unified benchmark campaign | CAMPAIGN-001, CAMPAIGN-002, CAMPAIGN-003, CAMPAIGN-004 |

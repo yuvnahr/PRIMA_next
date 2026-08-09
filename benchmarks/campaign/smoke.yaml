@@ -1,0 +1,40 @@
+schema_version: "1.0"
+output_root: ../../outputs/campaign_smoke
+provider:
+  kind: fake
+  model: fake-campaign-model
+  revision: fixture-v1
+  context_window: 4096
+  structured_output: true
+scheduler:
+  mode: sequential
+  max_gpu_requests: 1
+  cpu_workers: 2
+  min_free_disk_gb: 0.01
+benchmarks:
+  - id: goemotions-model-only
+    benchmark: goemotions
+    dataset_path: ../../tests/fixtures/goemotions/test.tsv
+    profile: affect_only
+    variant: model_only_zero_shot
+    context_budget: 512
+    max_items: 1
+    options:
+      split: test
+      bootstrap_samples: 20
+  - id: hotpotqa-model-only
+    benchmark: hotpotqa
+    dataset_path: ../../tests/fixtures/campaign/hotpot.json
+    profile: model_only
+    variant: distractor
+    context_budget: 2048
+    max_items: 2
+  - id: locomo-model-only
+    benchmark: locomo
+    dataset_path: ../../tests/fixtures/campaign/locomo.json
+    profile: model_only
+    variant: controlled_document_ingestion
+    context_budget: 2048
+    max_items: 1
+    options:
+      max_conversations: 1

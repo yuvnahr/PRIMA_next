@@ -42,6 +42,9 @@ class GoEmotionsSystem(Protocol):
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
         """Return raw output plus serializable system metadata."""
 
+    def use_client(self, client: LLMClient) -> Any:
+        """Reuse one campaign-owned inference client."""
+
 
 class _PredictionSource(Protocol):
     last_raw: str
@@ -151,6 +154,12 @@ class _RuntimeClassificationSystem:
     name: str
     system_family: str
     _client_instance: LLMClient | None = field(default=None, init=False, repr=False)
+
+    def use_client(self, client: LLMClient) -> _RuntimeClassificationSystem:
+        """Reuse one campaign-owned inference client."""
+
+        self._client_instance = client
+        return self
 
     def _client(self) -> LLMClient:
         if self._client_instance is None:

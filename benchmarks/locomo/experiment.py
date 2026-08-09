@@ -492,6 +492,7 @@ def run_locomo_experiment(
     ingestion_policy: IngestionPolicy | str | None = None,
     bounded_context_turns: int = 20, full_dataset: bool = False,
     resume: bool = False, runtime_factory: Callable[..., Any] = PrimaRuntime,
+    generation_config: GenerationConfig | None = None,
     _runtime_pool: SharedRuntimeFactory | None = None,
 ) -> dict[str, Any]:
     """Run one canonical LoCoMo profile with exact per-question resume."""
@@ -518,7 +519,7 @@ def run_locomo_experiment(
     root, store = output_root / profile.value, BenchmarkArtifactStore(output_root / profile.value)
     if not resume and store.layout.manifest.exists():
         raise ValueError(f"Output already contains a campaign; use resume or a new path: {root}")
-    generation = GenerationConfig(model=model, provider=provider, seed=seed)
+    generation = generation_config or GenerationConfig(model=model, provider=provider, seed=seed)
     scope = "full_dataset" if full_dataset else "preview"
     config = {
         "dataset_scope": scope, "full_dataset": full_dataset,

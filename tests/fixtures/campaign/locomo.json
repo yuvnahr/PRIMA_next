@@ -1,0 +1,22 @@
+[
+  {
+    "sample_id": "campaign-locomo-1",
+    "conversation": {
+      "speaker_a": "A",
+      "speaker_b": "B",
+      "session_1_date_time": "2023-05-08",
+      "session_1": [
+        {"speaker": "A", "dia_id": "D1:1", "text": "Alpha happened."}
+      ]
+    },
+    "qa": [
+      {
+        "id": "q1",
+        "question": "What happened?",
+        "answer": "Alpha",
+        "evidence": ["D1:1"],
+        "category": 1
+      }
+    ]
+  }
+]

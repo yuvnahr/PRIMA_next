@@ -55,6 +55,7 @@ from benchmarks.goemotions.systems import (
 )
 from benchmarks.goemotions.training.data import validate_splits
 from llm.generation_config import GenerationConfig, StructuredOutputMode
+from llm.llm_client import LLMClient
 from llm.provider import ProviderError
 from runtime.contracts import ExecutionProfile, TaskKind
 from runtime.route_profiles import select_route
@@ -100,6 +101,8 @@ def run_goemotions_experiment(
     progress: bool = True,
     resume: bool = False,
     bootstrap_samples: int = 1000,
+    generation_config: GenerationConfig | None = None,
+    llm_client: LLMClient | None = None,
 ) -> dict[str, Any]:
     """Run a split-safe affect/classification campaign with per-example resume."""
 
@@ -126,7 +129,7 @@ def run_goemotions_experiment(
     if write_sample_manifest:
         _write_sample_manifest(examples, selected_path, split, seed, write_sample_manifest)
 
-    generation = GenerationConfig(
+    generation = generation_config or GenerationConfig(
         model=_effective_model(canonical_name, model),
         provider=provider,
         temperature=0.0,
@@ -137,8 +140,9 @@ def run_goemotions_experiment(
         else StructuredOutputMode.JSON_SCHEMA,
     )
     classifier = ClassifierSettings(device, batch_size, thresholds, calibration)
-    _preflight_provider(provider, canonical_name, generation.model)
-    active_system = _system(canonical_name, generation, classifier)
+    if llm_client is None:
+        _preflight_provider(provider, canonical_name, generation.model)
+    active_system = _system(canonical_name, generation, classifier, llm_client)
     root = Path(output_path) / canonical_name
     store = BenchmarkArtifactStore(root)
     if not resume and store.layout.manifest.exists():
@@ -277,18 +281,27 @@ def run_goemotions_experiment(
     }
 
 
-def _system(name: str, generation: GenerationConfig, classifier: ClassifierSettings) -> GoEmotionsSystem:
+def _system(
+    name: str,
+    generation: GenerationConfig,
+    classifier: ClassifierSettings,
+    llm_client: LLMClient | None = None,
+) -> GoEmotionsSystem:
     if name == "model_only_zero_shot":
-        return ModelOnlyZeroShotSystem(generation)
-    if name == "schema_constrained_model_only":
-        return SchemaConstrainedModelOnlySystem(generation)
-    if name == "affect_telemetry_preserve_labels":
-        return AffectTelemetrySystem(generation)
-    if name == "bounded_prima_affect_decision":
-        return BoundedAffectDecisionSystem(generation)
-    if name == "trained_encoder":
-        return EncoderSystem(generation, "trained_encoder", "trained_encoder", classifier)
-    raise ValueError(f"Unsupported GoEmotions system: {name}")
+        system: GoEmotionsSystem = ModelOnlyZeroShotSystem(generation)
+    elif name == "schema_constrained_model_only":
+        system = SchemaConstrainedModelOnlySystem(generation)
+    elif name == "affect_telemetry_preserve_labels":
+        system = AffectTelemetrySystem(generation)
+    elif name == "bounded_prima_affect_decision":
+        system = BoundedAffectDecisionSystem(generation)
+    elif name == "trained_encoder":
+        system = EncoderSystem(generation, "trained_encoder", "trained_encoder", classifier)
+    else:
+        raise ValueError(f"Unsupported GoEmotions system: {name}")
+    if llm_client is not None:
+        system.use_client(llm_client)
+    return system
 
 
 def _classify_response(

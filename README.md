@@ -330,4 +330,19 @@ separately attributed trained encoder baseline. Reports exclude parse recovery f
 the headline paired affect comparison and label the multilabel matrix as label
 co-occurrence.
 
+Run GoEmotions, HotpotQA, and LoCoMo as one resumable campaign with one shared,
+bounded provider session:
+
+```powershell
+python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
+python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
+```
+
+The smoke configuration uses fixture data and a deterministic fake provider. Copy
+`benchmarks/campaign/full_gpu.example.yaml` for a real campaign; its endpoint, model,
+revision, datasets, and output directory remain unresolved environment placeholders
+and fail validation until explicitly supplied. GPU inference is serialized by
+default (`max_gpu_requests: 1`), including interleaved campaigns; CPU-side benchmark
+work may overlap.
+
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

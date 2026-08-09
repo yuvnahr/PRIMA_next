@@ -481,6 +481,7 @@ def run_hotpotqa_experiment(
     runtime_factory: Callable[..., Any] = PrimaRuntime,
     maintenance_mode: MaintenanceMode | str = MaintenanceMode.DISABLED,
     _runtime_pool: SharedRuntimeFactory | None = None,
+    generation_config: GenerationConfig | None = None,
 ) -> dict[str, Any]:
     if parallel_workers < 1 or offset < 0 or max_samples < 0:
         raise ValueError("Counts must be non-negative and workers must be positive")
@@ -506,7 +507,7 @@ def run_hotpotqa_experiment(
         sampling, resolved_seed, offset, max_samples,
     )
     selected_ids = [item.id for item in conversations]
-    generation = GenerationConfig(model=model, provider=provider, seed=resolved_seed)
+    generation = generation_config or GenerationConfig(model=model, provider=provider, seed=resolved_seed)
     benchmark_config = {
         "dataset_set": dataset_set, "context_mode": mode,
         "context_source": CONTEXT_SOURCES[mode], "oracle_diagnostic_only": mode == "oracle",
