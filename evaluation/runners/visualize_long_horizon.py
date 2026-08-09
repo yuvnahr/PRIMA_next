@@ -25,9 +25,9 @@ DEFAULT_RESULTS_DIR = Path("evaluation/results")
 
 # Attempt matplotlib import — degrade gracefully if not installed
 try:
-    import matplotlib
+    import matplotlib  # type: ignore[import-not-found]
     matplotlib.use("Agg")  # non-interactive backend, safe for servers
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore[import-not-found]
     _MATPLOTLIB_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _MATPLOTLIB_AVAILABLE = False

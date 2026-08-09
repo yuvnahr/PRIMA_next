@@ -5,7 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from uncertainty.uncertainty_types import ConfidenceSource, ConfidenceTrend, DecisionType, UncertaintyBand
+from uncertainty.uncertainty_types import (
+    ConfidenceSource,
+    ConfidenceTrend,
+    DecisionType,
+    UncertaintyBand,
+)
 
 
 def clamp01(value: float) -> float:

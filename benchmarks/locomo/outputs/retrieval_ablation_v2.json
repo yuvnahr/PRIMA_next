@@ -1,0 +1,50 @@
+{
+  "dense": {
+    "recall_at_1": 0.010204,
+    "recall_at_5": 0.010204,
+    "mrr": 0.010204,
+    "ndcg_at_5": 0.010204,
+    "average_retrieval_latency": 63.543053,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_query_analysis": {
+    "recall_at_1": 0.010204,
+    "recall_at_5": 0.010204,
+    "mrr": 0.010204,
+    "ndcg_at_5": 0.010204,
+    "average_retrieval_latency": 128.950405,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_expansion": {
+    "recall_at_1": 0.010204,
+    "recall_at_5": 0.010204,
+    "mrr": 0.010204,
+    "ndcg_at_5": 0.010204,
+    "average_retrieval_latency": 102.484362,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_sparse": {
+    "recall_at_1": 0.110544,
+    "recall_at_5": 0.244048,
+    "mrr": 0.17619,
+    "ndcg_at_5": 0.183209,
+    "average_retrieval_latency": 477.725806,
+    "average_retrieved_memory_count": 5.0
+  },
+  "dense_sparse_reranker": {
+    "recall_at_1": 0.170918,
+    "recall_at_5": 0.333333,
+    "mrr": 0.261565,
+    "ndcg_at_5": 0.267301,
+    "average_retrieval_latency": 475.617159,
+    "average_retrieved_memory_count": 5.0
+  },
+  "full_retrieval_v2": {
+    "recall_at_1": 0.170918,
+    "recall_at_5": 0.333333,
+    "mrr": 0.261565,
+    "ndcg_at_5": 0.267301,
+    "average_retrieval_latency": 468.381704,
+    "average_retrieved_memory_count": 5.0
+  }
+}

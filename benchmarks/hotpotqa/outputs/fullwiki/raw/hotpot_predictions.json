@@ -1,0 +1,65 @@
+{
+  "answer": {
+    "5aba9e235542994dbf019984": "no",
+    "5a84c01e5542991dd0999dd6": "12th century",
+    "5a77c74155429967ab105291": "Of Montreal",
+    "5abed4d55542990832d3a0e0": "Yes",
+    "5a8bc1565542996e8ac88a0c": "United States Senate election"
+  },
+  "sp": {
+    "5aba9e235542994dbf019984": [
+      [
+        "Conospermum",
+        0
+      ],
+      [
+        "Weberocereus",
+        0
+      ]
+    ],
+    "5a84c01e5542991dd0999dd6": [
+      [
+        "Bjaðǫk",
+        1
+      ]
+    ],
+    "5a77c74155429967ab105291": [
+      [
+        "Vib Gyor",
+        0
+      ],
+      [
+        "The Gorgeous",
+        0
+      ]
+    ],
+    "5abed4d55542990832d3a0e0": [
+      [
+        "Personal Preference",
+        1
+      ],
+      [
+        "Personal Preference",
+        0
+      ]
+    ],
+    "5a8bc1565542996e8ac88a0c": [
+      [
+        "United States Senate election in Nevada, 1998",
+        1
+      ],
+      [
+        "United States Senate election in Nevada, 2004",
+        1
+      ],
+      [
+        "United States Senate election in Nevada, 1992",
+        1
+      ],
+      [
+        "United States Senate election in Nevada, 1992",
+        0
+      ]
+    ]
+  }
+}

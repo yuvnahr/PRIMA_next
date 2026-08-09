@@ -6,7 +6,12 @@ from dataclasses import dataclass, field
 from statistics import fmean
 from typing import Any
 
-from world.prediction_result import ActionPrediction, ConstraintPrediction, PredictionResult, StateTransition
+from world.prediction_result import (
+    ActionPrediction,
+    ConstraintPrediction,
+    PredictionResult,
+    StateTransition,
+)
 from world.simulation_context import SimulationContext
 from world.transition_predictor import TransitionPredictor
 from world.world_state import WorldState, clamp01

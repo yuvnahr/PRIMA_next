@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from evaluation.metrics.confidence_calibration import calibration_records, confidence_calibration_summary
+from evaluation.metrics.confidence_calibration import (
+    calibration_records,
+    confidence_calibration_summary,
+)
 
 
 def test_confidence_calibration_summary_buckets_confidence() -> None:

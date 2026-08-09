@@ -1,4 +1,4 @@
-"""State carried through the adaptive reflection pipeline."""
+"""Deprecated state retained only for legacy reflection compatibility."""
 
 from __future__ import annotations
 

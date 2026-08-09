@@ -3,7 +3,7 @@ import re
 from re import Pattern
 
 # Patterns that likely indicate the model is leaking secrets or sensitive data.
-_SENSITIVE_PATTERNS: Pattern = re.compile(
+_SENSITIVE_PATTERNS: Pattern[str] = re.compile(
     r"(api[_-]?key|secret|password|private key|ssh-rsa|BEGIN RSA PRIVATE KEY|BEGIN PRIVATE KEY)",
     flags=re.IGNORECASE,
 )

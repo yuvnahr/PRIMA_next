@@ -32,10 +32,14 @@ class SimulationContext:
         """Create context from either an explicit world state or cognitive state."""
         state = current_state or WorldState.from_cognitive_state(cognitive_state)
         plan_constraints = tuple(getattr(plan, "constraints", ()) or ())
+        combined_constraints: list[Any] = []
+        for constraint in (*constraints, *plan_constraints):
+            if constraint not in combined_constraints:
+                combined_constraints.append(constraint)
         return cls(
             current_state=state,
             plan=plan,
-            constraints=tuple(dict.fromkeys((*constraints, *plan_constraints))),
+            constraints=tuple(combined_constraints),
             metadata=metadata or {},
         )
 

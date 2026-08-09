@@ -1,0 +1,5 @@
+pytest==9.1.1
+ruff==0.15.18
+xenon==0.9.3
+mypy==2.1.0
+bandit==1.9.4

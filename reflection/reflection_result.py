@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 
+from reasoning.reflection_advisor import ReflectionAdvice
 from reflection.reflection_confidence import ReflectionConfidence
 from reflection.reflection_memory import ReflectionMemory, Rule
 from reflection.reflection_signal import ReflectionSignal
@@ -22,6 +23,7 @@ class ReflectionResult:
     before_confidence: float = 0.0
     after_confidence: float = 0.0
     utility_score: float = 0.0
+    advice: ReflectionAdvice | None = None
 
     @property
     def correction_applied(self) -> bool:
@@ -47,4 +49,5 @@ class ReflectionResult:
             "after_confidence": self.after_confidence,
             "utility_score": self.utility_score,
             "correction_applied": self.correction_applied,
+            "advice": self.advice.to_dict() if self.advice is not None else None,
         }

@@ -211,7 +211,7 @@ def emotion_continuity(users: list[SyntheticUser]) -> dict[str, Any]:
 
 def reflection_utility(users: list[SyntheticUser]) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
-    counts = Counter()
+    counts: Counter[str] = Counter()
     for user in users:
         candidates = [t for t in user.conversation_turns if t.turn_type in {"correction", "contradiction"}]
         for turn in candidates:

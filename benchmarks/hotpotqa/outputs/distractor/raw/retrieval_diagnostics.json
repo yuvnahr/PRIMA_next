@@ -1,0 +1,909 @@
+[
+  {
+    "sample_id": "5a81b92a5542995ce29dcc52",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "University of Delaware Botanic Gardens",
+          0
+        ],
+        "source_id": "mem_f6d1e557-7100-4129-9b38-e9a56e368070",
+        "hop": 0,
+        "query": "Which college is located in the United States, University of Delaware of University of Debrecen?"
+      },
+      {
+        "prediction": [
+          "University of Debrecen",
+          0
+        ],
+        "source_id": "mem_525db509-1ab4-41e9-9522-348fcea2b3a1",
+        "hop": 0,
+        "query": "Which college is located in the United States, University of Delaware of University of Debrecen?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7270395542992359bc30a8",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 1,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Kansas City, Missouri",
+          3
+        ],
+        "source_id": "mem_b3d99616-dd6d-4e1c-95b4-75503f33cd85",
+        "hop": 0,
+        "query": "When was the city George Consider Hale was born in founded?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5ab9188c5542991b5579f0f5",
+    "retrieval_calls": 3,
+    "evidence_count": 12,
+    "supporting_fact_prediction_count": 12,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Reunion Tour (The Stone Roses)",
+          5
+        ],
+        "source_id": "mem_7da3449b-edbf-49b3-bc93-88bbd5893af1",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "The Stone Roses (album)",
+          1
+        ],
+        "source_id": "mem_4efc8a00-9bad-419b-958e-87c111103fd9",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "The Stone Roses: Made of Stone",
+          0
+        ],
+        "source_id": "mem_b43523c3-cb4c-408d-ac65-abcae04737f8",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "One Love (The Stone Roses song)",
+          1
+        ],
+        "source_id": "mem_0765f4d1-32bb-4a30-85b5-305c99dcb759",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "Whiteout (band)",
+          4
+        ],
+        "source_id": "mem_f047ecc7-a0c4-40e1-b7a4-03a206e3bd5c",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "Unfinished Monkey Business",
+          1
+        ],
+        "source_id": "mem_6bea1941-2a27-4bcf-8b5e-8e5eb2f56f76",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "The Stone Roses (album)",
+          2
+        ],
+        "source_id": "mem_4f12cfef-3c3d-44fc-956b-310237bf9399",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "The Stone Roses: Made of Stone",
+          2
+        ],
+        "source_id": "mem_aff1f194-51b1-4002-bd50-38ae3c9c50e0",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "Unorthodox (Wretch 32 song)",
+          3
+        ],
+        "source_id": "mem_e02e3c34-0506-4d4f-adb6-45d16a2bfec3",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "The Stone Roses",
+          1
+        ],
+        "source_id": "mem_30e34bf5-cfde-4352-82a2-0615fb85fb25",
+        "hop": 0,
+        "query": "What kind of music do The Stone Roses and The Lemonheads play?"
+      },
+      {
+        "prediction": [
+          "Whiteout (band)",
+          2
+        ],
+        "source_id": "mem_76832b8e-acc8-4345-b534-5734d1f7a4eb",
+        "hop": 1,
+        "query": "They"
+      },
+      {
+        "prediction": [
+          "Whiteout (band)",
+          1
+        ],
+        "source_id": "mem_0675dd73-fe1d-44b3-9b6f-c0f6095baa48",
+        "hop": 1,
+        "query": "They"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7dab795542990b8f503a22",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 4,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "El Chavo Animado",
+          0
+        ],
+        "source_id": "mem_8a653c49-7586-4807-a410-dda9cfe16980",
+        "hop": 0,
+        "query": "El Chavo is a video game published by Slang Publishing, that was based on what Mexican animated series that was based on another TV series created by Roberto Gomez Bolanos?"
+      },
+      {
+        "prediction": [
+          "El Chavo (video game)",
+          0
+        ],
+        "source_id": "mem_7b6eb11e-f4fd-48b8-997c-d16182f1a8a8",
+        "hop": 0,
+        "query": "El Chavo is a video game published by Slang Publishing, that was based on what Mexican animated series that was based on another TV series created by Roberto Gomez Bolanos?"
+      },
+      {
+        "prediction": [
+          "List of El Chavo del Ocho characters",
+          0
+        ],
+        "source_id": "mem_66a47a6e-594b-42fd-baee-deb890cd1e6f",
+        "hop": 0,
+        "query": "El Chavo is a video game published by Slang Publishing, that was based on what Mexican animated series that was based on another TV series created by Roberto Gomez Bolanos?"
+      },
+      {
+        "prediction": [
+          "El Chapul\u00edn Colorado",
+          0
+        ],
+        "source_id": "mem_888d9828-a6b3-4341-a8a0-99ed629207d4",
+        "hop": 0,
+        "query": "El Chavo is a video game published by Slang Publishing, that was based on what Mexican animated series that was based on another TV series created by Roberto Gomez Bolanos?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7914e155429974737f7973",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 10,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Vicente Garc\u00eda (musician)",
+          2
+        ],
+        "source_id": "mem_7b0b333e-3dcf-4e66-a2ed-376caa7cbe57",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Juan Campod\u00f3nico",
+          1
+        ],
+        "source_id": "mem_88384e7c-7a62-4924-b1c3-2e479755aefc",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Premios Oye! 2008",
+          2
+        ],
+        "source_id": "mem_edacf8f8-6b82-4363-8121-de237efe8fcb",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Mediocre (album)",
+          0
+        ],
+        "source_id": "mem_7c164006-d984-4a58-a2eb-e0f6cfb0f018",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Ximena Sari\u00f1ana (album)",
+          1
+        ],
+        "source_id": "mem_45d7602c-72cc-4c02-8982-83cf7f79d5cc",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Ximena Sari\u00f1ana (album)",
+          2
+        ],
+        "source_id": "mem_597ab2f7-fc39-4385-a806-4fa71512c514",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Los Sue\u00f1os de un H\u00edgado",
+          1
+        ],
+        "source_id": "mem_dfef4ea6-f255-4b5f-b67d-6c1e92386912",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "New Mexico Wool Manufacturing Company",
+          1
+        ],
+        "source_id": "mem_9e223d7e-96ac-4558-93fb-dd8ce4355593",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "D\u014ditashimashite",
+          2
+        ],
+        "source_id": "mem_39d13692-d6e0-4640-89be-afdce8d5165f",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      },
+      {
+        "prediction": [
+          "Ximena Sari\u00f1ana (album)",
+          3
+        ],
+        "source_id": "mem_55a7b836-102b-4658-ad6d-188816449042",
+        "hop": 0,
+        "query": "What is the birthday of the oldest among Vicente Garc\u00eda and Ximena Sari\u00f1ana?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5ae00b9f554299025d62a3c3",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Jerry Buss",
+          1
+        ],
+        "source_id": "mem_552c8b22-37a1-40c8-9c00-0a2fe95ff1f7",
+        "hop": 0,
+        "query": "What former Los Angeles Lakers majority owner is the father of Jeanie Marie Buss?"
+      },
+      {
+        "prediction": [
+          "Jim Buss",
+          1
+        ],
+        "source_id": "mem_d86e4c3d-c186-4c6f-ae8c-e9ba798f01fb",
+        "hop": 0,
+        "query": "What former Los Angeles Lakers majority owner is the father of Jeanie Marie Buss?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a74ee175542996c70cfae41",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 10,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Amrish Puri",
+          3
+        ],
+        "source_id": "mem_10cd6ba8-917e-4d93-a8ac-fb69e01dfbf2",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Tadakha",
+          5
+        ],
+        "source_id": "mem_48f32d22-ef52-4d02-8a61-c70c391effb4",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Vikrant Rai",
+          1
+        ],
+        "source_id": "mem_a7fff195-d37b-4f9a-808a-4bcd4fc6ae3d",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Rajesh Vivek",
+          1
+        ],
+        "source_id": "mem_75a7f093-ab7f-457e-b185-a874a78a1ce1",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "List of roles and awards of Arshad Warsi",
+          3
+        ],
+        "source_id": "mem_65f6e073-f859-4b82-b5a5-51c9448f6f65",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "List of roles and awards of Arshad Warsi",
+          5
+        ],
+        "source_id": "mem_5906ef0b-0e8c-46c0-a2ed-83b98444fd1d",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Sachin Nayak",
+          0
+        ],
+        "source_id": "mem_b7060258-7e79-45cf-aa4b-2c75cf5dc993",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Jass Bhatia",
+          2
+        ],
+        "source_id": "mem_a36c047e-8ea4-4923-939f-fed1ccf956d8",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Vikas Verma",
+          2
+        ],
+        "source_id": "mem_9e38fa32-20d5-4a46-8c56-a1b9507e313e",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      },
+      {
+        "prediction": [
+          "Vikas Verma",
+          5
+        ],
+        "source_id": "mem_a3fc5313-57c1-4be9-af8a-ce28cf4537cd",
+        "hop": 0,
+        "query": "Which Indian actor is best known for his role in the film Tadakha following his debut in the 2009 film Josh?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5ab72b5c5542993667793f63",
+    "retrieval_calls": 2,
+    "evidence_count": 12,
+    "supporting_fact_prediction_count": 3,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Craig Kilborn",
+          1
+        ],
+        "source_id": "mem_e89b7198-99f2-4374-bf8d-5e10bf43cc9b",
+        "hop": 0,
+        "query": "What country of origin does The Late Late Show and Craig Kilborn have in common?"
+      },
+      {
+        "prediction": [
+          "The Late Late Show (U.S. TV series)",
+          1
+        ],
+        "source_id": "mem_4039ca44-43f2-493d-bca5-0f3b012d69fd",
+        "hop": 0,
+        "query": "What country of origin does The Late Late Show and Craig Kilborn have in common?"
+      },
+      {
+        "prediction": [
+          "The Late Late Show with Craig Ferguson",
+          2
+        ],
+        "source_id": "mem_2c5b15ad-034e-462a-82bc-99197dd2a84c",
+        "hop": 0,
+        "query": "What country of origin does The Late Late Show and Craig Kilborn have in common?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7ba8fc5542995eb53be986",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Umar Israilov",
+          0
+        ],
+        "source_id": "mem_90c18593-7fe5-41dd-90ee-ab91be36d0f5",
+        "hop": 0,
+        "query": "Who was born first, Umar Israilov or Ramzan Kadyrov?"
+      },
+      {
+        "prediction": [
+          "Ramzan Kadyrov",
+          0
+        ],
+        "source_id": "mem_e57109b9-e80f-49a9-8e17-82c8981805da",
+        "hop": 0,
+        "query": "Who was born first, Umar Israilov or Ramzan Kadyrov?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5adf3e355542993a75d26440",
+    "retrieval_calls": 3,
+    "evidence_count": 12,
+    "supporting_fact_prediction_count": 12,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Copenhagen Malm\u00f6 Port",
+          3
+        ],
+        "source_id": "mem_6abf9dd7-356b-46a0-aaeb-4cb8b579ada6",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "\u00d8resund Region",
+          1
+        ],
+        "source_id": "mem_79db3132-4375-4735-a974-531b96f0a0df",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "\u00d8resund Region",
+          0
+        ],
+        "source_id": "mem_c1d3a11e-92bc-4ac1-a395-baa9eff33e46",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "Sweden",
+          1
+        ],
+        "source_id": "mem_bc4160f1-2a34-4528-b4f6-acfc8afc3727",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "\u00d8resund Bridge",
+          0
+        ],
+        "source_id": "mem_629e3ea5-567b-49f5-bd52-832489d95b88",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "Malm\u00f6 Harbour Heliport",
+          1
+        ],
+        "source_id": "mem_85a4ca53-9c6b-4cd7-a704-174094dacf43",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "City Tunnel (Malm\u00f6)",
+          0
+        ],
+        "source_id": "mem_311e68d5-3a7c-4e81-819e-b51977f09841",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "Copenhagen Malm\u00f6 Port",
+          2
+        ],
+        "source_id": "mem_5a62459c-f447-43fb-8c14-0a1f27e5a8e2",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "European route E47",
+          0
+        ],
+        "source_id": "mem_113445e4-444b-46bc-bf14-d6c5b4922840",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "\u00d8resund",
+          0
+        ],
+        "source_id": "mem_6e4d32b7-d7bd-41b2-b174-d398f3acfad9",
+        "hop": 0,
+        "query": "How long is the bridge in the \u00d6resund Region that connect Copenhagen, Denmark and Malmo, Sweden?"
+      },
+      {
+        "prediction": [
+          "\u00d6resund Committee",
+          1
+        ],
+        "source_id": "mem_5e1dcb26-4b34-486f-9c6e-12abc72a55e6",
+        "hop": 1,
+        "query": "Danish"
+      },
+      {
+        "prediction": [
+          "\u00d8resund Bridge",
+          2
+        ],
+        "source_id": "mem_a8310440-494d-4b69-842a-c704daf0eb83",
+        "hop": 1,
+        "query": "Danish"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a75b7475542992d0ec05feb",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Carlo Buccirosso",
+          0
+        ],
+        "source_id": "mem_cb0c85ce-ebe0-4f52-b3cc-bb2538b77314",
+        "hop": 0,
+        "query": "Carlo Buccirosso had a role in a movie that premiered at what film festival?"
+      },
+      {
+        "prediction": [
+          "The Great Beauty",
+          2
+        ],
+        "source_id": "mem_0c953199-5989-41f6-bba4-a2e53a5032af",
+        "hop": 0,
+        "query": "Carlo Buccirosso had a role in a movie that premiered at what film festival?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7cd8da55429909bec76845",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "The Ones Who Walk Away from Omelas",
+          1
+        ],
+        "source_id": "mem_70b3219e-bf79-4baa-bad8-1275a2bb67e4",
+        "hop": 0,
+        "query": "Which The Wind's Twelve Quarters story depicts a summer festival in the utopian city of Omelas?"
+      },
+      {
+        "prediction": [
+          "The Wind's Twelve Quarters",
+          3
+        ],
+        "source_id": "mem_e0dd7f52-1975-4bad-9b3c-a1a944c76466",
+        "hop": 0,
+        "query": "Which The Wind's Twelve Quarters story depicts a summer festival in the utopian city of Omelas?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a793b5b55429970f5fffe82",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 1,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Pankaj Mullick",
+          0
+        ],
+        "source_id": "mem_1a0cc662-0e32-45df-a805-15bbee05a251",
+        "hop": 0,
+        "query": "What is the country of origin of the film Dui Purush and the music director Pankaj Mullick"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7f89c75542994857a76775",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 1,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Glossary of classical algebraic geometry",
+          0
+        ],
+        "source_id": "mem_651f5696-e9e0-4ee2-b4dc-71874861e9ce",
+        "hop": 0,
+        "query": "The terminology of algebraic geometry changed drastically with the introduction of the general methods, initiated by a mathematician of what nationality?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a8a21a455429930ff3c0caf",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 10,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Greg Gianforte",
+          1
+        ],
+        "source_id": "mem_37dc0f24-6679-46b6-9b05-eae9fa94c08d",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Kevin Aguiar",
+          1
+        ],
+        "source_id": "mem_12651714-7501-4c87-838d-af177a3d94f5",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "David Jacoby",
+          1
+        ],
+        "source_id": "mem_44915bc2-1c7f-48e5-baee-1941d2dbd3fc",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Greg Gianforte",
+          0
+        ],
+        "source_id": "mem_99d1be8a-ca3e-4773-bf7d-0d7628ea725b",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Benjamin Peterson",
+          5
+        ],
+        "source_id": "mem_b3798abb-db2a-4d57-9121-d1fd5f56cec0",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "San Diego mayoral special election, 2005",
+          0
+        ],
+        "source_id": "mem_8284d5cb-bae4-42b3-95c0-6f60b2b0ba59",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Greg Gianforte",
+          2
+        ],
+        "source_id": "mem_fb4480dc-f39b-4522-ae69-b4cf8e5b1f61",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Benjamin Peterson",
+          2
+        ],
+        "source_id": "mem_6625fca0-437d-467a-aad4-cb2046206c32",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Louisiana State Treasurer special election, 2017",
+          0
+        ],
+        "source_id": "mem_5d899ecf-39c4-43ff-b6c2-e1398241c2c9",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      },
+      {
+        "prediction": [
+          "Mike Aguirre",
+          1
+        ],
+        "source_id": "mem_603f06e4-05d5-4fac-b567-46c98e75bc49",
+        "hop": 0,
+        "query": "On May 25, 2017 Greg Gianforte won the special election following the resignation of a politican that current holds what position?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5ac300905542996773102682",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Devilment",
+          1
+        ],
+        "source_id": "mem_60676e39-df77-4ab0-95bd-4bd38d30ec68",
+        "hop": 0,
+        "query": "Devilment finally found a stable vocalist in the founding member of which band?"
+      },
+      {
+        "prediction": [
+          "Dani Filth",
+          0
+        ],
+        "source_id": "mem_ca335911-38d1-4a11-b02d-8edf729c2b84",
+        "hop": 0,
+        "query": "Devilment finally found a stable vocalist in the founding member of which band?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a8483b45542992a431d1a40",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 1,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Angus T. Jones",
+          1
+        ],
+        "source_id": "mem_e3220187-a6bd-464a-bf70-91b03dd97532",
+        "hop": 0,
+        "query": "What star of Two and a Half Men won two young artist and TV-land awards for his character?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a7e08305542995f4f4023ab",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Masatoshi G\u00fcnd\u00fcz Ikeda",
+          0
+        ],
+        "source_id": "mem_30276c02-e760-443c-99e3-1ed51f4fbeb4",
+        "hop": 0,
+        "query": "Who was born first Al-Karaji or Masatoshi G\u00fcnd\u00fcz Ikeda?"
+      },
+      {
+        "prediction": [
+          "Al-Karaji",
+          1
+        ],
+        "source_id": "mem_281a7eab-3f77-42cd-8b4f-57daed46e0b3",
+        "hop": 0,
+        "query": "Who was born first Al-Karaji or Masatoshi G\u00fcnd\u00fcz Ikeda?"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a8a17685542993b751ca9f3",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Gordon Chambers",
+          2
+        ],
+        "source_id": "mem_fbcde877-26ce-49d5-a1fa-ae0d19ca1be3",
+        "hop": 0,
+        "query": "Which rapper who worked with a star of the film 8 Mile also worked with the artist who played keyboards and wrote songs for Anita Baker??"
+      },
+      {
+        "prediction": [
+          "Luis Resto (musician)",
+          3
+        ],
+        "source_id": "mem_8ba37ff5-78ad-4135-890d-c5d462cef0f7",
+        "hop": 0,
+        "query": "Which rapper who worked with a star of the film 8 Mile also worked with the artist who played keyboards and wrote songs for Anita Baker??"
+      }
+    ]
+  },
+  {
+    "sample_id": "5a888a625542997e5c09a602",
+    "retrieval_calls": 1,
+    "evidence_count": 10,
+    "supporting_fact_prediction_count": 2,
+    "supporting_fact_provenance": [
+      {
+        "prediction": [
+          "Hana Hou!",
+          2
+        ],
+        "source_id": "mem_3a28c067-9543-43a1-ae41-9c157a3d04ec",
+        "hop": 0,
+        "query": "What number largest commercial airline in the United States is Hana Hou! published for?"
+      },
+      {
+        "prediction": [
+          "Hawaiian Airlines",
+          1
+        ],
+        "source_id": "mem_32c84478-18c1-41f1-830e-58984a5aface",
+        "hop": 0,
+        "query": "What number largest commercial airline in the United States is Hana Hou! published for?"
+      }
+    ]
+  }
+]

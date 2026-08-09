@@ -101,7 +101,7 @@ def _importance_retention_correlation(records: list[dict[str, Any]]) -> float:
     retained = [1.0 if record.get("memory_created") else 0.0 for record in records]
     mean_score = sum(scores) / len(scores)
     mean_retained = sum(retained) / len(retained)
-    numerator = sum((score - mean_score) * (stored - mean_retained) for score, stored in zip(scores, retained))
+    numerator = sum((score - mean_score) * (stored - mean_retained) for score, stored in zip(scores, retained, strict=True))
     score_variance = sum((score - mean_score) ** 2 for score in scores)
     retained_variance = sum((stored - mean_retained) ** 2 for stored in retained)
     denominator = math.sqrt(score_variance * retained_variance)

@@ -1,0 +1,2 @@
+# Compatibility alias for the explicit encoder/training dependency group.
+-r requirements-encoder.txt

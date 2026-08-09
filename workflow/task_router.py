@@ -27,13 +27,116 @@ class TaskRouter:
         WorkflowPhase.OUTPUT,
     )
 
+    ROUTES = {
+        ("conversation", "model_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("conversation", "simple_rag"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.EVIDENCE_ACQUISITION,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("conversation", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.AFFECT,
+            WorkflowPhase.EVIDENCE_ACQUISITION,
+            WorkflowPhase.PLANNING,
+            WorkflowPhase.WORLD_SIMULATION,
+            WorkflowPhase.UNCERTAINTY_ESTIMATION,
+            WorkflowPhase.EXECUTION_DECISION,
+            WorkflowPhase.REFLECTION,
+            WorkflowPhase.ACTION,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("factual_qa", "model_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("factual_qa", "simple_rag"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.EVIDENCE_ACQUISITION,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("factual_qa", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.AFFECT,
+            WorkflowPhase.EVIDENCE_ACQUISITION,
+            WorkflowPhase.PLANNING,
+            WorkflowPhase.WORLD_SIMULATION,
+            WorkflowPhase.UNCERTAINTY_ESTIMATION,
+            WorkflowPhase.EXECUTION_DECISION,
+            WorkflowPhase.REFLECTION,
+            WorkflowPhase.ACTION,
+            WorkflowPhase.ANSWER_GENERATION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("document_ingestion", "ingestion_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.DOCUMENT_INGESTION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+        ("emotion_classification", "affect_only"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.AFFECT,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+        ),
+        ("tool_request", "prima_full"): (
+            WorkflowPhase.STATE_LOAD,
+            WorkflowPhase.AFFECT,
+            WorkflowPhase.MEMORY_RETRIEVAL,
+            WorkflowPhase.PLANNING,
+            WorkflowPhase.WORLD_SIMULATION,
+            WorkflowPhase.UNCERTAINTY_ESTIMATION,
+            WorkflowPhase.EXECUTION_DECISION,
+            WorkflowPhase.REFLECTION,
+            WorkflowPhase.ACTION,
+            WorkflowPhase.OUTPUT_VALIDATION,
+            WorkflowPhase.OUTPUT,
+            WorkflowPhase.STATE_COMMIT,
+            WorkflowPhase.MEMORY_COMMIT,
+            WorkflowPhase.MAINTENANCE_ENQUEUE,
+        ),
+    }
+
     def route(self, context: ExecutionContext) -> TaskRoute:
         """Return the route for the current context.
 
-        Future task-specific branching belongs here, keeping subsystem
-        components unaware of each other.
+        Subsystem components remain unaware of task/profile selection.
         """
         requested = context.metadata.get("route")
         if requested:
             return TaskRoute(tuple(WorkflowPhase(phase) for phase in requested))
+        key = (str(context.metadata.get("task_kind", "")), str(context.metadata.get("profile", "")))
+        if key in self.ROUTES:
+            return TaskRoute(self.ROUTES[key])
         return TaskRoute(self.DEFAULT_ROUTE)

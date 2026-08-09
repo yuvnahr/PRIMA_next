@@ -5,7 +5,7 @@ from __future__ import annotations
 from memory.graph.graph_edge import GraphEdge
 from memory.graph.graph_node import GraphNode
 from memory.graph.graph_repository import GraphRepository
-from memory.memory_note import calculate_smart_overlap
+from memory.memory_note import MemoryNote, calculate_smart_overlap
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
 
@@ -41,4 +41,35 @@ class GraphBuilder:
                         metadata={"overlap": overlap},
                     )
                 )
+        return self.graph_repository
+
+    def index_note(self, repository: MemoryRepository, note: MemoryNote) -> GraphRepository:
+        """Add or refresh one memory's derived graph node and relationships."""
+        memory_id = note.id
+        keywords = tuple(note.keywords)
+        memory_type = note.memory_type
+        memory_level = note.memory_level
+        self.graph_repository.add_node(
+            GraphNode(
+                id=f"node_{memory_id}",
+                memory_id=memory_id,
+                labels=(memory_type.value, memory_level.value),
+                metadata={"keywords": list(keywords)},
+            )
+        )
+        for other in repository.list():
+            if other.id == memory_id:
+                continue
+            overlap = calculate_smart_overlap(keywords, other.keywords)
+            if overlap <= 0:
+                continue
+            self.graph_repository.add_edge(
+                GraphEdge(
+                    source_id=f"node_{memory_id}",
+                    target_id=f"node_{other.id}",
+                    relation_type="shared_context",
+                    weight=min(1.0, 0.35 + overlap * 0.2),
+                    metadata={"overlap": overlap},
+                )
+            )
         return self.graph_repository

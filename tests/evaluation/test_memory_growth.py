@@ -98,11 +98,11 @@ def test_latency_vs_memory_cumulative() -> None:
 
 def test_average_latency_correct() -> None:
     records = [{"latency_ms": 10.0}, {"latency_ms": 20.0}, {"latency_ms": 30.0}]
-    assert abs(average_latency(records) - 20.0) < 1e-6  # type: ignore[arg-type]
+    assert abs(average_latency(records) - 20.0) < 1e-6
 
 
 def test_average_latency_empty() -> None:
-    assert average_latency([]) == 0.0  # type: ignore[arg-type]
+    assert average_latency([]) == 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ def test_memory_evolution_analysis_counts() -> None:
         {"memory_notes_created": 2, "abstraction_count": 1, "semantic_merge_count": 0},
         {"memory_notes_created": 0, "abstraction_count": 0, "semantic_merge_count": 1},
     ]
-    result = memory_evolution_analysis(records)  # type: ignore[arg-type]
+    result = memory_evolution_analysis(records)
     assert result["total_memories_created"] == 3
     assert result["abstraction_count"] == 1
     assert result["semantic_merge_count"] == 1
@@ -144,7 +144,7 @@ def test_synthetic_users_produce_memory_growth() -> None:
 
 def test_memory_growth_curve_non_decreasing() -> None:
     """Cumulative memory count must never decrease across turns."""
-    records = [_record(t, (t % 3 == 0)) for t in range(30)]  # type: ignore[arg-type]
+    records = [_record(t, (t % 3 == 0)) for t in range(30)]
     curve = memory_growth_curve(records)
     cumulative = [pt["cumulative_memories"] for pt in curve]
     for i in range(1, len(cumulative)):

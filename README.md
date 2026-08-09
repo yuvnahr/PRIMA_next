@@ -47,10 +47,10 @@ It converts plans into bounded execution results. It validates arguments, enforc
 The event layer provides in-process asynchronous communication:
 
 ```text
-Subsystem Output -> Event Publisher -> Async Event Bus -> Filtered Subscribers -> Event Store
+Workflow Memory Commit -> Typed Event -> Bounded Maintenance Supervisor -> Cold-Path Engines -> Event Store
 ```
 
-It replaces direct module coupling with typed events such as memory creation, reflection triggers, state changes, plan failures, and tool execution. It uses asyncio and an in-memory store; no external broker is required.
+Memory admission is published without awaiting encoding, salience, consolidation, abstraction, graph refresh, or decay. One local asyncio supervisor owns bounded queueing, retries, cancellation, idempotency by event ID, deterministic flush barriers, and failure diagnostics. Production failures are appended to a versioned JSONL store; no external broker is required.
 
 ## Package Layout
 
@@ -259,7 +259,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 - Retrieval priors and reflection signals are emitted as data, not acted on directly.
 - Memory fabric preserves dominant context chain extraction, smart keyword overlap boosting, hybrid retrieval, graph clustering, semantic evolution, and lineage.
 - ChromaDB is the intended persistence source of truth; an in-memory repository is included for deterministic tests and local development.
-- Forgetting is soft: maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
+- Forgetting is soft: background maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
 - Reflection preserves verifier-driven retry behavior, fuzzy answer matching, grounding validation, rejected-action feedback, and ExpeL rule extraction.
 - Reflection consumes affect signals and retrieval confidence as data; it does not call affect or retrieval internals.
 - Planning consumes workflow-routed state, retrieved memory summaries, affective priors, and reflection signals as data.
@@ -269,7 +269,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 - Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
 - Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
-- Events are local and async: the shared bus uses `asyncio`, filtered subscribers, typed event envelopes, and an injected in-memory event store. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope for now.
+- Events are local and async. Async applications explicitly start/flush/stop the runtime maintenance lifecycle; benchmark adapters select `disabled`, `eventual`, or a named deterministic flush barrier. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope.
 
 ## Setup
 
@@ -277,7 +277,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 python -m venv .venv
 . .venv/Scripts/Activate.ps1
 pip install -r requirements.txt
-python -m unittest discover
+python -m pytest -q
 ```
 
 Supervised affect evaluation:
@@ -294,9 +294,55 @@ Rule-set checks after installing development dependencies:
 python -m pytest -q
 python -m ruff check .
 python -m mypy .
-python -m bandit -r .
+python -m bandit -c bandit.yaml -r .
+python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
 ```
 
-Optional legacy benchmark dependencies are listed as comments in `requirements.txt` because this repo should remain lightweight by default.
+Dependencies are split into `requirements-core.txt`, `requirements-dev.txt`, and
+`requirements-benchmark.txt`. `requirements.txt` installs those three groups.
+Semantic metrics and encoder/training dependencies are opt-in through
+`requirements-semantic-metrics.txt` and `requirements-encoder.txt`.
+
+Check optional benchmark capabilities without installing or importing them:
+
+```powershell
+python -m benchmarks.preflight
+```
+
+LoCoMo core metrics do not require semantic-metric extras. Its built-in deterministic
+ROUGE-L is enabled only with `--rouge-l`; BERTScore is enabled only with
+`--bertscore` and accepts explicit device and batch-size options. LoCoMo defaults to
+a one-conversation preview; an unlimited run requires `--full-dataset`.
+
+GoEmotions is an affect/classification component benchmark, not a full QA-wrapper
+benchmark. Every example uses `TaskKind.EMOTION_CLASSIFICATION` through the bounded
+`affect_only` route; retrieval, QA reasoning, world simulation, and tools remain off.
+Run the complete test split with resumable per-example checkpoints using:
+
+```powershell
+python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision
+python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision --resume
+```
+
+Available systems distinguish model-only zero-shot, schema-constrained model-only,
+telemetry that preserves model labels, the bounded affect decision layer, and a
+separately attributed trained encoder baseline. Reports exclude parse recovery from
+the headline paired affect comparison and label the multilabel matrix as label
+co-occurrence.
+
+Run GoEmotions, HotpotQA, and LoCoMo as one resumable campaign with one shared,
+bounded provider session:
+
+```powershell
+python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
+python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
+```
+
+The smoke configuration uses fixture data and a deterministic fake provider. Copy
+`benchmarks/campaign/full_gpu.example.yaml` for a real campaign; its endpoint, model,
+revision, datasets, and output directory remain unresolved environment placeholders
+and fail validation until explicitly supplied. GPU inference is serialized by
+default (`max_gpu_requests: 1`), including interleaved campaigns; CPU-side benchmark
+work may overlap.
 
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

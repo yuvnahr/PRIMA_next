@@ -8,6 +8,7 @@ from typing import Protocol
 
 import numpy as np
 
+from affect.emotion_prediction import EmotionPrediction
 from affect.emotion_profile import EmotionProfile
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,13 @@ logger = logging.getLogger(__name__)
 class EmotionClassifier(Protocol):
     def classify(self, text: str) -> EmotionProfile:
         """Classify text and return an immutable profile."""
+
+
+class ProbabilisticEmotionClassifier(EmotionClassifier, Protocol):
+    """Optional classifier interface retaining complete GoEmotions probabilities."""
+
+    def predict(self, text: str) -> EmotionPrediction:
+        """Return an immutable probabilistic affect prediction."""
 
 
 class SimilarityBackend(ABC):
