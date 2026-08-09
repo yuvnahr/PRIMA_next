@@ -1,7 +1,6 @@
 ﻿"""Official HotpotQA answer, supporting-fact, and joint metrics."""
 from __future__ import annotations
 
-import json
 import re
 import string
 from collections import Counter
@@ -9,6 +8,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from benchmarks.common.artifacts import atomic_write_json
 from benchmarks.common.interfaces import BenchmarkEvaluator, BenchmarkResult
 
 SPECIAL = {"yes", "no", "noanswer"}
@@ -43,17 +43,20 @@ def project_supporting_facts(response_metadata: dict[str, Any]) -> tuple[list[li
     facts, provenance = [], []
     seen = set()
     diagnostics = response_metadata.get("answer_diagnostics", {})
-    selected = set(diagnostics.get("selected_memory_ids", []))
+    generation = response_metadata.get("output_data", {}).get("generation", {})
+    selected = set(diagnostics.get("selected_memory_ids", generation.get("selected_source_ids", [])))
     filter_selected = diagnostics.get("structured_answer_valid") is True
-    for evidence in response_metadata.get("evidence_references", []):
+    evidence_items = response_metadata.get("evidence", response_metadata.get("evidence_references", []))
+    for evidence in evidence_items:
         if filter_selected and evidence.get("source_id") not in selected:
             continue
-        source = evidence.get("provenance", {})
+        metadata = evidence.get("metadata", {})
+        source = evidence.get("provenance", metadata.get("provenance", {}))
         title, sentence_id = source.get("source_title"), source.get("sentence_id")
         if isinstance(title, str) and isinstance(sentence_id, int) and not isinstance(sentence_id, bool) and (title, sentence_id) not in seen:
             seen.add((title, sentence_id))
             facts.append([title, sentence_id])
-            provenance.append({"prediction": [title, sentence_id], "source_id": evidence.get("source_id"), "hop": evidence.get("hop"), "query": evidence.get("query")})
+            provenance.append({"prediction": [title, sentence_id], "source_id": evidence.get("source_id"), "hop": evidence.get("hop", metadata.get("hop")), "query": evidence.get("query", metadata.get("query"))})
     return facts, provenance
 
 def score_hotpot_record(row: BenchmarkResult | dict[str, Any]) -> dict[str, float]:
@@ -90,7 +93,7 @@ def write_predictions(predictions: dict[str, Any], path: str | Path) -> Path:
     validate_predictions(predictions)
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(predictions, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic_write_json(destination, predictions)
     return destination
 
 class HotpotQAEvaluator(BenchmarkEvaluator):

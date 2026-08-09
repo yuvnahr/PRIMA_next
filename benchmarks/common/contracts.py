@@ -211,6 +211,7 @@ class BenchmarkManifest(ContractModel):
     model: str
     model_revision: str | None = None
     generation_config: dict[str, Any]
+    benchmark_config: dict[str, Any] = Field(default_factory=dict)
     runtime_profile: str
     active_capabilities: dict[str, Any]
     repository_mode: str
@@ -238,6 +239,7 @@ class BenchmarkManifest(ContractModel):
             raise ValueError("manifest requires source_fingerprint or git_commit")
         for value in (
             self.generation_config,
+            self.benchmark_config,
             self.active_capabilities,
             self.dependencies,
             self.hardware,

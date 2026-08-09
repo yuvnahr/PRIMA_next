@@ -30,7 +30,7 @@ DATA_SOURCES = {
     "fullwiki": HotpotQADataSource(
         "fullwiki", "Fullwiki validation/evaluation",
         "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/14f0ace3c3fac7bd86149c616b5b05d8282e5c6a/fullwiki/validation-00000-of-00001.parquet",
-        "hotpot_dev_fullwiki_v1.json", "fullwiki", CONTEXT_SOURCES["fullwiki"],
+        "hotpot_dev_fullwiki_v1.json", "official_retrieved", CONTEXT_SOURCES["official_retrieved"],
     ),
 }
 

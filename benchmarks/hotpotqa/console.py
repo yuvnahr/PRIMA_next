@@ -28,7 +28,7 @@ class HotpotQATerminalReporter:
         if not self.enabled:
             return
         self._rule(); print("HotpotQA Run")
-        for label, key in (("Dataset set", "dataset_set"), ("Benchmark mode", "mode"), ("Dataset path", "dataset_path"), ("Selected samples", "sample_count"), ("Sampling", "sampling_strategy"), ("Resolved seed", "resolved_seed"), ("Provider", "provider"), ("Model", "model"), ("Reasoning mode", "reasoning_mode"), ("Top-k", "top_k"), ("Max hops", "max_hops"), ("Output directory", "output_dir"), ("Resume", "resume")):
+        for label, key in (("Dataset set", "dataset_set"), ("Context mode", "mode"), ("Runtime profile", "runtime_profile"), ("Dataset path", "dataset_path"), ("Selected samples", "sample_count"), ("Sampling", "sampling_strategy"), ("Resolved seed", "resolved_seed"), ("Provider", "provider"), ("Model", "model"), ("Reasoning mode", "reasoning_mode"), ("Top-k", "top_k"), ("Max hops", "max_hops"), ("Output directory", "output_dir"), ("Resume", "resume")):
             self._field(label, config.get(key, "-"))
         self._rule()
 
@@ -39,9 +39,9 @@ class HotpotQATerminalReporter:
         self._field("Sample ID", record.get("sample_id")); self._field("Type", record.get("type") or "-"); self._field("Level", record.get("level") or "-")
         self._wrapped("Question", record.get("question"))
         answer_em = 0.0
-        if record.get("runtime_error"):
+        if record.get("execution_failed"):
             self._field("Runtime status", "failed"); self._field("Failure stage", record.get("failure_stage") or "unknown"); self._field("Failure category", record.get("failure_category") or "UNKNOWN")
-            self._wrapped("Error", record.get("runtime_error")); self._field("Latency", f"{record.get('total_latency', 0.0):.2f} seconds")
+            self._wrapped("Error", record.get("runtime_error") or record.get("ingestion_error")); self._field("Latency", f"{record.get('total_latency_ms', 0.0):.2f} ms")
         else:
             self._wrapped("Prediction", record.get("prediction")); self._wrapped("Reference", record.get("expected_answer"))
             scores = score_hotpot_record(record)
@@ -53,19 +53,19 @@ class HotpotQATerminalReporter:
             for label, key in (("Runtime status", "runtime_status"), ("Stop reason", "final_stop_reason"), ("Reasoning hops", "reasoning_hops"), ("Retrieval calls", "retrieval_calls"), ("Reflections", "reflection_interventions"), ("Evidence items", "evidence_count")):
                 self._field(label, record.get(key, "-") if key != "runtime_status" else "completed")
             self._field("Failure category", record.get("failure_category") or "none")
-            self._field("Latency", f"{record.get('total_latency', 0.0):.2f} seconds")
+            self._field("Latency", f"{record.get('total_latency_ms', 0.0):.2f} ms")
         print("\n✓ CORRECT" if answer_em == 1.0 else "\n✗ WRONG")
         self._rule()
 
     def summary(self, records: list[dict[str, Any]], metrics: dict[str, float], config: dict[str, Any], artifacts: dict[str, str], elapsed: float) -> None:
         if not self.enabled:
             return
-        count = len(records); completed = sum(not row.get("runtime_error") for row in records)
-        passed = sum(not row.get("runtime_error") and score_hotpot_record(row).get("em") == 1.0 for row in records)
+        count = len(records); completed = sum(not row.get("execution_failed") for row in records)
+        passed = sum(not row.get("execution_failed") and score_hotpot_record(row).get("em") == 1.0 for row in records)
         average = lambda key: sum(float(row.get(key, 0) or 0) for row in records) / count if count else 0.0
         self._rule(); print("HotpotQA Aggregate Summary"); self._rule()
         print("Run completion")
-        for label, value in (("Selected samples", config.get("sample_count", count)), ("Completed samples", completed), ("Scored samples", metrics.get("scored", 0)), ("Questions passed", f"{passed}/{int(metrics.get('scored', 0))}"), ("Runtime failures", count - completed), ("Elapsed run time", f"{elapsed:.2f} seconds"), ("Average latency", f"{average('total_latency'):.2f} seconds")):
+        for label, value in (("Selected samples", config.get("sample_count", count)), ("Completed samples", completed), ("Scored samples", metrics.get("scored", 0)), ("Questions passed", f"{passed}/{int(metrics.get('scored', 0))}"), ("Execution failures", count - completed), ("Elapsed run time", f"{elapsed:.2f} seconds"), ("Average latency", f"{average('total_latency_ms'):.2f} ms")):
             self._field(label, value)
         for heading, prefix in (("Answer metrics", ""), ("Supporting-fact metrics", "sp_"), ("Joint metrics", "joint_")):
             print(f"\n{heading}")
@@ -77,7 +77,7 @@ class HotpotQATerminalReporter:
         self._field("Stop reasons", dict(Counter(str(row.get("final_stop_reason") or "none") for row in records)))
         self._field("Failure categories", dict(Counter(str(row.get("failure_category")) for row in records if row.get("failure_category"))))
         print("\nRun identity")
-        for label, key in (("Dataset set", "dataset_set"), ("Mode", "mode"), ("Provider", "provider"), ("Model", "model"), ("Resolved seed", "resolved_seed")):
+        for label, key in (("Dataset set", "dataset_set"), ("Context mode", "mode"), ("Runtime profile", "runtime_profile"), ("Provider", "provider"), ("Model", "model"), ("Resolved seed", "resolved_seed")):
             self._field(label, config.get(key, "-"))
         print("\nArtifacts")
         for label, key in (("Predictions", "predictions"), ("Metrics", "metrics"), ("Manifest", "manifest"), ("Checkpoint", "checkpoint"), ("Log directory", "logs")):

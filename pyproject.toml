@@ -36,7 +36,6 @@ ignore = [
 "affect/emotion_history.py" = ["UP017"]
 "benchmarks/common/runtime_adapter.py" = ["UP017"]
 "config/runtime_mode.py" = ["UP042"]
-"benchmarks/hotpotqa/checkpoint.py" = ["E701"]
 "benchmarks/hotpotqa/console.py" = ["E702", "E731"]
 "benchmarks/hotpotqa/experiment.py" = ["E702"]
 "evaluation/runners/retrieval_semantic_runner.py" = ["UP017"]

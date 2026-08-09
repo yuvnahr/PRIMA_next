@@ -4,12 +4,13 @@ from __future__ import annotations
 from typing import Any
 
 from benchmarks.common.interfaces import Conversation, ConversationQuestion, ConversationTurn
-from benchmarks.hotpotqa.config import CONTEXT_SOURCES
+from benchmarks.hotpotqa.config import CONTEXT_ALIASES, CONTEXT_SOURCES
 
 
 class HotpotQAAdapter:
     """Adapt supplied HotpotQA contexts without exposing gold labels to inference."""
     def __init__(self, mode: str = "distractor") -> None:
+        mode = CONTEXT_ALIASES.get(mode, mode)
         if mode not in CONTEXT_SOURCES:
             raise ValueError(f"Unsupported HotpotQA mode: {mode}")
         self.mode = mode

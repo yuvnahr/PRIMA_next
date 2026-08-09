@@ -1,13 +1,16 @@
 # HotpotQA benchmark
 
-This package runs supplied-context HotpotQA through `PrimaRuntimeAdapter`, `PrimaRuntime`, and the unchanged production `ReasoningController`. It does not implement benchmark-specific retrieval, reasoning, or Wikipedia access.
+This package routes every supplied sentence and question through typed `PrimaRuntime.execute()` requests. It does not implement benchmark-specific retrieval, reasoning, or Wikipedia access.
 
 ## Evaluation data
 
 Only the two official validation/evaluation sets are offered:
 
 - `distractor` writes `benchmarks\hotpotqa\data\hotpot_dev_distractor_v1.json` and uses all supplied distractor context.
-- `fullwiki` writes `benchmarks\hotpotqa\data\hotpot_dev_fullwiki_v1.json` and is labelled `official_retrieved_context`. This is the context returned by the benchmark authors' retriever, not a complete Wikipedia corpus.
+- `official_retrieved` (legacy CLI alias: `fullwiki`) is labelled `official_retrieved_context`. This is context returned by the benchmark authors' retriever, not open-domain Wikipedia retrieval.
+- `oracle` is diagnostic-only and is never eligible for headline improvement claims.
+
+Runtime profiles are `model_only`, `simple_rag`, and `prima_full`. Use `--paired` to run identical selected IDs and model settings across all three.
 
 Train sets are intentionally excluded. Missing JSON is prepared automatically from the selected Hugging Face validation Parquet file. Existing valid JSON is reused unless `--refresh-data` is passed. Preparation requires:
 
@@ -47,7 +50,7 @@ Fullwiki:
 
 ```powershell
 py -m benchmarks.hotpotqa.experiment `
-  --dataset-set fullwiki `
+  --dataset-set fullwiki --mode official_retrieved --paired `
   --max-samples 5 `
   --provider ollama `
   --model "qwen3.5:4b" `
@@ -106,10 +109,10 @@ When no seed is supplied on resume, the stored resolved seed is reused. Resume v
 
 The evaluator uses official HotpotQA normalization and reports answer, supporting-fact, and joint EM/F1/precision/recall. The same scoring helper powers per-question terminal scores and saved aggregate metrics; terminal values are percentages while JSON remains in the 0–1 range.
 
-Each mode writes under `benchmarks\hotpotqa\outputs\<mode>\` (or the selected `--output-path`) with:
+Each run writes under `benchmarks\hotpotqa\outputs\<context-mode>\<runtime-profile>\` (or the selected `--output-path`) with:
 
-- `raw\hotpot_results.jsonl`, `hotpot_predictions.json`, `hotpot_failures.json`, retrieval diagnostics, and reasoning diagnostics.
-- `metrics\hotpot_metrics.json`, `supporting_fact_metrics.json`, `hotpot_summary.json`, and `run_manifest.json`.
-- `logs\hotpotqa.log` and `prima_runtime_adapter.log` where produced by the existing runtime.
+- common `manifest.json`, `summary.json`, append-safe predictions/failures, and per-item checkpoints.
+- `raw\hotpot_predictions.json`, `hotpot_failures.json`, retrieval diagnostics, and reasoning diagnostics.
+- `metrics\hotpot_metrics.json`, `supporting_fact_metrics.json`, and `hotpot_summary.json`.
 
 Do not run the obsolete external baseline preprocessing, scrape Wikipedia, or modify `external\`.
