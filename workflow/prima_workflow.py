@@ -12,6 +12,7 @@ from affect.affect_engine import DynamicAffectEngine
 from events.event_bus import EventBus
 from events.event_types import EventType
 from events.maintenance_events import maintenance_event
+from llm.generation_config import GenerationConfig
 from llm.llm_client import LLMClient
 from memory.maintenance.background_supervisor import BackgroundMaintenanceSupervisor
 from memory.maintenance.maintenance_pipeline import MaintenancePipeline
@@ -782,6 +783,11 @@ class PrimaWorkflow:
                 MaintenancePipeline(repository, maintenance_bus).handle,
                 event_bus=maintenance_bus,
             )
+        generation_client = llm_client or LLMClient()
+        generation_config = GenerationConfig(
+            model=str(getattr(getattr(generation_client, "settings", None), "default_model", "default")),
+            provider=str(getattr(generation_client, "provider_name", "unknown")),
+        )
         registry = ControllerRegistry(
             controllers={
                 WorkflowPhase.STATE_LOAD: StateLoadController(state_manager),
@@ -805,7 +811,10 @@ class PrimaWorkflow:
                     reflection_advisor or ReasoningReflectionAdapter(reflection_engine),
                 ),
                 WorkflowPhase.ACTION: ActionController(action_executor or ActionExecutor()),
-                WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(llm_client or LLMClient()),
+                WorkflowPhase.ANSWER_GENERATION: AnswerGenerationController(
+                    generation_client,
+                    default_generation_config=generation_config,
+                ),
                 WorkflowPhase.OUTPUT_VALIDATION: OutputValidationController(),
                 WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),

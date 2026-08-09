@@ -34,6 +34,9 @@ class Settings(BaseSettingsCls):
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
     ollama_url: str = "http://localhost:11434"
+    lmstudio_url: str = "http://localhost:1234"
+    openai_url: str = "https://api.openai.com"
+    anthropic_url: str = "https://api.anthropic.com"
     rate_limit_per_minute: int = 60
 
 _SETTINGS: Settings | None = None

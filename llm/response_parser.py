@@ -22,7 +22,7 @@ def extract_answer(text: str) -> str:
     if isinstance(payload, dict) and "answer" in payload:
         value = payload["answer"]
         if value is None or str(value).strip().lower() in {"null", "none"}:
-            return "No information available"
+            return ""
         return str(value).strip()
     return answer
 
@@ -50,7 +50,15 @@ def parse_generic_response(raw: Any, provider: str = "generic") -> LLMResponse:
     """Fallback parser for other providers."""
 
     try:
-        text = (raw.get("text") or raw.get("output") or raw.get("response") or str(raw)) if isinstance(raw, dict) else str(raw)
+        if isinstance(raw, dict) and isinstance(raw.get("content"), list):
+            text = "".join(
+                str(item.get("text", ""))
+                for item in raw["content"]
+                if isinstance(item, dict) and item.get("type") == "text"
+            )
+        else:
+            text = (raw.get("text") or raw.get("output") or raw.get("response") or str(raw)) if isinstance(raw, dict) else str(raw)
     except Exception:
         text = str(raw)
-    return LLMResponse(text=text, raw=raw, provider=provider)
+    usage = raw.get("usage") if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) else None
+    return LLMResponse(text=text, raw=raw, usage=usage, provider=provider)

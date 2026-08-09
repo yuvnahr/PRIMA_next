@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 08. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 09. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -28,7 +28,11 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 08. `Open` means verified d
 | RETR-002 | High | Verified fact | Retrieval previously used one default strategy list regardless of execution profile; profile selection now controls exact strategy activation. | Phase 07 — retrieval alignment | Tests prove simple RAG invokes only dense+sparse and full invokes all capable strategies. | Closed |
 | RETR-003 | Medium | Verified fact | Evidence had no first-class traceable context-compression stage. | Phase 07 — retrieval alignment | Tests prove token enforcement, stable evidence/citation IDs, loss reporting and no-compression ablation. | Closed |
 | MEM-003 | High | Verified fact | Repository content, graph, temporal and metadata access lacked one lifecycle facade. | Phase 07 — retrieval alignment | Tests prove canonical writes update derived graph indexes without duplicating memory content. | Closed |
-| DIAG-001 | High | Verified fact | Canonical results now identify planned/executed/skipped components, but complete per-phase latency/fallback proof remains absent. | Phase 06 — diagnostics | Every route returns schema-versioned phase/call/latency/fallback diagnostics verified against spies. | Open |
+| DIAG-001 | High | Verified fact | One assembler now reports real runtime/generation latency, retrieval/reflection/model counters, usage, provider/fallback decisions and complete trace counts for every task route. | Phase 09 — providers/diagnostics | Spies prove counters and usage match calls; standard mode omits full events while diagnostic mode retains the complete execution trace. | Closed |
+| PROV-001 | High | Verified fact | Provider adapters previously read mutable environment values during each call and silently dropped system/schema/options. Configuration is now captured in immutable `GenerationConfig`; capability validation rejects unsupported fields. | Phase 09 — providers/config | Mocked HTTP tests prove payload parity and explicit rejection without live calls. | Closed |
+| PROV-002 | High | Verified fact | An unused compatibility synthesis path created a new client and rate limiter per answer. It and its parallel diagnostics/fallback helpers are removed; workflow generation uses the runtime-injected client only. | Phase 09 — provider ownership | Two canonical requests use the same client instance and produce two recorded calls. | Closed |
+| SEC-001 | High | Verified fact | Flat prompts mixed trusted policy with untrusted user, memory and tool content. Structured prompt construction now preserves channel/trust boundaries and recursive diagnostics redaction. | Phase 09 — prompts/security | Injection fixtures remain data inside marked sections; secrets, authorization values, query tokens and configured raw prompts are redacted. | Closed |
+| OUTCOME-002 | High | Verified fact | Provider/parse fallbacks were inconsistent and could expose JSON or the literal `No information available`. Fallback is now typed/configurable as fail, abstain or extractive and recorded in diagnostics. | Phase 09 — outcomes | Tests prove typed failure/abstention classification and no JSON-string public abstention. | Closed |
 | BENCH-001 | Critical | Verified fact | HotpotQA/LoCoMo compatibility calls now converge on `execute`; GoEmotions still uses benchmark-local classifier/LLM systems. | Future benchmark migration phase | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
 | BENCH-002 | Medium | Verified fact | Hotpot `checkpoint_every` is ignored, only Hotpot resumes, and checkpoint/manifest JSON lacks schema versions. | Future benchmark migration phase | Resume/cadence tests cover all supported runners and reject incompatible schema versions. | Open |
 | BENCH-003 | High | Verified fact | Current results cannot be attributed to one complete wrapper; Hotpot uses supplied context and GoEmotions classifier variants do not measure Qwen-wrapper uplift. | Future benchmark migration phase | Reports identify exact route/profile/components/data regime and prohibit unsupported attribution text. | Open |
@@ -58,5 +62,5 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 08. `Open` means verified d
 | Phase 05 — world/uncertainty | SUBSYS-002, SUBSYS-003 |
 | Phase 07 — retrieval alignment | SUBSYS-001, MEM-001, MEM-003, RETR-001, RETR-002, RETR-003 |
 | Phase 08 — background maintenance | SUBSYS-004, MAINT-001, MAINT-002, MAINT-003, DOC-001 |
-| Phase 06 — diagnostics | DIAG-001 |
+| Phase 09 — providers/prompts/security/diagnostics | DIAG-001, PROV-001, PROV-002, SEC-001, OUTCOME-002 |
 | Future benchmark migration phase | BENCH-001, BENCH-002, BENCH-003 |

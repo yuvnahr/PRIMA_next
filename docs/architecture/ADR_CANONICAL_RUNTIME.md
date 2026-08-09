@@ -77,6 +77,12 @@ Every one of the 25 combinations has a deterministic decision. `invalid` combina
 
 All nine valid task/profile combinations enter a workflow-owned route. Conversation and factual QA use injected answer generation; ingestion validates/indexes without generation; affect-only classification skips QA phases. Full profiles invoke graph retrieval, symbolic world simulation, uncertainty decisions, and bounded correction. Routes that admit memory finish with a non-blocking maintenance-enqueue phase; a local bounded supervisor performs cold-path work and exposes calls, skips, queue state, retries, and failures in diagnostics.
 
+### Provider, prompt and diagnostic ownership
+
+`PrimaRuntime` owns one reusable `LLMClient`/provider session and default immutable `GenerationConfig`. A request may supply a typed override, but execution does not reread mutable environment generation settings. `AnswerGenerationController` is the only production answer-generation owner. Provider adapters translate payloads and reject unsupported system/schema/generation features rather than dropping them. Trusted system policy stays outside marked untrusted user, retrieved-memory, and tool-result sections.
+
+One runtime diagnostics assembler serves every task kind. Standard mode retains measured counters and key decisions; diagnostic mode may retain the complete per-request workflow trace. Secret-like fields, authorization headers, URL credentials, and configured raw prompts are redacted before exposure.
+
 ## Phase 04 state and memory ownership
 
 Every canonical route now loads versioned session state through an injected `StateManager` and commits task-appropriate successful/abstained state with an expected-version check. Conversation and factual QA use the same session key. Runtime mode is explicit in diagnostics: tests may use deterministic memory, benchmarks declare their repository in runtime/run manifests, and production preflight requires persistent ChromaDB plus persistent JSON cognitive state. Failed/cancelled responses do not commit cognitive state; memory admission decisions are explicit for every task outcome.

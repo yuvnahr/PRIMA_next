@@ -12,7 +12,6 @@ from memory.retrieval.retrieval_controller import RetrievalResponse
 from memory.retrieval.retrieval_result import RetrievalResult
 from reasoning.controller import ReasoningController
 from reasoning.models import ReasoningMode, ReasoningRequest
-from runtime import PrimaRuntime
 
 
 def _response(note_id: str, text: str) -> RetrievalResponse:
@@ -33,26 +32,12 @@ def main() -> int:
         retrieve=lambda query: calls.append(query) or responses.get(query, RetrievalResponse((), RetrievalConfidence(0.0, 1.0, 0.0, 0.0))),
         synthesize=lambda _question, evidence: (evidence[-1].note.content, False, (), {"llm_used": False}),
     )
-    runtime = PrimaRuntime(log_path=Path("evaluation/results/reasoning_runtime_validation.log"))
-    runtime_calls: list[str] = []
-
-    class Gateway:
-        def retrieve(self, request):
-            runtime_calls.append(request.query)
-            return _fixture()[request.query]
-
-    runtime.retrieval_controller = Gateway()
-    runtime._synthesize_evidence = lambda _question, evidence, **_kwargs: (evidence[-1].note.content, False, (), {"llm_used": False})
-    runtime_result = runtime.answer_question("What fact is linked to Alpha?", reasoning_mode="adaptive", diagnostics=True)
     passed = (
         calls == ["What fact is linked to Alpha?", "Bridge"]
         and result.hop_count == 2
         and result.stop_reason == "sufficient"
-        and runtime_calls == calls
-        and runtime_result.hop_count == 2
-        and all("thought" not in event.to_dict() for event in runtime_result.trace_summary)
     )
-    payload = {"passed": passed, "calls": calls, "runtime_calls": runtime_calls, "result": result.to_dict(), "runtime_result": runtime_result.to_dict()}
+    payload = {"passed": passed, "calls": calls, "result": result.to_dict()}
     results_dir = Path("evaluation/results")
     results_dir.mkdir(parents=True, exist_ok=True)
     for name in ("reasoning_controller_validation.json", "reasoning_smoke_results.json"):

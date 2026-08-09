@@ -9,6 +9,7 @@ from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from config.runtime_mode import RuntimeMode
+from llm.generation_config import GenerationConfig
 
 SCHEMA_VERSION: Literal["1.0"] = "1.0"
 
@@ -52,6 +53,13 @@ class ExecutionOutcome(Enum):
     INGESTED = "ingested"
     CLASSIFIED = "classified"
     CANCELLED = "cancelled"
+
+
+class DiagnosticMode(Enum):
+    """Amount of trace detail retained in the public response."""
+
+    STANDARD = "standard"
+    DIAGNOSTIC = "diagnostic"
 
 
 class RuntimeComponent(Enum):
@@ -141,6 +149,15 @@ class RuntimeDiagnostics(ContractModel):
     correction_budget: dict[str, float | int] = Field(default_factory=dict)
     correction_attempts: tuple[dict[str, Any], ...] = ()
     maintenance: dict[str, Any] = Field(default_factory=dict)
+    diagnostic_mode: DiagnosticMode = DiagnosticMode.STANDARD
+    latency_ms: float = 0.0
+    retrieval_count: int = 0
+    reflection_count: int = 0
+    model_call_count: int = 0
+    model_usage: dict[str, int] = Field(default_factory=dict)
+    provider: dict[str, Any] = Field(default_factory=dict)
+    trace_event_count: int = 0
+    trace_events: tuple[dict[str, Any], ...] = ()
 
 
 class PrimaRequest(ContractModel):
@@ -152,6 +169,9 @@ class PrimaRequest(ContractModel):
     profile: ExecutionProfile
     input_text: str
     session_id: str | None = None
+    generation_config: GenerationConfig | None = None
+    diagnostic_mode: DiagnosticMode = DiagnosticMode.STANDARD
+    redact_prompts: bool = True
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("input_text")

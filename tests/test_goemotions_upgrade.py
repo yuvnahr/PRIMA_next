@@ -9,6 +9,7 @@ from benchmarks.goemotions.schemas import GOEMOTIONS_RESPONSE_SCHEMA
 from benchmarks.goemotions.systems import PrimaQwenSystem, QwenWithPrimaTelemetrySystem
 from benchmarks.goemotions.training.config import TrainingConfig
 from benchmarks.goemotions.training.thresholds import select_thresholds
+from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.provider import OllamaProvider
 
@@ -37,7 +38,17 @@ def test_schema_reaches_ollama_payload(monkeypatch) -> None:
         return {"response": '{"labels":["joy"]}'}
 
     monkeypatch.setattr("llm.provider.post_json", fake_post)
-    OllamaProvider().send(LLMRequest("qwen3.5:4b", "classify", response_schema=GOEMOTIONS_RESPONSE_SCHEMA))
+    OllamaProvider().send(
+        LLMRequest(
+            prompt="classify",
+            generation=GenerationConfig(
+                model="qwen3.5:4b",
+                provider="ollama",
+                structured_output=StructuredOutputMode.JSON_SCHEMA,
+            ),
+            response_schema=GOEMOTIONS_RESPONSE_SCHEMA,
+        )
+    )
     assert captured["format"] == GOEMOTIONS_RESPONSE_SCHEMA
     assert "allOf" not in GOEMOTIONS_RESPONSE_SCHEMA
 

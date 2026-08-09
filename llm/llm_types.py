@@ -2,17 +2,20 @@
 from dataclasses import dataclass
 from typing import Any
 
+from llm.generation_config import GenerationConfig
+
 
 @dataclass
 class LLMRequest:
-    model: str
     prompt: str
-    temperature: float = 0.0
-    max_tokens: int | None = None
+    generation: GenerationConfig
     metadata: dict[str, Any] | None = None
     system_prompt: str | None = None
-    response_format: dict[str, Any] | str | None = None
     response_schema: dict[str, Any] | None = None
+
+    @property
+    def model(self) -> str:
+        return self.generation.model
 
 
 @dataclass

@@ -3,6 +3,7 @@
 from config.runtime_mode import RuntimeMode
 from runtime.contracts import (
     ComponentCapability,
+    DiagnosticMode,
     EvidenceReference,
     ExecutionOutcome,
     ExecutionProfile,
@@ -21,6 +22,7 @@ from runtime.runtime_result import RuntimeResult
 
 __all__ = [
     "ComponentCapability",
+    "DiagnosticMode",
     "EvidenceReference",
     "ExecutionOutcome",
     "ExecutionProfile",

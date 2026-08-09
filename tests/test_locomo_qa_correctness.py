@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 from benchmarks.common.agent import BenchmarkAgent
 from benchmarks.common.interfaces import AgentResponse, BenchmarkResult, Conversation, ConversationQuestion
@@ -16,7 +17,8 @@ from benchmarks.locomo.evaluate import (
     rouge_l_score,
 )
 from llm import provider as provider_module
-from llm.llm_types import LLMRequest
+from llm.generation_config import GenerationConfig
+from llm.llm_client import LLMClient
 from llm.provider import OllamaProvider, ProviderError
 from llm.response_parser import extract_answer
 from memory.embedding_pipeline import current_embedding_metadata
@@ -35,8 +37,8 @@ def test_production_qa_correctness_contract() -> None:
     note = MemoryNote.create("dated memory", embedding=[0.0], timestamp=timestamp)
 
     assert conversation.questions[0].answer == "No information available"
-    assert extract_answer('{"answer": null, "insufficient_information": true}') == "No information available"
-    assert extract_answer('{"answer": "null"}') == "No information available"
+    assert extract_answer('{"answer": null, "insufficient_information": true}') == ""
+    assert extract_answer('{"answer": "null"}') == ""
     assert note.timestamp == timestamp
     assert exact_match_score("The Friday!", "friday") == 1.0
     assert f1_score("cats cats", "cats") == 2 / 3
@@ -118,13 +120,29 @@ def test_ollama_timeout_and_retry_contract(monkeypatch) -> None:
             raise ProviderError("temporary failure")
         return {"response": "done"}
 
-    monkeypatch.setenv("PRIMA_LLM_TIMEOUT_SECONDS", "7")
-    monkeypatch.setenv("PRIMA_LLM_RETRIES", "2")
-    monkeypatch.setenv("PRIMA_ANSWER_SEED", "13")
-    monkeypatch.setenv("PRIMA_ANSWER_TEMPERATURE", "0")
     monkeypatch.setattr(provider_module, "post_json", flaky_post)
 
-    response = OllamaProvider(settings=object()).send(LLMRequest(model="qwen3.5:4b", prompt="test"))
+    settings = SimpleNamespace(
+        ollama_url="http://localhost:11434",
+        default_provider="ollama",
+        default_model="qwen3.5:4b",
+        rate_limit_per_minute=60,
+    )
+    client = LLMClient(
+        provider_name="ollama",
+        settings=settings,
+        provider=OllamaProvider(settings=settings),
+    )
+    response = client.chat(
+        "test",
+        GenerationConfig(
+            model="qwen3.5:4b",
+            provider="ollama",
+            retries=2,
+            timeout_seconds=7,
+            seed=13,
+        ),
+    )
     assert response.text == "done"
     assert calls == [7, 7, 7]
     assert payloads[-1]["think"] is False

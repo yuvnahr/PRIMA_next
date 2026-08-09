@@ -8,16 +8,15 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 from action import ActionExecutor
 from affect.affect_engine import DynamicAffectEngine
 from config.runtime_mode import RuntimeMode
+from config.settings import get_settings
 from events.event_bus import EventBus
+from llm.generation_config import GenerationConfig
 from llm.llm_client import LLMClient
-from llm.provider import ProviderError
-from llm.response_parser import extract_answer
-from memory.embedding_pipeline import current_embedding_metadata
 from memory.maintenance.background_supervisor import (
     BackgroundMaintenanceSupervisor,
     InMemoryMaintenanceFailureStore,
@@ -46,9 +45,9 @@ from reasoning.models import (
 from reasoning.reflection_advisor import ReflectionAdvisor
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
-from runtime.context_builder import AnswerContext, RuntimeContextBuilder
 from runtime.contracts import (
     ComponentCapability,
+    DiagnosticMode,
     EvidenceReference,
     ExecutionOutcome,
     ExecutionProfile,
@@ -64,6 +63,7 @@ from runtime.route_profiles import InvalidRouteError, RoutePlan, select_route
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
+from security.redaction import redact
 from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
 from uncertainty import UncertaintyEstimator, UncertaintyGate, UncertaintyGatePolicy
 from workflow.correction_loop import CorrectionBudget
@@ -101,6 +101,7 @@ class PrimaRuntime:
         maintenance_queue_size: int = 128,
         maintenance_max_retries: int = 2,
         maintenance_failure_path: str | Path | None = None,
+        generation_config: GenerationConfig | None = None,
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
@@ -126,6 +127,11 @@ class PrimaRuntime:
             self.state_manager = InMemoryStateManager()
         self.affect_engine = affect_engine or DynamicAffectEngine()
         self.reflection_engine = reflection_engine or ReflectionEngine()
+        settings = get_settings()
+        self.generation_config = generation_config or GenerationConfig(
+            model=settings.default_model,
+            provider=(llm_client.provider_name if llm_client is not None else settings.default_provider),
+        )
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
         self.retrieval_controller = RetrievalController(
             self.memory_index,
@@ -134,7 +140,7 @@ class PrimaRuntime:
         self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
         self.correction_budget = correction_budget or CorrectionBudget()
         self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
-        self.llm_client = llm_client or LLMClient(provider_name=os.getenv("PRIMA_LLM_PROVIDER", "ollama"))
+        self.llm_client = llm_client or LLMClient(provider_name=self.generation_config.provider, settings=settings)
         self.state_simulator = state_simulator or StateSimulator()
         self.uncertainty_estimator = uncertainty_estimator or UncertaintyEstimator()
         self.uncertainty_gate = UncertaintyGate(uncertainty_policy or UncertaintyGatePolicy())
@@ -171,7 +177,9 @@ class PrimaRuntime:
                 profile=request.profile,
                 status=ExecutionStatus.REJECTED,
                 outcome=ExecutionOutcome.FAILED,
-                diagnostics=_invalid_route_diagnostics(str(exc), self.mode, self.repository_selection),
+                diagnostics=RuntimeDiagnosticsAssembler.invalid(
+                    str(exc), self.mode, self.repository_selection, request.diagnostic_mode
+                ),
                 errors=(str(exc),),
             )
         started = time.perf_counter()
@@ -184,12 +192,24 @@ class PrimaRuntime:
                 "session_id": request.session_id or "",
                 "state_session_id": request.session_id or request.request_id,
                 "correction_budget": self.correction_budget.to_dict(),
+                "generation_config": request.generation_config or self.generation_config,
             },
         )
         try:
             execution_context = await self.workflow.run(request.input_text, execution_context)
         except WorkflowExecutionError as exc:
             execution_context = exc.context
+        execution_context.metadata["workflow_trace"] = [
+            {
+                "event_type": event.event_type.value,
+                "phase": event.phase.value if event.phase is not None else None,
+                "status": event.status.value,
+                "timestamp": event.timestamp.isoformat(),
+                "payload": dict(event.payload),
+            }
+            for event in self.workflow.engine.event_bus.events
+            if event.execution_id == execution_context.execution_id
+        ]
         return self._response_from_execution(
             request,
             route,
@@ -333,14 +353,17 @@ class PrimaRuntime:
                 profile=ExecutionProfile.PRIMA_FULL,
                 input_text=question,
                 session_id=session_id or (context.session_id if context is not None else None),
+                generation_config=self.generation_config.with_overrides(
+                    provider=provider,
+                    model=model,
+                ),
+                diagnostic_mode=DiagnosticMode.DIAGNOSTIC if diagnostics else DiagnosticMode.STANDARD,
                 metadata={
-                    "top_k": int(top_k) if top_k is not None else int(os.getenv("PRIMA_RETRIEVAL_TOP_K", "5")),
-                    "provider": provider or "",
-                    "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
+                    "top_k": int(top_k) if top_k is not None else 5,
                     "max_context_tokens": (
                         int(max_context_tokens)
                         if max_context_tokens is not None
-                        else int(os.getenv("PRIMA_ANSWER_CONTEXT_TOKENS", "1600"))
+                        else 1600
                     ),
                     "max_hops": int(max_hops or 3),
                     "reasoning_mode": mode.value,
@@ -382,154 +405,9 @@ class PrimaRuntime:
             "memory_persistent": self.repository_selection.persistent,
             "memory_path": self.repository_selection.path,
             "state_repository": "json" if isinstance(self.state_manager, JsonStateManager) else "in_memory",
+            "generation": self.generation_config.to_dict(),
+            "provider_capabilities": dict(getattr(self.llm_client, "capabilities", {})),
             "maintenance": self.maintenance_supervisor.diagnostics(),
-        }
-
-    def _synthesize_evidence(
-        self,
-        question: str,
-        evidence: tuple[Any, ...],
-        *,
-        provider: str | None,
-        model: str | None,
-        max_context_tokens: int,
-    ) -> tuple[str, bool, tuple[str, ...], dict[str, Any]]:
-        """Reuse the established bounded context and LLM answer path after acquisition."""
-
-        answer_context = RuntimeContextBuilder(max_context_tokens).build(question, evidence)
-        errors: list[str] = []
-        llm_used = False
-        raw_model_response = ""
-        selected_memory_ids: list[str] = []
-        structured_answer_valid = False
-        prompt: str | None = None
-        llm_metadata: dict[str, Any] = {}
-        inference_settings = self._inference_settings(
-            provider=cast(str, provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama")),
-            model=cast(str, model or os.getenv("PRIMA_LLM_MODEL", "")),
-            answer_context=answer_context,
-        )
-        if not answer_context.memories:
-            answer = self._insufficient_information_answer(question, reason="no_retrieved_memories")
-        else:
-            prompt = self._build_answer_prompt(question, answer_context)
-            self._log_inference_settings(inference_settings)
-            try:
-                llm_response = LLMClient(provider_name=str(inference_settings["provider"])).chat(
-                    prompt=prompt,
-                    model=str(inference_settings["model"]),
-                    temperature=float(inference_settings["temperature"]),
-                    max_tokens=int(inference_settings["num_predict"]),
-                    system_prompt=self._answer_system_prompt(),
-                    response_format=self._answer_response_schema(),
-                )
-                raw_model_response = llm_response.text.strip()
-                llm_used = bool(raw_model_response)
-                if isinstance(llm_response.raw, dict):
-                    llm_metadata = {
-                        key: llm_response.raw.get(key)
-                        for key in (
-                            "model",
-                            "thinking",
-                            "done",
-                            "done_reason",
-                            "total_duration",
-                            "load_duration",
-                            "prompt_eval_count",
-                            "eval_count",
-                        )
-                    }
-                if llm_metadata.get("done_reason") == "length":
-                    errors.append("LLM answer was truncated at the generation limit.")
-                answer, selected_memory_ids = self._parse_structured_answer(raw_model_response, answer_context)
-                structured_answer_valid = True
-            except (json.JSONDecodeError, TypeError, KeyError, ProviderError, RuntimeError, ValueError) as exc:
-                errors.append(str(exc))
-                answer = (
-                    self._parse_partial_answer(raw_model_response)
-                    if raw_model_response.startswith("{")
-                    else raw_model_response
-                )
-                if not answer:
-                    answer = self._extractive_answer(answer_context)
-        if answer.strip() == question.strip():
-            errors.append("Answer matched question text; replaced with insufficient-information response.")
-            answer = self._insufficient_information_answer(question, reason="answer_echo_guard")
-        return (
-            answer,
-            llm_used,
-            tuple(errors),
-            {
-                "llm_used": llm_used,
-                "context_tokens": answer_context.token_count,
-                "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
-                "selected_memory_ids": selected_memory_ids,
-                "structured_answer_valid": structured_answer_valid,
-                "raw_model_response": raw_model_response,
-                "raw_response": raw_model_response or None,
-                "prompt": prompt,
-                "llm_metadata": llm_metadata,
-                "generation_settings": dict(inference_settings),
-                "provider": provider or os.getenv("PRIMA_LLM_PROVIDER", "ollama"),
-                "model": model or os.getenv("PRIMA_LLM_MODEL", ""),
-            },
-        )
-
-    def _parse_structured_answer(self, raw: str, answer_context: AnswerContext) -> tuple[str, list[str]]:
-        payload = json.loads(raw)
-        if not isinstance(payload, dict) or not isinstance(payload.get("insufficient_information"), bool):
-            raise ValueError("LLM returned an invalid structured answer.")
-        answer = payload.get("answer")
-        if payload["insufficient_information"]:
-            if answer is not None:
-                raise ValueError("Insufficient-information answer must be null.")
-            return self._insufficient_information_answer(answer_context.question, reason="model_abstention"), []
-        if not isinstance(answer, str) or not answer.strip():
-            raise ValueError("Structured answer must contain a non-empty answer string.")
-        labels = payload.get("evidence")
-        if not isinstance(labels, list) or not labels or any(not isinstance(label, str) for label in labels):
-            raise ValueError("Structured answer evidence must be a list of context labels.")
-        label_map = {f"M{index}": memory.memory_id for index, memory in enumerate(answer_context.memories, 1)}
-        unknown = [label for label in labels if label not in label_map]
-        if unknown:
-            raise ValueError(f"Structured answer cited unknown context labels: {', '.join(unknown)}")
-        return answer.strip(), list(dict.fromkeys(label_map[label] for label in labels))
-
-    @staticmethod
-    def _parse_partial_answer(raw: str) -> str:
-        key = raw.find('"answer"')
-        colon = raw.find(":", key + 8) if key >= 0 else -1
-        if colon < 0:
-            return ""
-        try:
-            answer, _ = json.JSONDecoder().raw_decode(raw[colon + 1 :].lstrip())
-        except json.JSONDecodeError:
-            return ""
-        return answer.strip() if isinstance(answer, str) else ""
-
-    def _answer_system_prompt(self) -> str:
-        return (
-            "You are a factual question-answering engine. Return only JSON matching the supplied schema. "
-            "The answer must be the shortest exact answer span, normally one to eight words, never a sentence or explanation. "
-            "Use the canonical singular form for a category, profession, nationality, or type. "
-            "Cite the smallest sufficient set of [M#] labels; for comparisons or shared properties, cite evidence for each subject."
-        )
-
-    def _answer_response_schema(self) -> dict[str, Any]:
-        return {
-            "type": "object",
-            "properties": {
-                "answer": {"type": ["string", "null"], "maxLength": 80},
-                "evidence": {
-                    "type": "array",
-                    "items": {"type": "string", "pattern": "^M[1-9][0-9]*$"},
-                    "minItems": 1,
-                    "maxItems": 4,
-                },
-                "insufficient_information": {"type": "boolean"},
-            },
-            "required": ["answer", "evidence", "insufficient_information"],
-            "additionalProperties": False,
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
@@ -554,10 +432,8 @@ class PrimaRuntime:
             profile=ExecutionProfile.PRIMA_FULL,
             input_text=user_input,
             session_id=context.session_id if context is not None else None,
-            metadata={
-                "turn_id": context.turn_id if context is not None else "",
-                "model": os.getenv("PRIMA_LLM_MODEL", ""),
-            },
+            generation_config=self.generation_config,
+            metadata={"turn_id": context.turn_id if context is not None else ""},
         )
 
     def _response_from_execution(
@@ -644,6 +520,7 @@ class PrimaRuntime:
             "correction_attempts": [attempt.to_dict() for attempt in context.correction_attempts],
             "correction_count": sum(attempt.accepted for attempt in context.correction_attempts),
             "maintenance": self.maintenance_supervisor.diagnostics(),
+            "trace_summary": list(reasoning.trace_summary) if reasoning is not None else [],
         }
         if reasoning is not None:
             output_data.update(
@@ -677,13 +554,16 @@ class PrimaRuntime:
             output_data=output_data,
             state_delta=StateDelta(changes=state_changes),
             evidence=evidence,
-            diagnostics=_route_diagnostics(
+            diagnostics=RuntimeDiagnosticsAssembler.assemble(
                 route,
                 context,
                 self.mode,
                 self.repository_selection,
                 context.cognitive_state.version,
                 self.maintenance_supervisor.diagnostics(),
+                latency_ms,
+                request.diagnostic_mode,
+                request.redact_prompts,
             ),
             errors=errors,
         )
@@ -916,159 +796,6 @@ class PrimaRuntime:
         }
         self.logger.info(json.dumps(payload, sort_keys=True))
 
-    def _build_answer_prompt(self, question: str, answer_context: AnswerContext) -> str:
-        return (
-            "Use only the retrieved context below.\n"
-            f"Question: {question}\n\n"
-            f"Retrieved context:\n{answer_context.context_text}\n\n"
-            "Return JSON matching the supplied schema. Put only the shortest exact answer in `answer`; "
-            "use null only when the context is insufficient. Cite the smallest sufficient set of context labels in `evidence`."
-        )
-
-    def _extractive_answer(self, answer_context: AnswerContext) -> str:
-        if not answer_context.memories:
-            return self._insufficient_information_answer(answer_context.question, reason="no_context")
-        best = max(answer_context.memories, key=lambda memory: memory.retrieval_score)
-        return f"Based on retrieved memory: {best.text}"
-
-    def _insufficient_information_answer(self, question: str, reason: str) -> str:
-        del question, reason
-        return "I do not have sufficient evidence to answer this question."
-
-    def _answer_diagnostics(
-        self,
-        question: str,
-        answer_context: AnswerContext,
-        retrieval_response: Any,
-        llm_used: bool,
-        latency_ms: float,
-        provider: str,
-        model: str,
-        errors: tuple[str, ...],
-        inference_settings: dict[str, Any],
-        prompt: str | None,
-        raw_response: str | None,
-        llm_metadata: dict[str, Any],
-    ) -> dict[str, Any]:
-        retrieval_diagnostics = dict(getattr(retrieval_response, "diagnostics", {}))
-        diagnostics = {
-            "question": question,
-            "retrieved_memory_ids": [memory.memory_id for memory in answer_context.memories],
-            "retrieved_memories": [
-                {
-                    "id": memory.memory_id,
-                    "text": memory.text,
-                    "timestamp": memory.timestamp,
-                    "importance_score": memory.importance_score,
-                    "retrieval_score": memory.retrieval_score,
-                }
-                for memory in answer_context.memories
-            ],
-            "retrieval_scores": [memory.retrieval_score for memory in answer_context.memories],
-            "context_length": answer_context.token_count,
-            "llm_used": llm_used,
-            "latency_ms": latency_ms,
-            "reflection_used": answer_context.reflection_used,
-            "memory_ids_used": [memory.memory_id for memory in answer_context.memories],
-            "graph_links_traversed": list(answer_context.graph_links_traversed),
-            "importance_scores": [memory.importance_score for memory in answer_context.memories],
-            "retrieval_confidence": retrieval_response.confidence.confidence,
-            "retrieval_confidence_components": retrieval_response.confidence.to_dict(),
-            "expanded_query": dict(retrieval_diagnostics.get("expanded_query", {})),
-            "entities": list(retrieval_diagnostics.get("entities", [])),
-            "relations": list(retrieval_diagnostics.get("relations", [])),
-            "temporal_constraints": list(retrieval_diagnostics.get("temporal_constraints", [])),
-            "retrieval_stages": {
-                stage: _compact_candidates(retrieval_diagnostics.get(stage, ()))
-                for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
-            },
-            "stored_source_turn_ids": sorted(
-                {
-                    str(note.context["source_turn_id"])
-                    for note in self.memory_repository.list()
-                    if note.context.get("source_turn_id")
-                }
-            ),
-            "embedding": current_embedding_metadata(),
-            "context_tokens": answer_context.token_count,
-            "provider": provider,
-            "model": model,
-            "errors": list(errors),
-            "prompt": prompt,
-            "raw_response": raw_response,
-            "parsed_answer": extract_answer(raw_response) if raw_response is not None else None,
-            "llm_metadata": llm_metadata,
-            "generation_settings": dict(inference_settings),
-        }
-        diagnostics["failure_type"] = self._classify_answer_failure(diagnostics, errors, llm_used)
-        return diagnostics
-
-    def _classify_answer_failure(
-        self, diagnostics: dict[str, Any], errors: tuple[str, ...], llm_used: bool
-    ) -> str | None:
-        if errors:
-            return "generation_error"
-        retrieved = diagnostics.get("retrieved_memory_ids", [])
-        if not retrieved:
-            return "retrieval_miss"
-        if not llm_used:
-            return "generation_error"
-        return None
-
-    def _log_answer(self, question: str, diagnostics: dict[str, Any]) -> None:
-        payload = {
-            "answer_event": {
-                "retrieved_memory_count": len(diagnostics.get("retrieved_memory_ids", ())),
-                "context_length": diagnostics.get("context_length", 0),
-                "llm_used": diagnostics.get("llm_used", False),
-                "latency_ms": diagnostics.get("latency_ms", 0.0),
-                "reflection_used": diagnostics.get("reflection_used", False),
-                "provider": diagnostics.get("provider", ""),
-                "model": diagnostics.get("model", ""),
-                "errors": diagnostics.get("errors", []),
-            }
-        }
-        self.logger.info(json.dumps(payload, sort_keys=True))
-
-    def _inference_settings(
-        self,
-        provider: str,
-        model: str,
-        answer_context: AnswerContext,
-    ) -> dict[str, Any]:
-        return {
-            "provider": provider,
-            "model": model,
-            "temperature": self._env_float("PRIMA_ANSWER_TEMPERATURE", 0.0),
-            "top_p": self._env_float("PRIMA_ANSWER_TOP_P", 0.8),
-            "top_k": self._env_int("PRIMA_ANSWER_TOP_K", 40),
-            "repeat_penalty": self._env_float("PRIMA_ANSWER_REPEAT_PENALTY", 1.1),
-            "seed": self._env_int("PRIMA_ANSWER_SEED", 13),
-            "num_predict": self._env_int("PRIMA_ANSWER_MAX_TOKENS", 128),
-            "context_tokens": answer_context.token_count,
-            "retrieved_memories": len(answer_context.memories),
-        }
-
-    def _log_inference_settings(self, settings: dict[str, Any]) -> None:
-        if not self._debug_inference_enabled():
-            return
-        self.logger.info(json.dumps({"inference_settings": settings}, sort_keys=True))
-
-    def _debug_inference_enabled(self) -> bool:
-        return os.getenv("PRIMA_DEBUG_INFERENCE", "").lower() in {"1", "true", "yes"}
-
-    def _env_float(self, name: str, default: float) -> float:
-        try:
-            return float(os.getenv(name, str(default)))
-        except ValueError:
-            return default
-
-    def _env_int(self, name: str, default: int) -> int:
-        try:
-            return int(os.getenv(name, str(default)))
-        except ValueError:
-            return default
-
     def _build_logger(self, log_path: Path) -> logging.Logger:
         log_path.parent.mkdir(parents=True, exist_ok=True)
         logger = logging.getLogger(f"prima_runtime.{id(self)}")
@@ -1079,19 +806,6 @@ class PrimaRuntime:
             handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(handler)
         return logger
-
-
-def _compact_candidates(candidates: Any) -> list[dict[str, Any]]:
-    return [
-        {
-            "id": item.get("id"),
-            "source_session_id": item.get("source_session_id"),
-            "source_turn_id": item.get("source_turn_id"),
-            "score": item.get("score"),
-            "strategy_scores": dict(item.get("strategy_scores", {})),
-        }
-        for item in candidates
-    ]
 
 
 def _retrieval_audit(response: Any) -> dict[str, Any]:
@@ -1215,6 +929,45 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
     return tuple(component for component in RuntimeComponent if component in executed)
 
 
+class RuntimeDiagnosticsAssembler:
+    """Build the single diagnostics contract used by every task route."""
+
+    @staticmethod
+    def assemble(
+        route: RoutePlan,
+        context: ExecutionContext,
+        mode: RuntimeMode,
+        repository: RepositorySelection,
+        state_version: int,
+        maintenance: dict[str, Any],
+        latency_ms: float,
+        diagnostic_mode: DiagnosticMode,
+        redact_prompts: bool,
+        note: str | None = None,
+    ) -> RuntimeDiagnostics:
+        return _route_diagnostics(
+            route,
+            context,
+            mode,
+            repository,
+            state_version,
+            maintenance,
+            latency_ms,
+            diagnostic_mode,
+            redact_prompts,
+            note,
+        )
+
+    @staticmethod
+    def invalid(
+        reason: str,
+        mode: RuntimeMode,
+        repository: RepositorySelection,
+        diagnostic_mode: DiagnosticMode,
+    ) -> RuntimeDiagnostics:
+        return _invalid_route_diagnostics(reason, mode, repository, diagnostic_mode)
+
+
 def _route_diagnostics(
     route: RoutePlan,
     context: ExecutionContext,
@@ -1222,6 +975,9 @@ def _route_diagnostics(
     repository: RepositorySelection,
     state_version: int,
     maintenance: dict[str, Any],
+    latency_ms: float,
+    diagnostic_mode: DiagnosticMode,
+    redact_prompts: bool,
     note: str | None = None,
 ) -> RuntimeDiagnostics:
     executed = _executed_components(context)
@@ -1308,6 +1064,25 @@ def _route_diagnostics(
             else str(context.maintenance_result.get("reason", "not selected by route"))
         ),
     }
+    generation = context.generation_result
+    trace = tuple(
+        redact(event, redact_prompts=redact_prompts)
+        for event in context.metadata.get("workflow_trace", ())
+        if isinstance(event, dict)
+    )
+    retrieval_count = len(getattr(context.retrieval_response, "results", ()) or ())
+    provider_details = {
+        "name": str(getattr(generation, "provider", "")),
+        "model": str(getattr(generation, "model", "")),
+        "capabilities": dict(getattr(generation, "provider_capabilities", {}) or {}),
+        "fallback_policy": str(getattr(generation, "fallback_policy", "")),
+        "fallback_used": bool(getattr(generation, "fallback_used", False)),
+        "fallback_reason": getattr(generation, "fallback_reason", None),
+    }
+    reflection_count = sum(
+        event.get("event_type") == "phase_completed" and event.get("phase") == "reflection"
+        for event in trace
+    )
     return RuntimeDiagnostics(
         route_name=route.name,
         planned_components=route.components,
@@ -1327,11 +1102,23 @@ def _route_diagnostics(
         correction_budget=dict(context.metadata.get("correction_budget", {})),
         correction_attempts=tuple(attempt.to_dict() for attempt in context.correction_attempts),
         maintenance=maintenance,
+        diagnostic_mode=diagnostic_mode,
+        latency_ms=latency_ms,
+        retrieval_count=retrieval_count,
+        reflection_count=reflection_count,
+        model_call_count=int(context.metadata.get("model_call_count", 0)),
+        model_usage=dict(context.metadata.get("model_usage", {})),
+        provider=redact(provider_details, redact_prompts=redact_prompts),
+        trace_event_count=len(trace),
+        trace_events=trace if diagnostic_mode is DiagnosticMode.DIAGNOSTIC else (),
     )
 
 
 def _invalid_route_diagnostics(
-    reason: str, mode: RuntimeMode, repository: RepositorySelection
+    reason: str,
+    mode: RuntimeMode,
+    repository: RepositorySelection,
+    diagnostic_mode: DiagnosticMode,
 ) -> RuntimeDiagnostics:
     return RuntimeDiagnostics(
         route_name="invalid",
@@ -1344,6 +1131,7 @@ def _invalid_route_diagnostics(
         runtime_mode=mode,
         memory_repository=repository.backend,
         memory_persistent=repository.persistent,
+        diagnostic_mode=diagnostic_mode,
     )
 
 
