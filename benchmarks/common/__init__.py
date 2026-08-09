@@ -1,6 +1,34 @@
 """Shared benchmark infrastructure."""
 
 from benchmarks.common.agent import BenchmarkAgent
+from benchmarks.common.artifacts import (
+    ArtifactLayout,
+    BenchmarkArtifactStore,
+    ResumeCompatibilityError,
+    atomic_write_json,
+    resume_manifest,
+    validate_resume,
+)
+from benchmarks.common.contracts import (
+    BenchmarkCase,
+    BenchmarkManifest,
+    BenchmarkMode,
+    BenchmarkSpec,
+    BenchmarkSummary,
+    CampaignReference,
+    CheckpointRecord,
+    ClassificationCase,
+    ConversationQACase,
+    FailureCategory,
+    FailureRecord,
+    ItemTiming,
+    LifecycleStage,
+    PredictionRecord,
+    ProgressEvent,
+    RunStatus,
+    TokenUsage,
+    stable_case_id,
+)
 from benchmarks.common.interfaces import (
     AgentResponse,
     BenchmarkDataset,
@@ -12,16 +40,43 @@ from benchmarks.common.interfaces import (
     ConversationTurn,
     RunnerResult,
 )
+from benchmarks.common.lifecycle import BenchmarkLifecycle, ProgressSink
 
 __all__ = [
     "AgentResponse",
+    "ArtifactLayout",
     "BenchmarkAgent",
+    "BenchmarkArtifactStore",
+    "BenchmarkCase",
+    "BenchmarkLifecycle",
+    "BenchmarkManifest",
+    "BenchmarkMode",
     "BenchmarkResult",
+    "BenchmarkSpec",
+    "BenchmarkSummary",
     "BenchmarkDataset",
     "BenchmarkEvaluator",
     "BenchmarkRunner",
+    "CampaignReference",
+    "CheckpointRecord",
+    "ClassificationCase",
     "Conversation",
     "ConversationQuestion",
+    "ConversationQACase",
     "ConversationTurn",
+    "FailureCategory",
+    "FailureRecord",
+    "ItemTiming",
+    "LifecycleStage",
+    "PredictionRecord",
+    "ProgressEvent",
+    "ProgressSink",
+    "ResumeCompatibilityError",
     "RunnerResult",
+    "RunStatus",
+    "TokenUsage",
+    "atomic_write_json",
+    "resume_manifest",
+    "stable_case_id",
+    "validate_resume",
 ]

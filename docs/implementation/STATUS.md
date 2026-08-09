@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 09. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 10. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -36,6 +36,10 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 09. `Open` means verified d
 | BENCH-001 | Critical | Verified fact | HotpotQA/LoCoMo compatibility calls now converge on `execute`; GoEmotions still uses benchmark-local classifier/LLM systems. | Future benchmark migration phase | All runners use only the public runtime contract; production packages import no benchmark modules. | Open |
 | BENCH-002 | Medium | Verified fact | Hotpot `checkpoint_every` is ignored, only Hotpot resumes, and checkpoint/manifest JSON lacks schema versions. | Future benchmark migration phase | Resume/cadence tests cover all supported runners and reject incompatible schema versions. | Open |
 | BENCH-003 | High | Verified fact | Current results cannot be attributed to one complete wrapper; Hotpot uses supplied context and GoEmotions classifier variants do not measure Qwen-wrapper uplift. | Future benchmark migration phase | Reports identify exact route/profile/components/data regime and prohibit unsupported attribution text. | Open |
+| BENCH-004 | High | Verified fact | Benchmarks lacked one task-neutral typed campaign/case/prediction/failure/checkpoint/manifest/summary contract. Classification and conversation-QA now share campaign infrastructure while retaining independent case and prediction shapes. | Phase 10 — common benchmark contracts | Contract tests validate both task shapes, timing/token fields, schema versions and benchmark-specific failure subcodes. | Closed |
+| ARTIFACT-001 | Critical | Verified fact | Direct JSON writes and benchmark-local JSONL could expose truncated or falsely complete runs. Common storage now uses same-directory atomic replacement, flushed append-only rows, strict malformed-row rejection and a manifest completion marker written last. | Phase 10 — crash-safe artifacts | Interruption and finalization tests prove the prior manifest remains partial when replacement fails. | Closed |
+| ARTIFACT-002 | High | Verified fact | Resume compatibility was benchmark-specific and incomplete. Stable case IDs, duplicate suppression and manifest fingerprints now cover source, dataset, selection, model/revision, generation, profile, capabilities, repository, prompts, seed, dependencies, Python and hardware. | Phase 10 — exact resume | Tests reject changed model/dataset/configuration and record compatible resume lineage. | Closed |
+| ARTIFACT-003 | High | Verified fact | Artifact security did not have one enforceable boundary. Manifests reject credential fields and credential-bearing URLs; all common JSON/JSONL writes recursively redact secrets and authorization data. | Phase 10 — artifact security | Tests prove raw credentials never reach disk. | Closed |
 | CFG-001 | Medium | Verified fact | Python 3.10 is now the explicit project, Ruff, mypy and CI target; strict core-module typing remains enabled without blanket `ignore_errors`. | Phase 05 — environment alignment | CI, Ruff and mypy target 3.10 and all quality gates pass. | Closed |
 | DOC-001 | Medium | Verified fact | README and canonical ADR now distinguish the connected local cold path, explicit lifecycle/defaults and still-deferred long-term compression from the target diagram. | Phase 08 — tooling/docs | Documentation assertions match executable architecture tests and deployed defaults. | Closed |
 | GATE-001 | Medium | Verified fact | Literal `compileall -q .` traversed external/venv sources and failed outside owned code. | Phase 01 — quality gates | Python 3.10 owned-source compile gate explicitly excludes Git, venv and external trees and passes. | Closed |
@@ -63,4 +67,5 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 09. `Open` means verified d
 | Phase 07 — retrieval alignment | SUBSYS-001, MEM-001, MEM-003, RETR-001, RETR-002, RETR-003 |
 | Phase 08 — background maintenance | SUBSYS-004, MAINT-001, MAINT-002, MAINT-003, DOC-001 |
 | Phase 09 — providers/prompts/security/diagnostics | DIAG-001, PROV-001, PROV-002, SEC-001, OUTCOME-002 |
+| Phase 10 — common benchmark infrastructure | BENCH-004, ARTIFACT-001, ARTIFACT-002, ARTIFACT-003 |
 | Future benchmark migration phase | BENCH-001, BENCH-002, BENCH-003 |

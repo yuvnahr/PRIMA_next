@@ -81,6 +81,7 @@ exclude = [
 [[tool.mypy.overrides]]
 module = [
     "action.*",
+    "benchmarks.common.*",
     "benchmarks.preflight",
     "events.*",
     "llm.*",

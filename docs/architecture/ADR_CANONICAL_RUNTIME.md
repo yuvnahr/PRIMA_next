@@ -83,6 +83,10 @@ All nine valid task/profile combinations enter a workflow-owned route. Conversat
 
 One runtime diagnostics assembler serves every task kind. Standard mode retains measured counters and key decisions; diagnostic mode may retain the complete per-request workflow trace. Secret-like fields, authorization headers, URL credentials, and configured raw prompts are redacted before exposure.
 
+### Benchmark campaign boundary
+
+Benchmark orchestration remains outside production packages. `benchmarks.common` defines classification and conversation-QA case shapes, a shared preflight-to-finalize lifecycle, exact-resume manifests, and crash-safe artifacts. Gold data remains in benchmark case/evaluation ownership and is never added to `PrimaRequest`, prompts, retrieval, routing, or reflection. A campaign is complete only when its authoritative manifest is atomically replaced after every selected case has a terminal checkpoint.
+
 ## Phase 04 state and memory ownership
 
 Every canonical route now loads versioned session state through an injected `StateManager` and commits task-appropriate successful/abstained state with an expected-version check. Conversation and factual QA use the same session key. Runtime mode is explicit in diagnostics: tests may use deterministic memory, benchmarks declare their repository in runtime/run manifests, and production preflight requires persistent ChromaDB plus persistent JSON cognitive state. Failed/cancelled responses do not commit cognitive state; memory admission decisions are explicit for every task outcome.
