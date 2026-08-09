@@ -309,7 +309,9 @@ Check optional benchmark capabilities without installing or importing them:
 python -m benchmarks.preflight
 ```
 
-LoCoMo uses its built-in deterministic ROUGE-L implementation by default.
-BERTScore is disabled unless the benchmark is run with `--bertscore`.
+LoCoMo core metrics do not require semantic-metric extras. Its built-in deterministic
+ROUGE-L is enabled only with `--rouge-l`; BERTScore is enabled only with
+`--bertscore` and accepts explicit device and batch-size options. LoCoMo defaults to
+a one-conversation preview; an unlimited run requires `--full-dataset`.
 
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

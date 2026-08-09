@@ -1,133 +1,179 @@
-"""LoCoMo-to-conversation adapter."""
+"""Strict LoCoMo-to-conversation adaptation."""
 
 from __future__ import annotations
 
+import re
+from datetime import datetime, timezone
 from typing import Any
 
 from benchmarks.common.interfaces import Conversation, ConversationQuestion, ConversationTurn
 
+EVIDENCE_ID_RE = re.compile(r"D\d+:\d+")
+TIMESTAMP_FORMATS = (
+    "%I:%M %p on %d %B, %Y",
+    "%I:%M %p on %B %d, %Y",
+    "%d %B %Y %I:%M %p",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d",
+)
+VALID_CATEGORIES = frozenset({"1", "2", "3", "4", "5"})
+
+
+def parse_timestamp(value: str, *, location: str = "timestamp") -> datetime:
+    """Parse known LoCoMo or ISO timestamps as UTC-aware datetimes."""
+    text = value.strip()
+    if not text:
+        raise ValueError(f"{location}: timestamp must not be empty")
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        parsed = None
+    if parsed is None:
+        for pattern in TIMESTAMP_FORMATS:
+            try:
+                parsed = datetime.strptime(text, pattern)
+                break
+            except ValueError:
+                continue
+    if parsed is None:
+        raise ValueError(f"{location}: unsupported timestamp {value!r}")
+    return parsed.replace(tzinfo=parsed.tzinfo or timezone.utc).astimezone(timezone.utc)
+
 
 class LoCoMoAdapter:
-    """Convert raw LoCoMo JSON records into benchmark-neutral conversations."""
+    """Validate raw LoCoMo records and expose benchmark-neutral conversations."""
 
     def adapt(self, raw_data: Any) -> list[Conversation]:
-        """Adapt a raw LoCoMo JSON document into conversations."""
-
-        if isinstance(raw_data, list):
-            records = raw_data
-        elif isinstance(raw_data, dict):
-            records = raw_data.get("data", [])
-        else:
-            raise ValueError("LoCoMo raw data must be a list or dictionary.")
+        records = raw_data if isinstance(raw_data, list) else raw_data.get("data") if isinstance(raw_data, dict) else None
         if not isinstance(records, list):
-            raise ValueError("LoCoMo raw data must be a list or contain a 'data' list.")
-
-        return [self._adapt_record(record, index) for index, record in enumerate(records)]
+            raise ValueError("LoCoMo root must be a list or contain a 'data' list")
+        conversations = []
+        seen = set()
+        for index, record in enumerate(records):
+            if not isinstance(record, dict):
+                raise ValueError(f"LoCoMo record {index}: expected object")
+            conversation = self._adapt_record(record, index)
+            if conversation.id in seen:
+                raise ValueError(f"LoCoMo record {index}: duplicate conversation ID {conversation.id!r}")
+            seen.add(conversation.id)
+            conversations.append(conversation)
+        return conversations
 
     def _adapt_record(self, record: dict[str, Any], index: int) -> Conversation:
-        conversation_id = str(record.get("sample_id") or record.get("id") or index)
-        conversation_payload = record.get("conversation", {})
+        conversation_id = str(record.get("sample_id") or record.get("id") or "").strip()
+        if not conversation_id:
+            raise ValueError(f"LoCoMo record {index}: missing sample_id/id")
+        payload = record.get("conversation")
+        if not isinstance(payload, dict):
+            raise ValueError(f"LoCoMo conversation {conversation_id}: 'conversation' must be an object")
+        qa = record.get("qa")
+        if not isinstance(qa, list):
+            raise ValueError(f"LoCoMo conversation {conversation_id}: 'qa' must be a list")
+        speakers = {}
+        for key in ("speaker_a", "speaker_b"):
+            value = payload.get(key, record.get(key))
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"LoCoMo conversation {conversation_id}: {key} must be a non-empty string")
+            speakers[key] = value.strip()
+        turns, turn_ids = self._normalize_turns(payload, conversation_id)
+        questions = self._normalize_questions(qa, conversation_id, turn_ids)
+        metadata = {key: value for key, value in record.items() if key not in {"conversation", "qa"}}
+        metadata["speakers"] = speakers
+        metadata["session_count"] = len({turn.session_id for turn in turns})
+        return Conversation(conversation_id, tuple(turns), tuple(questions), metadata)
 
-        return Conversation(
-            id=conversation_id,
-            turns=self._normalize_turns(conversation_payload),
-            questions=self._normalize_questions(record.get("qa", [])),
-            metadata=self._normalize_metadata(record, conversation_payload),
-        )
-
-    def _normalize_turns(self, conversation_payload: dict[str, Any]) -> list[ConversationTurn]:
-        turns: list[ConversationTurn] = []
-
-        for session_id in self._session_keys(conversation_payload):
-            session_turns = conversation_payload.get(session_id, [])
-            timestamp = conversation_payload.get(f"{session_id}_date_time")
-            if not isinstance(session_turns, list):
-                continue
-
-            for turn_index, turn in enumerate(session_turns):
-                if not isinstance(turn, dict):
-                    continue
-                metadata = {
-                    key: value
-                    for key, value in turn.items()
-                    if key not in {"speaker", "text", "dia_id"}
-                }
-                turns.append(
-                    ConversationTurn(
-                        speaker=str(turn.get("speaker", "")),
-                        text=str(turn.get("text", "")),
-                        turn_id=self._optional_string(turn.get("dia_id") or f"{session_id}:{turn_index}"),
-                        session_id=session_id,
-                        timestamp=self._optional_string(timestamp),
-                        metadata=metadata,
-                    )
+    def _normalize_turns(
+        self, payload: dict[str, Any], conversation_id: str,
+    ) -> tuple[list[ConversationTurn], set[str]]:
+        turns, ids = [], set()
+        for session_id in self._session_keys(payload):
+            session_turns = payload[session_id]
+            if not isinstance(session_turns, list) or not session_turns:
+                raise ValueError(
+                    f"LoCoMo conversation {conversation_id} {session_id}: session must be a non-empty list"
                 )
+            timestamp_value = payload.get(f"{session_id}_date_time")
+            if not isinstance(timestamp_value, str):
+                raise ValueError(f"LoCoMo conversation {conversation_id} {session_id}: missing timestamp")
+            timestamp = parse_timestamp(
+                timestamp_value, location=f"LoCoMo conversation {conversation_id} {session_id}",
+            ).isoformat()
+            for turn_index, turn in enumerate(session_turns):
+                location = f"LoCoMo conversation {conversation_id} {session_id} turn {turn_index}"
+                if not isinstance(turn, dict):
+                    raise ValueError(f"{location}: expected object")
+                speaker, text = turn.get("speaker"), turn.get("text")
+                turn_id = str(turn.get("dia_id") or "").strip()
+                if not isinstance(speaker, str) or not speaker.strip():
+                    raise ValueError(f"{location}: speaker must be a non-empty string")
+                if not isinstance(text, str) or not text.strip():
+                    raise ValueError(f"{location}: text must be a non-empty string")
+                if not EVIDENCE_ID_RE.fullmatch(turn_id):
+                    raise ValueError(f"{location}: invalid dia_id {turn_id!r}")
+                if turn_id in ids:
+                    raise ValueError(f"{location}: duplicate dia_id {turn_id!r}")
+                ids.add(turn_id)
+                metadata = {key: value for key, value in turn.items() if key not in {"speaker", "text", "dia_id"}}
+                metadata.update(source_turn_id=turn_id, source_session_id=session_id, source_timestamp=timestamp)
+                turns.append(ConversationTurn(speaker.strip(), text.strip(), turn_id, session_id, timestamp, metadata))
+        return turns, ids
 
-        return turns
-
-    def _normalize_questions(self, qa_payload: Any) -> list[ConversationQuestion]:
-        if not isinstance(qa_payload, list):
-            return []
-
-        questions: list[ConversationQuestion] = []
-        for index, question in enumerate(qa_payload):
-            if not isinstance(question, dict):
-                continue
-            category = self._optional_string(question.get("category"))
-            answer = question.get("answer")
+    def _normalize_questions(
+        self, qa: list[Any], conversation_id: str, turn_ids: set[str],
+    ) -> list[ConversationQuestion]:
+        questions, ids = [], set()
+        for index, raw in enumerate(qa):
+            location = f"LoCoMo conversation {conversation_id} question {index}"
+            if not isinstance(raw, dict):
+                raise ValueError(f"{location}: expected object")
+            question = raw.get("question")
+            if not isinstance(question, str) or not question.strip():
+                raise ValueError(f"{location}: question must be a non-empty string")
+            category = str(raw.get("category", "")).strip()
+            if category not in VALID_CATEGORIES:
+                raise ValueError(f"{location}: category must be one of {sorted(VALID_CATEGORIES)}")
+            question_id = str(raw.get("question_id") or raw.get("id") or index).strip()
+            if not question_id or question_id in ids:
+                raise ValueError(f"{location}: missing or duplicate question ID {question_id!r}")
+            ids.add(question_id)
+            answer = raw.get("answer")
             if answer is None and category == "5":
                 answer = "No information available"
+            if isinstance(answer, bool) or not isinstance(answer, (str, int, float)):
+                raise ValueError(f"{location}: answer must be a non-empty scalar value")
+            answer_text = str(answer).strip()
+            if not answer_text:
+                raise ValueError(f"{location}: answer must be a non-empty scalar value")
+            evidence = self._evidence_ids(raw.get("evidence", ()), location)
+            unknown = sorted(set(evidence) - turn_ids)
+            if unknown:
+                raise ValueError(f"{location}: evidence IDs not present in conversation: {unknown}")
             metadata = {
-                key: value
-                for key, value in question.items()
+                key: value for key, value in raw.items()
                 if key not in {"question", "answer", "category", "evidence", "question_id", "id"}
             }
-            evidence = question.get("evidence", ())
-            if isinstance(evidence, str):
-                evidence = (evidence,)
-            elif not isinstance(evidence, list | tuple):
-                evidence = ()
-
-            questions.append(
-                ConversationQuestion(
-                    question=str(question.get("question", "")),
-                    answer=self._optional_string(answer),
-                    question_id=self._optional_string(question.get("question_id") or question.get("id") or index),
-                    category=category,
-                    evidence=tuple(str(item) for item in evidence),
-                    metadata=metadata,
-                )
-            )
-
+            questions.append(ConversationQuestion(
+                question.strip(), answer_text, question_id, category, tuple(evidence), metadata,
+            ))
         return questions
 
-    def _normalize_metadata(self, record: dict[str, Any], conversation_payload: dict[str, Any]) -> dict[str, Any]:
-        metadata = {
-            key: value
-            for key, value in record.items()
-            if key not in {"conversation", "qa"}
-        }
-        metadata["speakers"] = {
-            "speaker_a": conversation_payload.get("speaker_a"),
-            "speaker_b": conversation_payload.get("speaker_b"),
-        }
-        return metadata
+    @staticmethod
+    def _evidence_ids(raw: Any, location: str) -> list[str]:
+        if raw in (None, "", []):
+            return []
+        values = [raw] if isinstance(raw, str) else raw if isinstance(raw, (list, tuple)) else None
+        if values is None or any(not isinstance(value, str) for value in values):
+            raise ValueError(f"{location}: evidence must be a string or list of strings")
+        ids = [identifier for value in values for identifier in EVIDENCE_ID_RE.findall(value)]
+        residue = " ".join(values)
+        residue = EVIDENCE_ID_RE.sub(" ", residue).replace(";", " ").replace(",", " ").strip()
+        if residue or (values and not ids):
+            raise ValueError(f"{location}: malformed evidence annotation {values!r}")
+        return list(dict.fromkeys(ids))
 
-    def _session_keys(self, conversation_payload: dict[str, Any]) -> list[str]:
-        return sorted(
-            (
-                key
-                for key, value in conversation_payload.items()
-                if key.startswith("session_") and isinstance(value, list)
-            ),
-            key=self._session_sort_key,
-        )
-
-    def _session_sort_key(self, session_id: str) -> tuple[int, str]:
-        suffix = session_id.removeprefix("session_")
-        return (int(suffix), session_id) if suffix.isdigit() else (10**9, session_id)
-
-    def _optional_string(self, value: Any) -> str | None:
-        if value is None:
-            return None
-        return str(value)
+    @staticmethod
+    def _session_keys(payload: dict[str, Any]) -> list[str]:
+        sessions = [key for key in payload if re.fullmatch(r"session_\d+", key)]
+        if not sessions:
+            raise ValueError("LoCoMo conversation must contain at least one numbered session")
+        return sorted(sessions, key=lambda value: int(value.removeprefix("session_")))

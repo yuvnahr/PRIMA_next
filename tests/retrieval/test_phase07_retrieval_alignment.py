@@ -40,7 +40,7 @@ def _note(note_id: str, text: str, memory_type: MemoryType = MemoryType.SEMANTIC
         memory_level=level,
         embedding=(1.0, 0.0),
         note_id=note_id,
-        context={"explicit_import": True} if memory_type is MemoryType.PROCEDURAL else None,
+        context={"explicit_import": True} if memory_type is MemoryType.PROCEDURAL else {"source_turn_id": note_id},
     )
 
 
@@ -117,8 +117,8 @@ def test_disabled_graph_capability_and_reranker_backend_are_explicit() -> None:
 
 def test_runtime_diagnostics_report_actual_profile_capabilities(tmp_path: Path) -> None:
     repository = InMemoryMemoryRepository()
-    repository.add(MemoryNote.create("Alpha bridge source", MemoryType.SEMANTIC, note_id="alpha"))
-    repository.add(MemoryNote.create("Bridge source related to Alpha", MemoryType.SEMANTIC, note_id="bridge"))
+    repository.add(MemoryNote.create("Alpha bridge source", MemoryType.SEMANTIC, note_id="alpha", context={"source_turn_id": "D1:1"}))
+    repository.add(MemoryNote.create("Bridge source related to Alpha", MemoryType.SEMANTIC, note_id="bridge", context={"source_turn_id": "D1:2"}))
     runtime = PrimaRuntime(
         memory_repository=repository,
         llm_client=_ModelClient(),
@@ -137,6 +137,7 @@ def test_runtime_diagnostics_report_actual_profile_capabilities(tmp_path: Path) 
     assert RuntimeComponent.DENSE_RETRIEVAL in simple.diagnostics.executed_components
     assert RuntimeComponent.GRAPH_TRAVERSAL not in simple.diagnostics.executed_components
     assert simple.diagnostics.component_details["graph_traversal"]["status"] == "disabled"
+    assert simple.output_data["retrieval"]["stage_source_ids"]["final_candidates"]
 
     full = asyncio.run(
         runtime.execute(

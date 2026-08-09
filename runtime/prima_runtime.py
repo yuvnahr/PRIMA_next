@@ -810,7 +810,7 @@ class PrimaRuntime:
 
 def _retrieval_audit(response: Any) -> dict[str, Any]:
     diagnostics = dict(getattr(response, "diagnostics", {}))
-    return {
+    audit = {
         key: diagnostics[key]
         for key in (
             "query_rewrite",
@@ -824,6 +824,15 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         )
         if key in diagnostics
     }
+    audit["stage_source_ids"] = {
+        stage: [
+            str(item["source_turn_id"])
+            for item in diagnostics.get(stage, ())
+            if isinstance(item, dict) and item.get("source_turn_id")
+        ]
+        for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
+    }
+    return audit
 
 
 _CANONICAL_AVAILABLE = {

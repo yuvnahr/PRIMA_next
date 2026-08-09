@@ -264,7 +264,15 @@ def test_all_three_benchmark_shapes_can_adopt_contract_without_gold_changes() ->
         [{"_id": "hotpot-1", "question": "Who?", "answer": "Ada", "context": [["Doc", ["Ada."]]]}]
     )[0]
     locomo = LoCoMoAdapter().adapt(
-        [{"id": "locomo-1", "conversation": {}, "qa": [{"id": "q1", "question": "Who?", "answer": "Lin"}]}]
+        [{
+            "id": "locomo-1",
+            "conversation": {
+                "speaker_a": "Lin", "speaker_b": "Ada",
+                "session_1_date_time": "2023-05-08",
+                "session_1": [{"speaker": "Lin", "text": "Hello", "dia_id": "D1:1"}],
+            },
+            "qa": [{"id": "q1", "question": "Who?", "answer": "Lin", "category": 3}],
+        }]
     )[0]
     qa_cases = [
         ConversationQACase(
