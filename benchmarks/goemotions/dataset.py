@@ -38,8 +38,14 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
         try:
             text, raw_labels, example_id = line.split("\t", 2)
             indices = [int(index) for index in raw_labels.split(",")]
+            if not text.strip() or not example_id.strip():
+                raise ValueError("text and example ID must be non-empty")
+            if len(indices) != len(set(indices)):
+                raise ValueError("label indices must be unique")
             example_labels = frozenset(labels[index] for index in indices)
         except (ValueError, IndexError) as exc:
             raise ValueError(f"Invalid GoEmotions row {line_number} in {dataset_path}") from exc
         examples.append(GoEmotionsExample(text=text, labels=example_labels, example_id=example_id))
+    if not examples:
+        raise ValueError(f"GoEmotions split is empty: {dataset_path}")
     return examples

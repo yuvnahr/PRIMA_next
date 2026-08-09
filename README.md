@@ -314,4 +314,20 @@ ROUGE-L is enabled only with `--rouge-l`; BERTScore is enabled only with
 `--bertscore` and accepts explicit device and batch-size options. LoCoMo defaults to
 a one-conversation preview; an unlimited run requires `--full-dataset`.
 
+GoEmotions is an affect/classification component benchmark, not a full QA-wrapper
+benchmark. Every example uses `TaskKind.EMOTION_CLASSIFICATION` through the bounded
+`affect_only` route; retrieval, QA reasoning, world simulation, and tools remain off.
+Run the complete test split with resumable per-example checkpoints using:
+
+```powershell
+python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision
+python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision --resume
+```
+
+Available systems distinguish model-only zero-shot, schema-constrained model-only,
+telemetry that preserves model labels, the bounded affect decision layer, and a
+separately attributed trained encoder baseline. Reports exclude parse recovery from
+the headline paired affect comparison and label the multilabel matrix as label
+co-occurrence.
+
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

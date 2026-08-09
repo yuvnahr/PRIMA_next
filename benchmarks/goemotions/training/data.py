@@ -18,10 +18,22 @@ def validate_splits(data_dir: Path) -> dict[str, object]:
     labels = load_labels(data_dir / "emotions.txt")
     splits = {name: load_split(data_dir, name) for name in ("train", "dev", "test")}
     ids = {name: {row.example_id for row in rows} for name, rows in splits.items()}
-    overlap = {f"{left}_{right}": sorted(ids[left] & ids[right]) for left, right in (("train", "dev"), ("train", "test"), ("dev", "test"))}
+    duplicates = {name: len(rows) - len(ids[name]) for name, rows in splits.items()}
+    if any(duplicates.values()):
+        raise ValueError(f"Duplicate GoEmotions IDs detected within splits: {duplicates}")
+    overlap = {
+        f"{left}_{right}": sorted(ids[left] & ids[right])
+        for left, right in (("train", "dev"), ("train", "test"), ("dev", "test"))
+    }
     if any(overlap.values()):
         raise ValueError("GoEmotions split ID leakage detected.")
-    return {"labels": labels, "counts": {name: len(rows) for name, rows in splits.items()}, "hashes": {name: hashlib.sha256((data_dir / f"{name}.tsv").read_bytes()).hexdigest() for name in splits}, "overlap": overlap}
+    return {
+        "labels": labels,
+        "counts": {name: len(rows) for name, rows in splits.items()},
+        "hashes": {name: hashlib.sha256((data_dir / f"{name}.tsv").read_bytes()).hexdigest() for name in splits},
+        "overlap": overlap,
+        "duplicates": duplicates,
+    }
 
 
 def multi_hot(example: GoEmotionsExample, labels: list[str]) -> list[float]:
