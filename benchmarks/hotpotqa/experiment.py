@@ -65,6 +65,7 @@ from llm.generation_config import GenerationConfig
 from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
 from runtime.contracts import (
     DiagnosticMode,
+    ExecutionOptions,
     ExecutionProfile,
     ExecutionStatus,
     PrimaRequest,
@@ -176,7 +177,7 @@ class SharedRuntimeFactory:
 async def _execute_case(
     conversation: Any, runtime: Any, profile: ExecutionProfile,
     generation: GenerationConfig, top_k: int, reasoning_mode: str,
-    max_hops: int, maintenance: MaintenanceMode,
+    max_hops: int, maintenance: MaintenanceMode, context_budget: int = 1600,
 ) -> tuple[PrimaResponse | None, PrimaResponse | None, float, float]:
     ingestion_ms = 0.0
     if hasattr(runtime, "start_maintenance"):
@@ -204,10 +205,10 @@ async def _execute_case(
             session_id=conversation.id,
             generation_config=generation,
             diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
-            metadata={
-                "top_k": top_k, "max_hops": max_hops,
-                "reasoning_mode": reasoning_mode, "max_context_tokens": 1600,
-            },
+            options=ExecutionOptions(
+                top_k=top_k, max_hops=max_hops, max_retrieval_calls=max_hops,
+                reasoning_mode=reasoning_mode, max_context_tokens=context_budget,
+            ),
         ))
         return None, answer, ingestion_ms, (time.perf_counter() - started) * 1000
     finally:
@@ -249,7 +250,7 @@ def _failure(record: dict[str, Any], profile: ExecutionProfile) -> str | None:
 def run_sample(
     conversation: Any, profile: ExecutionProfile, generation: GenerationConfig,
     top_k: int, reasoning_mode: str, max_hops: int,
-    runtime_pool: SharedRuntimeFactory, maintenance: MaintenanceMode,
+    runtime_pool: SharedRuntimeFactory, maintenance: MaintenanceMode, context_budget: int = 1600,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = runtime_pool.create(
@@ -258,7 +259,7 @@ def run_sample(
         generation_config=generation,
     )
     ingestion_failure, response, ingestion_ms, reasoning_ms = asyncio.run(_execute_case(
-        conversation, runtime, profile, generation, top_k, reasoning_mode, max_hops, maintenance,
+        conversation, runtime, profile, generation, top_k, reasoning_mode, max_hops, maintenance, context_budget,
     ))
     response_dict = response.to_dict() if response is not None else {}
     supporting, provenance = project_supporting_facts(response_dict)
@@ -354,15 +355,11 @@ def _checkpoint(store: BenchmarkArtifactStore, record: dict[str, Any]) -> None:
     if record["execution_failed"]:
         if failure is None:
             raise ValueError("failed HotpotQA record requires failure details")
-        store.append_failure(failure)
         store.append_checkpoint(CheckpointRecord(
             case_id=record["sample_id"], status=RunStatus.FAILED, failure=failure,
         ))
         return
     prediction = _prediction_record(record, datetime.now(timezone.utc))
-    store.append_prediction(prediction)
-    if failure is not None:
-        store.append_failure(failure)
     store.append_checkpoint(CheckpointRecord(
         case_id=record["sample_id"], status=RunStatus.COMPLETE,
         prediction=prediction, failure=failure,
@@ -480,6 +477,7 @@ def run_hotpotqa_experiment(
     progress: bool = False, quiet: bool = False, resume: bool = False,
     runtime_factory: Callable[..., Any] = PrimaRuntime,
     maintenance_mode: MaintenanceMode | str = MaintenanceMode.DISABLED,
+    context_budget: int = 1600,
     _runtime_pool: SharedRuntimeFactory | None = None,
     generation_config: GenerationConfig | None = None,
 ) -> dict[str, Any]:
@@ -513,7 +511,7 @@ def run_hotpotqa_experiment(
         "context_source": CONTEXT_SOURCES[mode], "oracle_diagnostic_only": mode == "oracle",
         "sampling": sampling, "offset": offset, "max_samples": max_samples,
         "top_k": top_k, "reasoning_mode": reasoning_mode, "max_hops": max_hops,
-        "maintenance_mode": maintenance.value,
+        "maintenance_mode": maintenance.value, "context_budget": context_budget,
     }
     manifest = _manifest(
         dataset, dataset_set, mode, profile, generation,
@@ -542,7 +540,7 @@ def run_hotpotqa_experiment(
     def execute(item: Any) -> dict[str, Any]:
         return run_sample(
             item, profile, generation, top_k, reasoning_mode,
-            max_hops, pool, maintenance,
+            max_hops, pool, maintenance, context_budget,
         )
 
     iterator = map(execute, pending)

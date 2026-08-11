@@ -137,6 +137,22 @@ events/
 
 ## Usage
 
+Canonical runtime requests keep caller metadata informational. Routing, retrieval,
+budget, reranker, compression, tool, and execution-policy controls belong only in
+typed `ExecutionOptions`; reserved control names in `PrimaRequest.metadata` are
+rejected.
+
+```python
+from runtime import ExecutionOptions, ExecutionProfile, PrimaRequest, PrimaRuntime, TaskKind
+
+response = await PrimaRuntime().execute(PrimaRequest(
+    task_kind=TaskKind.FACTUAL_QA,
+    profile=ExecutionProfile.SIMPLE_RAG,
+    input_text="What identifies Bridge?",
+    options=ExecutionOptions(max_retrieval_calls=1, max_context_tokens=1024),
+))
+```
+
 ```python
 from affect import DynamicAffectEngine
 
@@ -269,7 +285,7 @@ await bus.publish(publisher.memory_created("mem_123"))
 - Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
 - Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
 - Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
-- Events are local and async. Async applications explicitly start/flush/stop the runtime maintenance lifecycle; benchmark adapters select `disabled`, `eventual`, or a named deterministic flush barrier. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope.
+- Events are local and async. Async applications explicitly start/flush/stop the runtime maintenance lifecycle; benchmark adapters select `disabled`, `eventual`, or a named deterministic flush barrier. The queue and completed-event set are process-local and are not durable across process loss; production persists terminal maintenance failures only. Heavy consolidation/evolution is batched and flushed at barriers. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope.
 
 ## Setup
 
@@ -337,6 +353,12 @@ bounded provider session:
 python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
 python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
 ```
+
+Campaign preflight fingerprints the effective typed runtime configuration and the
+task-specific generation contract, including factual-QA JSON-schema mode. Every QA
+mode must satisfy `context_budget + max_output_tokens + safety_overhead_tokens <=
+context_window`. Checkpoints are the authoritative crash-consistent item record;
+prediction and failure JSONL files are deterministic mirrors reconciled on resume.
 
 The smoke configuration uses fixture data and a deterministic fake provider. Copy
 `benchmarks/campaign/full_gpu.example.yaml` for a real campaign; its endpoint, model,

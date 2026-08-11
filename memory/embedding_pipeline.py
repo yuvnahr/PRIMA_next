@@ -11,8 +11,13 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import Any
 
-from memory.embedding_backend import embed_text, embedding_backend_config
-from memory.experiment_config import EmbeddingExperimentConfig, configured_backend
+from memory.embedding_backend import (
+    EmbeddingBackendConfig,
+    embed_text,
+    embedding_backend_config,
+    use_embedding_backend_config,
+)
+from memory.experiment_config import EmbeddingExperimentConfig
 from memory.identity_normalization import IdentityNormalizer
 from memory.semantic_representation import (
     SemanticMemoryRepresentation,
@@ -114,8 +119,12 @@ def get_embedding_pipeline() -> CanonicalEmbeddingPipeline:
 
 
 @contextmanager
-def use_embedding_pipeline(pipeline: CanonicalEmbeddingPipeline) -> Iterator[None]:
-    with configured_backend(pipeline.config.backend):
+def use_embedding_pipeline(
+    pipeline: CanonicalEmbeddingPipeline,
+    backend_config: EmbeddingBackendConfig | None = None,
+) -> Iterator[None]:
+    resolved = backend_config or embedding_backend_config()
+    with use_embedding_backend_config(resolved):
         token = _ACTIVE_PIPELINE.set(pipeline)
         try:
             yield

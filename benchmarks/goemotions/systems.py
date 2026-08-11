@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -154,6 +156,7 @@ class _RuntimeClassificationSystem:
     name: str
     system_family: str
     _client_instance: LLMClient | None = field(default=None, init=False, repr=False)
+    _runtime_local: threading.local = field(default_factory=threading.local, init=False, repr=False)
 
     def use_client(self, client: LLMClient) -> _RuntimeClassificationSystem:
         """Reuse one campaign-owned inference client."""
@@ -167,13 +170,21 @@ class _RuntimeClassificationSystem:
         return self._client_instance
 
     def _execute(self, text: str, source: _PredictionSource) -> tuple[str, dict[str, Any]]:
-        adapter = GoEmotionsProfileAdapter(source)
-        runtime = PrimaRuntime(
-            affect_engine=DynamicAffectEngine(classifier=adapter),
-            llm_client=self._client(),
-            generation_config=self.generation,
-            maintenance_enabled=False,
-        )
+        adapter = getattr(self._runtime_local, "adapter", None)
+        runtime = getattr(self._runtime_local, "runtime", None)
+        if adapter is None or runtime is None:
+            adapter = GoEmotionsProfileAdapter(source)
+            runtime = PrimaRuntime(
+                affect_engine=DynamicAffectEngine(classifier=adapter),
+                llm_client=self._client(),
+                generation_config=self.generation,
+                maintenance_enabled=False,
+            )
+            self._runtime_local.adapter = adapter
+            self._runtime_local.runtime = runtime
+        else:
+            adapter.predictor = source
+            adapter.last_prediction = None
         response = asyncio.run(
             runtime.execute(
                 PrimaRequest(
@@ -215,6 +226,9 @@ class _RuntimeClassificationSystem:
                 "model_usage": dict(response.diagnostics.model_usage),
             },
             "scope": "affect/classification component benchmark; not retrieval, QA, tools, or full architecture",
+            "raw_model_response_hash": hashlib.sha256(
+                str(source.last_metadata.get("raw_model_response", source.last_raw)).encode("utf-8")
+            ).hexdigest(),
         }
 
 

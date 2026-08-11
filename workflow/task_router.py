@@ -18,125 +18,12 @@ class TaskRoute:
 class TaskRouter:
     """Determines the phase route for a user input."""
 
-    DEFAULT_ROUTE = (
-        WorkflowPhase.AFFECT,
-        WorkflowPhase.MEMORY_RETRIEVAL,
-        WorkflowPhase.PLANNING,
-        WorkflowPhase.REFLECTION,
-        WorkflowPhase.ACTION,
-        WorkflowPhase.OUTPUT,
-    )
-
-    ROUTES = {
-        ("conversation", "model_only"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MEMORY_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("conversation", "simple_rag"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.EVIDENCE_ACQUISITION,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MEMORY_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("conversation", "prima_full"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.AFFECT,
-            WorkflowPhase.EVIDENCE_ACQUISITION,
-            WorkflowPhase.PLANNING,
-            WorkflowPhase.WORLD_SIMULATION,
-            WorkflowPhase.UNCERTAINTY_ESTIMATION,
-            WorkflowPhase.EXECUTION_DECISION,
-            WorkflowPhase.REFLECTION,
-            WorkflowPhase.ACTION,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MEMORY_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("factual_qa", "model_only"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("factual_qa", "simple_rag"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.EVIDENCE_ACQUISITION,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("factual_qa", "prima_full"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.AFFECT,
-            WorkflowPhase.EVIDENCE_ACQUISITION,
-            WorkflowPhase.PLANNING,
-            WorkflowPhase.WORLD_SIMULATION,
-            WorkflowPhase.UNCERTAINTY_ESTIMATION,
-            WorkflowPhase.EXECUTION_DECISION,
-            WorkflowPhase.REFLECTION,
-            WorkflowPhase.ACTION,
-            WorkflowPhase.ANSWER_GENERATION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("document_ingestion", "ingestion_only"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.DOCUMENT_INGESTION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-        ("emotion_classification", "affect_only"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.AFFECT,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-        ),
-        ("tool_request", "prima_full"): (
-            WorkflowPhase.STATE_LOAD,
-            WorkflowPhase.AFFECT,
-            WorkflowPhase.MEMORY_RETRIEVAL,
-            WorkflowPhase.PLANNING,
-            WorkflowPhase.WORLD_SIMULATION,
-            WorkflowPhase.UNCERTAINTY_ESTIMATION,
-            WorkflowPhase.EXECUTION_DECISION,
-            WorkflowPhase.REFLECTION,
-            WorkflowPhase.ACTION,
-            WorkflowPhase.OUTPUT_VALIDATION,
-            WorkflowPhase.OUTPUT,
-            WorkflowPhase.STATE_COMMIT,
-            WorkflowPhase.MEMORY_COMMIT,
-            WorkflowPhase.MAINTENANCE_ENQUEUE,
-        ),
-    }
-
     def route(self, context: ExecutionContext) -> TaskRoute:
         """Return the route for the current context.
 
         Subsystem components remain unaware of task/profile selection.
         """
         requested = context.metadata.get("route")
-        if requested:
-            return TaskRoute(tuple(WorkflowPhase(phase) for phase in requested))
-        key = (str(context.metadata.get("task_kind", "")), str(context.metadata.get("profile", "")))
-        if key in self.ROUTES:
-            return TaskRoute(self.ROUTES[key])
-        return TaskRoute(self.DEFAULT_ROUTE)
+        if not isinstance(requested, tuple) or not requested:
+            raise ValueError("Workflow execution requires a trusted canonical route plan.")
+        return TaskRoute(tuple(WorkflowPhase(phase) for phase in requested))

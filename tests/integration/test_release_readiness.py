@@ -15,7 +15,15 @@ from llm.provider import Provider, ProviderError
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
-from runtime import DiagnosticMode, ExecutionOutcome, ExecutionProfile, PrimaRequest, PrimaRuntime, TaskKind
+from runtime import (
+    DiagnosticMode,
+    ExecutionOptions,
+    ExecutionOutcome,
+    ExecutionProfile,
+    PrimaRequest,
+    PrimaRuntime,
+    TaskKind,
+)
 from runtime.contracts import RuntimeComponent
 from uncertainty import DecisionType, OverallConfidence, UncertaintyBand, UncertaintyEstimator
 
@@ -102,7 +110,7 @@ def test_malformed_and_truncated_structured_output_fail_without_fallback(tmp_pat
                 task_kind=TaskKind.FACTUAL_QA,
                 profile=ExecutionProfile.SIMPLE_RAG,
                 input_text="What is the answer?",
-                metadata={"reasoning_mode": "single_pass"},
+                options=ExecutionOptions(reasoning_mode="single_pass"),
             )
         )
     )

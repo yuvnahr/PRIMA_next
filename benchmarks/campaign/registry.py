@@ -18,10 +18,12 @@ def execute_mode(
     output_root: Path,
     *,
     resume: bool,
+    cpu_workers: int | None = None,
 ) -> dict[str, Any]:
-    generation = _generation(campaign, mode)
+    generation = effective_generation(campaign, mode)
     options = dict(mode.options)
-    workers = min(int(options.pop("parallel_workers", campaign.scheduler.cpu_workers)), campaign.scheduler.cpu_workers)
+    worker_limit = cpu_workers or campaign.scheduler.cpu_workers
+    workers = min(int(options.pop("parallel_workers", worker_limit)), worker_limit)
     common: dict[str, Any] = {
         "provider": campaign.provider.kind,
         "model": campaign.provider.model,
@@ -58,6 +60,7 @@ def execute_mode(
             progress=False,
             quiet=True,
             runtime_factory=session.runtime_factory,
+            context_budget=mode.context_budget,
             **common,
             **options,
         ))
@@ -72,6 +75,7 @@ def execute_mode(
         include_rouge_l="rouge_l" in mode.optional_metrics,
         include_bertscore="bertscore" in mode.optional_metrics,
         runtime_factory=session.runtime_factory,
+        context_budget=mode.context_budget,
         **common,
         **options,
     ))
@@ -85,9 +89,13 @@ def child_manifest_path(mode: BenchmarkModeConfig, output_root: Path) -> Path:
     return output_root / mode.profile / "manifest.json"
 
 
-def _generation(campaign: CampaignConfig, mode: BenchmarkModeConfig) -> GenerationConfig:
+def effective_generation(campaign: CampaignConfig, mode: BenchmarkModeConfig) -> GenerationConfig:
+    """Return the exact task-specific generation contract used by execution and manifests."""
+
     structured = StructuredOutputMode.NONE
-    if mode.benchmark == "goemotions" and mode.variant != "model_only_zero_shot":
+    if mode.benchmark in {"hotpotqa", "locomo"} or (
+        mode.benchmark == "goemotions" and mode.variant not in {"model_only_zero_shot", "trained_encoder"}
+    ):
         structured = StructuredOutputMode.JSON_SCHEMA
     return GenerationConfig(
         model=campaign.provider.model,

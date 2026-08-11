@@ -83,9 +83,13 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     assert first["status"] == "complete"
     assert set(first["modes"]) == {"go", "hotpot", "locomo"}
     assert first["telemetry"]["max_active_requests"] <= 1
+    assert "gpu_peak_observed_memory_bytes" not in first["telemetry"]
+    assert first["telemetry"]["gpu_boundary_snapshots"]["measurement"].endswith("not peak usage")
 
     store = CampaignManifestStore(config.output_root)
     manifest = store.read()
+    assert len(manifest.preflight["runtime_config_fingerprint"]) == 64
+    assert manifest.preflight["effective_generation"]["hotpot"]["structured_output"] == "json_schema"
     assert all(
         state.child_manifest and not Path(state.child_manifest).is_absolute()
         for state in manifest.modes.values()
@@ -166,7 +170,19 @@ def test_shared_provider_enforces_active_request_bound() -> None:
     with ThreadPoolExecutor(max_workers=4) as executor:
         list(executor.map(session.provider.send, [request] * 8))
     assert maximum == 1
-    assert session.telemetry()["max_active_requests"] == 1
+    telemetry = session.telemetry()
+    assert telemetry["max_active_requests"] == 1
+    assert telemetry["throughput_requests_per_second"] > 0
+    assert "provider_session_initialization_ms" in telemetry
+    assert "model_load_time" not in telemetry
+
+
+def test_local_gpu_concurrency_above_one_is_refused_even_with_device_names(tmp_path: Path) -> None:
+    payload = _payload(tmp_path)
+    payload["provider"].update(kind="local", endpoint="http://localhost:8000")
+    payload["scheduler"].update(max_gpu_requests=2, gpu_devices=["0", "1"])
+    with pytest.raises(ValidationError, match="explicit endpoint routing"):
+        CampaignConfig.model_validate(payload)
 
 
 def test_isolated_mode_failure_does_not_corrupt_other_modes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -174,10 +190,10 @@ def test_isolated_mode_failure_does_not_corrupt_other_modes(tmp_path: Path, monk
 
     original = orchestrator.execute_mode
 
-    def fail_hotpot(config, mode, session, output_root, *, resume):
+    def fail_hotpot(config, mode, session, output_root, *, resume, cpu_workers=None):
         if mode.id == "hotpot":
             raise RuntimeError("isolated fixture failure")
-        return original(config, mode, session, output_root, resume=resume)
+        return original(config, mode, session, output_root, resume=resume, cpu_workers=cpu_workers)
 
     monkeypatch.setattr(orchestrator, "execute_mode", fail_hotpot)
     result = run_campaign(CampaignConfig.model_validate(_payload(tmp_path / "campaign")))
@@ -186,6 +202,19 @@ def test_isolated_mode_failure_does_not_corrupt_other_modes(tmp_path: Path, monk
     assert result["modes"]["go"]["status"] == "complete"
     assert result["modes"]["locomo"]["status"] == "complete"
 
+
+def test_preflight_uses_effective_qa_schema_and_full_window_budget(tmp_path: Path) -> None:
+    payload = _payload(tmp_path / "schema")
+    payload["benchmarks"] = [payload["benchmarks"][1]]
+    payload["provider"]["structured_output"] = False
+    with pytest.raises(ValueError, match="require provider JSON-schema"):
+        run_campaign(CampaignConfig.model_validate(payload))
+
+    payload = _payload(tmp_path / "window")
+    payload["benchmarks"] = [payload["benchmarks"][1]]
+    payload["benchmarks"][0]["context_budget"] = 3800
+    with pytest.raises(ValueError, match="context, output, and safety overhead"):
+        run_campaign(CampaignConfig.model_validate(payload))
 
 @pytest.mark.parametrize("interrupt", ["sigint", "sigterm"])
 def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, interrupt: str) -> None:

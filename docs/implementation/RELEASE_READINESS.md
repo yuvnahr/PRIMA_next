@@ -4,7 +4,7 @@ Date: 2026-08-11
 
 Runtime: Python 3.10.11 from `venv\Scripts\python.exe`
 
-Scope: Phase 15 validation; no full-dataset GPU execution
+Scope: Phase 15 validation plus Phase 16 principal hardening; no full-dataset GPU execution
 
 ## Decision
 
@@ -12,8 +12,58 @@ Scope: Phase 15 validation; no full-dataset GPU execution
 full-dataset GPU campaign until the deployment-specific configuration, endpoint,
 datasets, and hardware are supplied and pass preflight.**
 
-The repository-wide quality gates and complete fixture campaign are green in the
-final Phase 15 worktree.
+The fixture campaign, fail-closed routing invariants, paired-metric validity, resume,
+Ruff, mypy, Bandit, Xenon, and owned-source compile gates are green. The single
+complete pytest invocation found three stale direct-workflow tests with no trusted
+route; after correcting only those tests, all three focused reruns passed. Per the
+one-final-CI instruction, the complete suite was not launched a second time.
+
+## Phase 16 hardening transcript
+
+```text
+venv\Scripts\python.exe -m compileall -q -x "(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)" .
+passed (no output)
+
+venv\Scripts\python.exe -m pytest -q
+334 passed, 1 skipped, 3 failed in 171.23s
+All three failures were route-less direct-workflow tests after fallback removal.
+
+venv\Scripts\python.exe -m pytest -q <the three corrected node IDs>
+2 passed, 1 failed in 9.60s (the remaining test needed explicit factual GenerationConfig)
+
+venv\Scripts\python.exe -m pytest -q tests/workflow/test_phase06_correction_loop.py::test_pre_execution_reflection_changes_query_evidence_and_answer
+1 passed in 8.01s
+
+venv\Scripts\python.exe -m ruff check .
+initial: 9 findings (7 import-order, 2 unused tuple names)
+recheck: All checks passed!
+
+venv\Scripts\python.exe -m mypy .
+initial: 4 findings
+recheck: Success: no issues found in 234 source files
+
+venv\Scripts\python.exe -m bandit -q -c bandit.yaml -r .
+passed; existing informational nosec warnings only
+
+venv\Scripts\python.exe scripts/run_xenon.py
+passed on the production source-root allowlist
+
+venv\Scripts\python.exe -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
+campaign_id: campaign-9d98edf3-d542-4dfb-a63a-89a8ae31fde5
+status: complete; provider requests: 4/4; maximum active requests: 1
+
+venv\Scripts\python.exe -m pytest -q tests/benchmarks/test_campaign.py -k campaign_process_signal_resume_has_one_record_per_case
+2 passed, 7 deselected in 26.19s
+```
+
+Phase 16 smoke artifact audit:
+
+```text
+credential or absolute developer-path matches: 0
+GoEmotions checkpoint/prediction rows: 1/1, unique: 1/1
+HotpotQA checkpoint/prediction rows: 2/2, unique: 2/2
+LoCoMo checkpoint/prediction rows: 1/1, unique: 1/1
+```
 
 ## Command transcript
 
@@ -110,7 +160,8 @@ passed; two existing valid nosec annotations produced informational warnings
 |---|---|
 | Full conversation profile | Parser, state load, affect, dense/graph retrieval, planning, symbolic world simulation, uncertainty, triggered reflection, generation/action, validation, state/memory commit, and maintenance enqueue execute in one trace. |
 | Reflection | A low-confidence injection triggers reflection; the output remains generated rather than echoed. Existing correction tests prove accepted advice can revise retrieval/execution. |
-| Diagnostics | Executed/skipped components, trace count, and requested/active reranker identities reconcile. |
+| Diagnostics | Planned/enabled/executed/not-executed/skipped components reconcile; retrieval calls/results, two reflection categories, accepted corrections, latency, and active backends are distinct. |
+| Tool request | Returns typed `actioned` output and reports `tool_executor`; model execution remains route-unselected. |
 | Document ingestion | Stores through the canonical route and skips model generation. |
 | GoEmotions | Uses `EMOTION_CLASSIFICATION`/`affect_only`; QA retrieval, world simulation, planning, and tools are excluded. |
 | `model_only` | Skips retrieval components. |
@@ -134,7 +185,9 @@ No required no-go condition is present in the validated scope: output is generat
 QA uses the workflow, reflection can alter execution, diagnostics reconcile, all
 benchmarks resume, LoCoMo core metrics are dependency-independent, invalid pairs are
 refused, inference is bounded, interruption survives resume, and no P0 finding is
-open. The production campaign remains deliberately blocked until real environment
+open. The three complete-suite failures were test harnesses that omitted the newly
+required trusted route, not runtime invariant failures; their explicit corrections
+pass. The production campaign remains deliberately blocked until real environment
 fields pass preflight.
 
 ## Unresolved risks
@@ -147,3 +200,8 @@ fields pass preflight.
   detached Python process does not reliably receive terminal Ctrl+C injection.
 - Real-environment model load, GPU peak memory, endpoint rate limits, and throughput
   must be re-measured in the deployment campaign.
+- Maintenance work queues and completed-event sets are process-local; only terminal
+  production failure rows are durable. A process crash can discard queued cold work.
+- The single complete pytest command was not rerun after its three stale tests were
+  corrected, honoring the one-final-CI instruction; aggregate evidence is 334 passing
+  tests plus focused green reruns of the three corrected nodes.

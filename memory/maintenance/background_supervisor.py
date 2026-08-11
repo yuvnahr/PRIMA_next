@@ -191,6 +191,12 @@ class BackgroundMaintenanceSupervisor:
             return
         await self.start()
         await self._queue.join()
+        owner = getattr(self.handler, "__self__", None)
+        flush = getattr(owner, "flush", None)
+        if callable(flush):
+            result = flush()
+            if inspect.isawaitable(result):
+                await result
 
     async def stop(self, *, graceful: bool = True) -> None:
         """Stop the worker, optionally flushing first; cancellation preserves current work."""

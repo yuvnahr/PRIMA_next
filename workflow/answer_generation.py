@@ -89,7 +89,13 @@ class AnswerGenerationController:
             )
         factual = task_kind == "factual_qa"
         if factual and config.structured_output is not StructuredOutputMode.JSON_SCHEMA:
-            config = config.with_overrides(structured_output=StructuredOutputMode.JSON_SCHEMA)
+            return GenerationResult(
+                GenerationOutcome.FAILED,
+                errors=("Factual QA requires a precomputed JSON-schema GenerationConfig.",),
+                provider=provider,
+                model=config.model,
+                fallback_policy=config.fallback_policy.value,
+            )
         model = config.model
         if task_kind == "factual_qa" and reasoning is not None:
             if reasoning.status is SufficiencyStatus.ERROR:

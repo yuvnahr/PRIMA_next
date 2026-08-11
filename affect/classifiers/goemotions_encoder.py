@@ -30,6 +30,7 @@ class GoEmotionsEncoder:
     max_length: int = 128
     thresholds_path: Path | None = None
     calibration_path: Path | None = None
+    local_files_only: bool = False
     _tokenizer: Any = field(default=None, init=False, repr=False)
     _model: Any = field(default=None, init=False, repr=False)
     _device: str | None = field(default=None, init=False)
@@ -45,6 +46,7 @@ class GoEmotionsEncoder:
             batch_size=int(os.getenv("PRIMA_AFFECT_BATCH_SIZE", "4")),
             thresholds_path=_optional_path("PRIMA_AFFECT_THRESHOLDS_PATH"),
             calibration_path=_optional_path("PRIMA_AFFECT_CALIBRATION_PATH"),
+            local_files_only=os.getenv("PRIMA_AFFECT_LOCAL_FILES_ONLY", "false").lower() in {"1", "true", "yes"},
         )
 
     def predict(self, text: str) -> EmotionPrediction:
@@ -87,7 +89,7 @@ class GoEmotionsEncoder:
         if len(revision) < 7 or any(character not in "0123456789abcdefABCDEF" for character in revision):
             raise ValueError("Hugging Face model revisions must be immutable commit hashes.")
         self.revision = revision
-        kwargs = {"trust_remote_code": False, "local_files_only": os.getenv("PRIMA_AFFECT_LOCAL_FILES_ONLY", "false").lower() in {"1", "true", "yes"}}
+        kwargs = {"trust_remote_code": False, "local_files_only": self.local_files_only}
         self._tokenizer = AutoTokenizer.from_pretrained(self.model_id, revision=revision, **kwargs)
         self._model = AutoModelForSequenceClassification.from_pretrained(self.model_id, revision=revision, **kwargs).to(self._device)
         self._model.eval()

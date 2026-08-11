@@ -61,6 +61,7 @@ from llm.generation_config import GenerationConfig
 from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
 from runtime.contracts import (
     DiagnosticMode,
+    ExecutionOptions,
     ExecutionProfile,
     ExecutionStatus,
     PrimaRequest,
@@ -193,7 +194,7 @@ async def _run_conversation(
     conversation: Any, runtime: Any, profile: ExecutionProfile, policy: IngestionPolicy,
     generation: GenerationConfig, top_k: int, bounded_context_turns: int,
     maintenance: MaintenanceMode, pending_ids: set[str],
-    checkpoint: Callable[[dict[str, Any]], None],
+    checkpoint: Callable[[dict[str, Any]], None], context_budget: int = 1600,
 ) -> dict[str, Any]:
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
@@ -234,7 +235,10 @@ async def _run_conversation(
                     task_kind=TaskKind.FACTUAL_QA, profile=profile,
                     input_text=input_text, session_id=conversation.id,
                     generation_config=generation, diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
-                    metadata={"top_k": top_k, "reasoning_mode": "adaptive", "max_hops": 3},
+                    options=ExecutionOptions(
+                        top_k=top_k, reasoning_mode="adaptive", max_hops=3,
+                        max_retrieval_calls=3, max_context_tokens=context_budget,
+                    ),
                 ))
                 record = _question_record(
                     conversation, question, profile, policy, response, admitted_turn_ids,
@@ -282,8 +286,14 @@ def _question_record(
     if not candidate_ids:
         candidate_ids = set(stages.get("dense_top30", ())) | set(stages.get("sparse_top30", ()))
     final_ids, final_texts = set(), []
+    selected_source_ids = set()
     if response is not None:
+        generation = response.output_data.get("generation", {})
+        if isinstance(generation, dict):
+            selected_source_ids = {str(item) for item in generation.get("selected_source_ids", ())}
         for evidence in response.evidence:
+            if evidence.source_id not in selected_source_ids:
+                continue
             source_turn_id = evidence.metadata.get("provenance", {}).get("source_turn_id")
             if source_turn_id:
                 final_ids.add(str(source_turn_id))
@@ -383,15 +393,11 @@ def _checkpoint(store: BenchmarkArtifactStore, record: dict[str, Any]) -> None:
     if record["execution_failed"]:
         if failure is None:
             raise ValueError("failed LoCoMo question requires failure details")
-        store.append_failure(failure)
         store.append_checkpoint(CheckpointRecord(
             case_id=record["case_id"], status=RunStatus.FAILED, failure=failure,
         ))
         return
     prediction = _prediction_record(record)
-    store.append_prediction(prediction)
-    if failure:
-        store.append_failure(failure)
     store.append_checkpoint(CheckpointRecord(
         case_id=record["case_id"], status=RunStatus.COMPLETE,
         prediction=prediction, failure=failure,
@@ -491,6 +497,7 @@ def run_locomo_experiment(
     runtime_profile: ExecutionProfile | str = ExecutionProfile.PRIMA_FULL,
     ingestion_policy: IngestionPolicy | str | None = None,
     bounded_context_turns: int = 20, full_dataset: bool = False,
+    context_budget: int = 1600,
     resume: bool = False, runtime_factory: Callable[..., Any] = PrimaRuntime,
     generation_config: GenerationConfig | None = None,
     _runtime_pool: SharedRuntimeFactory | None = None,
@@ -529,6 +536,7 @@ def run_locomo_experiment(
         "rouge_l": include_rouge_l, "bertscore": include_bertscore,
         "bertscore_device": bertscore_device,
         "bertscore_batch_size": bertscore_batch_size,
+        "context_budget": context_budget,
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)
     if resume:
@@ -551,7 +559,7 @@ def run_locomo_experiment(
         return asyncio.run(_run_conversation(
             conversation, runtime, profile, policy, generation, top_k,
             bounded_context_turns, maintenance, pending_ids,
-            lambda record: _checkpoint(store, record),
+            lambda record: _checkpoint(store, record), context_budget,
         ))
 
     if parallel_workers > 1 and len(conversations) > 1:

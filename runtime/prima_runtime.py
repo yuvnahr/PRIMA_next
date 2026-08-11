@@ -5,18 +5,22 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import time
 from pathlib import Path
 from typing import Any
 
 from action import ActionExecutor
 from affect.affect_engine import DynamicAffectEngine
+from affect.classifier_factory import create_affect_classifier
+from config.runtime_config import RuntimeConfig
 from config.runtime_mode import RuntimeMode
 from config.settings import get_settings
 from events.event_bus import EventBus
-from llm.generation_config import GenerationConfig
+from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
+from memory.embedding_backend import BACKEND_ALIASES, MODEL_BY_BACKEND, EmbeddingBackendConfig
+from memory.embedding_pipeline import CanonicalEmbeddingPipeline, use_embedding_pipeline
+from memory.experiment_config import EmbeddingExperimentConfig
 from memory.maintenance.background_supervisor import (
     BackgroundMaintenanceSupervisor,
     InMemoryMaintenanceFailureStore,
@@ -32,6 +36,7 @@ from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.repository_factory import RepositorySelection, select_memory_repository
+from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
@@ -49,6 +54,7 @@ from runtime.contracts import (
     ComponentCapability,
     DiagnosticMode,
     EvidenceReference,
+    ExecutionOptions,
     ExecutionOutcome,
     ExecutionProfile,
     ExecutionStatus,
@@ -102,6 +108,7 @@ class PrimaRuntime:
         maintenance_max_retries: int = 2,
         maintenance_failure_path: str | Path | None = None,
         generation_config: GenerationConfig | None = None,
+        runtime_config: RuntimeConfig | None = None,
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
@@ -125,7 +132,34 @@ class PrimaRuntime:
             self.state_manager = JsonStateManager(state_path)
         else:
             self.state_manager = InMemoryStateManager()
-        self.affect_engine = affect_engine or DynamicAffectEngine()
+        self.runtime_config = runtime_config or RuntimeConfig.from_environment()
+        embedding_name = BACKEND_ALIASES.get(
+            self.runtime_config.embedding_backend, self.runtime_config.embedding_backend
+        )
+        embedding_model = self.runtime_config.embedding_model or MODEL_BY_BACKEND[embedding_name]
+        self.embedding_backend_config = EmbeddingBackendConfig(
+            embedding_name, embedding_model, self.runtime_config.embedding_dimensions
+        )
+        self.embedding_pipeline = CanonicalEmbeddingPipeline(
+            EmbeddingExperimentConfig(
+                backend=embedding_name,
+                representation_mode=self.runtime_config.representation_mode,
+                identity_enabled=self.runtime_config.identity_normalization,
+            )
+        )
+        self.affect_engine = affect_engine or DynamicAffectEngine(
+            classifier=create_affect_classifier(
+                self.runtime_config.affect_backend,
+                self.runtime_config.affect_model_id,
+                self.runtime_config.affect_allow_fallback,
+                revision=self.runtime_config.affect_model_revision,
+                device=self.runtime_config.affect_device,
+                batch_size=self.runtime_config.affect_batch_size,
+                thresholds_path=self.runtime_config.affect_thresholds_path,
+                calibration_path=self.runtime_config.affect_calibration_path,
+                local_files_only=self.runtime_config.affect_local_files_only,
+            )
+        )
         self.reflection_engine = reflection_engine or ReflectionEngine()
         settings = get_settings()
         self.generation_config = generation_config or GenerationConfig(
@@ -135,7 +169,12 @@ class PrimaRuntime:
         self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
         self.retrieval_controller = RetrievalController(
             self.memory_index,
-            candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+            candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+            reranker=Reranker(
+                enabled=self.runtime_config.reranker_enabled,
+                backend=self.runtime_config.reranker_backend,
+                model_name=self.runtime_config.reranker_model,
+            ),
         )
         self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
         self.correction_budget = correction_budget or CorrectionBudget()
@@ -183,20 +222,35 @@ class PrimaRuntime:
                 errors=(str(exc),),
             )
         started = time.perf_counter()
+        generation = request.generation_config or self.generation_config
+        if request.task_kind is TaskKind.FACTUAL_QA:
+            generation = generation.with_overrides(structured_output=StructuredOutputMode.JSON_SCHEMA)
         execution_context = ExecutionContext(
             user_input=request.input_text,
             metadata={
                 **request.metadata,
+                "route": route.phases,
                 "task_kind": request.task_kind.value,
                 "profile": request.profile.value,
                 "session_id": request.session_id or "",
                 "state_session_id": request.session_id or request.request_id,
                 "correction_budget": self.correction_budget.to_dict(),
-                "generation_config": request.generation_config or self.generation_config,
+                "generation_config": generation,
+                "runtime_config": self.runtime_config,
+                "top_k": request.options.top_k,
+                "reasoning_mode": request.options.reasoning_mode,
+                "max_hops": request.options.max_hops,
+                "max_retrieval_calls": request.options.max_retrieval_calls,
+                "max_context_tokens": request.options.max_context_tokens,
+                "context_compression_enabled": request.options.context_compression_enabled,
+                "required_reranker_backend": request.options.required_reranker_backend,
+                "execution_policy": request.options.execution_policy,
+                "tool_results": request.options.tool_results,
             },
         )
         try:
-            execution_context = await self.workflow.run(request.input_text, execution_context)
+            with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+                execution_context = await self.workflow.run(request.input_text, execution_context)
         except WorkflowExecutionError as exc:
             execution_context = exc.context
         execution_context.metadata["workflow_trace"] = [
@@ -291,7 +345,12 @@ class PrimaRuntime:
             self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
             self.retrieval_controller = RetrievalController(
                 self.memory_index,
-                candidate_pool_size=int(os.getenv("PRIMA_RETRIEVAL_CANDIDATE_POOL_SIZE", "30")),
+                candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+                reranker=Reranker(
+                    enabled=self.runtime_config.reranker_enabled,
+                    backend=self.runtime_config.reranker_backend,
+                    model_name=self.runtime_config.reranker_model,
+                ),
             )
             self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
             self.workflow = PrimaWorkflow.from_controllers(
@@ -313,7 +372,7 @@ class PrimaRuntime:
 
     def _create_maintenance_supervisor(self) -> BackgroundMaintenanceSupervisor:
         event_bus = EventBus()
-        pipeline = MaintenancePipeline(self.memory_index, event_bus)
+        pipeline = MaintenancePipeline(self.memory_index, event_bus, batch_size=8)
         failure_store = (
             JsonlMaintenanceFailureStore(
                 self._maintenance_failure_path
@@ -358,16 +417,17 @@ class PrimaRuntime:
                     model=model,
                 ),
                 diagnostic_mode=DiagnosticMode.DIAGNOSTIC if diagnostics else DiagnosticMode.STANDARD,
-                metadata={
-                    "top_k": int(top_k) if top_k is not None else 5,
-                    "max_context_tokens": (
+                options=ExecutionOptions(
+                    top_k=int(top_k) if top_k is not None else 5,
+                    max_context_tokens=(
                         int(max_context_tokens)
                         if max_context_tokens is not None
                         else 1600
                     ),
-                    "max_hops": int(max_hops or 3),
-                    "reasoning_mode": mode.value,
-                },
+                    max_hops=int(max_hops or 3),
+                    max_retrieval_calls=int(max_hops or 3),
+                    reasoning_mode=mode.value,
+                ),
             )
         )
         result = self._answer_result_from_response(response)
@@ -408,6 +468,8 @@ class PrimaRuntime:
             "generation": self.generation_config.to_dict(),
             "provider_capabilities": dict(getattr(self.llm_client, "capabilities", {})),
             "maintenance": self.maintenance_supervisor.diagnostics(),
+            "runtime_config": self.runtime_config.model_dump(mode="json"),
+            "runtime_config_fingerprint": self.runtime_config.fingerprint,
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
@@ -544,6 +606,8 @@ class PrimaRuntime:
             )
         if isinstance(output.get("classification"), dict):
             output_data.update(output["classification"])
+        if isinstance(output.get("action"), dict):
+            output_data["action"] = output["action"]
         return PrimaResponse(
             request_id=request.request_id,
             task_kind=request.task_kind,
@@ -866,6 +930,7 @@ _CANONICAL_AVAILABLE = {
     RuntimeComponent.MEMORY_INDEX,
     RuntimeComponent.MEMORY_COMMIT,
     RuntimeComponent.MAINTENANCE_EVENTS,
+    RuntimeComponent.TOOL_EXECUTOR,
 }
 
 
@@ -916,6 +981,8 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     if WorkflowPhase.REFLECTION in completed:
         executed.add(RuntimeComponent.REFLECTION)
+    if WorkflowPhase.ACTION in completed and str(context.metadata.get("task_kind")) == "tool_request":
+        executed.add(RuntimeComponent.TOOL_EXECUTOR)
     if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
         executed.add(RuntimeComponent.MODEL_EXECUTOR)
     if WorkflowPhase.OUTPUT_VALIDATION in completed:
@@ -997,6 +1064,16 @@ def _route_diagnostics(
         if index_capabilities and not bool(index_capabilities.get("graph", False))
         else set()
     )
+    runtime_config = context.metadata.get("runtime_config")
+    disabled = set(unavailable)
+    if runtime_config is not None:
+        if not bool(getattr(runtime_config, "reranker_enabled", True)):
+            disabled.add(RuntimeComponent.RERANKER)
+    if not bool(context.metadata.get("context_compression_enabled", True)):
+        disabled.add(RuntimeComponent.CONTEXT_COMPRESSOR)
+    if not bool(maintenance.get("enabled", True)):
+        disabled.add(RuntimeComponent.MAINTENANCE_EVENTS)
+    enabled = tuple(component for component in route.components if component not in disabled)
     capabilities = tuple(
         ComponentCapability(
             component=component,
@@ -1032,6 +1109,13 @@ def _route_diagnostics(
         )
         for component in (RuntimeComponent.WORLD_MODEL, RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     }
+    component_details[RuntimeComponent.AFFECT_ENGINE.value] = {
+        "status": (
+            "executed" if RuntimeComponent.AFFECT_ENGINE in executed else "enabled_not_executed"
+            if RuntimeComponent.AFFECT_ENGINE in enabled else "disabled"
+        ),
+        "active_backend": getattr(runtime_config, "affect_backend", "unknown"),
+    }
     skipped_strategies = dict(retrieval_diagnostics.get("skipped_strategies", {}))
     for name, component in {
         "dense": RuntimeComponent.DENSE_RETRIEVAL,
@@ -1040,18 +1124,37 @@ def _route_diagnostics(
         "graph": RuntimeComponent.GRAPH_TRAVERSAL,
     }.items():
         component_details[component.value] = {
-            "status": "executed" if component in executed else "disabled",
+            "status": (
+                "executed" if component in executed else "disabled" if component not in enabled
+                else "enabled_not_executed"
+            ),
             "reason": skipped_strategies.get(name, "selected and invoked" if component in executed else "not selected"),
         }
+    component_details[RuntimeComponent.DENSE_RETRIEVAL.value]["active_backend"] = getattr(
+        runtime_config, "embedding_backend", "unknown"
+    )
     component_details[RuntimeComponent.GRAPH_REASONING.value] = {
-        "status": "executed" if RuntimeComponent.GRAPH_REASONING in executed else "disabled",
+        "status": (
+            "executed" if RuntimeComponent.GRAPH_REASONING in executed else "enabled_not_executed"
+            if RuntimeComponent.GRAPH_REASONING in enabled else "disabled"
+        ),
         "reason": (
             "centrality reasoning invoked by graph traversal"
             if RuntimeComponent.GRAPH_REASONING in executed
             else skipped_strategies.get("graph", "graph retrieval not selected")
         ),
     }
-    component_details[RuntimeComponent.RERANKER.value] = dict(retrieval_diagnostics.get("reranker", {}))
+    reranker_details = dict(retrieval_diagnostics.get("reranker", {}))
+    if not reranker_details:
+        reranker_details = {
+            "requested_backend": getattr(runtime_config, "reranker_backend", "unknown"),
+            "active_backend": getattr(runtime_config, "reranker_backend", "unknown"),
+        }
+    reranker_details["status"] = (
+        "executed" if RuntimeComponent.RERANKER in executed else "disabled"
+        if RuntimeComponent.RERANKER not in enabled else "enabled_not_executed"
+    )
+    component_details[RuntimeComponent.RERANKER.value] = reranker_details
     if context.compressed_context is not None:
         component_details[RuntimeComponent.CONTEXT_COMPRESSOR.value] = {
             **context.compressed_context.to_dict(),
@@ -1060,13 +1163,25 @@ def _route_diagnostics(
         }
     else:
         component_details[RuntimeComponent.CONTEXT_COMPRESSOR.value] = {
-            "status": "disabled",
+            "status": (
+                "enabled_not_executed"
+                if RuntimeComponent.CONTEXT_COMPRESSOR in enabled else "disabled"
+            ),
             "reason": "route has no evidence context",
         }
-    component_details[RuntimeComponent.MEMORY_INDEX.value] = index_capabilities
+    component_details[RuntimeComponent.MEMORY_INDEX.value] = {
+        **index_capabilities,
+        "status": (
+            "executed" if RuntimeComponent.MEMORY_INDEX in executed else "enabled_not_executed"
+            if RuntimeComponent.MEMORY_INDEX in enabled else "disabled"
+        ),
+    }
     component_details[RuntimeComponent.MAINTENANCE_EVENTS.value] = {
         **maintenance,
-        "status": "executed" if RuntimeComponent.MAINTENANCE_EVENTS in executed else "disabled",
+        "status": (
+            "executed" if RuntimeComponent.MAINTENANCE_EVENTS in executed else "enabled_not_executed"
+            if RuntimeComponent.MAINTENANCE_EVENTS in enabled else "disabled"
+        ),
         "reason": (
             "admitted-memory event enqueued"
             if RuntimeComponent.MAINTENANCE_EVENTS in executed
@@ -1079,7 +1194,12 @@ def _route_diagnostics(
         for event in context.metadata.get("workflow_trace", ())
         if isinstance(event, dict)
     )
-    retrieval_count = len(getattr(context.retrieval_response, "results", ()) or ())
+    retrieval_result_count = len(getattr(context.retrieval_response, "results", ()) or ())
+    reasoning = context.reasoning_result if isinstance(context.reasoning_result, AnswerResult) else None
+    budget_usage = {}
+    if reasoning is not None and reasoning.trace_summary:
+        budget_usage = dict(reasoning.trace_summary[-1].fields.get("budget_usage", {}))
+    retrieval_call_count = int(budget_usage.get("retrieval_calls", 0))
     provider_details = {
         "name": str(getattr(generation, "provider", "")),
         "model": str(getattr(generation, "model", "")),
@@ -1088,15 +1208,24 @@ def _route_diagnostics(
         "fallback_used": bool(getattr(generation, "fallback_used", False)),
         "fallback_reason": getattr(generation, "fallback_reason", None),
     }
-    reflection_count = sum(
+    workflow_reflection_count = sum(
         event.get("event_type") == "phase_completed" and event.get("phase") == "reflection"
         for event in trace
+    )
+    reasoning_attempts = (
+        tuple(reasoning.answer_diagnostics.get("reflection_attempts", ())) if reasoning is not None else ()
+    )
+    reasoning_reflection_count = int(budget_usage.get("reflection_interventions", 0))
+    accepted_correction_count = sum(attempt.accepted for attempt in context.correction_attempts) + sum(
+        item.get("type") == "ReflectionAccepted" for item in reasoning_attempts if isinstance(item, dict)
     )
     return RuntimeDiagnostics(
         route_name=route.name,
         planned_components=route.components,
+        enabled_components=enabled,
         executed_components=executed,
-        skipped_components=tuple(component for component in RuntimeComponent if component not in executed),
+        not_executed_components=tuple(component for component in route.components if component not in executed),
+        skipped_components=route.skipped_components,
         capabilities=capabilities,
         notes=(note,) if note else (),
         runtime_mode=mode,
@@ -1113,8 +1242,13 @@ def _route_diagnostics(
         maintenance=maintenance,
         diagnostic_mode=diagnostic_mode,
         latency_ms=latency_ms,
-        retrieval_count=retrieval_count,
-        reflection_count=reflection_count,
+        retrieval_count=retrieval_call_count,
+        retrieval_call_count=retrieval_call_count,
+        retrieval_result_count=retrieval_result_count,
+        reflection_count=workflow_reflection_count + reasoning_reflection_count,
+        workflow_reflection_count=workflow_reflection_count,
+        reasoning_reflection_count=reasoning_reflection_count,
+        accepted_correction_count=accepted_correction_count,
         model_call_count=int(context.metadata.get("model_call_count", 0)),
         model_usage=dict(context.metadata.get("model_usage", {})),
         provider=redact(provider_details, redact_prompts=redact_prompts),

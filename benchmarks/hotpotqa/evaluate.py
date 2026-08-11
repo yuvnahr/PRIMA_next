@@ -42,13 +42,11 @@ def supporting_fact_scores(prediction: Iterable[Iterable[Any]], gold: Iterable[I
 def project_supporting_facts(response_metadata: dict[str, Any]) -> tuple[list[list[Any]], list[dict[str, Any]]]:
     facts, provenance = [], []
     seen = set()
-    diagnostics = response_metadata.get("answer_diagnostics", {})
     generation = response_metadata.get("output_data", {}).get("generation", {})
-    selected = set(diagnostics.get("selected_memory_ids", generation.get("selected_source_ids", [])))
-    filter_selected = diagnostics.get("structured_answer_valid") is True
+    selected = set(generation.get("selected_source_ids", []))
     evidence_items = response_metadata.get("evidence", response_metadata.get("evidence_references", []))
     for evidence in evidence_items:
-        if filter_selected and evidence.get("source_id") not in selected:
+        if evidence.get("source_id") not in selected:
             continue
         metadata = evidence.get("metadata", {})
         source = evidence.get("provenance", metadata.get("provenance", {}))

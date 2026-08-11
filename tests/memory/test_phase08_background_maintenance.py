@@ -13,7 +13,10 @@ from memory.maintenance.background_supervisor import (
     MaintenanceBarrier,
     MaintenanceMode,
 )
+from memory.memory_index import MemoryIndex
+from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
+from memory.memory_types import MemoryType
 from runtime.contracts import ExecutionProfile, PrimaRequest, RuntimeComponent, TaskKind
 from runtime.prima_runtime import PrimaRuntime
 
@@ -201,6 +204,46 @@ def test_runtime_enqueues_and_flushes_the_real_cold_path(tmp_path) -> None:
     assert runtime.maintenance_supervisor.diagnostics()["failure_count"] == 0
 
 
+def test_runtime_batches_heavy_maintenance_until_flush(tmp_path) -> None:
+    runtime = PrimaRuntime(
+        memory_repository=InMemoryMemoryRepository(),
+        log_path=tmp_path / "runtime.log",
+    )
+
+    async def run() -> None:
+        await runtime.start_maintenance()
+        for text in ("First admitted memory.", "Second admitted memory."):
+            await runtime.execute(PrimaRequest(
+                task_kind=TaskKind.DOCUMENT_INGESTION,
+                profile=ExecutionProfile.INGESTION_ONLY,
+                input_text=text,
+            ))
+        await asyncio.sleep(0)
+        assert not runtime.maintenance_supervisor.event_bus.store.filter(
+            event_type=EventType.CONSOLIDATION_COMPLETED
+        )
+        await runtime.flush_maintenance()
+        await runtime.stop_maintenance()
+
+    asyncio.run(run())
+    completed = runtime.maintenance_supervisor.event_bus.store.filter(
+        event_type=EventType.CONSOLIDATION_COMPLETED
+    )
+    assert len(completed) == 1
+    assert completed[0].payload["batch_size"] == 2
+
+
+def test_graph_sync_is_lazy_for_preexisting_repository_rows() -> None:
+    repository = InMemoryMemoryRepository()
+    note = repository.add(MemoryNote.create("Preexisting graph memory.", MemoryType.SEMANTIC))
+    index = MemoryIndex.for_repository(repository)
+
+    assert index.graph_repository is not None
+    assert index.graph_repository.find_by_memory_id(note.id) is None
+    index.ensure_graph_index()
+    assert index.graph_repository.find_by_memory_id(note.id) is not None
+
+
 def test_maintenance_failures_are_visible_in_later_runtime_diagnostics(tmp_path) -> None:
     def fail(_event: Event) -> None:
         raise RuntimeError("cold-path failure")
@@ -289,7 +332,7 @@ def test_disabled_maintenance_is_explicitly_skipped(tmp_path) -> None:
         )
     )
 
-    assert RuntimeComponent.MAINTENANCE_EVENTS in response.diagnostics.skipped_components
+    assert RuntimeComponent.MAINTENANCE_EVENTS in response.diagnostics.not_executed_components
     details = response.diagnostics.component_details[RuntimeComponent.MAINTENANCE_EVENTS.value]
     assert details["status"] == "disabled"
     assert details["reason"] == "maintenance_disabled"

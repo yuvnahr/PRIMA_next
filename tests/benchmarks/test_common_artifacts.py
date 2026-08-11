@@ -132,6 +132,21 @@ def test_stable_ids_and_duplicate_suppression(tmp_path) -> None:
     assert len(store.checkpoints()) == 1
 
 
+def test_checkpoint_reconciles_orphan_derived_rows(tmp_path) -> None:
+    root = tmp_path / "run"
+    store = BenchmarkArtifactStore(root)
+    store.initialize(_manifest())
+    store.append_prediction(_prediction("orphan"))
+    store.append_checkpoint(_complete_checkpoint())
+
+    resumed = BenchmarkArtifactStore(root)
+    resumed.initialize(_manifest(campaign_id="campaign-b"))
+
+    prediction_rows = artifact_module.read_jsonl(resumed.layout.predictions)
+    assert [row["case_id"] for row in prediction_rows] == ["case-1"]
+    assert len(resumed._indexes[resumed.layout.checkpoints]) == 1
+
+
 def test_resume_rejects_changed_model_and_dataset() -> None:
     existing = _manifest()
     with pytest.raises(ResumeCompatibilityError, match="model"):

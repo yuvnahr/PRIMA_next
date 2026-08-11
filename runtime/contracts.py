@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from action.execution_policy import ExecutionPolicy
 from config.runtime_mode import RuntimeMode
 from llm.generation_config import GenerationConfig
 
@@ -52,6 +53,7 @@ class ExecutionOutcome(Enum):
     FAILED = "failed"
     INGESTED = "ingested"
     CLASSIFIED = "classified"
+    ACTIONED = "actioned"
     CANCELLED = "cancelled"
 
 
@@ -133,7 +135,9 @@ class RuntimeDiagnostics(ContractModel):
     schema_version: Literal["1.0"] = SCHEMA_VERSION
     route_name: str = "unplanned"
     planned_components: tuple[RuntimeComponent, ...] = ()
+    enabled_components: tuple[RuntimeComponent, ...] = ()
     executed_components: tuple[RuntimeComponent, ...] = ()
+    not_executed_components: tuple[RuntimeComponent, ...] = ()
     skipped_components: tuple[RuntimeComponent, ...] = ()
     capabilities: tuple[ComponentCapability, ...] = ()
     notes: tuple[str, ...] = ()
@@ -152,12 +156,50 @@ class RuntimeDiagnostics(ContractModel):
     diagnostic_mode: DiagnosticMode = DiagnosticMode.STANDARD
     latency_ms: float = 0.0
     retrieval_count: int = 0
+    retrieval_call_count: int = 0
+    retrieval_result_count: int = 0
     reflection_count: int = 0
+    workflow_reflection_count: int = 0
+    reasoning_reflection_count: int = 0
+    accepted_correction_count: int = 0
     model_call_count: int = 0
     model_usage: dict[str, int] = Field(default_factory=dict)
     provider: dict[str, Any] = Field(default_factory=dict)
     trace_event_count: int = 0
     trace_events: tuple[dict[str, Any], ...] = ()
+
+
+class ExecutionOptions(ContractModel):
+    """Trusted request-scoped execution controls kept outside caller metadata."""
+
+    top_k: int = Field(default=5, gt=0)
+    reasoning_mode: Literal["bypass", "single_pass", "adaptive", "deliberative", "diagnostic"] = "adaptive"
+    max_hops: int = Field(default=3, gt=0)
+    max_retrieval_calls: int = Field(default=3, gt=0)
+    max_context_tokens: int = Field(default=1600, gt=0)
+    context_compression_enabled: bool = True
+    required_reranker_backend: Literal["disabled", "lexical_fallback", "cross_encoder"] | None = None
+    execution_policy: ExecutionPolicy = Field(default_factory=ExecutionPolicy)
+    tool_results: tuple[str, ...] = ()
+
+
+_INTERNAL_CONTROL_KEYS = {
+    "route",
+    "task_kind",
+    "profile",
+    "generation_config",
+    "execution_policy",
+    "top_k",
+    "reasoning_mode",
+    "max_hops",
+    "max_retrieval_calls",
+    "max_context_tokens",
+    "context_compression_enabled",
+    "required_reranker_backend",
+    "retrieval_query_override",
+    "correction_budget",
+    "tool_results",
+}
 
 
 class PrimaRequest(ContractModel):
@@ -170,6 +212,7 @@ class PrimaRequest(ContractModel):
     input_text: str
     session_id: str | None = None
     generation_config: GenerationConfig | None = None
+    options: ExecutionOptions = Field(default_factory=ExecutionOptions)
     diagnostic_mode: DiagnosticMode = DiagnosticMode.STANDARD
     redact_prompts: bool = True
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -181,6 +224,16 @@ class PrimaRequest(ContractModel):
 
         if not value.strip():
             raise ValueError("input_text must not be empty")
+        return value
+
+    @field_validator("metadata")
+    @classmethod
+    def reject_internal_controls(cls, value: dict[str, Any]) -> dict[str, Any]:
+        """Keep untrusted metadata from changing workflow execution controls."""
+
+        forbidden = sorted(_INTERNAL_CONTROL_KEYS & {str(key) for key in value})
+        if forbidden:
+            raise ValueError(f"metadata contains reserved execution keys: {', '.join(forbidden)}")
         return value
 
     def to_dict(self) -> dict[str, Any]:

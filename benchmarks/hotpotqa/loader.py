@@ -27,7 +27,7 @@ class HotpotQADataset(BenchmarkDataset):
             raise ValueError(f"Invalid HotpotQA JSON at {path}: {exc}") from exc
         if not isinstance(data, list):
             raise ValueError(f"Invalid HotpotQA schema at {path}: top-level value must be a list")
-        seen = set()
+        seen: set[str] = set()
         for index, record in enumerate(data):
             self._validate_record(record, index, seen)
         self._records = data

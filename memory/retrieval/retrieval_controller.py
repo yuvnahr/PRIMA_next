@@ -60,6 +60,8 @@ class RetrievalController:
 
     def retrieve(self, request: RetrievalRequest) -> RetrievalResponse:
         request = self._prepare_request(request)
+        if request.profile == "prima_full":
+            self.memory_index.ensure_graph_index()
         candidate_top_k = max(request.top_k, self.candidate_pool_size, request.top_k * self.candidate_pool_multiplier)
         candidate_request = replace(request, top_k=candidate_top_k)
         active_strategies, skipped = self._strategies_for(request.profile)

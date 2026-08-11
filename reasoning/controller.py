@@ -203,7 +203,9 @@ class ReasoningController:
     ) -> AnswerResult:
         state.add_trace("ReasoningStopped", len(state.attempted_queries), stop_reason=stop_reason,
                         hop_count=len(state.attempted_queries), budget_usage={
-                            "retrieval_calls": state.retrieval_calls, "llm_calls": state.llm_calls, "context_tokens": state.context_tokens,
+                            "retrieval_calls": state.retrieval_calls, "llm_calls": state.llm_calls,
+                            "context_tokens": state.context_tokens,
+                            "reflection_interventions": state.reflection_interventions,
                         })
         result_diagnostics = dict(diagnostics or {})
         result_diagnostics["reflection_attempts"] = [

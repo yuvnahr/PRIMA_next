@@ -18,7 +18,9 @@ from benchmarks.common.contracts import BenchmarkManifest, RunStatus
 
 
 def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, Any]:
-    session = SharedProviderSession(config.provider, config.scheduler.max_gpu_requests)
+    session = SharedProviderSession(
+        config.provider, config.scheduler.max_gpu_requests, config.runtime
+    )
     preflight = run_preflight(config, session)
     store = CampaignManifestStore(config.output_root)
     manifest = store.initialize(config, preflight, resume=resume)
@@ -31,7 +33,14 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
         child = child_manifest_path(mode, mode_root)
         store.update_mode(mode.id, status="running", error=None)
         try:
-            result = execute_mode(config, mode, session, mode_root, resume=resume and child.is_file())
+            result = execute_mode(
+                config,
+                mode,
+                session,
+                mode_root,
+                resume=resume and child.is_file(),
+                cpu_workers=1 if config.scheduler.mode == "interleaved" else config.scheduler.cpu_workers,
+            )
             child_status = _child_status(child)
             if child_status is not RunStatus.COMPLETE:
                 raise ValueError(f"Benchmark {mode.id} returned without a complete validated child manifest")
@@ -96,9 +105,11 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
         telemetry = {"available": False, "error": str(exc)}
     telemetry["host_before"] = host_before
     telemetry["host_after"] = collect_host_telemetry(config.telemetry.gpu) if config.telemetry.enabled else {}
-    telemetry["gpu_peak_observed_memory_bytes"] = _observed_gpu_peak(
-        telemetry["host_before"], telemetry["host_after"]
-    )
+    telemetry["gpu_boundary_snapshots"] = {
+        "before": _gpu_memory(telemetry["host_before"]),
+        "after": _gpu_memory(telemetry["host_after"]),
+        "measurement": "campaign-boundary snapshots; not peak usage",
+    }
     current = store.read()
     write_aggregate(config.output_root, current.campaign_id, current.modes, comparisons, telemetry)
     statuses = {item.status for item in current.modes.values()}
@@ -126,14 +137,12 @@ def _compact_summary(result: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _observed_gpu_peak(before: dict[str, Any], after: dict[str, Any]) -> dict[str, int]:
-    peak: dict[str, int] = {}
-    for snapshot in (before, after):
-        gpu = snapshot.get("gpu", {}) if isinstance(snapshot, dict) else {}
-        for device in gpu.get("devices", ()) if isinstance(gpu, dict) else ():
-            key = str(device.get("index"))
-            peak[key] = max(peak.get(key, 0), int(device.get("memory_used_bytes", 0)))
-    return peak
+def _gpu_memory(snapshot: dict[str, Any]) -> dict[str, int]:
+    gpu = snapshot.get("gpu", {}) if isinstance(snapshot, dict) else {}
+    return {
+        str(device.get("index")): int(device.get("memory_used_bytes", 0))
+        for device in gpu.get("devices", ()) if isinstance(gpu, dict)
+    }
 
 
 def _child_status(path: Path) -> RunStatus | None:

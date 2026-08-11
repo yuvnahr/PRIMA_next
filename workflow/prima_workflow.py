@@ -174,7 +174,7 @@ class EvidenceAcquisitionController:
         mode = ReasoningMode(str(context.metadata.get("reasoning_mode", ReasoningMode.ADAPTIVE.value)))
         budget = ReasoningBudget(
             max_hops=int(context.metadata.get("max_hops", 3)),
-            max_retrieval_calls=int(context.metadata.get("max_hops", 3)),
+            max_retrieval_calls=int(context.metadata.get("max_retrieval_calls", 3)),
             max_context_tokens=int(context.metadata.get("max_context_tokens", 1600)),
         )
         result = self.reasoning_controller.answer(
@@ -713,7 +713,7 @@ class OutputController:
             raise RuntimeError("Output shaping requires a generation, ingestion, classification, or action result.")
         return {
             "text": None,
-            "outcome": GenerationOutcome.ANSWERED.value,
+            "outcome": "actioned",
             "action": context.action_result,
             "execution_id": context.execution_id,
         }
