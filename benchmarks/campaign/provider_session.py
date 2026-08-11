@@ -27,15 +27,22 @@ class FakeProvider(Provider):
         supported_fields=frozenset({"temperature", "top_p", "top_k", "repeat_penalty", "seed", "max_output_tokens"}),
     )
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, delay_seconds: float = 0.0) -> None:
+        self.delay_seconds = delay_seconds
 
     def validate(self, request: LLMRequest) -> None:
         if request.response_schema and request.generation.structured_output is not StructuredOutputMode.JSON_SCHEMA:
             raise ValueError("response schema requires JSON_SCHEMA mode")
 
     def send(self, request: LLMRequest) -> LLMResponse:
-        text = '{"labels":["joy"]}' if "GoEmotions taxonomy" in request.prompt else "Alpha"
+        if self.delay_seconds:
+            time.sleep(self.delay_seconds)
+        if "GoEmotions taxonomy" in request.prompt:
+            text = '{"labels":["joy"]}'
+        elif request.response_schema:
+            text = '{"answer":"Alpha","evidence":[],"insufficient_information":false}'
+        else:
+            text = "Alpha"
         prompt_tokens = len(request.prompt.split())
         return LLMResponse(
             text=text,
@@ -50,7 +57,11 @@ class SharedProviderSession:
 
     def __init__(self, config: ProviderConfig, max_active_requests: int) -> None:
         started = time.perf_counter()
-        provider: Any = FakeProvider() if config.kind == "fake" else ProviderFactory.get_provider(config.kind)
+        provider: Any = (
+            FakeProvider(config.fake_delay_seconds)
+            if config.kind == "fake"
+            else ProviderFactory.get_provider(config.kind)
+        )
         if config.endpoint and hasattr(provider, "base_url"):
             provider.base_url = config.endpoint
         self.provider = _BoundedProvider(provider, max_active_requests)

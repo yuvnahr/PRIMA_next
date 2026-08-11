@@ -39,17 +39,26 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
             store.update_mode(
                 mode.id,
                 status="complete",
-                child_manifest=str(child),
+                child_manifest=_child_reference(child, config.output_root),
                 summary=_compact_summary(result),
             )
             return result
+        except (KeyboardInterrupt, SystemExit) as exc:
+            valid_child = _child_status(child)
+            store.update_mode(
+                mode.id,
+                status="partial" if valid_child is not None else "failed",
+                child_manifest=_child_reference(child, config.output_root) if valid_child is not None else None,
+                error=f"{type(exc).__name__}: campaign interrupted",
+            )
+            raise
         except Exception as exc:
             valid_child = _child_status(child)
             state = "partial" if valid_child is not None else "failed"
             store.update_mode(
                 mode.id,
                 status=state,
-                child_manifest=str(child) if valid_child is not None else None,
+                child_manifest=_child_reference(child, config.output_root) if valid_child is not None else None,
                 error=str(exc),
             )
             if not config.failure_policy.continue_benchmark_failures:
@@ -71,8 +80,8 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
                 raise ValueError("both paired modes must be complete")
             comparisons[spec.id] = compare(
                 spec,
-                Path(left_state.child_manifest or ""),
-                Path(right_state.child_manifest or ""),
+                _child_path(config.output_root, left_state.child_manifest),
+                _child_path(config.output_root, right_state.child_manifest),
                 results[spec.left],
                 results[spec.right],
                 config.provider.revision,
@@ -134,3 +143,14 @@ def _child_status(path: Path) -> RunStatus | None:
         return BenchmarkManifest.model_validate_json(path.read_text(encoding="utf-8")).status
     except (OSError, ValueError):
         return None
+
+
+def _child_reference(path: Path, root: Path) -> str:
+    return path.resolve().relative_to(root.resolve()).as_posix()
+
+
+def _child_path(root: Path, reference: str | None) -> Path:
+    if not reference:
+        raise ValueError("paired mode has no child manifest")
+    path = Path(reference)
+    return path if path.is_absolute() else root / path

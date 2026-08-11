@@ -28,7 +28,7 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
                 if not path.is_file():
                     raise FileNotFoundError(f"GoEmotions campaign file not found: {path}")
                 hashes[name] = _hash(path)
-        datasets[mode.id] = {"path": str(mode.dataset_path), "hashes": hashes}
+        datasets[mode.id] = {"path": mode.dataset_path.name, "hashes": hashes}
         if mode.context_budget > config.provider.context_window:
             raise ValueError(
                 f"Mode {mode.id} requires context budget {mode.context_budget}, "
@@ -85,7 +85,7 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
         "context_window": config.provider.context_window,
         "structured_output": {"required": requires_schema, "available": schema_available},
         "optional_metrics": {name: capabilities[name] for name in requested},
-        "output": {"path": str(config.output_root), "writable": True, "free_disk_gb": free_gb},
+        "output": {"path": ".", "writable": True, "free_disk_gb": free_gb},
         "repository_modes": {mode.id: mode.repository_mode for mode in config.benchmarks},
         "gpu_scheduling": {
             "mode": config.scheduler.mode,

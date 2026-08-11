@@ -345,4 +345,12 @@ and fail validation until explicitly supplied. GPU inference is serialized by
 default (`max_gpu_requests: 1`), including interleaved campaigns; CPU-side benchmark
 work may overlap.
 
+Release validation is documented in
+`docs/implementation/RELEASE_READINESS.md`. The Phase 15 gate uses the fixture
+campaign only: it runs all three canonical benchmark routes, exercises real process
+interruption and item-level resume, audits artifacts, and verifies bounded inference.
+It deliberately does not launch a full-dataset or GPU campaign. Operational commands,
+claim boundaries, and failure recovery are in `docs/benchmarks/RUNBOOK.md`,
+`docs/benchmarks/RESULT_CLAIM_POLICY.md`, and `docs/TROUBLESHOOTING.md`.
+
 Runtime knobs live in `.env`; `.env.example` documents the expected keys.

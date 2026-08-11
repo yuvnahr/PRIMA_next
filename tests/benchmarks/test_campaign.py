@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
+import signal
+import subprocess
+import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -81,6 +86,17 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
 
     store = CampaignManifestStore(config.output_root)
     manifest = store.read()
+    assert all(
+        state.child_manifest and not Path(state.child_manifest).is_absolute()
+        for state in manifest.modes.values()
+    )
+    artifact_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in config.output_root.rglob("*")
+        if path.is_file() and path.suffix in {".json", ".jsonl", ".md"}
+    )
+    assert str(REPOSITORY) not in artifact_text
+    assert str(tmp_path) not in artifact_text
     store.update_mode("hotpot", status="partial")
     second = run_campaign(config, resume=True)
     assert second["campaign_id"] == manifest.campaign_id
@@ -169,3 +185,49 @@ def test_isolated_mode_failure_does_not_corrupt_other_modes(tmp_path: Path, monk
     assert result["modes"]["hotpot"]["status"] == "failed"
     assert result["modes"]["go"]["status"] == "complete"
     assert result["modes"]["locomo"]["status"] == "complete"
+
+
+@pytest.mark.parametrize("interrupt", ["sigint", "sigterm"])
+def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, interrupt: str) -> None:
+    payload = _payload(tmp_path / interrupt)
+    payload["provider"]["fake_delay_seconds"] = 0.4
+    payload["benchmarks"] = [payload["benchmarks"][1]]
+    config_path = tmp_path / f"{interrupt}.json"
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+    process = subprocess.Popen(  # noqa: S603  # nosec B603 - fixed interpreter and module
+        [sys.executable, "-m", "benchmarks.campaign.cli", "run", "--config", str(config_path)],
+        cwd=REPOSITORY,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        creationflags=creationflags,
+    )
+    checkpoint = (
+        Path(payload["output_root"])
+        / "modes"
+        / "hotpot"
+        / "distractor"
+        / "model_only"
+        / "checkpoints"
+        / "records.jsonl"
+    )
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline and len(read_jsonl(checkpoint)) < 1:
+        if process.poll() is not None:
+            pytest.fail(f"campaign exited before interruption with {process.returncode}")
+        time.sleep(0.02)
+    assert len(read_jsonl(checkpoint)) == 1
+    if interrupt == "sigint":
+        process.send_signal(signal.CTRL_BREAK_EVENT if os.name == "nt" else signal.SIGINT)
+    else:
+        process.send_signal(signal.SIGTERM)
+    process.wait(timeout=10)
+    assert process.returncode != 0
+
+    config = load_campaign_config(config_path)
+    result = run_campaign(config, resume=True)
+    assert result["status"] == "complete"
+    checkpoints = read_jsonl(checkpoint)
+    predictions = read_jsonl(checkpoint.parents[1] / "predictions" / "records.jsonl")
+    assert len(checkpoints) == len({row["case_id"] for row in checkpoints}) == 2
+    assert len(predictions) == len({row["case_id"] for row in predictions}) == 2

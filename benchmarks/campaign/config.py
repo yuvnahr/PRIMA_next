@@ -29,6 +29,7 @@ class ProviderConfig(ConfigModel):
     max_output_tokens: int = Field(default=128, gt=0)
     timeout_seconds: float = Field(default=60.0, gt=0)
     retries: int = Field(default=0, ge=0)
+    fake_delay_seconds: float = Field(default=0.0, ge=0.0)
 
 
 class SchedulerConfig(ConfigModel):
