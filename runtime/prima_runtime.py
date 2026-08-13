@@ -954,10 +954,12 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
                 RuntimeComponent.QUERY_REWRITER,
                 RuntimeComponent.MEMORY_INDEX,
                 RuntimeComponent.FUSION,
-                RuntimeComponent.RERANKER,
                 RuntimeComponent.CONFIDENCE_ESTIMATOR,
             )
         )
+        reranker = retrieval_diagnostics.get("reranker", {})
+        if isinstance(reranker, dict) and reranker.get("active_backend") != "disabled":
+            executed.add(RuntimeComponent.RERANKER)
         strategy_components = {
             "dense": RuntimeComponent.DENSE_RETRIEVAL,
             "sparse": RuntimeComponent.SPARSE_RETRIEVAL,

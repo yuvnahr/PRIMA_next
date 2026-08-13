@@ -5,6 +5,7 @@ import asyncio
 import pytest
 from pydantic import ValidationError
 
+from config.runtime_config import RuntimeConfig
 from llm.generation_config import GenerationConfig
 from llm.llm_types import LLMResponse
 from memory.memory_note import MemoryNote
@@ -90,6 +91,30 @@ def test_retrieval_calls_results_and_budget_are_distinct(tmp_path) -> None:
     executed = set(response.diagnostics.executed_components)
     assert planned == executed | set(response.diagnostics.not_executed_components)
     assert executed <= set(response.diagnostics.enabled_components) <= planned
+
+
+def test_disabled_reranker_is_not_reported_as_executed(tmp_path) -> None:
+    repository = InMemoryMemoryRepository()
+    repository.add(MemoryNote.create("Alpha evidence", MemoryType.SEMANTIC))
+    response = asyncio.run(
+        PrimaRuntime(
+            llm_client=_Client(),
+            generation_config=GenerationConfig(model="fixture", provider="test"),
+            memory_repository=repository,
+            runtime_config=RuntimeConfig(reranker_enabled=False, reranker_backend="disabled"),
+            log_path=tmp_path / "runtime.log",
+        ).execute(
+            PrimaRequest(
+                task_kind=TaskKind.FACTUAL_QA,
+                profile=ExecutionProfile.SIMPLE_RAG,
+                input_text="What is Alpha?",
+                options=ExecutionOptions(reasoning_mode="single_pass"),
+            )
+        )
+    )
+    assert RuntimeComponent.RERANKER not in response.diagnostics.executed_components
+    assert RuntimeComponent.RERANKER not in response.diagnostics.enabled_components
+    assert response.diagnostics.component_details[RuntimeComponent.RERANKER.value]["status"] == "disabled"
 
 
 def test_tool_request_has_typed_action_outcome_and_executor_diagnostics(tmp_path) -> None:
