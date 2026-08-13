@@ -1,3 +1,0 @@
-recall_at_1,recall_at_5,recall_at_10,mrr,ndcg_at_5,candidate_generation_success,candidate_miss_rate,expected_rank,similarity_margin,backend,representation,identity_enabled,backend_fingerprint,status,embedding_time_seconds,retrieval_time_seconds,execution_time_seconds,query_count,entity_resolution_success
-0.186345,0.409464,0.515587,0.326786,0.314753,0.734209,0.265791,13.055584,-0.503195,nomic,raw,False,2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a,completed,274.194135,110.641954,385.092674,1979,0.0
-0.176657,0.392039,0.495895,0.313333,0.30085,0.715513,0.284487,13.611925,-0.53704,nomic,raw,True,2289b0cdb75f194181ad6954e282da28bea598595b8a5d8c5f4b554bdba2a54a,completed,275.16113,108.827956,384.230325,1979,0.0

@@ -1,1 +1,0 @@
-{"status":"PASS","dry_run":true,"cli":"python -m memory.embedding_rebuild --dry-run"}

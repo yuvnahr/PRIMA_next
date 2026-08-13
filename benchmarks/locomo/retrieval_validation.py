@@ -56,7 +56,7 @@ def run_locomo_retrieval_validation(
     output_path.mkdir(parents=True, exist_ok=True)
     dataset_path = Path(dataset_path)
     dataset_available = dataset_path.exists()
-    dataset_used = dataset_path if dataset_available else Path("benchmarks/locomo/outputs/processed/locomo_smoke.json")
+    dataset_used = dataset_path if dataset_available else Path("benchmarks/locomo/locomo_smoke.json")
     conversations = list(LoCoMoDataset(dataset_used).conversations())
     records = _build_records(conversations)
     configs = _configs()
@@ -1473,7 +1473,7 @@ def _debug_readme(report: dict[str, Any], output_path: Path) -> str:
         "",
         "```bash",
         "python -m compileall memory/retrieval benchmarks/locomo runtime",
-        "python -m benchmarks.locomo.retrieval_validation --dataset-path benchmarks/locomo/outputs/processed/locomo_debug_100.json --output-dir benchmarks/locomo/outputs --top-k 5",
+        "python -m benchmarks.locomo.retrieval_validation --dataset-path benchmarks/locomo/locomo_smoke.json --output-dir benchmarks/locomo/outputs --top-k 5",
         "python -m benchmarks.locomo.retrieval_validation --dataset-path benchmarks/locomo/external/data/locomo10.json --output-dir benchmarks/locomo/outputs/debug_full --top-k 5",
         "```",
         "",

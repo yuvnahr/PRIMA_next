@@ -1,378 +1,103 @@
-# PRIMA-NEXT Cognitive Subsystems
+# PRIMA-NEXT
 
-Python reimplementation of the PRIMA affect subsystem, PRIMA-NEXT hierarchical memory fabric, and PRIMA-NEXT adaptive reflection pillar. The packages preserve legacy AWARE/A-MEM/Reflexion behavior while exposing stateful, structured APIs for the newer architecture.
+PRIMA-NEXT is an experimental Python runtime for building AI agents that can remember, reason, plan, reflect, and act through controlled tools.
 
-## Architecture
+In simple terms: a request enters one runtime, the runtime chooses the needed cognitive components, and it returns a typed answer with diagnostics. The project is designed for local research, reproducible benchmarks, and safe extension.
 
-The affect subsystem sits on the input-processing path:
+## What it includes
 
-```text
-Input Processing -> Affect Engine -> Persistent Cognitive State
-```
+- Long- and short-term memory with dense, sparse, temporal, and graph retrieval.
+- Emotion-aware state and retrieval signals.
+- Planning, uncertainty checks, world simulation, and bounded reflection.
+- Provider-backed language-model calls with structured output.
+- Policy-gated tools with validation, timeouts, and audit records.
+- HotpotQA, LoCoMo, and GoEmotions benchmark integrations.
 
-It does not orchestrate retrieval, planning, reflection, memory consolidation, or memory writes. It emits structured metadata those subsystems may consume.
-
-The memory subsystem sits between persistent cognitive state and expanded hybrid retrieval:
-
-```text
-Persistent Cognitive State -> Retrieval Controller -> Hierarchical Memory Fabric -> Expanded Hybrid Retrieval
-```
-
-It does not call planner, reflection, action, or LLM layers directly.
-
-The reflection subsystem sits after retrieval confidence and before memory storage/future retrieval:
-
-```text
-Retrieval -> Retrieval Confidence -> Adaptive Reflection -> Reflection Memories -> Memory Fabric
-```
-
-It emits reflection signals, reflection memories, rules, confidence estimates, and state updates. It does not directly control retrieval, affect, memory consolidation, planning, or action execution.
-
-The planning layer sits between memory retrieval and reflection/action:
-
-```text
-Persistent Cognitive State + Retrieved Memory Context + Affective Priors + Reflection Signals -> Task Planner -> Plan
-```
-
-It emits structured plans, actions, execution intent, constraints, simulations, and replanning lineage. It does not execute tools, invoke LLMs, or orchestrate other subsystems.
-
-The action layer sits after planning and reflection:
-
-```text
-Plan -> Action Executor -> Policy-Gated Tool Router -> Registered Tool Handler -> Execution Result
-```
-
-It converts plans into bounded execution results. It validates arguments, enforces sandbox policy, audits tool calls, and only dispatches explicitly registered handlers. It does not allow arbitrary command execution or bypass validation.
-
-The event layer provides in-process asynchronous communication:
-
-```text
-Workflow Memory Commit -> Typed Event -> Bounded Maintenance Supervisor -> Cold-Path Engines -> Event Store
-```
-
-Memory admission is published without awaiting encoding, salience, consolidation, abstraction, graph refresh, or decay. One local asyncio supervisor owns bounded queueing, retries, cancellation, idempotency by event ID, deterministic flush barriers, and failure diagnostics. Production failures are appended to a versioned JSONL store; no external broker is required.
-
-## Package Layout
-
-```text
-affect/
-  affect_engine.py              # DynamicAffectEngine entrypoint
-  affect_state.py               # compatibility exports
-  affect_types.py               # AffectUpdate and reflection signals
-  emotion_classifier.py         # legacy-compatible classifier and cache hook
-  emotion_profile.py            # immutable single-input profile
-  emotion_history.py            # rolling history with velocity/acceleration/drift
-  pad_model.py                  # immutable PADState model
-  affect_evolution.py           # momentum, volatility, dissonance
-  emotional_memory_adapter.py   # metadata generation only
-  salience_modulation.py        # salience score
-  retrieval_priors.py           # retrieval priors, no retrieval calls
-  reflection_triggers.py        # reflection signals, no reflection calls
-  emotion_cache.py              # lightweight LRU cache
-  interfaces.py                 # Numpy/Faiss similarity backend abstraction
-state/
-  emotional_state.py            # persistent emotional state
-  cognitive_state.py            # integration container
-tests/
-  affect/                       # deterministic unit tests
-memory/
-  memory_note.py                 # metadata-rich memory note and A-MEM formatter
-  memory_repository.py           # Chroma/in-memory repository layer
-  memory_store.py                # logical store wrapper
-  stores/                        # working, episodic, semantic, emotional stores
-  graph/                         # persistent graph nodes, edges, traversal, reasoning
-  retrieval/                     # dense, sparse, temporal, graph, fusion, confidence
-  evolution/                     # semantic abstraction, lineage, evolution engine
-  maintenance/                   # salience, retention, soft forgetting, consolidation
-reflection/
-  adaptive_reflection_pipeline.py # verifier -> reflection -> retry -> ExpeL flow
-  reflection_engine.py           # state-aware trigger scoring and signal/memory output
-  reflection_context.py          # query, memory, affect, state, confidence context
-  verifier_adapter.py            # PASS parsing, fuzzy matching, grounding checks
-  failure_classifier.py          # typed failure source classification
-  rule_extractor.py              # ExpeL-style rule distillation
-  reflection_repository.py       # reflection/rule repository with Memory Fabric adapter
-planning/
-  task_planner.py                 # pure planner facade with replanning support
-  plan.py                         # immutable plan, action, constraint, intent, simulation models
-  planning_context.py             # workflow-routed context adapter
-  goal_selector.py                # state-aware goal selection
-  action_selector.py              # pure action and execution intent selection
-  plan_evaluator.py               # deterministic simulation and plan evaluation
-  planning_types.py               # planning enums
-tests/
-  retrieval/
-  graph/
-  evolution/
-  lineage/
-  reflection/
-workflow/
-  prima_workflow.py               # high-level Cognitive Control Bus facade
-  orchestration_engine.py         # lifecycle, retries, cancellation, event publication
-  execution_context.py            # per-request state and routed subsystem outputs
-  workflow_state.py               # phase/status models
-  task_router.py                  # phase routing
-  controller_registry.py          # dependency-injected controller pattern
-  workflow_events.py              # async in-process event bus
-action/
-  action_executor.py              # plan-to-execution facade
-  action_context.py               # workflow-provided action context and audit records
-  execution_result.py             # aggregate and per-step execution results
-  tool_invocation.py              # typed tool/external/environment invocation requests
-  execution_policy.py             # sandbox policy and policy decisions
-tools/
-  tool_router.py                  # explicit registry-based routing
-  tool_registry.py                # registered safe tool handlers and schemas
-  tool_executor.py                # policy, validation, timeout, audit, execution
-  tool_validator.py               # declarative argument validation and sanitization
-  tool_result.py                  # structured tool execution results
-events/
-  event.py                        # immutable event envelope
-  event_bus.py                    # asyncio in-process publish/subscribe bus
-  event_types.py                  # canonical event type enum
-  subscribers.py                  # filtered subscriber records and registry
-  publishers.py                   # helper publisher factories for common events
-  event_store.py                  # append-only in-memory event history
-```
-
-## Usage
-
-Canonical runtime requests keep caller metadata informational. Routing, retrieval,
-budget, reranker, compression, tool, and execution-policy controls belong only in
-typed `ExecutionOptions`; reserved control names in `PrimaRequest.metadata` are
-rejected.
-
-```python
-from runtime import ExecutionOptions, ExecutionProfile, PrimaRequest, PrimaRuntime, TaskKind
-
-response = await PrimaRuntime().execute(PrimaRequest(
-    task_kind=TaskKind.FACTUAL_QA,
-    profile=ExecutionProfile.SIMPLE_RAG,
-    input_text="What identifies Bridge?",
-    options=ExecutionOptions(max_retrieval_calls=1, max_context_tokens=1024),
-))
-```
-
-```python
-from affect import DynamicAffectEngine
-
-engine = DynamicAffectEngine()
-update = engine.process("I am really scared and nervous about my exam")
-
-print(update.profile.dominant_emotion)
-print(update.retrieval_priors)
-print(update.reflection_signals)
-print(update.memory_metadata)
-```
-
-Backward-compatible helper:
-
-```python
-from affect import get_emotion_profile
-
-profile = get_emotion_profile("I feel very happy today")
-```
-
-Memory fabric:
-
-```python
-from memory import InMemoryMemoryRepository
-from memory.memory_note import MemoryNote
-from memory.retrieval.retrieval_controller import RetrievalController
-from memory.retrieval.retrieval_request import RetrievalRequest
-
-repository = InMemoryMemoryRepository()
-repository.add(MemoryNote.create("I baked sourdough bread for the party"))
-
-response = RetrievalController(repository).retrieve(RetrievalRequest(query="sourdough party"))
-print(response.results[0].note.content)
-print(response.confidence)
-```
-
-Adaptive reflection:
-
-```python
-from reflection import AdaptiveReflectionPipeline
-
-pipeline = AdaptiveReflectionPipeline()
-result = pipeline.run_answer_trial(
-    query="Who was Milhouse named after?",
-    proposals=["Abraham Lincoln", "Richard Nixon"],
-    ground_truth="Richard Nixon",
-    retrieved_content="Milhouse was named after Richard Nixon.",
-)
-
-print(result.is_correct)
-print(result.extracted_rules)
-```
-
-Pure planning:
-
-```python
-from planning import PlanningContext, TaskPlanner
-
-context = PlanningContext(objective="Answer using retrieved memory")
-plan = TaskPlanner().create_plan(context)
-
-print(plan.execution_intent.intent_type)
-print(plan.simulation.predicted_confidence if plan.simulation else None)
-```
-
-Cognitive workflow:
-
-```python
-from affect import DynamicAffectEngine
-from memory import InMemoryMemoryRepository
-from memory.retrieval.retrieval_controller import RetrievalController
-from reflection import ReflectionEngine
-from workflow import PrimaWorkflow
-
-repository = InMemoryMemoryRepository()
-workflow = PrimaWorkflow.from_controllers(
-    affect_engine=DynamicAffectEngine(),
-    retrieval_controller=RetrievalController(repository),
-    reflection_engine=ReflectionEngine(),
-)
-
-context = await workflow.run("I am nervous about tomorrow")
-print(context.output)
-```
-
-Policy-gated action execution:
-
-```python
-from action import ActionContext, ActionExecutor, ExecutionPolicy
-
-policy = ExecutionPolicy(
-    allowed_tools=("safe_lookup",),
-    allow_external_actions=True,
-    allowed_sandbox_tags=("read_only",),
-)
-result = await ActionExecutor(tool_executor=my_tool_executor).execute(ActionContext(plan=plan, policy=policy))
-
-print(result.status)
-print(result.audit_log)
-```
-
-Async events:
-
-```python
-from events import EventBus, EventPublisher, EventType
-
-bus = EventBus()
-bus.subscribe(handle_memory_created, event_types=(EventType.MEMORY_CREATED,), topics=("memory",))
-
-publisher = EventPublisher(source="memory.repository", topic="memory")
-await bus.publish(publisher.memory_created("mem_123"))
-```
-
-## Design Notes
-
-- Deterministic local fallback classifier is included so tests and PRIMA state behavior do not require network downloads.
-- Legacy scoring semantics are preserved: nearest-neighbor rank weighting, score normalization, intensity modifiers, and Plutchik-style negation flipping.
-- FAISS is optional. The default backend is NumPy.
-- `EmotionalMemoryAdapter` only creates metadata. It never writes memory.
-- Retrieval priors and reflection signals are emitted as data, not acted on directly.
-- Memory fabric preserves dominant context chain extraction, smart keyword overlap boosting, hybrid retrieval, graph clustering, semantic evolution, and lineage.
-- ChromaDB is the intended persistence source of truth; an in-memory repository is included for deterministic tests and local development.
-- Forgetting is soft: background maintenance lowers retention and suppresses retrieval rather than hard-deleting notes.
-- Reflection preserves verifier-driven retry behavior, fuzzy answer matching, grounding validation, rejected-action feedback, and ExpeL rule extraction.
-- Reflection consumes affect signals and retrieval confidence as data; it does not call affect or retrieval internals.
-- Planning consumes workflow-routed state, retrieved memory summaries, affective priors, and reflection signals as data.
-- Planning produces structured plans with constraints, simulated transitions, evaluation scores, and replanning lineage.
-- Planning is pure reasoning: it never executes tools, dispatches actions, invokes LLMs, or writes memory.
-- Workflow is the sole subsystem coordinator: user input flows through affect, memory retrieval, planning, reflection, action, and output via injected controllers.
-- Workflow owns lifecycle state, execution context, event publication, retries, and cooperative cancellation.
-- Action execution is sandbox-first: external tools are blocked by default, registered handlers are allowlisted by policy, arguments are schema-validated, and every invocation is audited.
-- Tool execution supports tool calls, external actions, and environment operations only through typed `ToolInvocationKind` values and registered handlers; there is no arbitrary execution path.
-- Events are local and async. Async applications explicitly start/flush/stop the runtime maintenance lifecycle; benchmark adapters select `disabled`, `eventual`, or a named deterministic flush barrier. The queue and completed-event set are process-local and are not durable across process loss; production persists terminal maintenance failures only. Heavy consolidation/evolution is batched and flushed at barriers. Kafka, Redis, RabbitMQ, and other external brokers are intentionally out of scope.
+PRIMA-NEXT is research software. It is not yet a hosted assistant or a production service.
 
 ## Setup
 
+Requirements:
+
+- Windows PowerShell
+- Python 3.10 or newer
+- Git
+
+From the repository root, run one command:
+
 ```powershell
-python -m venv .venv
-. .venv/Scripts/Activate.ps1
-pip install -r requirements.txt
-python -m pytest -q
+.\setup.ps1
 ```
 
-Supervised affect evaluation:
+The script creates `.venv`, installs the development and benchmark dependencies, initializes Git submodules, and creates a local `.env` from `.env.example` when needed. It never overwrites an existing `.env`.
+
+If PowerShell blocks local scripts, use:
 
 ```powershell
-python -m evaluation.runners.emotion_eval_runner
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
-The default runner evaluates PRIMA Affect against `evaluation/datasets/emotion_gold.json` and writes metrics to `evaluation/results/emotion_eval_results.json`. Transformer baselines are disabled by default to avoid network access; set `PRIMA_ENABLE_TRANSFORMER_BASELINES=1` only when local model weights are available.
+## Quick start
 
-Rule-set checks after installing development dependencies:
+Activate the environment and run the small affect demo:
 
 ```powershell
+. .\.venv\Scripts\Activate.ps1
+python main.py
+```
+
+Use the canonical runtime from Python:
+
+```python
+import asyncio
+
+from runtime import ExecutionOptions, ExecutionProfile, PrimaRequest, PrimaRuntime, TaskKind
+
+
+async def main() -> None:
+    response = await PrimaRuntime().execute(
+        PrimaRequest(
+            task_kind=TaskKind.FACTUAL_QA,
+            profile=ExecutionProfile.SIMPLE_RAG,
+            input_text="What should I remember?",
+            options=ExecutionOptions(max_retrieval_calls=1),
+        )
+    )
+    print(response.output_text)
+
+
+asyncio.run(main())
+```
+
+Configuration values and provider examples are documented in `.env.example`. The runtime has deterministic local fallbacks, so the test suite does not require a model download or API key.
+
+## Development
+
+Run the same quality checks used by CI:
+
+```powershell
+python -m benchmarks.preflight --json
+python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
 python -m pytest -q
 python -m ruff check .
+python scripts/run_xenon.py
 python -m mypy .
-python -m bandit -c bandit.yaml -r .
-python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
+python -m bandit -q -c bandit.yaml -r .
 ```
 
-Dependencies are split into `requirements-core.txt`, `requirements-dev.txt`, and
-`requirements-benchmark.txt`. `requirements.txt` installs those three groups.
-Semantic metrics and encoder/training dependencies are opt-in through
-`requirements-semantic-metrics.txt` and `requirements-encoder.txt`.
+Optional encoder/training dependencies live in `requirements-encoder.txt`; optional semantic metrics live in `requirements-semantic-metrics.txt`. Benchmark instructions are in [benchmarks/README.md](benchmarks/README.md), and operational details are in [docs/benchmarks/RUNBOOK.md](docs/benchmarks/RUNBOOK.md).
 
-Check optional benchmark capabilities without installing or importing them:
+## Project structure
 
-```powershell
-python -m benchmarks.preflight
-```
+- `runtime/` provides the public request/response boundary.
+- `workflow/` coordinates the selected cognitive components.
+- `memory/`, `affect/`, `reasoning/`, `planning/`, and `reflection/` contain the core subsystems.
+- `action/` and `tools/` enforce controlled execution.
+- `benchmarks/` and `evaluation/` contain research and validation code.
+- `tests/` contains deterministic unit, integration, architecture, and release checks.
 
-LoCoMo core metrics do not require semantic-metric extras. Its built-in deterministic
-ROUGE-L is enabled only with `--rouge-l`; BERTScore is enabled only with
-`--bertscore` and accepts explicit device and batch-size options. LoCoMo defaults to
-a one-conversation preview; an unlimited run requires `--full-dataset`.
+## Contact and license
 
-GoEmotions is an affect/classification component benchmark, not a full QA-wrapper
-benchmark. Every example uses `TaskKind.EMOTION_CLASSIFICATION` through the bounded
-`affect_only` route; retrieval, QA reasoning, world simulation, and tools remain off.
-Run the complete test split with resumable per-example checkpoints using:
+[Yuv Nahar](https://github.com/yuvnahr) is the project lead and primary contact. Everyone represented in the Git history is listed in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
-```powershell
-python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision
-python -m benchmarks.goemotions.experiment --system bounded_prima_affect_decision --resume
-```
-
-Available systems distinguish model-only zero-shot, schema-constrained model-only,
-telemetry that preserves model labels, the bounded affect decision layer, and a
-separately attributed trained encoder baseline. Reports exclude parse recovery from
-the headline paired affect comparison and label the multilabel matrix as label
-co-occurrence.
-
-Run GoEmotions, HotpotQA, and LoCoMo as one resumable campaign with one shared,
-bounded provider session:
-
-```powershell
-python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
-python -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
-```
-
-Campaign preflight fingerprints the effective typed runtime configuration and the
-task-specific generation contract, including factual-QA JSON-schema mode. Every QA
-mode must satisfy `context_budget + max_output_tokens + safety_overhead_tokens <=
-context_window`. Checkpoints are the authoritative crash-consistent item record;
-prediction and failure JSONL files are deterministic mirrors reconciled on resume.
-
-The smoke configuration uses fixture data and a deterministic fake provider. Copy
-`benchmarks/campaign/full_gpu.example.yaml` for a real campaign; its endpoint, model,
-revision, datasets, and output directory remain unresolved environment placeholders
-and fail validation until explicitly supplied. GPU inference is serialized by
-default (`max_gpu_requests: 1`), including interleaved campaigns; CPU-side benchmark
-work may overlap.
-
-Release validation is documented in
-`docs/implementation/RELEASE_READINESS.md`. The Phase 15 gate uses the fixture
-campaign only: it runs all three canonical benchmark routes, exercises real process
-interruption and item-level resume, audits artifacts, and verifies bounded inference.
-It deliberately does not launch a full-dataset or GPU campaign. Operational commands,
-claim boundaries, and failure recovery are in `docs/benchmarks/RUNBOOK.md`,
-`docs/benchmarks/RESULT_CLAIM_POLICY.md`, and `docs/TROUBLESHOOTING.md`.
-
-Runtime knobs live in `.env`; `.env.example` documents the expected keys.
+PRIMA-NEXT is licensed under the [Apache License 2.0](LICENSE). Third-party dependencies, datasets, and submodules remain subject to their own licenses.

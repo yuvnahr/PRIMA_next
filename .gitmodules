@@ -5,3 +5,7 @@
 [submodule "benchmarks/locomo-v2/external"]
 	path = benchmarks/locomo-v2/external
 	url = https://github.com/BrianV1981/locomo-v2
+
+[submodule "benchmarks/hotpotqa/external"]
+	path = benchmarks/hotpotqa/external
+	url = https://github.com/hotpotqa/hotpot
