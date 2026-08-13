@@ -221,6 +221,15 @@ def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, 
     payload = _payload(tmp_path / interrupt)
     payload["provider"]["fake_delay_seconds"] = 0.4
     payload["benchmarks"] = [payload["benchmarks"][1]]
+    source_rows = json.loads((FIXTURES / "campaign" / "hotpot.json").read_text(encoding="utf-8"))
+    interrupt_rows = []
+    for index in range(6):
+        row = dict(source_rows[index % len(source_rows)])
+        row.update(_id=f"interrupt-hotpot-{index}", question=f"{row['question']} Case {index}")
+        interrupt_rows.append(row)
+    dataset_path = tmp_path / f"{interrupt}-hotpot.json"
+    dataset_path.write_text(json.dumps(interrupt_rows), encoding="utf-8")
+    payload["benchmarks"][0].update(dataset_path=str(dataset_path), max_items=len(interrupt_rows))
     config_path = tmp_path / f"{interrupt}.json"
     config_path.write_text(json.dumps(payload), encoding="utf-8")
     creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
@@ -245,7 +254,8 @@ def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, 
         if process.poll() is not None:
             pytest.fail(f"campaign exited before interruption with {process.returncode}")
         time.sleep(0.02)
-    assert len(read_jsonl(checkpoint)) == 1
+    interrupted_count = len(read_jsonl(checkpoint))
+    assert 0 < interrupted_count < len(interrupt_rows)
     if interrupt == "sigint":
         process.send_signal(signal.CTRL_BREAK_EVENT if os.name == "nt" else signal.SIGINT)
     else:
@@ -258,5 +268,5 @@ def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, 
     assert result["status"] == "complete"
     checkpoints = read_jsonl(checkpoint)
     predictions = read_jsonl(checkpoint.parents[1] / "predictions" / "records.jsonl")
-    assert len(checkpoints) == len({row["case_id"] for row in checkpoints}) == 2
-    assert len(predictions) == len({row["case_id"] for row in predictions}) == 2
+    assert len(checkpoints) == len({row["case_id"] for row in checkpoints}) == len(interrupt_rows)
+    assert len(predictions) == len({row["case_id"] for row in predictions}) == len(interrupt_rows)
