@@ -61,6 +61,7 @@ class BenchmarkArtifactStore:
         self.layout = ArtifactLayout(Path(root))
         # ponytail: process-local lock; add an OS file lock only when multi-process writers are adopted.
         self._lock = threading.Lock()
+        self._indexes: dict[Path, set[str]] = {}
 
     def initialize(self, manifest: BenchmarkManifest) -> None:
         """Create a partial campaign manifest before case execution."""
@@ -68,6 +69,7 @@ class BenchmarkArtifactStore:
         if manifest.status is RunStatus.COMPLETE:
             raise ValueError("a campaign must initialize as partial, failed, or cancelled")
         atomic_write_json(self.layout.manifest, manifest.to_dict())
+        self.reconcile()
 
     def read_manifest(self) -> BenchmarkManifest:
         """Load and validate the canonical campaign status marker."""
@@ -85,7 +87,13 @@ class BenchmarkArtifactStore:
     def append_checkpoint(self, record: CheckpointRecord) -> bool:
         """Append one case exactly once; return false for an existing case ID."""
 
-        return self._append_unique(self.layout.checkpoints, record.case_id, record.to_dict())
+        appended = self._append_unique(self.layout.checkpoints, record.case_id, record.to_dict())
+        if appended:
+            if record.prediction is not None:
+                self.append_prediction(record.prediction)
+            if record.failure is not None:
+                self.append_failure(record.failure)
+        return appended
 
     def append_prediction(self, record: PredictionRecord) -> bool:
         """Append one prediction exactly once."""
@@ -140,14 +148,40 @@ class BenchmarkArtifactStore:
 
     def _append_unique(self, path: Path, key: str, payload: dict[str, Any]) -> bool:
         with self._lock:
-            existing = {
-                str(row.get("case_id") or row.get("_record_key", ""))
-                for row in read_jsonl(path)
-            }
+            existing = self._indexes.setdefault(
+                path,
+                {
+                    str(row.get("case_id") or row.get("_record_key", ""))
+                    for row in read_jsonl(path)
+                },
+            )
             if key in existing:
                 return False
             append_jsonl(path, payload)
+            existing.add(key)
             return True
+
+    def reconcile(self) -> None:
+        """Project prediction/failure mirrors deterministically from authoritative checkpoints."""
+
+        checkpoints = self.checkpoints()
+        if not checkpoints and not (
+            self.layout.predictions.exists() or self.layout.failures.exists()
+        ):
+            return
+        predictions = [record.prediction.to_dict() for record in checkpoints if record.prediction is not None]
+        failures = [record.failure.to_dict() for record in checkpoints if record.failure is not None]
+        campaign_failures = [
+            row for row in read_jsonl(self.layout.failures) if row.get("case_id") is None
+        ]
+        atomic_write_jsonl(self.layout.predictions, predictions)
+        atomic_write_jsonl(self.layout.failures, [*campaign_failures, *failures])
+        self._indexes[self.layout.checkpoints] = {record.case_id for record in checkpoints}
+        self._indexes[self.layout.predictions] = {record.case_id for record in checkpoints if record.prediction}
+        self._indexes[self.layout.failures] = {
+            str(row.get("case_id") or row.get("_record_key", ""))
+            for row in [*campaign_failures, *failures]
+        }
 
 
 def atomic_write_json(path: str | Path, payload: Any) -> None:
@@ -186,6 +220,28 @@ def append_jsonl(path: str | Path, payload: dict[str, Any]) -> None:
         stream.write(line + "\n")
         stream.flush()
         os.fsync(stream.fileno())
+
+
+def atomic_write_jsonl(path: str | Path, rows: list[dict[str, Any]]) -> None:
+    """Atomically replace a derived JSONL projection."""
+
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=destination.parent,
+            prefix=f".{destination.name}.", suffix=".tmp", delete=False,
+        ) as stream:
+            temporary = Path(stream.name)
+            for row in rows:
+                stream.write(json.dumps(redact(row, redact_prompts=False), sort_keys=True, ensure_ascii=False) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, destination)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
 
 
 def read_json(path: str | Path) -> Any:

@@ -14,6 +14,7 @@ from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
 from reasoning.models import AnswerResult
 from runtime import (
+    ExecutionOptions,
     ExecutionOutcome,
     ExecutionProfile,
     ExecutionStatus,
@@ -25,6 +26,7 @@ from runtime import (
 from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.prima_workflow import OutputController, PrimaWorkflow
+from workflow.task_router import TaskRoute
 from workflow.workflow_state import WorkflowPhase
 
 
@@ -90,7 +92,7 @@ def test_factual_qa_acquires_evidence_and_generates_inside_workflow(tmp_path) ->
         task_kind=TaskKind.FACTUAL_QA,
         profile=ExecutionProfile.SIMPLE_RAG,
         input_text="What identifies Bridge?",
-        metadata={"reasoning_mode": "single_pass"},
+        options=ExecutionOptions(reasoning_mode="single_pass"),
     )
 
     response = asyncio.run(runtime.execute(request))
@@ -177,8 +179,15 @@ def test_classification_and_cancellation_have_typed_outcomes(tmp_path) -> None:
         async def execute(self, _context):
             raise asyncio.CancelledError
 
+    class CancellationRouter:
+        def route(self, _context):
+            return TaskRoute((WorkflowPhase.ANSWER_GENERATION,))
+
     cancelled_runtime = PrimaRuntime(
-        workflow=PrimaWorkflow(ControllerRegistry({WorkflowPhase.ANSWER_GENERATION: CancellingController()})),
+        workflow=PrimaWorkflow(
+            ControllerRegistry({WorkflowPhase.ANSWER_GENERATION: CancellingController()}),
+            router=CancellationRouter(),
+        ),
         llm_client=FakeLLMClient(),
         memory_repository=InMemoryMemoryRepository(),
         log_path=tmp_path / "cancelled.log",
@@ -189,7 +198,6 @@ def test_classification_and_cancellation_have_typed_outcomes(tmp_path) -> None:
                 task_kind=TaskKind.CONVERSATION,
                 profile=ExecutionProfile.MODEL_ONLY,
                 input_text="Cancel this request.",
-                metadata={"route": ["answer_generation"]},
             )
         )
     )

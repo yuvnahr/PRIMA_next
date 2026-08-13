@@ -10,6 +10,9 @@ import sys
 import time
 import tracemalloc
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
@@ -31,6 +34,22 @@ class EmbeddingBackendConfig:
     name: str
     model_identifier: str
     dimensions: int = DEFAULT_DIMENSIONS
+
+
+_CONFIG_OVERRIDE: ContextVar[EmbeddingBackendConfig | None] = ContextVar(
+    "prima_embedding_backend_config", default=None
+)
+
+
+@contextmanager
+def use_embedding_backend_config(config: EmbeddingBackendConfig) -> Iterator[None]:
+    """Apply one request-scoped embedding configuration without mutating the process environment."""
+
+    token = _CONFIG_OVERRIDE.set(config)
+    try:
+        yield
+    finally:
+        _CONFIG_OVERRIDE.reset(token)
 
 
 class EmbeddingBackend(ABC):
@@ -151,6 +170,13 @@ def get_embedding_backend(dimensions: int | None = None) -> EmbeddingBackend:
 
 
 def embedding_backend_config(dimensions: int | None = None) -> EmbeddingBackendConfig:
+    override = _CONFIG_OVERRIDE.get()
+    if override is not None:
+        return (
+            override
+            if dimensions is None or dimensions == override.dimensions
+            else EmbeddingBackendConfig(override.name, override.model_identifier, dimensions)
+        )
     configured = os.getenv("PRIMA_EMBEDDING_BACKEND", "stable").lower().strip()
     name = _resolve_backend_name(configured)
     configured_model = os.getenv("PRIMA_EMBEDDING_MODEL", "").strip()

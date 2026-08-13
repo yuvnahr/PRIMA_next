@@ -1,6 +1,6 @@
 # Implementation Status
 
-Phase 00 baseline: 2026-08-02. Updated through Phase 14. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
+Phase 00 baseline: 2026-08-02. Updated through Phase 16. `Open` means verified debt, not incomplete work in the latest phase. Owner labels must preserve the ID or record why ownership changed.
 
 | ID | Severity | Kind | Finding and evidence | Owner phase | Acceptance test | Status |
 |---|---|---|---|---|---|---|
@@ -73,6 +73,15 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 14. `Open` means verified d
 | CAMPAIGN-003 | High | Verified fact | Root and child manifests retain independent benchmark/mode status; terminal item checkpoints suppress duplicates during resume and isolated mode failures do not corrupt sibling results. | Phase 14 — campaign resume | Smoke resume retains one campaign ID and one record per case; injected failure leaves the other two modes complete. | Closed |
 | CAMPAIGN-004 | Medium | Verified fact | Validated complete/partial modes aggregate into JSON and Markdown with provider/request/host telemetry; invalid pairs are explicitly refused and telemetry collection is non-fatal. | Phase 14 — aggregation and telemetry | Campaign tests cover bound telemetry and refusal; reports expose latency percentiles, tokens, throughput, retries/timeouts, CPU/RAM, and optional observed GPU memory. | Closed |
 
+| RELEASE-001 | Critical | Verified fact | Provider, structured-output, retrieval, graph, memory, maintenance, disk, checkpoint, resume, process-signal, and semaphore fault boundaries now have executable coverage. | Phase 15 — fault injection | Focused and existing tests inject every required fault and prove typed failure, bounded retry, crash-safe persistence, or successful resume. | Closed |
+| RELEASE-002 | Critical | Verified fact | The full profile has one diagnostic call trace covering parsing through event enqueue, while ingestion, affect-only classification, and model-only routes exclude irrelevant stages. | Phase 15 — architecture trace | Integration assertions prove required executed/skipped components, reflection-triggered modification, consistent traces, and non-echo output. | Closed |
+| RELEASE-003 | High | Verified fact | Campaign cancellation now persists partial state for SIGINT/SIGTERM/Windows console break; artifact references are relative and aggregate error/telemetry payloads are redacted. | Phase 15 — campaign resilience | Real subprocess interruption/resume tests produce one checkpoint and prediction per case; artifact audits find no developer paths or credentials. | Closed |
+| RELEASE-004 | Critical | Verified fact | The complete fake-provider campaign succeeds for all three benchmarks under one bounded session; the deployment example remains gated by unresolved environment fields. | Phase 15 — release gate | Smoke manifest is complete, counts reconcile, maximum active requests is one, and unresolved full-GPU configuration is rejected. | Closed |
+| HARDEN-001 | Critical | Verified fact | Caller metadata could influence internal routing/control values and workflow routing had a permissive default. `ExecutionOptions` now owns trusted controls and one route specification owns both components and phases; missing routes fail closed. | Phase 16 — principal hardening | Reserved-key, no-fallback, route reconciliation, and typed tool-outcome tests pass. | Closed |
+| HARDEN-002 | High | Verified fact | Runtime diagnostics conflated retrieval results with calls and reflection categories. Diagnostics now separate retrieval calls/results, workflow/reasoning reflection, accepted corrections, enabled/not-executed components, latency, and active backends. | Phase 16 — principal hardening | Focused budget/diagnostic tests reconcile planned, enabled, executed, and not-executed sets. | Closed |
+| HARDEN-003 | Critical | Verified fact | Paired bootstrap used binary exactness and silently scored missing/failing cases. It now recomputes benchmark-native metrics, excludes and reports failed/parse-failed/unscored pairs, and validates dataset/context/headline invariants. | Phase 16 — principal hardening | Native macro-F1/bootstrap, exclusion, dataset mismatch, cited-evidence, and raw-response replay tests pass. | Closed |
+| HARDEN-004 | High | Verified fact | Item mirrors were scanned per append and memory maintenance/graph setup did repeated eager work. Indexed checkpoints are authoritative, mirrors reconcile deterministically, heavy maintenance batches, and graph sync is lazy/incremental. | Phase 16 — principal hardening | Orphan reconciliation, batching, lazy graph, resume, and duplicate tests pass. | Closed |
+
 ## Phase ownership map
 
 | Later phase | Finding IDs |
@@ -91,3 +100,5 @@ Phase 00 baseline: 2026-08-02. Updated through Phase 14. `Open` means verified d
 | Phase 12 — LoCoMo migration | BENCH-001 (LoCoMo), BENCH-002 (LoCoMo), BENCH-003 (LoCoMo), LOCOMO-001, LOCOMO-002, LOCOMO-003, LOCOMO-004, LOCOMO-005 |
 | Phase 13 — GoEmotions migration | BENCH-001, BENCH-002, BENCH-003, GOEMOTIONS-001, GOEMOTIONS-002, GOEMOTIONS-003, GOEMOTIONS-004, GOEMOTIONS-005 |
 | Phase 14 — unified benchmark campaign | CAMPAIGN-001, CAMPAIGN-002, CAMPAIGN-003, CAMPAIGN-004 |
+| Phase 15 — release readiness | RELEASE-001, RELEASE-002, RELEASE-003, RELEASE-004 |
+| Phase 16 — principal hardening | HARDEN-001, HARDEN-002, HARDEN-003, HARDEN-004 |

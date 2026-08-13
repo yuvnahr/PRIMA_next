@@ -23,17 +23,48 @@ benchmarks:
     variant: schema_constrained_model_only
     context_budget: 2048
     options: {split: test, batch_size: 8}
-  - id: hotpotqa-prima
+  - id: hotpotqa-model-only
+    benchmark: hotpotqa
+    dataset_path: ${HOTPOTQA_FILE}
+    profile: model_only
+    variant: distractor
+    context_budget: 16384
+  - id: hotpotqa-simple-rag
+    benchmark: hotpotqa
+    dataset_path: ${HOTPOTQA_FILE}
+    profile: simple_rag
+    variant: distractor
+    context_budget: 16384
+  - id: hotpotqa-prima-full
     benchmark: hotpotqa
     dataset_path: ${HOTPOTQA_FILE}
     profile: prima_full
     variant: distractor
     context_budget: 16384
-  - id: locomo-prima
+  - id: locomo-model-only
+    benchmark: locomo
+    dataset_path: ${LOCOMO_FILE}
+    profile: model_only
+    variant: controlled_document_ingestion
+    context_budget: 16384
+    options: {full_dataset: true}
+  - id: locomo-simple-rag
+    benchmark: locomo
+    dataset_path: ${LOCOMO_FILE}
+    profile: simple_rag
+    variant: controlled_document_ingestion
+    context_budget: 16384
+    options: {full_dataset: true}
+  - id: locomo-prima-full
     benchmark: locomo
     dataset_path: ${LOCOMO_FILE}
     profile: prima_full
-    variant: normal_prima_admission
-    context_budget: 32768
+    variant: controlled_document_ingestion
+    context_budget: 16384
     optional_metrics: [rouge_l]
     options: {full_dataset: true}
+comparisons:
+  - {id: hotpot-model-vs-full, left: hotpotqa-model-only, right: hotpotqa-prima-full, metric: metrics.joint_f1}
+  - {id: hotpot-rag-vs-full, left: hotpotqa-simple-rag, right: hotpotqa-prima-full, metric: metrics.joint_f1}
+  - {id: locomo-model-vs-full, left: locomo-model-only, right: locomo-prima-full, metric: metrics.f1}
+  - {id: locomo-rag-vs-full, left: locomo-simple-rag, right: locomo-prima-full, metric: metrics.f1}

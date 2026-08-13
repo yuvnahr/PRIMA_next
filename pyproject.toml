@@ -15,6 +15,7 @@ exclude = [
     ".pytest_cache",
     "pytest-cache-files-*",
     "pytest-tmp",
+    "PRIMA_Kaggle_Benchmark.ipynb",
     "benchmarks/**/external",
     "__pycache__",
 ]

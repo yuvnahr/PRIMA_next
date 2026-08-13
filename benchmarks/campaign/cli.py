@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 from collections.abc import Sequence
 
 from benchmarks.campaign.config import load_campaign_config
@@ -17,7 +18,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     run.add_argument("--config", required=True)
     run.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
-    result = run_campaign(load_campaign_config(args.config), resume=args.resume)
+    def cancel(_signum: int, _frame: object) -> None:
+        raise KeyboardInterrupt
+
+    cancellation_signals = [signal.SIGTERM]
+    if hasattr(signal, "SIGBREAK"):
+        cancellation_signals.append(signal.SIGBREAK)
+    previous = {item: signal.getsignal(item) for item in cancellation_signals}
+    for item in cancellation_signals:
+        signal.signal(item, cancel)
+    try:
+        result = run_campaign(load_campaign_config(args.config), resume=args.resume)
+    except KeyboardInterrupt:
+        return 130
+    finally:
+        for item, handler in previous.items():
+            signal.signal(item, handler)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "complete" else 1
 

@@ -23,9 +23,11 @@ class MemoryIndex(MemoryRepository):
 
     repository: MemoryRepository
     graph_repository: GraphRepository | None = field(default_factory=GraphRepository)
+    _graph_initialized: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self) -> None:
-        self._sync_graph()
+        if self.graph_repository is None:
+            self._graph_initialized = True
 
     @classmethod
     def for_repository(cls, repository: MemoryRepository) -> MemoryIndex:
@@ -84,6 +86,13 @@ class MemoryIndex(MemoryRepository):
             if note.id not in known:
                 self._index_note(note)
                 known.add(note.id)
+        self._graph_initialized = True
+
+    def ensure_graph_index(self) -> None:
+        """Lazily synchronize pre-existing repository rows once before graph retrieval."""
+
+        if not self._graph_initialized:
+            self._sync_graph()
 
     def _index_note(self, note: MemoryNote) -> None:
         if self.graph_repository is None:

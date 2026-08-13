@@ -20,7 +20,7 @@ from memory.memory_index import MemoryIndex
 class MaintenancePipeline:
     """Run consolidation, abstraction, decay, and derived-index updates."""
 
-    def __init__(self, memory_index: MemoryIndex, event_bus: EventBus) -> None:
+    def __init__(self, memory_index: MemoryIndex, event_bus: EventBus, batch_size: int = 1) -> None:
         if memory_index.graph_repository is None:
             raise ValueError("MaintenancePipeline requires a graph-capable MemoryIndex.")
         self.memory_index = memory_index
@@ -30,6 +30,8 @@ class MaintenancePipeline:
         self.consolidation = ConsolidationEngine(memory_index)
         self.evolution = MemoryEvolutionEngine(memory_index, self.graph_repository)
         self.short_term_buffer: deque[str] = deque(maxlen=256)
+        self.batch_size = max(1, batch_size)
+        self._pending_heavy: list[Event] = []
 
     async def handle(self, event: Event) -> None:
         """Process one admitted memory outside the hot request task."""
@@ -63,9 +65,21 @@ class MaintenancePipeline:
             event,
             {"buffer": "maintenance_short_term", "buffer_size": len(self.short_term_buffer)},
         )
+        self._pending_heavy.append(event)
+        if len(self._pending_heavy) >= self.batch_size:
+            await self.flush()
+
+    async def flush(self) -> None:
+        """Run expensive maintenance once for all admissions accumulated since the last batch."""
+
+        if not self._pending_heavy:
+            return
+        causes, self._pending_heavy = self._pending_heavy, []
+        event = causes[-1]
         await self._emit(EventType.CONSOLIDATION_REQUESTED, event)
         maintained = await asyncio.to_thread(self.consolidation.run)
-        await self._emit(EventType.CONSOLIDATION_COMPLETED, event, {"updated_count": len(maintained)})
+        batch = {"updated_count": len(maintained), "batch_size": len(causes)}
+        await self._emit(EventType.CONSOLIDATION_COMPLETED, event, batch)
         await self._emit(EventType.DECAY_APPLIED, event, {"updated_count": len(maintained)})
         await self._emit(EventType.ABSTRACTION_REQUESTED, event)
         evolved = await asyncio.to_thread(self.evolution.evolve)
@@ -80,6 +94,7 @@ class MaintenancePipeline:
             {
                 "node_count": len(self.graph_repository.nodes),
                 "edge_count": len(self.graph_repository.edges),
+                "batch_size": len(causes),
             },
         )
 

@@ -10,6 +10,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from config.runtime_config import RuntimeConfig
+
 PLACEHOLDER = re.compile(r"^\$\{([A-Za-z_][A-Za-z0-9_]*)\}$")
 
 
@@ -27,8 +29,10 @@ class ProviderConfig(ConfigModel):
     structured_output: bool = True
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     max_output_tokens: int = Field(default=128, gt=0)
+    safety_overhead_tokens: int = Field(default=256, ge=0)
     timeout_seconds: float = Field(default=60.0, gt=0)
     retries: int = Field(default=0, ge=0)
+    fake_delay_seconds: float = Field(default=0.0, ge=0.0)
 
 
 class SchedulerConfig(ConfigModel):
@@ -107,6 +111,7 @@ class CampaignConfig(ConfigModel):
     scheduler: SchedulerConfig = Field(default_factory=SchedulerConfig)
     failure_policy: FailurePolicyConfig = Field(default_factory=FailurePolicyConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)
+    runtime: RuntimeConfig = Field(default_factory=RuntimeConfig.from_environment)
     benchmarks: tuple[BenchmarkModeConfig, ...]
     comparisons: tuple[ComparisonConfig, ...] = ()
 
@@ -133,9 +138,10 @@ class CampaignConfig(ConfigModel):
                 raise ValueError(f"comparison {comparison.id!r} requires the same generation configuration")
         if self.scheduler.max_gpu_requests > 1:
             validated = self.provider.kind in {"openai", "anthropic"} and self.scheduler.allow_api_concurrency
-            validated = validated or len(self.scheduler.gpu_devices) >= self.scheduler.max_gpu_requests
             if not validated:
-                raise ValueError("max_gpu_requests > 1 requires explicit API concurrency or enough GPU devices")
+                raise ValueError(
+                    "max_gpu_requests > 1 requires explicit endpoint routing with validated API concurrency"
+                )
         return self
 
 

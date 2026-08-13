@@ -12,6 +12,7 @@ from typing import Any
 
 from benchmarks.campaign.config import CampaignConfig
 from benchmarks.campaign.provider_session import SharedProviderSession
+from benchmarks.campaign.registry import effective_generation
 from benchmarks.preflight import capability_report
 from llm.generation_config import StructuredOutputMode
 
@@ -28,11 +29,16 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
                 if not path.is_file():
                     raise FileNotFoundError(f"GoEmotions campaign file not found: {path}")
                 hashes[name] = _hash(path)
-        datasets[mode.id] = {"path": str(mode.dataset_path), "hashes": hashes}
-        if mode.context_budget > config.provider.context_window:
+        datasets[mode.id] = {"path": mode.dataset_path.name, "hashes": hashes}
+        required_window = (
+            mode.context_budget
+            + config.provider.max_output_tokens
+            + config.provider.safety_overhead_tokens
+        )
+        if required_window > config.provider.context_window:
             raise ValueError(
-                f"Mode {mode.id} requires context budget {mode.context_budget}, "
-                f"above provider limit {config.provider.context_window}"
+                f"Mode {mode.id} requires {required_window} tokens including context, output, and safety overhead; "
+                f"provider limit is {config.provider.context_window}"
             )
 
     if config.provider.kind != "fake":
@@ -47,14 +53,14 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
     else:
         endpoint = {"url": None, "status": "fake"}
 
+    generations = {mode.id: effective_generation(config, mode) for mode in config.benchmarks}
     requires_schema = any(
-        mode.benchmark == "goemotions"
-        and mode.variant not in {"model_only_zero_shot", "trained_encoder"}
-        for mode in config.benchmarks
+        generation.structured_output is StructuredOutputMode.JSON_SCHEMA
+        for generation in generations.values()
     )
     schema_available = StructuredOutputMode.JSON_SCHEMA in session.provider.capabilities.structured_output
     if requires_schema and (not config.provider.structured_output or not schema_available):
-        raise ValueError("Configured GoEmotions modes require provider JSON-schema output")
+        raise ValueError("Configured benchmark modes require provider JSON-schema output")
     if any(mode.seed is not None for mode in config.benchmarks) and not session.provider.capabilities.seed:
         raise ValueError(f"Provider {config.provider.kind!r} does not support the configured deterministic seeds")
 
@@ -84,9 +90,12 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
         "endpoint": endpoint,
         "context_window": config.provider.context_window,
         "structured_output": {"required": requires_schema, "available": schema_available},
+        "effective_generation": {key: value.to_dict() for key, value in generations.items()},
         "optional_metrics": {name: capabilities[name] for name in requested},
-        "output": {"path": str(config.output_root), "writable": True, "free_disk_gb": free_gb},
+        "output": {"path": ".", "writable": True, "free_disk_gb": free_gb},
         "repository_modes": {mode.id: mode.repository_mode for mode in config.benchmarks},
+        "runtime_config": config.runtime.model_dump(mode="json"),
+        "runtime_config_fingerprint": config.runtime.fingerprint,
         "gpu_scheduling": {
             "mode": config.scheduler.mode,
             "max_gpu_requests": config.scheduler.max_gpu_requests,

@@ -6,6 +6,7 @@ import asyncio
 import json
 
 from affect.affect_engine import DynamicAffectEngine
+from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_types import LLMResponse
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
@@ -18,6 +19,7 @@ from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice, Ref
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
 from runtime import ExecutionProfile, PrimaRequest, PrimaRuntime, TaskKind
+from runtime.route_profiles import select_route
 from state.state_manager import InMemoryStateManager
 from uncertainty import DecisionType, OverallConfidence, UncertaintyBand, UncertaintyEstimator
 from workflow.correction_loop import CorrectionBudget, CorrectionLoop
@@ -136,6 +138,12 @@ def test_pre_execution_reflection_changes_query_evidence_and_answer() -> None:
             "profile": "prima_full",
             "reasoning_mode": "single_pass",
             "state_session_id": "phase06",
+            "route": select_route(TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL).phases,
+            "generation_config": GenerationConfig(
+                model="fixture",
+                provider="test",
+                structured_output=StructuredOutputMode.JSON_SCHEMA,
+            ),
         },
     )
 

@@ -60,7 +60,10 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
             }
         )
         context = await OrchestrationEngine(registry, event_bus=event_bus).execute(
-            ExecutionContext(user_input="hello")
+            ExecutionContext(
+                user_input="hello",
+                metadata={"route": tuple(phase.value for phase in registry.controllers)},
+            )
         )
 
         self.assertEqual(context.workflow_state.status, WorkflowStatus.COMPLETED)
@@ -87,7 +90,7 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
                 WorkflowPhase.PLANNING: planner,
             }
         )
-        context = ExecutionContext(user_input="plan only", metadata={"route": [WorkflowPhase.PLANNING.value]})
+        context = ExecutionContext(user_input="plan only", metadata={"route": (WorkflowPhase.PLANNING.value,)})
 
         result = await OrchestrationEngine(
             registry,
@@ -108,7 +111,7 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
         )
         context = ExecutionContext(
             user_input="cancel",
-            metadata={"route": [WorkflowPhase.AFFECT.value, WorkflowPhase.MEMORY_RETRIEVAL.value]},
+            metadata={"route": (WorkflowPhase.AFFECT.value, WorkflowPhase.MEMORY_RETRIEVAL.value)},
         )
 
         result = await OrchestrationEngine(registry, event_bus=WorkflowEventBus()).execute(context)
@@ -128,7 +131,22 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
             state_manager=InMemoryStateManager(),
         )
 
-        context = await workflow.run("I am nervous about sourdough bread tomorrow")
+        context = await workflow.run(
+            "I am nervous about sourdough bread tomorrow",
+            ExecutionContext(
+                user_input="I am nervous about sourdough bread tomorrow",
+                metadata={
+                    "route": tuple(phase.value for phase in (
+                        WorkflowPhase.AFFECT,
+                        WorkflowPhase.MEMORY_RETRIEVAL,
+                        WorkflowPhase.PLANNING,
+                        WorkflowPhase.REFLECTION,
+                        WorkflowPhase.ACTION,
+                        WorkflowPhase.OUTPUT,
+                    )),
+                },
+            ),
+        )
 
         self.assertEqual(context.workflow_state.status, WorkflowStatus.COMPLETED)
         self.assertIsNotNone(context.affect_update)

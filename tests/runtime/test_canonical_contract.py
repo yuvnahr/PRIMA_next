@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from llm.llm_types import LLMResponse
 from memory.memory_repository import InMemoryMemoryRepository
 from runtime.contracts import (
+    ExecutionOptions,
     ExecutionProfile,
     ExecutionStatus,
     PrimaRequest,
@@ -34,7 +35,7 @@ def test_contract_serialization_round_trip() -> None:
         task_kind=TaskKind.FACTUAL_QA,
         profile=ExecutionProfile.SIMPLE_RAG,
         input_text="What does Nate like?",
-        metadata={"top_k": 5},
+        options=ExecutionOptions(top_k=5),
     )
 
     restored = PrimaRequest.from_json(request.to_json())
@@ -74,13 +75,13 @@ def test_all_task_profile_pairs_have_deterministic_decisions() -> None:
 
 def test_every_valid_contract_route_has_a_workflow_phase_plan() -> None:
     plans = []
-    for (task_kind, profile), route in route_matrix().items():
+    for (_task_kind, _profile), route in route_matrix().items():
         if route is None:
             continue
         plan = TaskRouter().route(
             ExecutionContext(
                 user_input="route",
-                metadata={"task_kind": task_kind.value, "profile": profile.value},
+                metadata={"route": route.phases},
             )
         )
         assert plan.phases
@@ -141,9 +142,9 @@ def test_execute_reports_planned_executed_and_skipped_components(tmp_path) -> No
     assert RuntimeComponent.MODEL_EXECUTOR in response.diagnostics.executed_components
     assert RuntimeComponent.AFFECT_ENGINE in response.diagnostics.skipped_components
     assert RuntimeComponent.MODEL_EXECUTOR not in response.diagnostics.skipped_components
-    assert set(response.diagnostics.executed_components) | set(response.diagnostics.skipped_components) == set(
-        RuntimeComponent
-    )
+    assert set(response.diagnostics.enabled_components) == set(response.diagnostics.planned_components)
+    assert set(response.diagnostics.not_executed_components) <= set(response.diagnostics.enabled_components)
+    assert set(response.diagnostics.skipped_components).isdisjoint(response.diagnostics.enabled_components)
     assert not set(response.diagnostics.executed_components) - set(response.diagnostics.planned_components)
 
 

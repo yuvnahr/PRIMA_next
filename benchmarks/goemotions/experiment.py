@@ -190,7 +190,6 @@ def run_goemotions_experiment(
             ),
             diagnostics={"goemotions_record": record},
         )
-        store.append_prediction(prediction)
         store.append_checkpoint(
             CheckpointRecord(case_id=example.example_id, status=RunStatus.COMPLETE, prediction=prediction)
         )
@@ -218,7 +217,6 @@ def run_goemotions_experiment(
                 message=str(exc),
                 details={"goemotions_record": failure_record},
             )
-            store.append_failure(failure)
             store.append_checkpoint(
                 CheckpointRecord(case_id=example.example_id, status=RunStatus.FAILED, failure=failure)
             )
@@ -323,6 +321,9 @@ def _classify_response(
         "predicted_labels": sorted(predicted),
         "prompt": prompt,
         "raw_response": raw_response,
+        "response_hash": hashlib.sha256(
+            str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
+        ).hexdigest(),
         **metadata,
         "parse_error": parse_error,
         "latency_ms": latency_ms,

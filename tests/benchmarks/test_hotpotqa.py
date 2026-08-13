@@ -54,7 +54,11 @@ def response(request: PrimaRequest, *, text: str = "", failed: bool = False, evi
             else ExecutionOutcome.ANSWERED
         ),
         output_text=text or None,
-        output_data={"hop_count": 1 if evidence else 0, "stop_reason": "sufficient"},
+        output_data={
+            "hop_count": 1 if evidence else 0,
+            "stop_reason": "sufficient",
+            "generation": {"selected_source_ids": [item.source_id for item in evidence]},
+        },
         evidence=tuple(evidence),
         diagnostics=RuntimeDiagnostics(
             route_name=f"{request.task_kind.value}:{request.profile.value}",
@@ -131,9 +135,20 @@ def test_official_metrics_and_canonical_support_projection() -> None:
     assert answer_scores("The Alpha!", "alpha") == (1.0, 1.0, 1.0, 1.0)
     assert answer_scores("yes", "no") == (0.0, 0.0, 0.0, 0.0)
     assert supporting_fact_scores([["A", 0], ["B", 1]], [["A", 0], ["C", 2]]) == (0.0, 0.5, 0.5, 0.5)
-    metadata = {"evidence": [{"source_id": "m1", "metadata": {"hop": 0, "query": "q", "provenance": {"source_title": "Exact Title", "sentence_id": 2}}}]}
+    metadata = {
+        "output_data": {"generation": {"selected_source_ids": ["m1"]}},
+        "evidence": [{"source_id": "m1", "metadata": {"hop": 0, "query": "q", "provenance": {"source_title": "Exact Title", "sentence_id": 2}}}],
+    }
     facts, provenance = project_supporting_facts(metadata)
     assert facts == [["Exact Title", 2]] and provenance[0]["source_id"] == "m1"
+    selected_metadata = {
+        "output_data": {"generation": {"selected_source_ids": ["m1"]}},
+        "evidence": [
+            *metadata["evidence"],
+            {"source_id": "m2", "metadata": {"provenance": {"source_title": "Uncited", "sentence_id": 9}}},
+        ],
+    }
+    assert project_supporting_facts(selected_metadata)[0] == [["Exact Title", 2]]
     validate_predictions({"answer": {"x": "yes"}, "sp": {"x": facts}})
     rows = [{"expected_answer": "alpha", "prediction": "alpha", "supporting_facts": [["A", 0]], "gold_supporting_facts": [["A", 0]]}]
     assert all(HotpotQAEvaluator().evaluate(rows)[key] == 1.0 for key in ("em", "f1", "sp_em", "sp_f1", "joint_em", "joint_f1"))

@@ -25,7 +25,7 @@ from memory.retrieval.temporal_strategy import TemporalRetrievalStrategy
 from planning import PlanningContext, TaskPlanner
 from planning.planning_types import ActionType
 from reasoning.models import EvidenceItem
-from runtime.contracts import ExecutionProfile, PrimaRequest, RuntimeComponent, TaskKind
+from runtime.contracts import ExecutionOptions, ExecutionProfile, PrimaRequest, RuntimeComponent, TaskKind
 from runtime.prima_runtime import PrimaRuntime
 from state.cognitive_state import CognitiveState
 from workflow.execution_context import ExecutionContext
@@ -130,7 +130,7 @@ def test_runtime_diagnostics_report_actual_profile_capabilities(tmp_path: Path) 
                 task_kind=TaskKind.FACTUAL_QA,
                 profile=ExecutionProfile.SIMPLE_RAG,
                 input_text="What is Alpha bridge?",
-                metadata={"reasoning_mode": "single_pass"},
+                options=ExecutionOptions(reasoning_mode="single_pass"),
             )
         )
     )
@@ -145,7 +145,7 @@ def test_runtime_diagnostics_report_actual_profile_capabilities(tmp_path: Path) 
                 task_kind=TaskKind.FACTUAL_QA,
                 profile=ExecutionProfile.PRIMA_FULL,
                 input_text="What is connected to Alpha bridge?",
-                metadata={"reasoning_mode": "single_pass"},
+                options=ExecutionOptions(reasoning_mode="single_pass"),
             )
         )
     )

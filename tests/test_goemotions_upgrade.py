@@ -6,8 +6,15 @@ from affect.affect_perception import GoEmotionsDecisionController
 from affect.classifiers.goemotions_adapter import GoEmotionsProfileAdapter
 from affect.emotion_prediction import EmotionPrediction
 from affect.taxonomies.goemotions import LABELS, PRIMA_CORE_MAP, validate_taxonomy
+from benchmarks.campaign.config import ProviderConfig
+from benchmarks.campaign.provider_session import SharedProviderSession
 from benchmarks.goemotions.schemas import GOEMOTIONS_RESPONSE_SCHEMA
-from benchmarks.goemotions.systems import PrimaQwenSystem, QwenWithPrimaTelemetrySystem
+from benchmarks.goemotions.systems import (
+    BoundedAffectDecisionSystem,
+    PrimaQwenSystem,
+    QwenWithPrimaTelemetrySystem,
+    SchemaConstrainedModelOnlySystem,
+)
 from benchmarks.goemotions.training.classical import _runtime_predictions
 from benchmarks.goemotions.training.config import TrainingConfig
 from benchmarks.goemotions.training.thresholds import select_thresholds
@@ -26,6 +33,31 @@ def test_taxonomy_is_complete() -> None:
     assert validate_taxonomy()["label_count"] == 28
     assert set(PRIMA_CORE_MAP) == set(LABELS)
     assert _prediction().selected_labels == ("joy",)
+
+
+def test_paired_affect_transform_replays_identical_raw_response_and_reuses_runtime() -> None:
+    session = SharedProviderSession(
+        ProviderConfig(kind="fake", model="fixture", revision="fixture-v1", context_window=4096),
+        max_active_requests=1,
+    )
+    generation = GenerationConfig(
+        model="fixture",
+        provider="fake",
+        seed=7,
+        structured_output=StructuredOutputMode.JSON_SCHEMA,
+    )
+    baseline = SchemaConstrainedModelOnlySystem(generation).use_client(session.client)
+    bounded = BoundedAffectDecisionSystem(generation).use_client(session.client)
+
+    _, baseline_metadata = baseline.predict("I feel joyful.", list(LABELS))
+    baseline_runtime = baseline._runtime_local.runtime
+    baseline.predict("I feel joyful.", list(LABELS))
+    _, bounded_metadata = bounded.predict("I feel joyful.", list(LABELS))
+
+    assert baseline._runtime_local.runtime is baseline_runtime
+    assert baseline_metadata["raw_model_response_hash"] == bounded_metadata["raw_model_response_hash"]
+    assert session.telemetry()["request_attempts"] == 1
+    assert session.telemetry()["response_cache_hits"] == 2
 
 
 def test_official_mixed_neutral_predictions_are_preserved() -> None:

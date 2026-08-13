@@ -18,6 +18,7 @@ class RoutePlan:
     task_kind: TaskKind
     profile: ExecutionProfile
     components: tuple[RuntimeComponent, ...]
+    phases: tuple[str, ...]
 
     @property
     def name(self) -> str:
@@ -73,7 +74,7 @@ PRIMA_FULL = CONTROL + (
     RuntimeComponent.REFLECTION,
     RuntimeComponent.MODEL_EXECUTOR,
 ) + COMMIT
-INGESTION_ONLY = CONTROL[:5] + (
+INGESTION_ONLY = CONTROL + (
     RuntimeComponent.DOCUMENT_ENCODER,
     RuntimeComponent.MEMORY_INDEX,
     RuntimeComponent.MEMORY_COMMIT,
@@ -98,20 +99,48 @@ TOOL_FULL = CONTROL + (
 ) + COMMIT
 
 
-def _plan(task_kind: TaskKind, profile: ExecutionProfile, components: tuple[RuntimeComponent, ...]) -> RoutePlan:
-    return RoutePlan(task_kind=task_kind, profile=profile, components=components)
+MODEL_ONLY_PHASES = (
+    "state_load", "answer_generation", "output_validation", "output", "state_commit", "memory_commit",
+    "maintenance_enqueue",
+)
+FACTUAL_MODEL_ONLY_PHASES = tuple(phase for phase in MODEL_ONLY_PHASES if phase != "memory_commit")
+SIMPLE_RAG_PHASES = (
+    "state_load", "evidence_acquisition", "answer_generation", "output_validation", "output", "state_commit",
+    "memory_commit", "maintenance_enqueue",
+)
+FACTUAL_SIMPLE_RAG_PHASES = tuple(phase for phase in SIMPLE_RAG_PHASES if phase != "memory_commit")
+PRIMA_FULL_PHASES = (
+    "state_load", "affect", "evidence_acquisition", "planning", "world_simulation", "uncertainty_estimation",
+    "execution_decision", "reflection", "action", "answer_generation", "output_validation", "output",
+    "state_commit", "memory_commit", "maintenance_enqueue",
+)
+FACTUAL_PRIMA_FULL_PHASES = tuple(
+    phase for phase in PRIMA_FULL_PHASES if phase != "memory_commit"
+)
+INGESTION_PHASES = ("state_load", "document_ingestion", "output", "state_commit", "maintenance_enqueue")
+AFFECT_PHASES = ("state_load", "affect", "output", "state_commit")
+TOOL_PHASES = tuple(phase for phase in PRIMA_FULL_PHASES if phase != "answer_generation")
+
+
+def _plan(
+    task_kind: TaskKind,
+    profile: ExecutionProfile,
+    components: tuple[RuntimeComponent, ...],
+    phases: tuple[str, ...],
+) -> RoutePlan:
+    return RoutePlan(task_kind=task_kind, profile=profile, components=components, phases=phases)
 
 
 _ROUTES = {
-    (TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY, MODEL_ONLY),
-    (TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG),
-    (TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL, PRIMA_FULL),
-    (TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY, MODEL_ONLY),
-    (TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG),
-    (TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL, PRIMA_FULL),
-    (TaskKind.DOCUMENT_INGESTION, ExecutionProfile.INGESTION_ONLY): _plan(TaskKind.DOCUMENT_INGESTION, ExecutionProfile.INGESTION_ONLY, INGESTION_ONLY),
-    (TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY): _plan(TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY, AFFECT_ONLY),
-    (TaskKind.TOOL_REQUEST, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.TOOL_REQUEST, ExecutionProfile.PRIMA_FULL, TOOL_FULL),
+    (TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY, MODEL_ONLY, MODEL_ONLY_PHASES),
+    (TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG, SIMPLE_RAG_PHASES),
+    (TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL, PRIMA_FULL, PRIMA_FULL_PHASES),
+    (TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY, MODEL_ONLY, FACTUAL_MODEL_ONLY_PHASES),
+    (TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG, FACTUAL_SIMPLE_RAG_PHASES),
+    (TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL, PRIMA_FULL, FACTUAL_PRIMA_FULL_PHASES),
+    (TaskKind.DOCUMENT_INGESTION, ExecutionProfile.INGESTION_ONLY): _plan(TaskKind.DOCUMENT_INGESTION, ExecutionProfile.INGESTION_ONLY, INGESTION_ONLY, INGESTION_PHASES),
+    (TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY): _plan(TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY, AFFECT_ONLY, AFFECT_PHASES),
+    (TaskKind.TOOL_REQUEST, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.TOOL_REQUEST, ExecutionProfile.PRIMA_FULL, TOOL_FULL, TOOL_PHASES),
 }
 
 

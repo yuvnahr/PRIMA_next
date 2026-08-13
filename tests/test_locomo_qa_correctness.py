@@ -82,7 +82,7 @@ def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaRespon
                 source_id="memory-D1:1", text="Alpha happened.", score=1.0,
                 metadata={"provenance": {"source_turn_id": "D1:1"}},
             ),)
-            output_data = {"retrieval": {"stage_source_ids": {
+            output_data = {"generation": {"selected_source_ids": ["memory-D1:1"]}, "retrieval": {"stage_source_ids": {
                 "dense_top30": ["D1:1", "D2:1"], "sparse_top30": [],
                 "fused_top30": ["D1:1", "D2:1"],
                 "reranked_top30": ["D1:1"], "final_candidates": ["D1:1"],
