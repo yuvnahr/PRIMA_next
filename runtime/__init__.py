@@ -1,8 +1,47 @@
 """PRIMA-NEXT runtime package."""
 
+from config.runtime_mode import RuntimeMode
+from runtime.contracts import (
+    ComponentCapability,
+    DiagnosticMode,
+    EvidenceReference,
+    ExecutionOptions,
+    ExecutionOutcome,
+    ExecutionProfile,
+    ExecutionStatus,
+    PrimaRequest,
+    PrimaResponse,
+    RuntimeComponent,
+    RuntimeDiagnostics,
+    StateDelta,
+    TaskKind,
+)
 from runtime.prima_runtime import PrimaRuntime
+from runtime.route_profiles import InvalidRouteError, RoutePlan, select_route
 from runtime.runtime_context import RuntimeContext
 from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 
-__all__ = ["PrimaRuntime", "RuntimeContext", "RuntimeMetrics", "RuntimeResult"]
+__all__ = [
+    "ComponentCapability",
+    "DiagnosticMode",
+    "EvidenceReference",
+    "ExecutionOptions",
+    "ExecutionOutcome",
+    "ExecutionProfile",
+    "ExecutionStatus",
+    "InvalidRouteError",
+    "PrimaRequest",
+    "PrimaResponse",
+    "PrimaRuntime",
+    "RoutePlan",
+    "RuntimeContext",
+    "RuntimeComponent",
+    "RuntimeDiagnostics",
+    "RuntimeMetrics",
+    "RuntimeResult",
+    "RuntimeMode",
+    "StateDelta",
+    "TaskKind",
+    "select_route",
+]

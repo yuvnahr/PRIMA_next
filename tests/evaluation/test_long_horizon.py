@@ -16,7 +16,19 @@ from evaluation.runners.long_horizon_runner import (
     _check_preference_retrieved,
     _get_dominant_emotion,
 )
+from llm.llm_types import LLMResponse
+from runtime import PrimaRuntime
 
+
+class _ModelClient:
+    provider_name = "test"
+
+    def chat(self, **_kwargs: object) -> LLMResponse:
+        return LLMResponse("Generated long-horizon response.")
+
+
+def _runtime_factory(**kwargs: object) -> PrimaRuntime:
+    return PrimaRuntime(llm_client=_ModelClient(), **kwargs)
 
 # ---------------------------------------------------------------------------
 # Helper probe utilities
@@ -182,6 +194,7 @@ def test_long_horizon_runner_smoke(tmp_path: object) -> None:
             max_turns=40,
             seed_base=42,
             results_dir=Path(tmpdir),
+            runtime_factory=_runtime_factory,
         )
         output = runner.run()
 
@@ -210,6 +223,7 @@ def test_long_horizon_runner_output_files(tmp_path: object) -> None:
             max_turns=25,
             seed_base=42,
             results_dir=results_dir,
+            runtime_factory=_runtime_factory,
         )
         runner.run()
 

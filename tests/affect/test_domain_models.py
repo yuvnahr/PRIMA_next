@@ -1,6 +1,10 @@
 import unittest
 
-from affect.emotion_classifier import get_emotion_profile, map_opposite_emotions, resolve_modifiers_and_negations
+from affect.emotion_classifier import (
+    get_emotion_profile,
+    map_opposite_emotions,
+    resolve_modifiers_and_negations,
+)
 from affect.emotion_profile import EmotionProfile
 from affect.pad_model import PADState
 from state.emotional_state import EmotionalState

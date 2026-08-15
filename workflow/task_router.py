@@ -18,22 +18,12 @@ class TaskRoute:
 class TaskRouter:
     """Determines the phase route for a user input."""
 
-    DEFAULT_ROUTE = (
-        WorkflowPhase.AFFECT,
-        WorkflowPhase.MEMORY_RETRIEVAL,
-        WorkflowPhase.PLANNING,
-        WorkflowPhase.REFLECTION,
-        WorkflowPhase.ACTION,
-        WorkflowPhase.OUTPUT,
-    )
-
     def route(self, context: ExecutionContext) -> TaskRoute:
         """Return the route for the current context.
 
-        Future task-specific branching belongs here, keeping subsystem
-        components unaware of each other.
+        Subsystem components remain unaware of task/profile selection.
         """
         requested = context.metadata.get("route")
-        if requested:
-            return TaskRoute(tuple(WorkflowPhase(phase) for phase in requested))
-        return TaskRoute(self.DEFAULT_ROUTE)
+        if not isinstance(requested, tuple) or not requested:
+            raise ValueError("Workflow execution requires a trusted canonical route plan.")
+        return TaskRoute(tuple(WorkflowPhase(phase) for phase in requested))

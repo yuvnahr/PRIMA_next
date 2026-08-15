@@ -1,9 +1,22 @@
 import unittest
 
-from action import ActionContext, ActionExecutor, ExecutionPolicy, ToolInvocation, ToolInvocationKind
+from action import (
+    ActionContext,
+    ActionExecutor,
+    ExecutionPolicy,
+    ToolInvocation,
+    ToolInvocationKind,
+)
 from planning.plan import ExecutionIntent, Plan, PlanAction, PlanConstraint, PlanGoal
 from planning.planning_types import ActionType, ConstraintType, ExecutionIntentType, GoalPriority
-from tools import RegisteredTool, ToolExecutionStatus, ToolExecutor, ToolParameterSpec, ToolRegistry, ToolResult
+from tools import (
+    RegisteredTool,
+    ToolExecutionStatus,
+    ToolExecutor,
+    ToolParameterSpec,
+    ToolRegistry,
+    ToolResult,
+)
 
 
 class EchoTool:

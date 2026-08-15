@@ -8,7 +8,7 @@ from re import Pattern
 
 # Patterns that commonly indicate instruction-injection attempts. Keep this
 # list conservative; it's not a replacement for runtime monitoring.
-_INJECTION_PATTERNS: Pattern = re.compile(
+_INJECTION_PATTERNS: Pattern[str] = re.compile(
     r"(ignore (?:previous|prior) instructions|don't follow .*instructions|bypass|DROP TABLE|\bpassword\b|\bsecret\b)",
     flags=re.IGNORECASE,
 )

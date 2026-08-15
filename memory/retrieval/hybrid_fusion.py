@@ -62,7 +62,10 @@ class HybridFusion:
                 )
 
         fused: list[RetrievalResult] = []
-        total_weight = sum(self.config.weights.values()) or 1.0
+        active_names = set(results_by_strategy)
+        total_weight = sum(
+            weight for name, weight in self.config.weights.items() if name in active_names
+        ) or 1.0
         for note_id, result in merged.items():
             strategy_scores = scores[note_id]
             weighted = sum(

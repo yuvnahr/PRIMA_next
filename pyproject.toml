@@ -1,6 +1,9 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+filterwarnings = [
+    "ignore:SelectableGroups dict interface is deprecated\\. Use select\\.:DeprecationWarning:opentelemetry\\.util\\._importlib_metadata",
+]
 
 [tool.ruff]
 line-length = 120
@@ -8,6 +11,12 @@ target-version = "py310"
 exclude = [
     ".git",
     ".venv",
+    "venv",
+    ".pytest_cache",
+    "pytest-cache-files-*",
+    "pytest-tmp",
+    "PRIMA_Kaggle_Benchmark.ipynb",
+    "benchmarks/**/external",
     "__pycache__",
 ]
 
@@ -15,19 +24,112 @@ exclude = [
 select = ["E", "F", "I", "B", "UP", "S"]
 ignore = [
     "S101", # tests use assert-style helpers through unittest in some checks
-    "S110", # optional dependency fallbacks intentionally continue silently
-    "B904", # provider wrappers preserve concise user-facing request errors
     "E501", # this codebase permits long declarative lines
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"action/action_context.py" = ["UP017"]
+"action/execution_result.py" = ["UP042"]
+"action/tool_invocation.py" = ["UP042"]
+"affect/affect_engine.py" = ["UP017"]
+"affect/affect_types.py" = ["UP017"]
+"affect/emotion_cache.py" = ["UP046"]
+"affect/emotion_history.py" = ["UP017"]
+"config/runtime_mode.py" = ["UP042"]
+"benchmarks/hotpotqa/console.py" = ["E702", "E731"]
+"benchmarks/hotpotqa/experiment.py" = ["E702"]
+"evaluation/runners/retrieval_semantic_runner.py" = ["UP017"]
+"events/event.py" = ["UP017"]
+"events/event_types.py" = ["UP042"]
+"memory/memory_note.py" = ["UP017"]
+"memory/memory_types.py" = ["UP042"]
+"memory/retrieval/query_analysis.py" = ["UP017"]
+"memory/retrieval/temporal_strategy.py" = ["UP017"]
+"planning/planning_types.py" = ["UP042"]
+"reasoning/models.py" = ["UP042"]
+"reasoning/reflection_advisor.py" = ["UP042"]
+"reflection/reflection_memory.py" = ["UP017"]
+"reflection/reflection_signal.py" = ["UP017"]
+"reflection/reflection_types.py" = ["UP042"]
+"runtime/runtime_context.py" = ["UP017"]
+"state/emotional_state.py" = ["UP017"]
+"state/cognitive_state.py" = ["UP017"]
+"tests/benchmarks/test_hotpotqa.py" = ["E701", "E702"]
+"tests/benchmarks/test_hotpotqa_qol.py" = ["E702"]
+"tests/test_locomo_qa_correctness.py" = ["UP017"]
+"tools/tool_executor.py" = ["UP017"]
+"tools/tool_result.py" = ["UP042"]
+"uncertainty/uncertainty_types.py" = ["UP042"]
+"workflow/execution_context.py" = ["UP017"]
+"workflow/workflow_events.py" = ["UP017", "UP042"]
+"workflow/workflow_state.py" = ["UP042"]
+
 [tool.mypy]
 python_version = "3.10"
-ignore_missing_imports = true
 strict = false
-ignore_errors = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_unused_configs = true
+explicit_package_bases = true
 exclude = [
-    "__pycache__",
+    '(^|[\\/])(?:venv|\.venv|__pycache__|evaluation|tests|scripts|benchmarks[\\/](?:goemotions|hotpotqa|locomo(?:-v2)?))([\\/]|$)|reasoning[\\/]validate_.*\.py$',
 ]
 
-[tool.bandit]
-exclude_dirs = ["tests", ".git", ".venv", "__pycache__"]
+# New production packages must join this strict list before merge. Benchmarks,
+# evaluation scripts and tests retain the typed baseline above while legacy is retired.
+[[tool.mypy.overrides]]
+module = [
+    "action.*",
+    "benchmarks.common.*",
+    "benchmarks.preflight",
+    "events.*",
+    "llm.*",
+    "planning.*",
+    "reasoning.*",
+    "runtime.*",
+    "security.*",
+    "state.*",
+    "tools.*",
+    "uncertainty.*",
+    "workflow.*",
+    "world.*",
+]
+strict = true
+
+# Verified third-party boundaries without complete type information.
+[[tool.mypy.overrides]]
+module = [
+    "chromadb.*",
+    "datasets.*",
+    "networkx.*",
+    "nltk.*",
+    "pyarrow.*",
+    "sentence_transformers.*",
+    "sklearn.*",
+    "spacy.*",
+    "torch.*",
+    "tqdm.*",
+    "transformers.*",
+]
+ignore_missing_imports = true
+
+# Affect, memory and reflection retain legacy NumPy/Chroma/plugin typing until
+# their owning architecture phases replace those boundaries.
+[[tool.mypy.overrides]]
+module = ["affect.*", "memory.*", "reflection.*"]
+strict = false
+disallow_any_generics = false
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+warn_return_any = false
+warn_unused_ignores = false
+
+# Chroma query result payloads are runtime-validated but currently untyped.
+[[tool.mypy.overrides]]
+module = ["memory.memory_repository"]
+disable_error_code = ["attr-defined"]
+
+# Pydantic's optional runtime-selected base class is intentionally dynamic.
+[[tool.mypy.overrides]]
+module = ["config.settings"]
+disable_error_code = ["misc"]

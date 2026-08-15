@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import builtins
+import json
+import os
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Any, List
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 
+from memory.embedding_pipeline import current_embedding_metadata
 from memory.memory_metadata import decode_metadata, encode_metadata
 from memory.memory_note import MemoryNote
 from memory.memory_types import COLLECTION_BY_TYPE, MemoryType
@@ -28,11 +33,11 @@ class MemoryRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         raise NotImplementedError
 
     @abstractmethod
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         raise NotImplementedError
 
 
@@ -41,6 +46,7 @@ class InMemoryMemoryRepository(MemoryRepository):
 
     def __init__(self) -> None:
         self._notes: dict[MemoryType, dict[str, MemoryNote]] = defaultdict(dict)
+        self.fingerprint_status = "valid"
 
     def add(self, note: MemoryNote) -> MemoryNote:
         self._notes[note.memory_type][note.id] = note
@@ -58,7 +64,7 @@ class InMemoryMemoryRepository(MemoryRepository):
                 return notes[note_id]
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         if memory_type is not None:
             return list(self._notes[memory_type].values())
         notes: list[MemoryNote] = []
@@ -66,7 +72,7 @@ class InMemoryMemoryRepository(MemoryRepository):
             notes.extend(typed_notes.values())
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         query = np.array(list(embedding), dtype="float32")
         query_norm = np.linalg.norm(query) or 1.0
         query = query / query_norm
@@ -85,6 +91,10 @@ class ChromaMemoryRepository(MemoryRepository):
     def __init__(self, path: str = "./memory_db") -> None:
         import chromadb
 
+        self.path = Path(path)
+        self.path.mkdir(parents=True, exist_ok=True)
+        self.metadata_path = self.path / ".prima_embedding_metadata.json"
+        self.repository_metadata = self._read_repository_metadata()
         self.client: Any = chromadb.PersistentClient(path=path)
         self.collections: dict[MemoryType, Any] = {
             memory_type: self.client.get_or_create_collection(
@@ -93,8 +103,42 @@ class ChromaMemoryRepository(MemoryRepository):
             )
             for memory_type, collection_name in COLLECTION_BY_TYPE.items()
         }
+        self.fingerprint_status = self._validate_fingerprint()
 
+    def _validate_fingerprint(self) -> str:
+        expected = current_embedding_metadata()["backend_fingerprint"]
+        if self.repository_metadata:
+            found = self.repository_metadata.get("backend_fingerprint")
+            if found == expected:
+                return "valid"
+            return self._mismatch_status(found, expected)
+        notes = self.list()
+        if not notes:
+            return "valid"
+        found = {note.retrieval_metadata.get("backend_fingerprint") for note in notes}
+        if found == {expected}:
+            return "valid"
+        return self._mismatch_status(found, expected)
+
+    def _mismatch_status(self, found: object, expected: str) -> str:
+        mode = os.getenv("PRIMA_EMBEDDING_MISMATCH", "error").lower()
+        if mode == "readonly":
+            return "readonly"
+        if mode == "rebuild":
+            return "invalid-rebuild-required"
+        raise RuntimeError(f"Embedding fingerprint mismatch: stored={sorted(str(item) for item in found)} current={expected}")
+
+    def _read_repository_metadata(self) -> dict[str, Any]:
+        if not self.metadata_path.exists():
+            return {}
+        return json.loads(self.metadata_path.read_text(encoding="utf-8"))
+
+    def _write_repository_metadata(self) -> None:
+        self.repository_metadata = current_embedding_metadata()
+        self.metadata_path.write_text(json.dumps(self.repository_metadata, sort_keys=True), encoding="utf-8")
     def add(self, note: MemoryNote) -> MemoryNote:
+        if self.fingerprint_status == "readonly":
+            raise RuntimeError("Repository is readonly because embedding fingerprints differ")
         collection: Any = self.collections[note.memory_type]
         collection.add(
             ids=[note.id],
@@ -102,9 +146,12 @@ class ChromaMemoryRepository(MemoryRepository):
             embeddings=[list(note.embedding)],
             metadatas=[encode_metadata(note.to_metadata())],
         )
+        self._write_repository_metadata()
         return note
 
     def update(self, note: MemoryNote) -> MemoryNote:
+        if self.fingerprint_status == "readonly":
+            raise RuntimeError("Repository is readonly because embedding fingerprints differ")
         collection: Any = self.collections[note.memory_type]
         collection.upsert(
             ids=[note.id],
@@ -112,6 +159,7 @@ class ChromaMemoryRepository(MemoryRepository):
             embeddings=[list(note.embedding)],
             metadatas=[encode_metadata(note.to_metadata())],
         )
+        self._write_repository_metadata()
         return note
 
     def get(self, note_id: str, memory_type: MemoryType | None = None) -> MemoryNote | None:
@@ -123,7 +171,7 @@ class ChromaMemoryRepository(MemoryRepository):
                 return self._from_chroma_result(result, 0)
         return None
 
-    def list(self, memory_type: MemoryType | None = None) -> List[MemoryNote]:
+    def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         notes: list[MemoryNote] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
@@ -131,8 +179,10 @@ class ChromaMemoryRepository(MemoryRepository):
             notes.extend(self._from_chroma_result(result, index) for index in range(len(result["ids"])))
         return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> List[tuple[MemoryNote, float]]:
-        notes: List[tuple[MemoryNote, float]] = []
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
+        if self.fingerprint_status != "valid":
+            raise RuntimeError("Repository fingerprint is invalid; rebuild before retrieval")
+        notes: list[tuple[MemoryNote, float]] = []
         memory_types = [memory_type] if memory_type else list(MemoryType)
         for candidate_type in memory_types:
             result = self.collections[candidate_type].query(
@@ -160,3 +210,5 @@ class ChromaMemoryRepository(MemoryRepository):
             "metadata": decode_metadata(result["metadatas"][index]),
         }
         return MemoryNote.from_record(record)
+
+

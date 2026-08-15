@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -165,9 +166,10 @@ class UserSimulationResult:
 def _simulate_user(
     user: SyntheticUser,
     max_turns: int | None = None,
+    runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime,
 ) -> UserSimulationResult:
     """Run a full conversation for one synthetic user through PrimaRuntime."""
-    runtime = PrimaRuntime(log_path=f"logs/long_horizon_{user.user_id}.log")
+    runtime = runtime_factory(log_path=f"logs/long_horizon_{user.user_id}.log")
     ctx = RuntimeContext(session_id=f"lh_{user.user_id}")
 
     result = UserSimulationResult(
@@ -268,6 +270,7 @@ class LongHorizonRunner:
     seed_base: int = UserGenerator.DEFAULT_SEED_BASE
     results_dir: Path = field(default_factory=lambda: DEFAULT_RESULTS_DIR)
     max_turns_override: int | None = None
+    runtime_factory: Callable[..., PrimaRuntime] = PrimaRuntime
 
     def __post_init__(self) -> None:
         self.results_dir = Path(self.results_dir)
@@ -298,7 +301,11 @@ class LongHorizonRunner:
 
         for idx, user in enumerate(users):
             logger.info("Simulating user %d/%d: %s", idx + 1, len(users), user.user_id)
-            sim = _simulate_user(user, max_turns=self.max_turns_override)
+            sim = _simulate_user(
+                user,
+                max_turns=self.max_turns_override,
+                runtime_factory=self.runtime_factory,
+            )
             user_dict = sim.to_dict()
             all_results.append(user_dict)
 

@@ -6,7 +6,15 @@ import json
 from pathlib import Path
 
 from evaluation.runners.dataset_runner import DatasetRunner
+from llm.llm_types import LLMResponse
 from runtime import PrimaRuntime
+
+
+class _ModelClient:
+    provider_name = "test"
+
+    def chat(self, **_kwargs: object) -> LLMResponse:
+        return LLMResponse("Generated dataset response.")
 
 
 def test_dataset_replay_executes_and_generates_files(tmp_path: Path) -> None:
@@ -38,7 +46,7 @@ def test_dataset_replay_executes_and_generates_files(tmp_path: Path) -> None:
     )
 
     records = DatasetRunner(
-        runtime=PrimaRuntime(),
+        runtime=PrimaRuntime(llm_client=_ModelClient()),
         dataset_path=dataset_path,
         results_path=results_path,
         metrics_path=metrics_path,

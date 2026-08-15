@@ -13,10 +13,12 @@ from affect.affect_evolution import (
     update_momentum,
 )
 from affect.affect_types import AffectUpdate
-from affect.emotion_classifier import LegacyAffectClassifier
+from affect.classifier_factory import create_affect_classifier
 from affect.emotion_history import EmotionHistory
+from affect.emotion_prediction import EmotionPrediction
 from affect.emotion_profile import EmotionProfile
 from affect.emotional_memory_adapter import EmotionalMemoryAdapter
+from affect.interfaces import EmotionClassifier
 from affect.pad_model import PADState
 from affect.reflection_triggers import generate_reflection_signals
 from affect.retrieval_priors import generate_retrieval_priors
@@ -30,12 +32,12 @@ class DynamicAffectEngine:
 
     def __init__(
         self,
-        classifier: LegacyAffectClassifier | None = None,
+        classifier: EmotionClassifier | None = None,
         emotional_state: EmotionalState | None = None,
         history: EmotionHistory | None = None,
         memory_adapter: EmotionalMemoryAdapter | None = None,
     ) -> None:
-        self.classifier = classifier or LegacyAffectClassifier()
+        self.classifier = classifier or create_affect_classifier()
         self.emotional_state = emotional_state or EmotionalState()
         self.history = history or EmotionHistory(maxlen=50)
         self.memory_adapter = memory_adapter or EmotionalMemoryAdapter()
@@ -82,6 +84,20 @@ class DynamicAffectEngine:
         retrieval_priors = generate_retrieval_priors(profile, salience_score, volatility)
         reflection_signals = generate_reflection_signals(profile, dissonance_score, evolution, volatility)
         memory_metadata = self.memory_adapter.to_metadata(profile, salience_score, dissonance_score)
+        prediction = getattr(self.classifier, "last_prediction", None)
+        if isinstance(prediction, EmotionPrediction):
+            memory_metadata.update({
+                "affect_backend": "goemotions",
+                "affect_model_id": prediction.model_id,
+                "affect_model_revision": prediction.model_revision,
+                "affect_taxonomy": prediction.taxonomy,
+                "fine_grained_emotions": dict(prediction.probabilities),
+                "selected_fine_grained_labels": list(prediction.selected_labels),
+                "prima_core_emotions": dict(profile.emotions),
+                "entropy": prediction.entropy,
+                "uncertainty": prediction.uncertainty,
+                "margin": prediction.margin,
+            })
         if memory_context:
             memory_metadata["memory_context_keys"] = sorted(memory_context.keys())
 

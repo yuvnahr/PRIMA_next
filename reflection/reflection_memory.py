@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from memory.memory_context import StateSnapshot
-from memory.memory_note import MemoryNote, stable_embedding
+from memory.memory_note import MemoryNote
 from memory.memory_types import MemoryLevel, MemoryType
 from reflection.reflection_lineage import ReflectionLineage
 from reflection.reflection_signal import ReflectionSignal
@@ -31,11 +31,12 @@ class ReflectionMemory:
             content=self.reflection_text,
             memory_type=MemoryType.SEMANTIC,
             memory_level=MemoryLevel.SEMANTIC_ABSTRACTION,
-            embedding=stable_embedding(self.reflection_text),
             affective_state={},
             context={
                 "type": "reflection_memory",
                 "source_failure": self.source_failure,
+                "retrieval_channel": "procedural",
+                "evidence_eligible": False,
                 "reflection_id": self.reflection_id,
                 "retrieval_context": self.retrieval_context,
             },
@@ -87,13 +88,17 @@ class Rule:
             content=self.rule_text,
             memory_type=MemoryType.SEMANTIC,
             memory_level=MemoryLevel.SEMANTIC_ABSTRACTION,
-            embedding=stable_embedding(self.rule_text),
             context={
                 "type": "expel_rule",
                 "rule_id": self.rule_id,
+                "retrieval_channel": "procedural",
+                "evidence_eligible": False,
                 "source_failures": list(self.source_failures),
                 "applicability": list(self.applicability),
             },
             salience_score=self.confidence,
             note_id=f"rule_{self.rule_id}",
         ).with_updates(evolution_metadata={"reflection_lineage": self.lineage.to_dict()})
+
+
+

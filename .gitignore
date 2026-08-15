@@ -1,10 +1,11 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.codex_pycache/
+.codex_deps/
 .coverage
 htmlcov/
 
@@ -12,18 +13,48 @@ htmlcov/
 .venv/
 venv/
 env/
+.goemotions-venv/
 
-# Local configuration and model/data caches
+# Local configuration, logs, models, and caches
 .env
 *.log
 models/
 cache/
 Finetuned_Langue_Models/
+memory_db/
 
-# OS/editor
+# Editors and operating systems
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 
+# External benchmark checkouts and downloaded datasets
+benchmarks/goemotions/external/
+benchmarks/hotpotqa/data/*.json
+benchmarks/hotpotqa/data/*.parquet
+
+# Generated benchmark and evaluation artifacts
+benchmarks/**/outputs/
+benchmarks/**/results/
+evaluation/**/outputs/
+evaluation/**/results/
+evaluation/qa*/
+evaluation/goemotions/raw/
+evaluation/goemotions/parsed/
+evaluation/goemotions/answers/
+evaluation/goemotions/prompts/
+evaluation/goemotions/metrics/
+evaluation/goemotions/logs/
+evaluation/goemotions/figures/
+evaluation/goemotions/reports/
+evaluation/goemotions/models/
+evaluation/goemotions/smoke/
+evaluation/goemotions/final/
 cleanup_reports/
+pytest-tmp/
+pytest-cache-files-*/
+*.generated.json
+*.generated.md
+*.tmp.json
+*.tmp.csv

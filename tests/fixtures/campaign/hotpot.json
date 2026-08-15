@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "campaign-hotpot-1",
+    "question": "Who won?",
+    "answer": "Alpha",
+    "supporting_facts": [["Result", 0]],
+    "context": [["Result", ["Alpha won."]]]
+  },
+  {
+    "_id": "campaign-hotpot-2",
+    "question": "What is the answer?",
+    "answer": "Alpha",
+    "supporting_facts": [["Answer", 0]],
+    "context": [["Answer", ["The answer is Alpha."]]]
+  }
+]

@@ -12,7 +12,10 @@ import numpy as np
 from evaluation.metrics.retrieval_metrics import (
     summarize_retrieval_metrics,
 )
-from evaluation.runners.retrieval_semantic_runner import SemanticRetrievalConfiguration, SemanticRetrievalRunner
+from evaluation.runners.retrieval_semantic_runner import (
+    SemanticRetrievalConfiguration,
+    SemanticRetrievalRunner,
+)
 from memory.memory_note import stable_embedding
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
@@ -189,7 +192,7 @@ class RetrievalOptimizationRunner:
         diagnostics = []
         nearest_hits = 0
         all_notes = repository.list()
-        for record, trace_record in zip(records, trace):
+        for record, trace_record in zip(records, trace, strict=True):
             query_vector = np.array(stable_embedding(str(record["query"])), dtype="float32")
             expected_id = str(record["expected_memory_ids"][0])
             expected_note = repository.get(expected_id)
