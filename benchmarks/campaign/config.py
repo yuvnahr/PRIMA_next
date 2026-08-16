@@ -35,6 +35,12 @@ class ProviderConfig(ConfigModel):
     fake_delay_seconds: float = Field(default=0.0, ge=0.0)
 
 
+class RepositoryConfig(ConfigModel):
+    url: str | None = None
+    requested_ref: str | None = None
+    commit_sha: str | None = None
+
+
 class SchedulerConfig(ConfigModel):
     mode: Literal["sequential", "interleaved"] = "sequential"
     max_gpu_requests: int = Field(default=1, gt=0)
@@ -108,6 +114,7 @@ class CampaignConfig(ConfigModel):
     schema_version: Literal["1.0"] = "1.0"
     output_root: Path
     provider: ProviderConfig
+    repository: RepositoryConfig = Field(default_factory=RepositoryConfig)
     scheduler: SchedulerConfig = Field(default_factory=SchedulerConfig)
     failure_policy: FailurePolicyConfig = Field(default_factory=FailurePolicyConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)

@@ -31,6 +31,7 @@ class CampaignManifest(BaseModel):
     config_hash: str
     status: Literal["partial", "complete", "failed"] = "partial"
     provider: dict[str, Any]
+    repository: dict[str, Any] = Field(default_factory=dict)
     preflight: dict[str, Any]
     modes: dict[str, CampaignModeRecord]
     comparisons: dict[str, Any] = Field(default_factory=dict)
@@ -66,6 +67,7 @@ class CampaignManifestStore:
                     "model": config.provider.model,
                     "revision": config.provider.revision,
                 },
+                repository=config.repository.model_dump(mode="json"),
                 preflight=preflight,
                 modes={mode.id: CampaignModeRecord() for mode in config.benchmarks},
                 created_at=now,

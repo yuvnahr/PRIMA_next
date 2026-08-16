@@ -407,7 +407,7 @@ def _manifest(
         ),
         source_fingerprint=None if commit else fingerprint(Path(__file__)), git_commit=commit,
         dataset_hash=fingerprint(dataset), selected_ids=tuple(selected_ids),
-        provider=generation.provider, model=generation.model,
+        provider=generation.provider, model=generation.model, model_revision=generation.revision,
         generation_config=generation.to_dict(), benchmark_config=benchmark_config,
         runtime_profile=profile.value,
         active_capabilities={

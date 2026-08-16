@@ -314,6 +314,12 @@ def _classify_response(
     final = metadata.get("final_scored_labels")
     if isinstance(final, list) and all(isinstance(value, str) and value in labels for value in final):
         predicted = frozenset(final)
+    response_hash = hashlib.sha256(
+        str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
+    ).hexdigest()
+    recorded_hash = metadata.get("raw_model_response_hash")
+    if recorded_hash is not None and str(recorded_hash) != response_hash:
+        raise ValueError("GoEmotions paired scoring refused: cached raw-response hashes do not match")
     return {
         "id": example.example_id,
         "text": example.text,
@@ -321,9 +327,7 @@ def _classify_response(
         "predicted_labels": sorted(predicted),
         "prompt": prompt,
         "raw_response": raw_response,
-        "response_hash": hashlib.sha256(
-            str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
-        ).hexdigest(),
+        "response_hash": response_hash,
         **metadata,
         "parse_error": parse_error,
         "latency_ms": latency_ms,
@@ -426,6 +430,7 @@ def _manifest(
         selected_ids=tuple(row.example_id for row in examples),
         provider=generation.provider,
         model=generation.model,
+        model_revision=generation.revision,
         generation_config=generation.to_dict(),
         benchmark_config={
             "system": system.name,

@@ -100,6 +100,7 @@ def effective_generation(campaign: CampaignConfig, mode: BenchmarkModeConfig) ->
     return GenerationConfig(
         model=campaign.provider.model,
         provider=campaign.provider.kind,
+        revision=campaign.provider.revision,
         temperature=campaign.provider.temperature,
         seed=mode.seed,
         max_output_tokens=campaign.provider.max_output_tokens,

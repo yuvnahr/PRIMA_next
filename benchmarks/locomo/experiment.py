@@ -176,7 +176,7 @@ def _turn_request(
     text = _turn_text(turn)
     if policy is IngestionPolicy.NORMAL_PRIMA:
         return PrimaRequest(
-            task_kind=TaskKind.CONVERSATION, profile=ExecutionProfile.PRIMA_FULL,
+            task_kind=TaskKind.HISTORICAL_REPLAY, profile=ExecutionProfile.PRIMA_FULL,
             input_text=text, session_id=conversation_id, generation_config=generation,
             metadata={
                 "turn_id": turn.turn_id, "source_session_id": turn.session_id,
@@ -199,11 +199,14 @@ async def _run_conversation(
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
     ingestion_failure: PrimaResponse | None = None
+    historical_replay_ms = 0.0
     if hasattr(runtime, "start_maintenance"):
         await runtime.start_maintenance()
     try:
         for turn in conversation.turns:
+            replay_started = time.perf_counter()
             response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation))
+            historical_replay_ms += (time.perf_counter() - replay_started) * 1000
             if response.status is not ExecutionStatus.COMPLETED:
                 ingestion_failure = response
                 break
@@ -223,6 +226,7 @@ async def _run_conversation(
                 record = _question_record(
                     conversation, question, profile, policy, None, admitted_turn_ids,
                     created_memory_ids, ingestion_failure=ingestion_failure,
+                    historical_replay_ms=historical_replay_ms,
                 )
             else:
                 await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_QUESTION)
@@ -243,6 +247,7 @@ async def _run_conversation(
                 record = _question_record(
                     conversation, question, profile, policy, response, admitted_turn_ids,
                     created_memory_ids, elapsed_ms=(time.perf_counter() - started) * 1000,
+                    historical_replay_ms=historical_replay_ms,
                 )
             checkpoint(record)
         await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_FINALIZATION)
@@ -277,6 +282,7 @@ def _question_record(
     policy: IngestionPolicy, response: PrimaResponse | None,
     admitted_turn_ids: set[str], created_memory_ids: set[str],
     *, elapsed_ms: float = 0.0, ingestion_failure: PrimaResponse | None = None,
+    historical_replay_ms: float = 0.0,
 ) -> dict[str, Any]:
     expected_evidence = tuple(str(item) for item in question.evidence)
     response_dict = response.to_dict() if response is not None else {}
@@ -324,6 +330,7 @@ def _question_record(
             response.diagnostics.maintenance if response is not None else {}
         ),
         "latency_ms": round(elapsed_ms or (response.diagnostics.latency_ms if response else 0.0), 3),
+        "historical_replay_ms": round(historical_replay_ms, 3),
         "retrieval_count": response.diagnostics.retrieval_count if response else 0,
         "reflection_interventions": response.diagnostics.reflection_count if response else 0,
         "model_call_count": response.diagnostics.model_call_count if response else 0,
@@ -444,7 +451,7 @@ def _manifest(
         ),
         source_fingerprint=None if commit else fingerprint(Path(__file__)), git_commit=commit,
         dataset_hash=fingerprint(dataset), selected_ids=tuple(selected_ids),
-        provider=generation.provider, model=generation.model,
+        provider=generation.provider, model=generation.model, model_revision=generation.revision,
         generation_config=generation.to_dict(), benchmark_config=config,
         runtime_profile=profile.value,
         active_capabilities={
