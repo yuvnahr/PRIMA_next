@@ -1,6 +1,7 @@
+import json
 from pathlib import Path
 
-from benchmarks.goemotions.dataset import load_examples, load_labels
+from benchmarks.goemotions.dataset import load_examples, load_labels, validate_json_splits
 from benchmarks.goemotions.experiment import _parse_labels
 from benchmarks.goemotions.metrics import evaluate, paired_outcomes, probability_metrics
 from benchmarks.goemotions.schemas import parse_label_response
@@ -63,6 +64,19 @@ def test_dataset_rejects_malformed_rows(tmp_path) -> None:
         assert "row 1" in str(exc)
     else:
         raise AssertionError("Duplicate source labels must be rejected.")
+
+
+def test_kaggle_json_splits_use_canonical_labels(tmp_path) -> None:
+    (tmp_path / "goemotions_val.json").write_text(
+        json.dumps([{"text": "calm", "labels": [27], "id": "val-1"}]), encoding="utf-8"
+    )
+    test_path = tmp_path / "goemotions_test.json"
+    test_path.write_text(
+        json.dumps([{"text": "happy", "labels": [17, 26], "id": "test-1"}]), encoding="utf-8"
+    )
+    examples = load_examples(test_path)
+    assert examples[0].labels == {"joy", "surprise"}
+    assert validate_json_splits(tmp_path)["counts"] == {"val": 1, "test": 1}
 
 
 def test_paired_outcome_groups_separate_parse_recovery() -> None:

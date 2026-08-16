@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from affect.taxonomies.goemotions import LABELS
 from benchmarks.common import (
     BenchmarkArtifactStore,
     BenchmarkManifest,
@@ -34,7 +35,13 @@ from benchmarks.common import (
     atomic_write_json,
     resume_manifest,
 )
-from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExample, load_examples, load_labels
+from benchmarks.goemotions.dataset import (
+    DEFAULT_DATASET_PATH,
+    GoEmotionsExample,
+    load_examples,
+    load_labels,
+    validate_json_splits,
+)
 from benchmarks.goemotions.metrics import (
     evaluate,
     paired_bootstrap_sample_f1,
@@ -118,10 +125,18 @@ def run_goemotions_experiment(
 
     requested = Path(dataset_path)
     data_dir = requested.parent
-    split_validation = validate_splits(data_dir)
-    selected_path = data_dir / f"{split}.tsv"
-    labels = load_labels(data_dir / "emotions.txt")
-    examples = load_examples(selected_path, data_dir / "emotions.txt")
+    if requested.suffix.lower() == ".json":
+        if requested.name != "goemotions_test.json" or split != "test":
+            raise ValueError("The Kaggle GoEmotions JSON dataset supports test evaluation only.")
+        selected_path = data_dir / "goemotions_test.json"
+        split_validation = validate_json_splits(data_dir)
+        labels = list(LABELS)
+        examples = load_examples(selected_path)
+    else:
+        split_validation = validate_splits(data_dir)
+        selected_path = data_dir / f"{split}.tsv"
+        labels = load_labels(data_dir / "emotions.txt")
+        examples = load_examples(selected_path, data_dir / "emotions.txt")
     if sample_manifest:
         examples = _examples_from_manifest(examples, selected_path, sample_manifest)
     elif max_samples > 0:
