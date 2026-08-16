@@ -24,7 +24,12 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
             raise FileNotFoundError(f"Campaign dataset not found for {mode.id}: {mode.dataset_path}")
         hashes = {mode.dataset_path.name: _hash(mode.dataset_path)}
         if mode.benchmark == "goemotions":
-            for name in ("train.tsv", "dev.tsv", "test.tsv", "emotions.txt"):
+            required_files = (
+                ("goemotions_val.json", "goemotions_test.json")
+                if mode.dataset_path.suffix.lower() == ".json"
+                else ("train.tsv", "dev.tsv", "test.tsv", "emotions.txt")
+            )
+            for name in required_files:
                 path = mode.dataset_path.with_name(name)
                 if not path.is_file():
                     raise FileNotFoundError(f"GoEmotions campaign file not found: {path}")

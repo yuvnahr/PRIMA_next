@@ -114,6 +114,30 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     assert len(case_ids) == len(set(case_ids)) == 2
 
 
+def test_campaign_uses_published_goemotions_json_pair(tmp_path: Path) -> None:
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "goemotions_val.json").write_text(
+        json.dumps([{"text": "validation", "labels": [17], "id": "val-1"}]), encoding="utf-8"
+    )
+    test_path = data / "goemotions_test.json"
+    test_path.write_text(
+        json.dumps([{"text": "joyful", "labels": [17], "id": "test-1"}]), encoding="utf-8"
+    )
+    payload = _payload(tmp_path / "campaign")
+    payload["benchmarks"] = [payload["benchmarks"][0]]
+    payload["benchmarks"][0]["dataset_path"] = str(test_path)
+
+    result = run_campaign(CampaignConfig.model_validate(payload))
+
+    assert result["status"] == "complete"
+    preflight = CampaignManifestStore(Path(payload["output_root"])).read().preflight
+    assert set(preflight["datasets"]["go"]["hashes"]) == {
+        "goemotions_val.json",
+        "goemotions_test.json",
+    }
+
+
 def test_comparison_with_different_seed_is_refused_during_validation(tmp_path: Path) -> None:
     payload = _payload(tmp_path)
     right = dict(payload["benchmarks"][1])
