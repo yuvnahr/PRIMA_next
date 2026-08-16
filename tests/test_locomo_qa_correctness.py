@@ -186,6 +186,43 @@ def test_timestamp_schema_category_and_evidence_validation() -> None:
         LoCoMoAdapter().adapt(invalid)
 
 
+@pytest.mark.parametrize(
+    ("conversation_id", "source_evidence", "expected_evidence"),
+    [
+        (
+            "conv-42", ("D2:14", "D9:12", "D9:14", "D10:11", "D19:17", "D27:23", "D10:19"),
+            ("D2:14", "D9:12", "D9:14", "D10:11", "D19:17", "D27:23", "D20:15"),
+        ),
+        ("conv-42", ("D1:18", "D", "D1:20"), ("D1:18", "D1:20")),
+        (
+            "conv-43", ("D1:14", "D2:7", "D4:7", "D5:15", "D:11:26", "D20:21", "D26:36"),
+            ("D1:14", "D2:7", "D4:7", "D5:15", "D11:26", "D20:21", "D26:36"),
+        ),
+        ("conv-47", ("D4:36", "D18:1", "D18:7"), ("D13:3", "D18:1", "D18:7")),
+        ("conv-50", ("D30:05",), ("D30:5",)),
+    ],
+)
+def test_canonical_locomo_evidence_errata_are_corrected(
+    conversation_id: str, source_evidence: tuple[str, ...], expected_evidence: tuple[str, ...],
+) -> None:
+    record = fixture()[0]
+    record["sample_id"] = conversation_id
+    record["conversation"] = {
+        "speaker_a": "A", "speaker_b": "B", "session_1_date_time": "2023-05-08",
+        "session_1": [
+            {"speaker": "A", "dia_id": identifier, "text": f"Evidence {identifier}"}
+            for identifier in expected_evidence
+        ],
+    }
+    record["qa"] = [{
+        "id": "q1", "question": "What happened?", "answer": "Answer",
+        "evidence": list(source_evidence), "category": 1,
+    }]
+    question = LoCoMoAdapter().adapt([record])[0].questions[0]
+    assert question.evidence == expected_evidence
+    assert question.metadata["source_evidence"] == source_evidence
+
+
 def test_optional_metrics_are_opt_in_and_bertscore_uses_device_and_batch(monkeypatch) -> None:
     records = [{"prediction": "alpha", "expected_answer": "alpha", "category": "3", "execution_failed": False}]
     core = LoCoMoEvaluator().evaluate(records)
