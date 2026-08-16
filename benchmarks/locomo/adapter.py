@@ -17,6 +17,13 @@ TIMESTAMP_FORMATS = (
     "%Y-%m-%d",
 )
 VALID_CATEGORIES = frozenset({"1", "2", "3", "4", "5"})
+KNOWN_EVIDENCE_CORRECTIONS = {
+    ("conv-42", "D10:19"): "D20:15",
+    ("conv-42", "D"): None,
+    ("conv-43", "D:11:26"): "D11:26",
+    ("conv-47", "D4:36"): "D13:3",
+    ("conv-50", "D30:05"): "D30:5",
+}
 
 
 def parse_timestamp(value: str, *, location: str = "timestamp") -> datetime:
@@ -144,7 +151,17 @@ class LoCoMoAdapter:
             answer_text = str(answer).strip()
             if not answer_text:
                 raise ValueError(f"{location}: answer must be a non-empty scalar value")
-            evidence = self._evidence_ids(raw.get("evidence", ()), location)
+            raw_evidence = raw.get("evidence", ())
+            source_values = (
+                [raw_evidence] if isinstance(raw_evidence, str)
+                else list(raw_evidence) if isinstance(raw_evidence, (list, tuple))
+                else None
+            )
+            corrected_evidence = raw_evidence if source_values is None else [
+                replacement for item in source_values
+                if (replacement := KNOWN_EVIDENCE_CORRECTIONS.get((conversation_id, item), item)) is not None
+            ]
+            evidence = self._evidence_ids(corrected_evidence, location)
             unknown = sorted(set(evidence) - turn_ids)
             if unknown:
                 raise ValueError(f"{location}: evidence IDs not present in conversation: {unknown}")
@@ -152,6 +169,8 @@ class LoCoMoAdapter:
                 key: value for key, value in raw.items()
                 if key not in {"question", "answer", "category", "evidence", "question_id", "id"}
             }
+            if source_values is not None and corrected_evidence != source_values:
+                metadata["source_evidence"] = tuple(source_values)
             questions.append(ConversationQuestion(
                 question.strip(), answer_text, question_id, category, tuple(evidence), metadata,
             ))
