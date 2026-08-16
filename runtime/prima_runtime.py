@@ -997,6 +997,8 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.OUTPUT_SHAPER)
     if WorkflowPhase.MEMORY_COMMIT in completed:
         executed.add(RuntimeComponent.MEMORY_COMMIT)
+        if str(context.metadata.get("task_kind")) == TaskKind.HISTORICAL_REPLAY.value:
+            executed.add(RuntimeComponent.MEMORY_INDEX)
     if (
         WorkflowPhase.MAINTENANCE_ENQUEUE in completed
         and int(context.maintenance_result.get("queued_count", 0)) > 0
@@ -1111,6 +1113,11 @@ def _route_diagnostics(
         )
         for component in (RuntimeComponent.WORLD_MODEL, RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     }
+    for component in route.skipped_components:
+        component_details.setdefault(
+            component.value,
+            {"status": "task_inapplicable", "reason": f"not applicable to task '{route.task_kind.value}'"},
+        )
     component_details[RuntimeComponent.AFFECT_ENGINE.value] = {
         "status": (
             "executed" if RuntimeComponent.AFFECT_ENGINE in executed else "enabled_not_executed"

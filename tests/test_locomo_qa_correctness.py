@@ -67,13 +67,14 @@ def write_fixture(tmp_path: Path) -> Path:
 def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaResponse:
     ingestion = request.profile is ExecutionProfile.INGESTION_ONLY
     conversation = request.task_kind.value == "conversation"
+    historical_replay = request.task_kind.value == "historical_replay"
     evidence = ()
     output_data = {}
     text = None
     if ingestion:
         output_data = {"memory_id": f"memory-{request.metadata['document_metadata']['source_turn_id']}"}
-    elif conversation:
-        text = "acknowledged"
+    elif conversation or historical_replay:
+        text = None if historical_replay else "acknowledged"
         output_data = {"memory_ids_created": [f"memory-{request.metadata['turn_id']}"], "memory_admission": {"stored": True}}
     else:
         text = "Alpha"
@@ -91,15 +92,17 @@ def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaRespon
         request_id=request.request_id, task_kind=request.task_kind, profile=request.profile,
         status=ExecutionStatus.FAILED if failed else ExecutionStatus.COMPLETED,
         outcome=ExecutionOutcome.FAILED if failed else (
-            ExecutionOutcome.INGESTED if ingestion else ExecutionOutcome.ANSWERED
+            ExecutionOutcome.INGESTED if ingestion or historical_replay else ExecutionOutcome.ANSWERED
         ),
         output_text=text, output_data=output_data, evidence=evidence,
         diagnostics=RuntimeDiagnostics(
             route_name=f"{request.task_kind.value}:{request.profile.value}",
             latency_ms=3.0, retrieval_count=len(evidence),
             reflection_count=1 if request.profile is ExecutionProfile.PRIMA_FULL else 0,
-            model_call_count=0 if ingestion else 1,
-            model_usage={"prompt_tokens": 4, "completion_tokens": 1, "total_tokens": 5},
+            model_call_count=0 if ingestion or historical_replay else 1,
+            model_usage={} if ingestion or historical_replay else {
+                "prompt_tokens": 4, "completion_tokens": 1, "total_tokens": 5,
+            },
             maintenance={"enabled": False, "queue_size": 0, "failure_count": 0},
         ),
         errors=("synthetic failure",) if failed else (),
@@ -258,7 +261,7 @@ def test_profiles_use_execute_and_explicit_ingestion_policies(tmp_path: Path, pr
     for request in FakeRuntime.requests[:-1]:
         policy = (
             request.metadata["ingestion_policy"]
-            if request.task_kind.value == "conversation"
+            if request.task_kind.value in {"conversation", "historical_replay"}
             else request.metadata["document_metadata"]["ingestion_policy"]
         )
         assert policy == DEFAULT_POLICIES[profile].value

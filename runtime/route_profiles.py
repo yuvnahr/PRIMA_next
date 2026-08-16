@@ -88,6 +88,14 @@ AFFECT_ONLY = CONTROL + (
     RuntimeComponent.STATE_COMMIT,
     RuntimeComponent.OUTPUT_SHAPER,
 )
+HISTORICAL_REPLAY = CONTROL + (
+    RuntimeComponent.AFFECT_ENGINE,
+    RuntimeComponent.MEMORY_INDEX,
+    RuntimeComponent.OUTPUT_SHAPER,
+    RuntimeComponent.STATE_COMMIT,
+    RuntimeComponent.MEMORY_COMMIT,
+    RuntimeComponent.MAINTENANCE_EVENTS,
+)
 TOOL_FULL = CONTROL + (
     RuntimeComponent.AFFECT_ENGINE,
 ) + FULL_RETRIEVAL + (
@@ -119,6 +127,9 @@ FACTUAL_PRIMA_FULL_PHASES = tuple(
 )
 INGESTION_PHASES = ("state_load", "document_ingestion", "output", "state_commit", "maintenance_enqueue")
 AFFECT_PHASES = ("state_load", "affect", "output", "state_commit")
+HISTORICAL_REPLAY_PHASES = (
+    "state_load", "affect", "output", "state_commit", "memory_commit", "maintenance_enqueue",
+)
 TOOL_PHASES = tuple(phase for phase in PRIMA_FULL_PHASES if phase != "answer_generation")
 
 
@@ -135,6 +146,12 @@ _ROUTES = {
     (TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.CONVERSATION, ExecutionProfile.MODEL_ONLY, MODEL_ONLY, MODEL_ONLY_PHASES),
     (TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.CONVERSATION, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG, SIMPLE_RAG_PHASES),
     (TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.CONVERSATION, ExecutionProfile.PRIMA_FULL, PRIMA_FULL, PRIMA_FULL_PHASES),
+    (TaskKind.HISTORICAL_REPLAY, ExecutionProfile.PRIMA_FULL): _plan(
+        TaskKind.HISTORICAL_REPLAY,
+        ExecutionProfile.PRIMA_FULL,
+        HISTORICAL_REPLAY,
+        HISTORICAL_REPLAY_PHASES,
+    ),
     (TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.MODEL_ONLY, MODEL_ONLY, FACTUAL_MODEL_ONLY_PHASES),
     (TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.SIMPLE_RAG, SIMPLE_RAG, FACTUAL_SIMPLE_RAG_PHASES),
     (TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL): _plan(TaskKind.FACTUAL_QA, ExecutionProfile.PRIMA_FULL, PRIMA_FULL, FACTUAL_PRIMA_FULL_PHASES),

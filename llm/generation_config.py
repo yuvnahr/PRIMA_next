@@ -29,6 +29,7 @@ class GenerationConfig:
 
     model: str
     provider: str
+    revision: str | None = None
     temperature: float = 0.0
     top_p: float | None = None
     top_k: int | None = None
@@ -65,6 +66,7 @@ class GenerationConfig:
         return {
             "model": self.model,
             "provider": self.provider,
+            "revision": self.revision,
             "temperature": self.temperature,
             "top_p": self.top_p,
             "top_k": self.top_k,

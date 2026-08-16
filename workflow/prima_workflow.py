@@ -521,6 +521,16 @@ class MemoryCommitController:
             state_snapshot=getattr(context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
         )
+        if str(context.metadata.get("task_kind")) == "historical_replay":
+            saved = self.repository.add(user_note)
+            return {
+                "notes": (saved,),
+                "admission": {
+                    **decision.to_log_record(),
+                    "policy": "historical_replay_importance_threshold",
+                    "record_count": 1,
+                },
+            }
         assistant_note = MemoryNote.create(
             content=str(output.get("text", "")),
             memory_type=MemoryType.EPISODIC,
@@ -698,6 +708,8 @@ class OutputController:
                 "memory_id": context.ingestion_result.memory_id,
                 "memory_type": context.ingestion_result.memory_type.value,
             }
+        if str(context.metadata.get("task_kind")) == "historical_replay":
+            return {"text": None, "outcome": "ingested", "historical_replay": True}
         if str(context.metadata.get("task_kind")) == "emotion_classification" and context.affect_update is not None:
             profile = context.affect_update.profile
             return {
