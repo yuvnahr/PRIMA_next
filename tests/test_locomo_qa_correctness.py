@@ -229,6 +229,7 @@ def test_optional_metrics_are_opt_in_and_bertscore_uses_device_and_batch(monkeyp
     assert core["rouge_l"] is None and core["rouge_l_status"] == "disabled"
     assert core["bertscore"] is None and core["bertscore_status"] == "disabled"
     assert LoCoMoEvaluator(include_rouge_l=True).evaluate(records)["rouge_l"] == 1.0
+    monkeypatch.setattr("benchmarks.locomo.evaluate.missing_modules", lambda _modules: ("bert_score",))
     unavailable = LoCoMoEvaluator(include_bertscore=True).evaluate(records)
     assert str(unavailable["bertscore_status"]).startswith(("unavailable", "available"))
     calls = {}

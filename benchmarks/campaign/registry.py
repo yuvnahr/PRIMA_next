@@ -69,7 +69,7 @@ def execute_mode(
         dataset_path=str(mode.dataset_path),
         runtime_profile=mode.profile,
         ingestion_policy=mode.variant,
-        max_questions=mode.max_items or None,
+        max_questions=mode.max_items,
         max_conversations=options.pop("max_conversations", None),
         full_dataset=bool(options.pop("full_dataset", False)),
         include_rouge_l="rouge_l" in mode.optional_metrics,

@@ -47,6 +47,7 @@ class SchedulerConfig(ConfigModel):
     cpu_workers: int = Field(default=3, gt=0)
     gpu_devices: tuple[str, ...] = ()
     allow_api_concurrency: bool = False
+    ollama_parallel_slots: int = Field(default=1, ge=1, le=2)
     min_free_disk_gb: float = Field(default=0.1, ge=0.0)
 
 
@@ -145,7 +146,17 @@ class CampaignConfig(ConfigModel):
                 raise ValueError(f"comparison {comparison.id!r} requires the same generation configuration")
         if self.scheduler.max_gpu_requests > 1:
             validated = self.provider.kind in {"openai", "anthropic"} and self.scheduler.allow_api_concurrency
-            if not validated:
+            pilot = (
+                self.provider.kind in {"ollama", "fake"}
+                and self.scheduler.max_gpu_requests == self.scheduler.ollama_parallel_slots == 2
+                and self.scheduler.mode == "sequential"
+                and self.scheduler.cpu_workers == 2
+                and all(
+                    mode.benchmark == "locomo" and mode.options.get("parallel_workers") == 2
+                    for mode in self.benchmarks
+                )
+            )
+            if not (validated or pilot):
                 raise ValueError(
                     "max_gpu_requests > 1 requires explicit endpoint routing with validated API concurrency"
                 )
