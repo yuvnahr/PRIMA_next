@@ -108,6 +108,14 @@ class WorkflowEventBus:
             if event.event_type in WORKFLOW_EVENT_TYPE_MAP.values()
         ]
 
+    def events_for_execution(self, execution_id: str) -> list[WorkflowEvent]:
+        """Read one execution through the shared store's index and retain workflow types."""
+        return [
+            WorkflowEvent.from_event(event)
+            for event in self.event_bus.store.filter(topic="workflow", execution_id=execution_id)
+            if event.event_type in WORKFLOW_EVENT_TYPE_MAP.values()
+        ]
+
     def subscribe(self, handler: WorkflowEventHandler) -> None:
         """Register a workflow event handler."""
         self._handlers.append(handler)

@@ -172,7 +172,8 @@ class CampaignConfig(ConfigModel):
             )
             if not (validated or pilot):
                 raise ValueError(
-                    "max_gpu_requests > 1 requires a bounded two-worker native pilot or validated API concurrency"
+                    "max_gpu_requests > 1 requires a bounded two-worker native pilot or validated API concurrency; "
+                    "other local providers require explicit endpoint routing"
                 )
         return self
 

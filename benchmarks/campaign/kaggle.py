@@ -64,7 +64,7 @@ def selected_case_ids(mode: dict[str, Any]) -> list[str]:
 
             rows = _examples_from_manifest(rows, path, Path(options["sample_manifest"]))
         elif limit > 0:
-            rows = random.Random(mode["seed"]).sample(rows, min(limit, len(rows)))  # noqa: S311
+            rows = random.Random(mode["seed"]).sample(rows, min(limit, len(rows)))  # noqa: S311  # nosec B311 - reproducible benchmark sampling
         ids = [row.example_id for row in rows]
     if not ids or len(ids) != len(set(ids)):
         raise ValueError("Expected selection must contain nonempty unique IDs")

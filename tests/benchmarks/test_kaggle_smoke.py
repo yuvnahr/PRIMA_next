@@ -60,6 +60,7 @@ def test_full_notebook_launch_requires_budget_resources_and_complete_source_sele
                   "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": "a" * 40},
                   "model_identity": {"name": "synthetic", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "selected_workers": 1,
+                  "expected_dataset_sha256": digest,
               }, dataset_summary={"items": len(source_ids), "expected_full_run_count": len(source_ids)},
               require_production_identity=require_production_identity, budget_gate=budget_gate)
     ns["CONFIG"].update(RUN_FULL_BENCHMARK=True, FULL_RUN_ID="synthetic-full", PINNED_COMMIT_SHA="a" * 40,
@@ -199,7 +200,8 @@ def test_notebook_smoke_stages_native_artifacts_and_partial_packages(tmp_path, m
         dataset.write_text(json.dumps(source))
     digest = hashlib.sha256(dataset.read_bytes()).hexdigest()
     ns.update(SELECTED_DATASET=dataset, sha256_file=lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest(),
-              dataset_summary={"sha256": digest, "expected_digest_pinned": False}, STATE={
+              dataset_summary={"sha256": digest, "expected_digest_pinned": False,
+                               "identity_policy": "selected_kaggle_input_snapshot"}, STATE={
                   "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": git_commit()},
                   "model_identity": {"name": "fake", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "mode_id": f"{benchmark}-prima",

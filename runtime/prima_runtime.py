@@ -261,7 +261,7 @@ class PrimaRuntime:
                 "timestamp": event.timestamp.isoformat(),
                 "payload": dict(event.payload),
             }
-            for event in self.workflow.engine.event_bus.store.filter(execution_id=execution_context.execution_id)
+            for event in self.workflow.engine.event_bus.events_for_execution(execution_context.execution_id)
         ]
         return self._response_from_execution(
             request,

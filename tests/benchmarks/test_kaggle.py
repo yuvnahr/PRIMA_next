@@ -445,7 +445,7 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
                   "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": git_commit()},
                   "model_identity": {"name": "fake", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "mode_id": "locomo-prima",
-                  "ollama_parallel_slots": 1,
+                  "ollama_parallel_slots": 1, "timing_started": time.monotonic(),
               })
     monkeypatch.setattr(provider_session.SharedProviderSession, "runtime_factory", lambda self, **kw: FakeRuntime(**kw))
 

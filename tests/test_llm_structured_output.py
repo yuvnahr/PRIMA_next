@@ -62,7 +62,7 @@ def test_ollama_payload_preserves_system_schema_and_generation_config(monkeypatc
     assert captured["payload"]["format"]["type"] == "object"
     assert captured["payload"]["options"] == {"temperature": 0.0, "num_predict": 64, "top_p": 0.8}
     assert captured["timeout"] == 12
-    assert response.usage == {"prompt_tokens": 8, "completion_tokens": 3}
+    assert response.usage == {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}
 
 
 def test_openai_payload_preserves_system_schema_and_seed(monkeypatch) -> None:
