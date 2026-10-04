@@ -58,8 +58,10 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
 3. **Improve LoCoMo scheduling without changing its conversation state.**
    Keep turns/questions serial within a conversation and isolate its runtime.
    Run independent conversations on the already supported two-worker path.
-   Schedule expensive conversations first using source history/question
-   counts and measured costs; keep manifest/source ID order unchanged.
+   Schedule larger conversations first using source history/question counts;
+   keep manifest/source ID order unchanged. The current heuristic gives each
+   history turn/question equal weight. Refine it with measured replay/QA
+   rates only if actual worker timings justify that change.
    Compare the same real QA predictions, evidence/evaluation decisions and
    maintenance outcomes against the sequential canary. Require observed
    overlapping provider requests and safe unchanged-context GPU residency.
@@ -99,8 +101,12 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    than spending the production window on many experiments. Two-example
    smoke only verifies mechanics. LoCoMo estimates separate full history and
    QA costs; HotpotQA must cover differing context sizes/difficulty and
-   GoEmotions must cover differing text/output sizes. Use conservative cost
-   estimates for unsampled cases and record the sampling limitations.
+   GoEmotions must cover differing text/output sizes. The notebook uses native
+   seed sampling for independent cases and a slowest-observed-case projection
+   floor, alongside measured wall throughput. This does not prove that every
+   difficulty/length stratum is covered; record that sampling limitation.
+   Representative canary/pilot campaign processes now stop at 75 minutes
+   combined; the full-run gate still accounts for all actual elapsed time.
 
 ## Model identity blocker
 
@@ -122,13 +128,19 @@ complete campaign and remaining session time; passed budget/resource gates.
 Final reportability additionally requires complete successful full coverage,
 native metrics/artifacts and a validated ZIP.
 
-The first implementation batch includes setup/coverage fixes, thread-local
+The committed implementation includes setup/coverage fixes, thread-local
 spaCy loading, an execution-ID event lookup used by runtime trace assembly,
 and cached float32 normalized retrieval vectors invalidated when embeddings
 change. Full event retention, cosine calculation and stable result ordering
-are preserved. Scheduling improvements, HotpotQA/GoEmotions concurrency and
-the smaller-model replica topology remain subsequent work; they are not
-claimed as implemented or measured.
+are preserved. LoCoMo now starts larger conversations first on its parallel
+path and restores source order for conversation diagnostics. Its estimate
+includes projected worker assignments, busiest-worker load and the longest
+conversation, with the observed scheduling factor retained as another floor.
+HotpotQA/GoEmotions now have two-worker notebook pilots through their existing
+isolated native paths, benchmark-specific equality checks, resource/overlap
+requirements and measured faster-setting selection. All these changes are
+unmeasured here. Measured-cost scheduling refinement, difficulty/length
+stratification and the smaller-model replica topology remain subsequent work.
 
 Current status: local control-flow checks from the earlier work passed, but
 there is no connected Kaggle runtime/cache or real GPU timing evidence here.

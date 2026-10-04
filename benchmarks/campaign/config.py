@@ -165,13 +165,14 @@ class CampaignConfig(ConfigModel):
                 and self.scheduler.mode == "sequential"
                 and self.scheduler.cpu_workers == 2
                 and all(
-                    mode.benchmark == "locomo" and mode.options.get("parallel_workers") == 2
+                    mode.options.get("parallel_workers") == 2
+                    and not (mode.benchmark == "goemotions" and mode.variant == "trained_encoder")
                     for mode in self.benchmarks
                 )
             )
             if not (validated or pilot):
                 raise ValueError(
-                    "max_gpu_requests > 1 requires explicit endpoint routing with validated API concurrency"
+                    "max_gpu_requests > 1 requires a bounded two-worker native pilot or validated API concurrency"
                 )
         return self
 

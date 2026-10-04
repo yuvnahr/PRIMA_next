@@ -250,7 +250,7 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
     if campaign_wall <= 0 or packaging_seconds <= 0:
         raise ValueError("Fresh wall time and packaging measurement required")
     replay = qa = measured_work = 0.0
-    projected_workers = []
+    projected_workers: dict[str, float] = {}
     for cid, row in measurements.items():
         count = row["question_count"]
         history, questions, worker = row["history_seconds"], row["qa_seconds"], row["worker_seconds"]
@@ -264,7 +264,7 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
         projected_qa = questions / count * full_counts[cid]
         qa += projected_qa
         measured_work += worker
-        projected_workers.append(worker - questions + projected_qa)
+        projected_workers[cid] = worker - questions + projected_qa
     if full_turn_counts is not None:
         replay_rate = max(row["history_seconds"] / row["historical_turn_count"] for row in measurements.values())
         qa_rate = max(row["qa_seconds"] / row["question_count"] for row in measurements.values())
@@ -274,9 +274,20 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
             replay_work, qa_work = full_turn_counts[cid] * replay_rate, full_counts[cid] * qa_rate
             replay += replay_work
             qa += qa_work
-            projected_workers.append(replay_work + qa_work + overhead)
+            projected_workers[cid] = replay_work + qa_work + overhead
     factor = max(1 / workers, execution[0]["seconds"] / measured_work)
-    execution_projection = max(sum(projected_workers) * factor, max(projected_workers))
+    # Match the runner's source-size ordering; count the tail on the busiest worker.
+    schedule = sorted(full_counts, key=lambda cid: (
+        (full_turn_counts[cid] if full_turn_counts else measurements[cid]["historical_turn_count"])
+        + full_counts[cid], cid
+    ), reverse=True) if workers > 1 else list(full_counts)
+    worker_loads = [0.0] * workers
+    worker_assignments: list[list[str]] = [[] for _ in range(workers)]
+    for cid in schedule:
+        slot = min(range(workers), key=worker_loads.__getitem__)
+        worker_loads[slot] += projected_workers[cid]
+        worker_assignments[slot].append(cid)
+    execution_projection = max(sum(projected_workers.values()) * factor, max(worker_loads))
     startup = max(0.0, campaign_wall - execution[0]["seconds"] - finalization[0]["seconds"])
     # Final report/ZIP cost scales by item count; keep a floor, plus safety margin.
     scale = sum(full_counts.values()) / sum(row["question_count"] for row in measurements.values())
@@ -289,6 +300,9 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
         "measured_items": sum(row["question_count"] for row in measurements.values()),
         "measured_campaign_seconds": campaign_wall, "measured_schedule_factor": factor,
         "measured_conversations": len(measurements), "full_conversations": len(full_counts),
+        "projected_worker_loads_seconds": worker_loads, "projected_worker_assignments": worker_assignments,
+        "longest_conversation_seconds": max(projected_workers.values()),
+        "schedule": "descending source history-turn plus question counts; isolated conversations",
         "extrapolation": "unsampled conversations use slowest observed replay/QA rates; full sampled histories counted once",
         "historical_replay_seconds": replay, "projected_qa_work_seconds": qa,
         "campaign_startup_seconds": startup, "projected_execution_seconds": execution_projection,
@@ -323,7 +337,8 @@ def budget_gate(estimate: dict[str, Any], *, elapsed_seconds: float, session_hou
 
 
 def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, Any]],
-                   selected_ids: list[str], *, resources_validated: bool, max_active_requests: int) -> None:
+                   selected_ids: list[str], *, resources_validated: bool, max_active_requests: int,
+                   benchmark: str = "locomo") -> None:
     """Match fixed predictions and evaluation decisions, excluding timing/random memory IDs."""
     if not resources_validated or max_active_requests != 2:
         raise ValueError("Two-worker pilot did not validate resources and actual overlapping model requests")
@@ -331,12 +346,30 @@ def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, 
               "candidate_evidence_ids", "final_evidence_ids", "admitted_evidence_ids",
               "candidate_evidence_recall", "final_evidence_recall", "memory_admission_recall",
               "answer_token_coverage", "memory_growth", "maintenance_complete")
+    id_field = "case_id"
+    required = ("prediction", "execution_failed")
+    if benchmark == "hotpotqa":
+        id_field = "sample_id"
+        fields = ("prediction", "supporting_facts", "evidence_ids", "reasoning_hops", "retrieval_calls",
+                  "reflection_interventions", "model_call_count", "final_stop_reason", "scored",
+                  "execution_failed", "failure_category", "ingestion_error", "runtime_error")
+        required = ("prediction", "supporting_facts", "final_stop_reason", "execution_failed")
+    elif benchmark == "goemotions":
+        id_field = "id"
+        fields = ("raw_response", "raw_model_response", "response_hash", "predicted_labels",
+                  "baseline_labels", "baseline_parse_error", "baseline_empty_output", "final_scored_labels",
+                  "affect_derived_labels", "affect_decision", "prima_decision", "parse_error", "execution_failed")
+        required = ("raw_response", "predicted_labels", "baseline_labels", "final_scored_labels", "execution_failed")
+    elif benchmark != "locomo":
+        raise ValueError(f"Unsupported pilot benchmark: {benchmark}")
     def index(rows: list[dict[str, Any]]) -> dict[str, Any]:
-        ids = [row["case_id"] for row in rows]
+        ids = [row[id_field] for row in rows]
         if len(ids) != len(set(ids)) or set(ids) != set(selected_ids) or len(ids) != len(selected_ids):
             raise ValueError("Pilot selected/checkpoint IDs do not reconcile")
         if any(row.get("execution_failed") for row in rows):
             raise ValueError("Pilot contains execution failures")
-        return {row["case_id"]: {key: row.get(key) for key in fields} for row in rows}
+        if any(any(key not in row for key in required) for row in rows):
+            raise ValueError("Pilot lacks native prediction/evaluation diagnostics")
+        return {row[id_field]: {key: row.get(key) for key in fields} for row in rows}
     if index(sequential) != index(concurrent):
         raise ValueError("Concurrency changed predictions or evaluation decisions; retain sequential configuration")

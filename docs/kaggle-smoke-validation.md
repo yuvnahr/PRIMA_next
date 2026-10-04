@@ -15,7 +15,7 @@ upper bound. No training is launched.
    [LoCoMo](https://www.kaggle.com/datasets/thegifman/prima-locomo),
    [HotpotQA](https://www.kaggle.com/datasets/thegifman/prima-hotpot-qa), and
    [GoEmotions](https://www.kaggle.com/datasets/thegifman/prima-goemotions).
-2. Publish the edited repository changes to `3.10_to_3.14`. Setup clones only
+2. The edited repository changes are published to `3.10_to_3.14`. Setup clones only
    that branch and records its fetched commit for the session; running an
    uploaded notebook against the unchanged remote branch will omit the
    required campaign helpers. Do not change an existing full-run checkout.
@@ -52,10 +52,12 @@ upper bound. No training is launched.
 
 LoCoMo's pilot uses the existing isolated two-conversation worker path.
 It must preserve native predictions/evaluation decisions and actually show
-two overlapping provider requests. HotpotQA and GoEmotions run a second
-**sequential** pilot: the existing campaign scheduler has not validated
-two-slot Ollama execution for these modes. Their reports explicitly state
-that safe concurrency was not demonstrated.
+two overlapping provider requests. HotpotQA and GoEmotions now exercise
+their existing isolated native two-worker paths too. HotpotQA compares
+answers, supporting facts and reasoning decisions; GoEmotions compares raw
+model output, baseline/final labels and bounded affect decisions. The real
+pilot must preserve those results and pass resource/overlap checks before
+concurrency can be accepted; the implementation alone is not validation.
 
 ## Validation and measurements
 
@@ -104,8 +106,8 @@ Run sections 1–9 to obtain representative fresh timing:
 | Selector | Representative canary | Full selection | Scheduling |
 |---|---|---|---|
 | 1: LoCoMo | Three conversations, five questions each; complete histories | All source conversations and questions; 1,986 required | Sequential or validated faster two-worker pilot |
-| 2: HotpotQA | 20 questions | Every question in the pinned source | Sequential |
-| 3: GoEmotions | 50 test examples | Every test example in the pinned source; validation split checked separately | Sequential |
+| 2: HotpotQA | 20 seed-sampled questions | Every question in the pinned source | Sequential or validated faster two-worker pilot |
+| 3: GoEmotions | 50 seed-sampled test examples | Every test example in the pinned source; validation split checked separately | Sequential or validated faster two-worker pilot |
 
 Review `timing-<session>.json` and `budget-<session>.json`. Section 10 requires
 the measured estimate to fit 10.5 campaign hours and the entire session,
@@ -133,8 +135,8 @@ or supplied mounted datasets/cache are available to this task.
 | Benchmark | Actual Kaggle stages | Real examples | Actual artifact checks | Elapsed / GPU / RAM | Actual concurrency | Full-run decision |
 |---|---|---:|---|---|---|---|
 | LoCoMo | Setup/preflight/canary/pilot blocked | 0 | Not run | Unmeasured | Unmeasured | **NO-GO** |
-| HotpotQA | Setup/preflight/canary/pilot blocked | 0 | Not run | Unmeasured | Unmeasured; sequential pilot configured | **NO-GO** |
-| GoEmotions | Setup/preflight/canary/pilot blocked | 0 | Not run | Unmeasured | Unmeasured; sequential pilot configured | **NO-GO** |
+| HotpotQA | Setup/preflight/canary/pilot blocked | 0 | Not run | Unmeasured | Unmeasured; two-worker candidate configured | **NO-GO** |
+| GoEmotions | Setup/preflight/canary/pilot blocked | 0 | Not run | Unmeasured | Unmeasured; two-worker candidate configured | **NO-GO** |
 
 Local checks use tiny fixtures with fake inference and synthetic hardware;
 they validate native selection, scoring, checkpoints, packaging and guards,

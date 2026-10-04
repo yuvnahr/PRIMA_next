@@ -593,8 +593,11 @@ def run_locomo_experiment(
 
     execution_started = time.perf_counter()
     if parallel_workers > 1 and len(conversations) > 1:
+        # Start larger independent workloads first; each conversation remains serial.
+        scheduled = sorted(conversations, key=lambda c: (len(c.turns) + len(c.questions), c.id), reverse=True)
         with ThreadPoolExecutor(max_workers=parallel_workers) as executor:
-            conversation_diagnostics = list(executor.map(execute, conversations))
+            results = dict(zip((c.id for c in scheduled), executor.map(execute, scheduled), strict=True))
+        conversation_diagnostics = [results[c.id] for c in conversations]
     else:
         conversation_diagnostics = [execute(conversation) for conversation in conversations]
     timing({"phase": "execution", "seconds": time.perf_counter() - execution_started,
