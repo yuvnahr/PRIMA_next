@@ -71,6 +71,9 @@ class SharedProviderSession:
         )
         if config.endpoint and hasattr(provider, "base_url"):
             provider.base_url = config.endpoint
+        if config.kind in {"ollama", "local"}:
+            provider.context_window = config.context_window
+            provider.keep_alive = "24h"
         self.provider = _BoundedProvider(provider, max_active_requests)
         self.client = LLMClient(provider_name=config.kind, provider=self.provider)
         self.session_initialization_ms = (time.perf_counter() - started) * 1000

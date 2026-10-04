@@ -5,8 +5,9 @@ is every source example scored and packaged within that session. Dataset
 coverage, native evaluation, evidence checks, maintenance barriers and durable
 checkpoints remain required. A timeout or incomplete selection is not success.
 
-The current 27B setup has not demonstrated this outcome. The supplied LoCoMo
-reference projected 76,961 seconds (about 21h23m). Dividing that by two is
+The current 27B setup has not demonstrated this outcome. The saved old notebook
+has now been inspected: see [reference analysis](kaggle-reference-analysis.md).
+Its partial LoCoMo run projected 76,961 seconds (about 21h23m). Dividing that by two is
 insufficient once setup, validation and the 20% safety margin are included.
 No unmeasured speedup is credited in the launch gate.
 
@@ -41,8 +42,9 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    model weights, keep the model resident and retain all full-coverage gates.
    spaCy now loads once per worker instead of attempting a load repeatedly.
    Use existing caches for smoke; do not download large resources to hide a
-   missing-cache blocker. Install only needed runtime/benchmark dependencies
-   in a later setup cleanup, without changing their supported behavior.
+   missing-cache blocker. The notebook now installs `requirements-kaggle.txt`
+   for the native default profile, reusing compatible Kaggle packages without
+   upgrades. HF/encoder backends or BERTScore explicitly select the full list.
 
 2. **Remove repeated CPU work before increasing GPU workers.** Source
    inspection found that runtime trace assembly copies/scans the complete
@@ -54,6 +56,13 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    Do not replace full retrieval with approximate search or drop graph edges.
    Measure replay, maintenance, retrieval and inference separately in the
    actual campaign; prioritize the dominant measured cost.
+
+   Source inspection of the old graph path found centrality sorting every
+   adjacency list only to count neighbors. The implementation now reads
+   exact adjacency degrees, caches descending neighbor-ID order with edge
+   invalidation under a per-graph lock, and snapshots keywords once per
+   rebuild. Every pair calculation, edge and maintenance operation remains;
+   no performance factor is assumed from these source changes.
 
 3. **Improve LoCoMo scheduling without changing its conversation state.**
    Keep turns/questions serial within a conversation and isolate its runtime.
@@ -79,8 +88,8 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    Allow the faster setting only after its real pilot passes. Do not enable
    four slots merely because four CPU threads exist.
 
-5. **Choose the model topology from evidence.** First attempt the pinned
-   27B model with the preceding fixes. If it still cannot meet the gate, the
+5. **Choose the model topology from evidence.** First attempt the available,
+   newly pinned 27B model revision with the preceding fixes. If it still cannot meet the gate, the
    performance fallback is a uniformly pinned smaller model for all three
    benchmarks, such as Qwen3.5 9B Q4_K_M, with one independent model replica
    per T4 if measured residency fits. This changes the evaluated model and
@@ -108,19 +117,34 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    Representative canary/pilot campaign processes now stop at 75 minutes
    combined; the full-run gate still accounts for all actual elapsed time.
 
-## Model identity blocker
+## Model identity and cold-start readiness
 
-The configured reference digest starts `22130167c4c2`. The public
-`qwen3.8:27b` tag currently lists a different digest prefix, `e118e4d12a70`.
-Pulling a mutable tag is therefore not proof of obtaining the pinned model.
-Use the matching cached snapshot for the original experiment, or independently
-verify and pin the new full manifest digest and record a new experiment before
-running all three benchmarks. Never automatically trust the observed digest
-after a mismatch. This is separate from timing feasibility.
+On 2026-10-05, a direct read of the public `qwen3.8:27b` registry manifest
+returned SHA-256 `aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813`.
+Only small manifest/source metadata was fetched; no weights were downloaded.
+Ollama's native pull saves these manifest bytes, and its model digest hashes
+the saved manifest. The notebook now explicitly pins this available **new
+experiment revision** for all three benchmarks. It retains 27B and Q4_K_M;
+its scores cannot be identified as the old saved model experiment.
+
+The old digest `22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643`
+returned HTTP 404 when requested by digest. Reproducing that revision therefore
+requires its matching attached cache and an explicit old expected digest.
+The notebook reuses that cache without a registry pull. A fresh full-session
+pull checks the public manifest against the configured expected digest before
+transferring weights, then checks the local digest again after download.
+Future tag drift fails early instead of wasting a 30-minute download window.
+
+Attached `/kaggle/input` caches are read-only. The notebook creates a writable
+cache in `/kaggle/tmp`, links the immutable blob files and copies small metadata.
+This permits Ollama's metadata writes without duplicating model weights. Cached
+setup is the 15-minute planning target; a cold pull can consume up to 30 minutes
+plus installation/load time. Actual elapsed setup always reduces the full-run
+budget, so the cached setup target is never credited to a cold-start session.
 
 ## Evidence required for a green light
 
-For each benchmark: dataset/split hashes and complete source IDs/count;
+For each benchmark: frozen selected input/split hashes and complete source IDs/count;
 repository commit; actual model/backend/context identity; real canary and
 pilot predictions/checkpoints; observed concurrency; inference/replay/
 maintenance/retrieval timing; sampled GPU/RAM peaks; conservative projected
@@ -142,8 +166,18 @@ requirements and measured faster-setting selection. All these changes are
 unmeasured here. Measured-cost scheduling refinement, difficulty/length
 stratification and the smaller-model replica topology remain subsequent work.
 
-Current status: local control-flow checks from the earlier work passed, but
-there is no connected Kaggle runtime/cache or real GPU timing evidence here.
+Current status: local control-flow checks from the earlier work passed. The
+old saved notebook provides partial historical LoCoMo timing and single-slot
+placement evidence, but no timing/resource evidence for the updated code or
+for HotpotQA/GoEmotions. No live Kaggle runtime is connected here. The user
+requests source-based estimates without further tests; none were run.
+
+The current notebook accepts a frozen SHA snapshot of the authorized selected
+Kaggle input when an optional external dataset pin is absent. Explicit pins
+(including LoCoMo's) are still enforced. Unpinned external full-run files are
+rejected. Every source ID/count/hash and GoEmotions split/leakage check stays
+required, with mutation between stages rejected. Missing optional HotpotQA/
+GoEmotions external digests no longer make their full modes impossible.
 The user requested no further local test runs; none are included in this
 planning/commit step. The plan cannot honestly certify that every benchmark
 finishes in 12 hours before the real measurements above exist.
@@ -157,7 +191,9 @@ finishes in 12 hours before the real measurements above exist.
   optimization and is excluded from the first unchanged-model path.
 - [Ollama generation telemetry](https://docs.ollama.com/api/generate): model
   load, prompt evaluation and decode durations/counts can distinguish costs.
-- [Qwen3.8 published tags](https://ollama.com/library/qwen3.8/tags).
+- [Qwen3.8 registry manifest](https://registry.ollama.ai/v2/library/qwen3.8/manifests/27b).
+- [Native Ollama pull implementation](https://github.com/ollama/ollama/blob/main/server/images.go)
+  and [saved manifest digest](https://github.com/ollama/ollama/blob/main/manifest/manifest.go).
 - [Qwen3.5 9B model details](https://ollama.com/library/qwen3.5:9b): published
   Q4_K_M artifact size is 6.6 GB; that is a weight-file size, not a measured
   total runtime VRAM allocation or a speed guarantee.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
+from threading import Lock
 from typing import Any
 
 from memory.graph.graph_edge import GraphEdge
@@ -17,25 +18,46 @@ class GraphRepository:
         self.nodes: dict[str, GraphNode] = {}
         self.edges: dict[tuple[str, str], GraphEdge] = {}
         self._neighbors: dict[str, set[str]] = defaultdict(set)
+        self._ordered_neighbors: dict[str, list[str]] = {}
+        # ponytail: one lock per isolated graph; split locks only if graph access becomes contended.
+        self._neighbor_lock = Lock()
 
     def add_node(self, node: GraphNode) -> GraphNode:
         self.nodes[node.id] = node
         return node
 
     def add_edge(self, edge: GraphEdge) -> GraphEdge:
-        self.edges[edge.key] = edge
-        self._neighbors[edge.source_id].add(edge.target_id)
-        self._neighbors[edge.target_id].add(edge.source_id)
+        with self._neighbor_lock:
+            previous = self.edges.get(edge.key)
+            self.edges[edge.key] = edge
+            self._neighbors[edge.source_id].add(edge.target_id)
+            self._neighbors[edge.target_id].add(edge.source_id)
+            if previous is None or previous.weight != edge.weight:
+                self._ordered_neighbors.pop(edge.source_id, None)
+                self._ordered_neighbors.pop(edge.target_id, None)
         return edge
 
     def get_neighbors(self, node_id: str) -> list[tuple[GraphNode, GraphEdge]]:
-        neighbors = []
-        for neighbor_id in self._neighbors.get(node_id, set()):
-            a, b = sorted((node_id, neighbor_id))
-            edge = self.edges[(a, b)]
-            node = self.nodes[neighbor_id]
-            neighbors.append((node, edge))
-        return sorted(neighbors, key=lambda item: item[1].weight, reverse=True)
+        with self._neighbor_lock:
+            ordered = self._ordered_neighbors.get(node_id)
+            if ordered is None:
+                ordered = sorted(
+                    self._neighbors.get(node_id, ()),
+                    key=lambda neighbor_id: self.edges[tuple(sorted((node_id, neighbor_id)))].weight,
+                    reverse=True,
+                )
+                self._ordered_neighbors[node_id] = ordered
+            neighbors = []
+            for neighbor_id in ordered:
+                a, b = sorted((node_id, neighbor_id))
+                edge = self.edges[(a, b)]
+                node = self.nodes[neighbor_id]
+                neighbors.append((node, edge))
+            return neighbors
+
+    def degree(self, node_id: str) -> int:
+        """Count neighbors without materializing or sorting their records."""
+        return len(self._neighbors.get(node_id, ()))
 
     def find_by_memory_id(self, memory_id: str) -> GraphNode | None:
         for node in self.nodes.values():

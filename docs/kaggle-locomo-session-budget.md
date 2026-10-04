@@ -10,8 +10,9 @@ the configured retry policy. The local LoCoMo dataset has ten conversations,
 The supplied reference run reached 698/1,986 questions after 27,049 seconds
 with 49,912 seconds remaining: roughly 21h23m projected, before setup and
 final artifacts. Its fixed-path, resumable canary is not reliable fresh
-throughput evidence. The reference notebook was on another machine; these
-are supplied observations, not a reproduced GPU run. The displayed 19.47
+throughput evidence. Its saved source, output and timestamps are now directly
+inspected in [reference analysis](kaggle-reference-analysis.md). These are
+historical observations, not a reproduced run of the changed code. The displayed 19.47
 GiB was disk space, not a measured RAM peak.
 
 ## Running the notebook
@@ -28,7 +29,11 @@ steps and limitations. The production timing steps below require
    commit/tag override or detached checkout. Verify the expected model digest
    and dataset hash. `FULL_RUN_ID` is generated automatically for a fresh run;
    supply an existing ID only for intentional partial resume.
-2. Keep `RUN_FULL_BENCHMARK=False` while running setup, preflight and pilots.
+2. For an unattended production session, set `SMOKE_MODE=False` and
+   `RUN_FULL_BENCHMARK=True` in the initial configuration, then run all cells.
+   This authorizes automatic full execution only if every measured admission
+   gate passes. For staged review, keep `RUN_FULL_BENCHMARK=False` until after
+   the pilots and set it to true immediately before the full-run cell.
    The initial server uses one model slot. Context reduction and CPU offload
    are forbidden.
 3. Run the fresh sequential canary. The default sample is three conversations
@@ -42,9 +47,8 @@ steps and limitations. The production timing steps below require
    outcomes and evidence/evaluation decisions must match the sequential run.
    Provider telemetry must show two actually overlapping requests. A failed,
    changed-prediction or slower pilot retains/restores one-worker execution.
-5. Inspect the saved timing and budget reports. Only after a passing estimate,
-   set `CONFIG['RUN_FULL_BENCHMARK'] = True` immediately before the full-run
-   cell. It rechecks live repository/model/dataset identities, unchanged
+5. The full-run cell requires a passing timing/budget report and the full-run
+   flag. It rechecks live repository/model/dataset identities, unchanged
    effective config, full selected IDs, resources and elapsed session time.
 
 Canary and pilot namespaces include a unique session suffix and **never

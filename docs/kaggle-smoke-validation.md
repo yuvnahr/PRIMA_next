@@ -26,19 +26,25 @@ upper bound. No training is launched.
    `/kaggle/working`, or the attached `/kaggle/input` inputs. Multiple caches
    require an explicit path. Smoke never calls `ollama pull`; missing models
    or required ancillary Hugging Face resources block the run. The smoke
-   process sets HF offline flags. Dependency installation is still the
-   repository's existing setup step.
+   process sets HF offline flags. Attached caches use a writable metadata
+   mirror with links to immutable blobs, avoiding a full weight copy.
+   Native default dependencies come from `requirements-kaggle.txt`; optional
+   model backends/BERTScore explicitly use the full requirements list.
+   The default model digest is the available 2026-10-05 27B revision. Set the
+   old expected digest explicitly when using the original cached snapshot;
+   never mix the two model revisions in one reported experiment.
 4. Keep `SMOKE_MODE=True`, `SMOKE_ITEMS=2`, `RUN_FULL_BENCHMARK=False`,
    `RUN_PAIRED_BASELINE=False`. Select `BENCHMARK_SELECTION=1`, `2`, or `3`.
    Dataset discovery searches the supplied slug in the actual mount, including
    both `/kaggle/input/<slug>` and `/kaggle/input/datasets/thegifman/<slug>`;
    nested data files work, and ambiguous candidates fail closed.
-5. Set each trusted expected dataset digest independently in
-   `EXPECTED_DATASET_SHA256[benchmark]`. The existing LoCoMo pin remains;
-   HotpotQA/GoEmotions start unpinned because their trusted digests are not
-   available locally. Smoke records this limitation and validates observed
-   file/split identities throughout execution. A missing trusted pin blocks
-   production. Never copy LoCoMo's digest into another benchmark.
+5. `EXPECTED_DATASET_SHA256[benchmark]` can enforce a separately supplied
+   expected digest. LoCoMo's existing pin remains required and enforced.
+   HotpotQA/GoEmotions instead freeze the validated selected Kaggle input's
+   SHA before the canary when the optional expected digest is absent. The
+   report records this snapshot policy; every stage must match its original
+   source IDs/count/hash and GoEmotions split hashes. Unpinned external files
+   cannot be used for full runs. Never copy LoCoMo's digest into another benchmark.
 6. Run sections **1 through 9** in order (setup, hardware inspection, model
    preflight, dataset validation, canary and tiny pilot). **Stop after 9.**
    Section 10 rejects smoke even if the full-run flag is enabled. Use a new
@@ -99,7 +105,7 @@ session limit applies independently to each run; the notebook selects one
 benchmark per session. A smoke pass does not provide production timing evidence.
 
 For each selector, start a new session with `SMOKE_MODE=False`,
-`RUN_FULL_BENCHMARK=False` and trusted model/dataset digests. The fetched
+`RUN_FULL_BENCHMARK=False`, the pinned model digest and selected Kaggle inputs. The fetched
 `3.10_to_3.14` branch commit is recorded and a fresh `FULL_RUN_ID` is automatic.
 Run sections 1–9 to obtain representative fresh timing:
 
