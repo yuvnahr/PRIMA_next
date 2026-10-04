@@ -37,8 +37,8 @@ class CapabilityReport(TypedDict):
 
 CAPABILITIES = (
     CapabilitySpec("rouge_l", (), None),
-    CapabilitySpec("bertscore", ("bert_score",), "requirements-semantic-metrics.txt"),
-    CapabilitySpec("goemotions_encoder", ("torch", "transformers", "sklearn"), "requirements-encoder.txt"),
+    CapabilitySpec("bertscore", ("bert_score",), "requirements.txt"),
+    CapabilitySpec("goemotions_encoder", ("torch", "transformers", "sklearn"), "requirements.txt"),
 )
 
 

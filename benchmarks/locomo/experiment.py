@@ -16,8 +16,8 @@ import time
 from collections import Counter
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -76,7 +76,7 @@ LOCOMO_PROFILES = (
 )
 
 
-class IngestionPolicy(str, Enum):
+class IngestionPolicy(StrEnum):
     """Explicit treatment of conversation turns before questions."""
 
     CONTROLLED_DOCUMENT = "controlled_document_ingestion"
@@ -381,7 +381,7 @@ def _failure_record(record: dict[str, Any]) -> FailureRecord | None:
 
 def _prediction_record(record: dict[str, Any]) -> PredictionRecord:
     usage = record.get("model_usage", {})
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return PredictionRecord(
         case_id=record["case_id"], mode=BenchmarkMode.CONVERSATION_QA,
         prediction=record["prediction"],

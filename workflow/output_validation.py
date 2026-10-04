@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from reasoning.models import AnswerResult
@@ -13,7 +13,7 @@ from workflow.execution_context import ExecutionContext
 from workflow.workflow_state import WorkflowPhase
 
 
-class OutputValidationSignal(str, Enum):
+class OutputValidationSignal(StrEnum):
     """Observable post-execution failures eligible for correction."""
 
     OUTPUT_SCHEMA_FAILURE = "output_schema_failure"

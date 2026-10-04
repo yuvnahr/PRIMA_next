@@ -4,7 +4,7 @@
 
 Learned backends are opt-in via `PRIMA_AFFECT_BACKEND=goemotions_pretrained` or `goemotions_deberta`; otherwise PRIMA keeps `LegacyAffectClassifier`.
 
-Install learned inference/training dependencies with `pip install -r requirements-goemotions.txt`.
+The learned inference/training dependencies are included in the repository's `requirements.txt`.
 
 ```powershell
 .venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system qwen_schema --provider ollama --model qwen3.5:4b --seed 13

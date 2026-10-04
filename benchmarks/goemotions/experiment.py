@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -197,7 +197,7 @@ def run_goemotions_experiment(
             case_id=example.example_id,
             mode=BenchmarkMode.CLASSIFICATION,
             prediction=tuple(record["predicted_labels"]),
-            timing=ItemTiming(started_at=started_at, finished_at=datetime.now(timezone.utc), total_ms=elapsed),
+            timing=ItemTiming(started_at=started_at, finished_at=datetime.now(UTC), total_ms=elapsed),
             tokens=TokenUsage(
                 prompt_tokens=_usage(usage, "prompt_tokens", "prompt_eval_count"),
                 completion_tokens=_usage(usage, "completion_tokens", "eval_count"),
@@ -210,7 +210,7 @@ def run_goemotions_experiment(
         )
 
     def execute(example: GoEmotionsExample) -> None:
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         started = time.perf_counter()
         try:
             raw, details = active_system.predict(example.text, labels)
@@ -239,7 +239,7 @@ def run_goemotions_experiment(
     if hasattr(active_system, "predict_many"):
         for offset in range(0, len(pending), batch_size):
             chunk = pending[offset : offset + batch_size]
-            started_at = datetime.now(timezone.utc)
+            started_at = datetime.now(UTC)
             started = time.perf_counter()
             try:
                 responses = active_system.predict_many([row.text for row in chunk], labels)

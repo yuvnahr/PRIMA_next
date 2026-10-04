@@ -81,7 +81,7 @@ class GoEmotionsEncoder:
         try:
             from transformers import AutoModelForSequenceClassification, AutoTokenizer
         except ImportError as exc:
-            raise RuntimeError("GoEmotions encoder requires requirements-goemotions.txt.") from exc
+            raise RuntimeError("GoEmotions encoder dependencies are listed in requirements.txt.") from exc
         self._device = self._resolve_device()
         revision = self.revision or PINNED_MODEL_REVISIONS.get(self.model_id)
         if revision is None:

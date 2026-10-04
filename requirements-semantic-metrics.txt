@@ -1,2 +1,0 @@
-# Optional semantic benchmark metric. May download model weights when invoked.
-bert-score>=0.3.13

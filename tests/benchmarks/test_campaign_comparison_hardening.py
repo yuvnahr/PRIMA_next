@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -61,8 +61,8 @@ def _checkpoint(root: Path, case_id: str, record: dict | None, *, status: str = 
             "mode": "classification",
             "prediction": record.get("predicted_labels", []),
             "timing": {
-                "started_at": datetime.now(timezone.utc).isoformat(),
-                "finished_at": datetime.now(timezone.utc).isoformat(),
+                "started_at": datetime.now(UTC).isoformat(),
+                "finished_at": datetime.now(UTC).isoformat(),
                 "total_ms": 1.0,
             },
             "diagnostics": {"goemotions_record": record},

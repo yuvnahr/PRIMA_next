@@ -16,7 +16,7 @@ import time
 from collections import Counter
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -338,7 +338,7 @@ def _prediction_record(record: dict[str, Any], started_at: datetime) -> Predicti
         case_id=record["sample_id"], mode=BenchmarkMode.CONVERSATION_QA,
         prediction=record["prediction"],
         timing=ItemTiming(
-            started_at=started_at, finished_at=datetime.now(timezone.utc),
+            started_at=started_at, finished_at=datetime.now(UTC),
             total_ms=record["total_latency_ms"], provider_ms=record["reasoning_time_ms"],
         ),
         tokens=TokenUsage(
@@ -359,7 +359,7 @@ def _checkpoint(store: BenchmarkArtifactStore, record: dict[str, Any]) -> None:
             case_id=record["sample_id"], status=RunStatus.FAILED, failure=failure,
         ))
         return
-    prediction = _prediction_record(record, datetime.now(timezone.utc))
+    prediction = _prediction_record(record, datetime.now(UTC))
     store.append_checkpoint(CheckpointRecord(
         case_id=record["sample_id"], status=RunStatus.COMPLETE,
         prediction=prediction, failure=failure,
@@ -535,7 +535,7 @@ def run_hotpotqa_experiment(
         "top_k": top_k, "max_hops": max_hops, "output_dir": output_dir, "resume": resume,
     }
     reporter.header(report_config)
-    campaign_started, wall_started = datetime.now(timezone.utc), time.perf_counter()
+    campaign_started, wall_started = datetime.now(UTC), time.perf_counter()
 
     def execute(item: Any) -> dict[str, Any]:
         return run_sample(

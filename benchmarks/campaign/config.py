@@ -164,7 +164,7 @@ def load_campaign_config(path: str | Path, environment: dict[str, str] | None = 
         try:
             import yaml  # type: ignore[import-untyped]
         except ImportError as exc:
-            raise RuntimeError("YAML campaign configs require PyYAML from requirements-benchmark.txt") from exc
+            raise RuntimeError("YAML campaign configs require PyYAML from requirements.txt") from exc
         payload = yaml.safe_load(source.read_text(encoding="utf-8"))
     else:
         raise ValueError("Campaign config must be JSON, YAML, or YML")

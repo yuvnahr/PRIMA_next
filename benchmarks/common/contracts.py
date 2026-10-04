@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, Literal
 from urllib.parse import parse_qsl, urlsplit
@@ -18,7 +18,7 @@ SCHEMA_VERSION: Literal["1.0"] = "1.0"
 def utc_now() -> datetime:
     """Return an aware UTC timestamp."""
 
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class BenchmarkMode(Enum):

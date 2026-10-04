@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from benchmarks.common.interfaces import Conversation, ConversationQuestion, ConversationTurn
@@ -44,7 +44,7 @@ def parse_timestamp(value: str, *, location: str = "timestamp") -> datetime:
                 continue
     if parsed is None:
         raise ValueError(f"{location}: unsupported timestamp {value!r}")
-    return parsed.replace(tzinfo=parsed.tzinfo or timezone.utc).astimezone(timezone.utc)
+    return parsed.replace(tzinfo=parsed.tzinfo or UTC).astimezone(UTC)
 
 
 class LoCoMoAdapter:

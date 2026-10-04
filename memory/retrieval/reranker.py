@@ -7,7 +7,7 @@ import re
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import replace
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from memory.retrieval.retrieval_result import RetrievalResult
@@ -19,7 +19,7 @@ STOPWORDS = {
 }
 
 
-class RerankerBackend(str, Enum):
+class RerankerBackend(StrEnum):
     """Stable reranker identities reported in manifests and diagnostics."""
 
     DISABLED = "disabled"

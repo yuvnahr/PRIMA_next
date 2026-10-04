@@ -20,7 +20,7 @@ PRIMA-NEXT is research software. It is not yet a hosted assistant or a productio
 Requirements:
 
 - Windows PowerShell
-- Python 3.10 or newer
+- CPython 3.14
 - Git
 
 From the repository root, run one command:
@@ -29,7 +29,9 @@ From the repository root, run one command:
 .\setup.ps1
 ```
 
-The script creates `.venv`, installs the development and benchmark dependencies, initializes Git submodules, and creates a local `.env` from `.env.example` when needed. It never overwrites an existing `.env`.
+The script creates `.venv`, installs the full dependency set from `requirements.txt`, initializes Git submodules, and creates a local `.env` from `.env.example` when needed. It never overwrites an existing `.env`.
+
+The Kaggle notebook uses Kaggle's managed Python kernel; that environment is separate from the local Python 3.14 environment and reports its own version in run artifacts.
 
 If PowerShell blocks local scripts, use:
 
@@ -85,7 +87,7 @@ python -m mypy .
 python -m bandit -q -c bandit.yaml -r .
 ```
 
-Optional encoder/training dependencies live in `requirements-encoder.txt`; optional semantic metrics live in `requirements-semantic-metrics.txt`. Benchmark instructions are in [benchmarks/README.md](benchmarks/README.md), and operational details are in [docs/benchmarks/RUNBOOK.md](docs/benchmarks/RUNBOOK.md).
+All runtime, benchmark, development, encoder/training, and semantic-metric dependencies are listed in `requirements.txt`. This includes PyTorch and BERTScore, so a fresh environment install is larger than the previous default. Benchmark instructions are in [benchmarks/README.md](benchmarks/README.md), and operational details are in [docs/benchmarks/RUNBOOK.md](docs/benchmarks/RUNBOOK.md).
 
 ## Project structure
 

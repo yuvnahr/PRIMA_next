@@ -7,7 +7,7 @@ function Test-Python {
         [string[]]$Prefix = @()
     )
     try {
-        & $Executable @Prefix -c "import sys; raise SystemExit(sys.version_info < (3, 10))" 2>$null
+        & $Executable @Prefix -c "import sys; raise SystemExit(sys.version_info[:2] != (3, 14))" 2>$null
         return $LASTEXITCODE -eq 0
     }
     catch {
@@ -17,21 +17,27 @@ function Test-Python {
 
 $pythonExecutable = $null
 $pythonPrefix = @()
-if ((Get-Command py -ErrorAction SilentlyContinue) -and (Test-Python "py" @("-3"))) {
+if ((Get-Command py -ErrorAction SilentlyContinue) -and (Test-Python "py" @("-3.14"))) {
     $pythonExecutable = "py"
-    $pythonPrefix = @("-3")
-}
-elseif ((Get-Command python -ErrorAction SilentlyContinue) -and (Test-Python "python")) {
-    $pythonExecutable = "python"
+    $pythonPrefix = @("-3.14")
 }
 else {
-    throw "Python 3.10 or newer is required. Install it, then run setup.ps1 again."
+    $userPython314 = Join-Path $env:LocalAppData "Programs\Python\Python314\python.exe"
+    if ((Test-Path -LiteralPath $userPython314) -and (Test-Python $userPython314)) {
+        $pythonExecutable = $userPython314
+    }
+}
+if (-not $pythonExecutable -and (Get-Command python -ErrorAction SilentlyContinue) -and (Test-Python "python")) {
+    $pythonExecutable = "python"
+}
+if (-not $pythonExecutable) {
+    throw "Python 3.14 is required. Install CPython 3.14, then run setup.ps1 again."
 }
 
 $venvPath = Join-Path $PSScriptRoot ".venv"
 $venvPython = Join-Path $venvPath "Scripts\python.exe"
 if (Test-Path -LiteralPath $venvPython) {
-    & $venvPython -c "import sys; raise SystemExit(sys.version_info < (3, 10))" 2>$null
+    & $venvPython -c "import sys; raise SystemExit(sys.version_info[:2] != (3, 14))" 2>$null
     if ($LASTEXITCODE -ne 0) {
         Remove-Item -LiteralPath $venvPath -Recurse -Force
     }
