@@ -342,12 +342,12 @@ def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, 
     """Match fixed predictions and evaluation decisions, excluding timing/random memory IDs."""
     if not resources_validated or max_active_requests != 2:
         raise ValueError("Two-worker pilot did not validate resources and actual overlapping model requests")
-    fields = ("prediction", "outcome", "execution_failed", "failure_category", "category",
+    fields: tuple[str, ...] = ("prediction", "outcome", "execution_failed", "failure_category", "category",
               "candidate_evidence_ids", "final_evidence_ids", "admitted_evidence_ids",
               "candidate_evidence_recall", "final_evidence_recall", "memory_admission_recall",
               "answer_token_coverage", "memory_growth", "maintenance_complete")
     id_field = "case_id"
-    required = ("prediction", "execution_failed")
+    required: tuple[str, ...] = ("prediction", "execution_failed")
     if benchmark == "hotpotqa":
         id_field = "sample_id"
         fields = ("prediction", "supporting_facts", "evidence_ids", "reasoning_hops", "retrieval_calls",

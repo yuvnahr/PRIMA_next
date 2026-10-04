@@ -36,6 +36,7 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
     dataset_path = Path(dataset_path)
     if not dataset_path.is_file():
         raise FileNotFoundError(f"GoEmotions dataset not found: {dataset_path}")
+    examples: list[GoEmotionsExample] = []
     if dataset_path.suffix.lower() == ".json":
         try:
             rows = json.loads(dataset_path.read_text(encoding="utf-8"))
@@ -43,7 +44,6 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
             raise ValueError(f"Invalid GoEmotions JSON in {dataset_path}") from exc
         if not isinstance(rows, list):
             raise ValueError(f"Expected a GoEmotions JSON array in {dataset_path}")
-        examples = []
         for row_number, row in enumerate(rows, start=1):
             try:
                 text, indices, example_id = row["text"], row["labels"], row["id"]
@@ -61,7 +61,6 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
             raise ValueError(f"GoEmotions split is empty: {dataset_path}")
         return examples
     labels = load_labels(label_path or dataset_path.with_name("emotions.txt"))
-    examples: list[GoEmotionsExample] = []
     for line_number, line in enumerate(dataset_path.read_text(encoding="utf-8").splitlines(), start=1):
         try:
             text, raw_labels, example_id = line.split("\t", 2)

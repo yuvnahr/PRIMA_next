@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -86,7 +86,7 @@ class InMemoryMemoryRepository(MemoryRepository):
             vector = self._normalized_vectors.get(key)
             if vector is None:
                 raw = np.array(note.embedding, dtype="float32")
-                vector = raw / (np.linalg.norm(raw) or 1.0)
+                vector = cast(NDArray[np.float32], raw / (np.linalg.norm(raw) or 1.0))
                 self._normalized_vectors[key] = vector
             score = float(np.dot(query, vector))
             scored.append((note, score))

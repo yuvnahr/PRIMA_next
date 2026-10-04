@@ -14,7 +14,7 @@ import subprocess  # nosec B404
 import threading
 import time
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
@@ -205,10 +205,10 @@ async def _execute_case(
             session_id=conversation.id,
             generation_config=generation,
             diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
-            options=ExecutionOptions(
-                top_k=top_k, max_hops=max_hops, max_retrieval_calls=max_hops,
-                reasoning_mode=reasoning_mode, max_context_tokens=context_budget,
-            ),
+            options=ExecutionOptions.model_validate({
+                "top_k": top_k, "max_hops": max_hops, "max_retrieval_calls": max_hops,
+                "reasoning_mode": reasoning_mode, "max_context_tokens": context_budget,
+            }),
         ))
         return None, answer, ingestion_ms, (time.perf_counter() - started) * 1000
     finally:
@@ -543,7 +543,7 @@ def run_hotpotqa_experiment(
             max_hops, pool, maintenance, context_budget,
         )
 
-    iterator = map(execute, pending)
+    iterator: Iterator[dict[str, Any]] = map(execute, pending)
     executor = None
     if parallel_workers > 1:
         executor = ThreadPoolExecutor(max_workers=parallel_workers)

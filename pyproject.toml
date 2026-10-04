@@ -72,7 +72,7 @@ no_implicit_optional = true
 warn_unused_configs = true
 explicit_package_bases = true
 exclude = [
-    '(^|[\\/])(?:venv|\.venv|__pycache__|evaluation|tests|scripts|benchmarks[\\/](?:goemotions|hotpotqa|locomo(?:-v2)?))([\\/]|$)|reasoning[\\/]validate_.*\.py$',
+    '(^|[\\/])(?:venv|\.venv|__pycache__|pytest-tmp|evaluation|tests|scripts|benchmarks[\\/](?:goemotions|hotpotqa|locomo(?:-v2)?))([\\/]|$)|reasoning[\\/]validate_.*\.py$',
 ]
 
 # New production packages must join this strict list before merge. Benchmarks,
