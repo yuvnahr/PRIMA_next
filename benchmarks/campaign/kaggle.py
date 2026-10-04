@@ -1,15 +1,89 @@
-"""Measured Kaggle session guards; no inference or benchmark semantics live here."""
+"""Kaggle dataset selection, coverage validation and measured session guards."""
 
 from __future__ import annotations
 
 import json
 import math
+import random
 import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
 from benchmarks.common.artifacts import append_jsonl, atomic_write_json
+
+DATASET_FILES = {
+    "locomo": ("prima-locomo", "locomo10.json"),
+    "hotpotqa": ("prima-hotpot-qa", "hotpot-qa_distractor-val.json"),
+    "goemotions": ("prima-goemotions", "goemotions_test.json"),
+}
+
+
+def discover_dataset(benchmark: str, configured: Path, input_root: Path = Path("/kaggle/input")) -> Path:
+    """Resolve the supplied slug in either Kaggle layout, refusing ambiguous mounts."""
+    slug, filename = DATASET_FILES[benchmark]
+    configured = Path(configured)
+    if configured.is_file():
+        if configured.name != filename:
+            raise ValueError(f"Expected {filename}, got {configured.name}")
+        return configured.resolve()
+    roots = [configured] if configured.is_dir() and configured != input_root else [
+        path for path in input_root.rglob(slug) if path.is_dir()
+    ]
+    candidates = sorted({path.resolve() for root in roots for path in root.rglob(filename) if path.is_file()})
+    if len(candidates) != 1:
+        raise ValueError(f"Missing/ambiguous {slug}/{filename}: found {len(candidates)} candidates in {input_root}")
+    return candidates[0]
+
+
+def selected_case_ids(mode: dict[str, Any]) -> list[str]:
+    """Use each canonical runner's native selection semantics, never its output manifest."""
+    path, options, limit = Path(mode["dataset_path"]), mode["options"], mode["max_items"]
+    if mode["benchmark"] == "locomo":
+        from benchmarks.locomo.experiment import question_case_id
+        from benchmarks.locomo.experiment import select_conversations as select_locomo
+        from benchmarks.locomo.loader import LoCoMoDataset
+
+        rows = select_locomo(list(LoCoMoDataset(path).conversations()), seed=mode["seed"],
+            max_conversations=options.get("max_conversations", 0), max_questions=limit,
+            full_dataset=options.get("full_dataset", False))
+        ids = [question_case_id(c.id, q.question_id) for c in rows for q in c.questions]
+    elif mode["benchmark"] == "hotpotqa":
+        from benchmarks.hotpotqa.experiment import select_conversations as select_hotpotqa
+        from benchmarks.hotpotqa.loader import HotpotQADataset
+
+        rows = select_hotpotqa(list(HotpotQADataset(path, mode["variant"]).conversations()),
+            options.get("sampling", "sequential"), mode["seed"], options.get("offset", 0), limit)
+        ids = [row.id for row in rows]
+    else:
+        from benchmarks.goemotions.dataset import load_examples
+
+        rows = load_examples(path)
+        if options.get("sample_manifest"):
+            from benchmarks.goemotions.experiment import _examples_from_manifest
+
+            rows = _examples_from_manifest(rows, path, Path(options["sample_manifest"]))
+        elif limit > 0:
+            rows = random.Random(mode["seed"]).sample(rows, min(limit, len(rows)))  # noqa: S311
+        ids = [row.example_id for row in rows]
+    if not ids or len(ids) != len(set(ids)):
+        raise ValueError("Expected selection must contain nonempty unique IDs")
+    return ids
+
+
+def validate_coverage(manifest: dict[str, Any], checkpoints: list[dict[str, Any]], expected_ids: list[str],
+                      *, expected_count: int, dataset_sha256: str) -> None:
+    """Fail closed against independently selected source IDs, count, and dataset hash."""
+    selected = manifest.get("selected_ids", [])
+    completed = [row.get("case_id") for row in checkpoints]
+    if (not expected_ids or len(expected_ids) != expected_count or len(set(expected_ids)) != expected_count
+            or selected != expected_ids or len(completed) != expected_count
+            or len(set(completed)) != expected_count or set(completed) != set(expected_ids)):
+        raise ValueError("Dataset coverage mismatch: missing, duplicate, unexpected or truncated IDs/count")
+    if manifest.get("dataset_hash") != dataset_sha256:
+        raise ValueError("Dataset identity mismatch during coverage validation")
+    if any(row.get("status") != "complete" or not row.get("prediction") for row in checkpoints):
+        raise ValueError("Dataset coverage contains unsuccessful/incomplete checkpoints")
 
 
 def require_production_identity(repository_sha: str, model_digest: str, dataset_sha: str) -> None:
@@ -121,10 +195,13 @@ def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
     gpus, ram = sample.get("gpus", []), sample.get("ram", {})
     if len(gpus) != 2 or len({gpu["index"] for gpu in gpus}) != 2:
         raise ValueError("Exactly two GPUs must be observed")
+    if any(not math.isfinite(gpu["memory_used_mib"]) or gpu["memory_used_mib"] < 0 for gpu in gpus):
+        raise ValueError("GPU safety measurement is invalid")
     if any(gpu["memory_used_mib"] > vram_gib * 1024 for gpu in gpus):
         raise ValueError("Observed per-GPU VRAM exceeds 12 GiB ceiling")
     total, available = ram.get("total_bytes"), ram.get("available_bytes")
-    if not total or available is None:
+    if (total is None or available is None or not math.isfinite(total) or not math.isfinite(available)
+            or total <= 0 or not 0 <= available <= total):
         raise ValueError("RAM safety measurement is unavailable")
     used = total - available
     # GB is decimal here: the user's 19 GB planning cap is stricter than 19 GiB.
@@ -132,6 +209,9 @@ def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
         raise ValueError("RAM planning cap/reserve violated")
     cgroup_used, cgroup_limit = ram.get("cgroup_current_bytes"), ram.get("cgroup_limit_bytes")
     if cgroup_used is not None and cgroup_limit is not None:
+        if (not math.isfinite(cgroup_used) or not math.isfinite(cgroup_limit)
+                or cgroup_limit <= 0 or not 0 <= cgroup_used <= cgroup_limit):
+            raise ValueError("Cgroup RAM safety measurement is invalid")
         if cgroup_limit - cgroup_used < reserve_gb * 10**9:
             raise ValueError("Cgroup RAM reserve violated")
 

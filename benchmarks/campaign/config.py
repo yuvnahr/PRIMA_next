@@ -113,6 +113,7 @@ class ComparisonConfig(ConfigModel):
 
 class CampaignConfig(ConfigModel):
     schema_version: Literal["1.0"] = "1.0"
+    run_kind: Literal["benchmark", "smoke"] = "benchmark"
     output_root: Path
     provider: ProviderConfig
     repository: RepositoryConfig = Field(default_factory=RepositoryConfig)
@@ -127,6 +128,18 @@ class CampaignConfig(ConfigModel):
     def validate_campaign(self) -> CampaignConfig:
         if not self.benchmarks:
             raise ValueError("campaign requires at least one benchmark mode")
+        if self.run_kind == "smoke":
+            if len(self.benchmarks) != 1 or self.comparisons:
+                raise ValueError("Smoke requires one benchmark mode without paired comparisons")
+            mode = self.benchmarks[0]
+            count = mode.max_items
+            if mode.benchmark == "locomo":
+                conversations = mode.options.get("max_conversations", 0)
+                if type(conversations) is not int or conversations <= 0 or mode.options.get("full_dataset"):
+                    raise ValueError("Smoke LoCoMo requires bounded conversations and questions")
+                count *= conversations
+            if not 0 < count <= 3:
+                raise ValueError("Smoke must select at most three examples, with a positive limit")
         modes = {mode.id: mode for mode in self.benchmarks}
         if len(modes) != len(self.benchmarks):
             raise ValueError("benchmark mode IDs must be unique")

@@ -15,6 +15,8 @@ def write_aggregate(
     modes: dict[str, Any],
     comparisons: dict[str, Any],
     telemetry: dict[str, Any],
+    *,
+    run_kind: str = "benchmark",
 ) -> dict[str, Any]:
     included = {
         mode_id: {"status": item.status, "summary": item.summary, "child_manifest": item.child_manifest}
@@ -25,6 +27,8 @@ def write_aggregate(
     safe_telemetry = redact(telemetry, redact_prompts=False)
     aggregate = {
         "schema_version": "1.0",
+        "run_kind": run_kind,
+        "reportable": run_kind != "smoke",
         "campaign_id": campaign_id,
         "included_modes": included,
         "comparisons": safe_comparisons,
@@ -32,6 +36,8 @@ def write_aggregate(
     }
     atomic_write_json(root / "aggregate.json", aggregate)
     lines = [f"# Campaign {campaign_id}", "", "## Benchmark modes", ""]
+    if run_kind == "smoke":
+        lines.insert(2, "PARTIAL SMOKE — non-reportable; full dataset coverage is incomplete.\n")
     lines.extend(
         f"- `{mode_id}`: **{item.status}**"
         + (f" — {redact({'error': item.error}, redact_prompts=False)['error']}" if item.error else "")

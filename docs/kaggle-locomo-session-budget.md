@@ -16,16 +16,26 @@ GiB was disk space, not a measured RAM peak.
 
 ## Running the notebook
 
-1. Set `PINNED_COMMIT_SHA` or `EXPECTED_COMMIT_SHA` to the exact implementation
-   commit. The notebook defaults to the `3.10_to_3.14` branch. Verify the
-   expected model digest and dataset hash, and set an explicit `FULL_RUN_ID`.
+The notebook now defaults to an isolated two-example smoke mode. See
+[three-benchmark smoke validation](kaggle-smoke-validation.md) for its exact
+steps and limitations. The production timing steps below require
+`SMOKE_MODE=False` in a new session.
+
+1. Publish the accompanying notebook/campaign/runtime changes to
+   `3.10_to_3.14` before uploading the notebook. Setup clones only that branch
+   with `--single-branch --branch 3.10_to_3.14`, keeps it checked out, and records
+   its exact fetched commit for all subsequent identity checks. There is no
+   commit/tag override or detached checkout. Verify the expected model digest
+   and dataset hash. `FULL_RUN_ID` is generated automatically for a fresh run;
+   supply an existing ID only for intentional partial resume.
 2. Keep `RUN_FULL_BENCHMARK=False` while running setup, preflight and pilots.
    The initial server uses one model slot. Context reduction and CPU offload
    are forbidden.
 3. Run the fresh sequential canary. The default sample is three conversations
    selected by the original seed-shuffled runner and five ordered questions
    **per conversation** (normally 15 questions). Each sampled conversation
-   replays every historical turn. There is no separate overlapping smoke run.
+   replays every historical turn. The separate default smoke mode does not
+   provide representative timing evidence for this production gate.
 4. The enabled throughput pilot repeats exactly the same IDs in a fresh
    namespace with two isolated conversation workers and two model slots.
    Each conversation still processes turns and questions serially. Predictions,
@@ -97,3 +107,22 @@ the requested two-T4 model pilot or prove the 12 GiB-per-GPU resource envelope.
 Fake-provider/runtime checks prove control flow and invariants, not GPU
 throughput. Safe optimization alone has **not established single-session
 feasibility**; the full-run flag remains off until fresh Kaggle evidence passes.
+
+## Inspection after the request to stop testing
+
+No further tests or benchmark executions were run. Notebook inspection found
+manual commit/run-ID stops, detached checkout, an unnecessary registry pull
+for an existing model, and repeated optional spaCy model loads. Setup now
+checks out only the requested branch and captures its commit; fresh full-run
+IDs are automatic. Existing Ollama caches are discovered for production too,
+cached models skip pulling and the download-space guard, missing models have
+a bounded download, and model residency is retained for the session. spaCy
+is loaded once per worker thread, preserving its existing extraction policy
+and missing-model fallback.
+
+The reference projection still does not support a 12-hour promise. Halving
+21h23m gives about 10h42m before setup and final artifacts; adding the existing
+20% safety margin already exceeds 12 hours. The 10.5-hour campaign gate is
+stricter still. These changes may remove overhead, but their speedup has not
+been measured. Actual two-slot model/context residency and representative
+timing must pass before the notebook permits the full run.

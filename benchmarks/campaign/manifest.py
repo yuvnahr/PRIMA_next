@@ -27,6 +27,7 @@ class CampaignModeRecord(BaseModel):
 class CampaignManifest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     schema_version: Literal["1.0"] = "1.0"
+    run_kind: Literal["benchmark", "smoke"] = "benchmark"
     campaign_id: str
     config_hash: str
     status: Literal["partial", "complete", "failed"] = "partial"
@@ -62,6 +63,7 @@ class CampaignManifestStore:
                 raise ValueError(f"Campaign output already exists; use --resume or a new output_root: {self.root}")
             now = _now()
             manifest = CampaignManifest(
+                run_kind=config.run_kind,
                 campaign_id=f"campaign-{uuid4()}",
                 config_hash=fingerprint,
                 provider={
@@ -95,13 +97,18 @@ class CampaignManifestStore:
 
     def finalize(self, status: Literal["partial", "complete", "failed"], **values: Any) -> CampaignManifest:
         with self._lock:
-            manifest = self.read().model_copy(update={"status": status, "updated_at": _now(), **values})
+            current = self.read()
+            if current.run_kind == "smoke" and status == "complete":
+                status = "partial"
+            manifest = current.model_copy(update={"status": status, "updated_at": _now(), **values})
             self.write(manifest)
             return manifest
 
 
 def config_hash(config: CampaignConfig) -> str:
     payload = config.model_dump(mode="json")
+    if config.run_kind == "benchmark":
+        payload.pop("run_kind")  # Preserve compatibility with existing full-run manifests.
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 

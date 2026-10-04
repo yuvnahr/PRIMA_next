@@ -223,7 +223,7 @@ def test_telemetry_survives_failure_before_exit(tmp_path, monkeypatch):
     assert rows[1]["gpus"][0]["memory_used_mib"] == 12289
 
 
-@pytest.mark.parametrize("case", ["vram", "ram", "cgroup", "missing", "relax"])
+@pytest.mark.parametrize("case", ["vram", "ram", "cgroup", "missing", "relax", "gpu-nan", "ram-nan", "cgroup-nan"])
 def test_resource_limits_fail_closed(case):
     value = sample()
     kwargs = {}
@@ -235,6 +235,12 @@ def test_resource_limits_fail_closed(case):
         value["ram"].update(cgroup_current_bytes=8 * 10**9, cgroup_limit_bytes=10 * 10**9)
     elif case == "missing":
         value["ram"] = {}
+    elif case == "gpu-nan":
+        value["gpus"][0]["memory_used_mib"] = float("nan")
+    elif case == "ram-nan":
+        value["ram"]["available_bytes"] = float("nan")
+    elif case == "cgroup-nan":
+        value["ram"].update(cgroup_current_bytes=float("nan"), cgroup_limit_bytes=10 * 10**9)
     else:
         kwargs["vram_gib"] = 13
     with pytest.raises(ValueError):
@@ -348,6 +354,7 @@ def test_notebook_contract_and_full_gate_no_launch_without_measurement():
     exec(code[0], ns)  # noqa: S102 - execute checked-in notebook config in an isolated namespace
     config = ns["CONFIG"]
     assert config["RUN_FULL_BENCHMARK"] is False
+    assert config["SMOKE_MODE"] is True and config["SMOKE_ITEMS"] == 2
     assert config["GPU_MEMORY_CEILING_GIB"] == 12
     assert config["MAINTENANCE_MODE"] == "flush_before_question"
     assert config["CONTEXT_LENGTH"] == 8192 and config["MAX_OUTPUT_TOKENS"] == 512
@@ -356,22 +363,39 @@ def test_notebook_contract_and_full_gate_no_launch_without_measurement():
     assert config["EXPECTED_LOCOMO_ITEMS"] == 1986
     assert "REDUCED_CONTEXT_LENGTH" not in config
     full_cell = "".join(notebook["cells"][20]["source"])
+    with pytest.raises(RuntimeError, match="Smoke mode"):
+        exec(full_cell, ns)  # noqa: S102
+    config["SMOKE_MODE"] = False
     with pytest.raises(RuntimeError, match="disabled"):
         exec(full_cell, ns)  # noqa: S102 - disabled gate must stop before any launch
     assert full_cell.index("budget_gate(") < full_cell.index("execute_campaign(")
     assert "fresh=True" in "".join(notebook["cells"][18]["source"])
 
 
-def notebook_namespace():
+def notebook_namespace(*, smoke=False):
     """Load only definitions from checked-in cells; never run setup or inference cells."""
     notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
     ns = {}
     exec("".join(notebook["cells"][2]["source"]), ns)  # noqa: S102 - trusted notebook definitions
+    ns["CONFIG"]["SMOKE_MODE"] = smoke
     for index in (16, 18):
         tree = ast.parse("".join(notebook["cells"][index]["source"]))
         tree.body = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.Import, ast.ImportFrom))]
         exec(compile(tree, f"notebook-cell-{index}", "exec"), ns)  # noqa: S102 - imports/functions only
     return ns
+
+
+@pytest.mark.parametrize("field,value", [
+    ("RESOURCE_SAMPLE_SECONDS", 3), ("RESOURCE_SAMPLE_SECONDS", float("nan")),
+    ("SESSION_BUDGET_HOURS", 13), ("CAMPAIGN_BUDGET_HOURS", 11),
+    ("RUNTIME_SAFETY_MARGIN", 0.19), ("FINALIZATION_RESERVE_SECONDS", 899),
+])
+def test_notebook_rejects_relaxed_guards_before_model_setup(field, value):
+    notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
+    ns = notebook_namespace()
+    ns["CONFIG"][field] = value
+    with pytest.raises(ValueError):
+        exec("".join(notebook["cells"][4]["source"]), ns)  # noqa: S102 - guard before any setup
 
 
 def test_notebook_ram_sampling_tolerates_a_process_exiting_during_poll(monkeypatch):
@@ -414,6 +438,7 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     from benchmarks.locomo.experiment import fingerprint, git_commit
     ns.update(sys=__import__("sys"), client_env={}, datetime=datetime, timezone=timezone,
               shutil=__import__("shutil"), re=__import__("re"))
+    ns["sha256_file"] = lambda path: fingerprint(Path(path))
     ns["CONFIG"]["FULL_RUN_ID"] = "synthetic-full"
     ns.update(SELECTED_DATASET=dataset, conversations=list(LoCoMoDataset(dataset).conversations()),
               dataset_summary={"items": 6, "sha256": fingerprint(dataset)}, STATE={
@@ -475,3 +500,14 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     assert stopped
     assert read_jsonl(unsafe_root / "resource_samples.jsonl")[0]["gpus"][0]["memory_used_mib"] == 13000
     assert read_jsonl(unsafe_root / "progress.jsonl")[-1]["event"] == "resource_failure"
+    # A violation after the child exits must also release the model and persist evidence.
+    stopped.clear()
+    final_samples = iter([sample(), bad_sample])
+    ns["safety_sample"] = lambda started, process=None: {
+        **next(final_samples), "timestamp": "synthetic", "elapsed_seconds": 1}
+    _, final_path, final_root, _ = ns["build_campaign_config"]("unsafe-final", full=False, max_items=2)
+    with pytest.raises(ValueError, match="VRAM"):
+        ns["execute_campaign"](final_path, final_root, 4, fresh=True)
+    assert stopped == [True]
+    assert read_jsonl(final_root / "resource_samples.jsonl")[-1]["gpus"][0]["memory_used_mib"] == 13000
+    assert read_jsonl(final_root / "progress.jsonl")[-1]["event"] == "resource_failure"

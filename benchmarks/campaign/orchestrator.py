@@ -18,6 +18,8 @@ from benchmarks.common.contracts import BenchmarkManifest, RunStatus
 
 
 def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, Any]:
+    if config.run_kind == "smoke" and resume:
+        raise ValueError("Smoke campaigns must be fresh; resume is disabled")
     session = SharedProviderSession(
         config.provider, config.scheduler.max_gpu_requests, config.runtime
     )
@@ -111,7 +113,8 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
         "measurement": "campaign-boundary snapshots; not peak usage",
     }
     current = store.read()
-    write_aggregate(config.output_root, current.campaign_id, current.modes, comparisons, telemetry)
+    write_aggregate(config.output_root, current.campaign_id, current.modes, comparisons, telemetry,
+                    run_kind=config.run_kind)
     statuses = {item.status for item in current.modes.values()}
     status: Literal["complete", "partial"] = (
         "complete"
@@ -122,6 +125,8 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
     return {
         "campaign_id": final.campaign_id,
         "status": final.status,
+        "run_kind": config.run_kind,
+        "smoke_execution_complete": config.run_kind == "smoke" and status == "complete",
         "output_root": str(config.output_root),
         "modes": {key: value.model_dump(mode="json") for key, value in final.modes.items()},
         "comparisons": comparisons,

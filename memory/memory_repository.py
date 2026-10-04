@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from memory.embedding_pipeline import current_embedding_metadata
 from memory.memory_metadata import decode_metadata, encode_metadata
@@ -46,15 +47,18 @@ class InMemoryMemoryRepository(MemoryRepository):
 
     def __init__(self) -> None:
         self._notes: dict[MemoryType, dict[str, MemoryNote]] = defaultdict(dict)
+        self._normalized_vectors: dict[tuple[MemoryType, str], NDArray[np.float32]] = {}
         self.fingerprint_status = "valid"
 
     def add(self, note: MemoryNote) -> MemoryNote:
+        previous = self._notes[note.memory_type].get(note.id)
+        if previous is None or previous.embedding != note.embedding:
+            self._normalized_vectors.pop((note.memory_type, note.id), None)
         self._notes[note.memory_type][note.id] = note
         return note
 
     def update(self, note: MemoryNote) -> MemoryNote:
-        self._notes[note.memory_type][note.id] = note
-        return note
+        return self.add(note)
 
     def get(self, note_id: str, memory_type: MemoryType | None = None) -> MemoryNote | None:
         if memory_type is not None:
@@ -78,9 +82,13 @@ class InMemoryMemoryRepository(MemoryRepository):
         query = query / query_norm
         scored: list[tuple[MemoryNote, float]] = []
         for note in self.list(memory_type):
-            vector = np.array(note.embedding, dtype="float32")
-            vector_norm = np.linalg.norm(vector) or 1.0
-            score = float(np.dot(query, vector / vector_norm))
+            key = (note.memory_type, note.id)
+            vector = self._normalized_vectors.get(key)
+            if vector is None:
+                raw = np.array(note.embedding, dtype="float32")
+                vector = raw / (np.linalg.norm(raw) or 1.0)
+                self._normalized_vectors[key] = vector
+            score = float(np.dot(query, vector))
             scored.append((note, score))
         return sorted(scored, key=lambda item: item[1], reverse=True)[:limit]
 
