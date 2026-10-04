@@ -17,6 +17,28 @@ GiB was disk space, not a measured RAM peak.
 
 ## Running the notebook
 
+The saved `notebook0c24a612be.ipynb` run fetched `e524609`, pulled the pinned
+model, passed the 8192-context two-GPU preflight (9,547/9,721 MiB VRAM), then
+stopped at the first sequential canary with `Cgroup RAM reserve violated`.
+It contains no completed canary timing or full-run results. The raw cgroup
+guard counted filesystem cache as unreclaimable memory; the saved notebook
+does not include the counters needed to establish how much cache caused this
+particular failure.
+
+Warm-up, preflight and campaign monitoring now record the same Linux cgroup
+v1/v2 counters. Only clean inactive disk cache receives reclaimable credit;
+active cache, shared/tmpfs memory, dirty/writeback pages and locked memory
+receive none. Missing counters retain the raw-usage guard. The 19 GB planning
+cap and 3 GB reserve still apply to the working set, and failure messages give
+raw usage, cache credit, working set and limit. Counter definitions follow the
+[Linux cgroup documentation](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory).
+These accounting changes do
+not establish a 12-hour completion time; the fresh canary must still pass.
+Upload the updated canonical notebook and start a fresh Kaggle session rather
+than continuing cells in the failed session with old imports. For any further
+failure, save `/kaggle/working/prima_outputs` together with the notebook so the
+resource and timing measurements remain available.
+
 The notebook now defaults to an isolated two-example smoke mode. See
 [three-benchmark smoke validation](kaggle-smoke-validation.md) for its exact
 steps and limitations. The production timing steps below require

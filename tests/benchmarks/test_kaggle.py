@@ -20,6 +20,7 @@ from benchmarks.campaign.kaggle import (
     estimate_locomo,
     persist_sample,
     prepare_run,
+    read_cgroup_memory,
     require_production_identity,
     resource_guard,
     validate_pilot,
@@ -245,6 +246,57 @@ def test_resource_limits_fail_closed(case):
         kwargs["vram_gib"] = 13
     with pytest.raises(ValueError):
         resource_guard(value, **kwargs)
+
+
+@pytest.mark.parametrize("version", [1, 2])
+def test_cgroup_disk_cache_is_recorded_and_does_not_trigger_false_reserve_failure(tmp_path, version):
+    directory = tmp_path if version == 2 else tmp_path / "memory"
+    directory.mkdir(exist_ok=True)
+    current, limit = ("memory.current", "memory.max") if version == 2 else (
+        "memory.usage_in_bytes", "memory.limit_in_bytes")
+    (directory / current).write_text(str(24 * 10**9))
+    (directory / limit).write_text(str(25 * 10**9))
+    stat = {"file": 12 * 10**9, "inactive_file": 11 * 10**9, "shmem": 10**9,
+            "file_dirty": 400 * 10**6, "file_writeback": 300 * 10**6, "unevictable": 300 * 10**6}
+    aliases = {"file": "cache", "file_dirty": "dirty", "file_writeback": "writeback"}
+    (directory / "memory.stat").write_text("\n".join(
+        f"{key if version == 2 else 'total_' + aliases.get(key, key)} {value}"
+        for key, value in stat.items()))
+    value = sample()
+    value["ram"].update(read_cgroup_memory(tmp_path))
+    assert value["ram"]["cgroup_stat_bytes"] == stat
+    assert value["ram"]["cgroup_reclaimable_cache_bytes"] == 10 * 10**9
+    assert value["ram"]["cgroup_working_set_bytes"] == 14 * 10**9
+    assert value["ram"]["cgroup_available_bytes"] == 11 * 10**9
+    resource_guard(value)
+    (directory / "memory.stat").unlink()
+    value["ram"].update(read_cgroup_memory(tmp_path))
+    with pytest.raises(ValueError, match="raw=24.000 GB.*clean inactive cache=0.000 GB"):
+        resource_guard(value)
+
+
+@pytest.mark.parametrize("mutation", ["active", "dirty", "writeback", "shmem", "locked", "missing", "negative"])
+def test_cgroup_cache_credit_cannot_hide_unreclaimable_memory(mutation):
+    stat = {"file": 5 * 10**9, "inactive_file": 5 * 10**9, "shmem": 0,
+            "file_dirty": 0, "file_writeback": 0, "unevictable": 0}
+    key = {"active": "inactive_file", "dirty": "file_dirty", "writeback": "file_writeback",
+           "shmem": "shmem", "locked": "unevictable", "negative": "file_dirty"}.get(mutation)
+    if mutation == "missing":
+        stat.pop("file_writeback")
+    else:
+        stat[key] = 0 if mutation == "active" else -1 if mutation == "negative" else 5 * 10**9
+    value = sample()
+    value["ram"].update(cgroup_current_bytes=18 * 10**9, cgroup_limit_bytes=19 * 10**9,
+                        cgroup_stat_bytes=stat, cgroup_reclaimable_cache_bytes=18 * 10**9)
+    with pytest.raises(ValueError, match="Cgroup RAM reserve violated"):
+        resource_guard(value)
+
+
+def test_cgroup_working_set_still_obeys_the_19_gb_plan():
+    value = sample()
+    value["ram"].update(cgroup_current_bytes=17 * 10**9, cgroup_limit_bytes=32 * 10**9)
+    with pytest.raises(ValueError, match="working=17.000 GB"):
+        resource_guard(value)
 
 
 def test_only_explicit_two_slot_isolated_locomo_concurrency_allowed(tmp_path):

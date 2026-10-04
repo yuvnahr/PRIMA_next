@@ -186,6 +186,49 @@ def persist_sample(path: Path, sample: dict[str, Any]) -> None:
     append_jsonl(path, sample)
 
 
+def _cgroup_cache_credit(stat: dict[str, Any]) -> int:
+    """Credit only clean, inactive disk cache; missing counters get no credit."""
+    keys = ("inactive_file", "file", "shmem", "file_dirty", "file_writeback", "unevictable")
+    if any(not isinstance(stat.get(key), int) or stat[key] < 0 for key in keys):
+        return 0
+    return int(max(0, min(stat["inactive_file"], max(0, stat["file"] - stat["shmem"]))
+                   - stat["file_dirty"] - stat["file_writeback"] - stat["unevictable"]))
+
+
+def read_cgroup_memory(root: Path = Path("/sys/fs/cgroup")) -> dict[str, Any]:
+    """Record raw usage and conservative cache-adjusted headroom on Linux v1/v2."""
+    for directory, current, limit, version in (
+        (root, "memory.current", "memory.max", 2),
+        (root / "memory", "memory.usage_in_bytes", "memory.limit_in_bytes", 1),
+    ):
+        try:
+            used = int((directory / current).read_text().strip())
+            cap = (directory / limit).read_text().strip()
+        except OSError:
+            continue
+        ram: dict[str, Any] = {"cgroup_current_bytes": used, "cgroup_version": version}
+        if cap != "max" and int(cap) < 2**60:
+            ram["cgroup_limit_bytes"] = int(cap)
+        stat = {}
+        try:
+            counters = dict(line.split() for line in (directory / "memory.stat").read_text().splitlines())
+            for key, v1_key in (("file", "cache"), ("inactive_file", "inactive_file"),
+                                ("shmem", "shmem"), ("file_dirty", "dirty"),
+                                ("file_writeback", "writeback"), ("unevictable", "unevictable")):
+                source = key if version == 2 else f"total_{v1_key}"
+                if source in counters:
+                    stat[key] = int(counters[source])
+        except (OSError, ValueError):
+            stat = {}
+        credit = min(max(0, used), _cgroup_cache_credit(stat))
+        ram.update(cgroup_stat_bytes=stat, cgroup_reclaimable_cache_bytes=credit,
+                   cgroup_working_set_bytes=used - credit)
+        if "cgroup_limit_bytes" in ram:
+            ram["cgroup_available_bytes"] = ram["cgroup_limit_bytes"] - used + credit
+        return ram
+    return {}
+
+
 def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
                    ram_cap_gb: float = 19.0, reserve_gb: float = 3.0) -> None:
     if not 0 < vram_gib <= 12 or not 0 < reserve_gb < ram_cap_gb <= 19:
@@ -212,8 +255,17 @@ def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
         if (not math.isfinite(cgroup_used) or not math.isfinite(cgroup_limit)
                 or cgroup_limit <= 0 or not 0 <= cgroup_used <= cgroup_limit):
             raise ValueError("Cgroup RAM safety measurement is invalid")
-        if cgroup_limit - cgroup_used < reserve_gb * 10**9:
-            raise ValueError("Cgroup RAM reserve violated")
+        credit = min(cgroup_used, _cgroup_cache_credit(ram.get("cgroup_stat_bytes", {})))
+        working = cgroup_used - credit
+        if cgroup_limit - working < reserve_gb * 10**9 or working > (ram_cap_gb - reserve_gb) * 10**9:
+            raise ValueError(
+                "Cgroup RAM reserve violated: "
+                f"raw={cgroup_used / 10**9:.3f} GB, limit={cgroup_limit / 10**9:.3f} GB, "
+                f"clean inactive cache={credit / 10**9:.3f} GB, working={working / 10**9:.3f} GB, "
+                f"available={(cgroup_limit - working) / 10**9:.3f} GB; "
+                f"require reserve>={reserve_gb:.3f} GB and working<={ram_cap_gb - reserve_gb:.3f} GB "
+                "(missing/invalid memory.stat counters receive no cache credit)"
+            )
 
 
 def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *, workers: int,
