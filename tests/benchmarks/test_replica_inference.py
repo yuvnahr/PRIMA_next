@@ -62,6 +62,29 @@ def test_replica_workers_are_sticky_and_really_overlap():
     assert [row["request_attempts"] for row in router.telemetry()["endpoints"]] == [2, 2]
 
 
+def test_replica_error_releases_its_slot():
+    class FailingOnce(FakeProvider):
+        attempts = 0
+
+        def send(self, request):
+            self.attempts += 1
+            if self.attempts == 1:
+                raise TimeoutError("test timeout")
+            return super().send(request)
+
+    router = _ReplicaProvider([FailingOnce(), FakeProvider()], ENDPOINTS)
+    request = LLMRequest(prompt="hello", generation=GenerationConfig(model="pinned", provider="ollama"))
+
+    def worker():
+        with pytest.raises(TimeoutError):
+            router.send(request)
+        return router.send(request)
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        assert pool.submit(worker).result(timeout=5).text == "Alpha"
+    assert router.telemetry()["max_active_requests"] == 1
+
+
 @pytest.mark.parametrize("field,value", [
     ("digest", "b" * 64), ("context_length", 4096), ("size_vram", 99),
     ("size", -1), ("size", True), ("name", "different"),
