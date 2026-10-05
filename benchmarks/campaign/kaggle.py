@@ -187,11 +187,12 @@ def persist_sample(path: Path, sample: dict[str, Any]) -> None:
 
 
 def _cgroup_cache_credit(stat: dict[str, Any]) -> int:
-    """Credit only clean, inactive disk cache; missing counters get no credit."""
-    keys = ("inactive_file", "file", "shmem", "file_dirty", "file_writeback", "unevictable")
+    """Credit clean disk cache on both reclaim lists; missing counters get no credit."""
+    keys = ("inactive_file", "active_file", "file", "shmem", "file_dirty", "file_writeback", "unevictable")
     if any(not isinstance(stat.get(key), int) or stat[key] < 0 for key in keys):
         return 0
-    return int(max(0, min(stat["inactive_file"], max(0, stat["file"] - stat["shmem"]))
+    # Reading model weights promotes clean pages; active file cache is still reclaimable.
+    return int(max(0, min(stat["inactive_file"] + stat["active_file"], max(0, stat["file"] - stat["shmem"]))
                    - stat["file_dirty"] - stat["file_writeback"] - stat["unevictable"]))
 
 
@@ -212,7 +213,7 @@ def read_cgroup_memory(root: Path = Path("/sys/fs/cgroup")) -> dict[str, Any]:
         stat = {}
         try:
             counters = dict(line.split() for line in (directory / "memory.stat").read_text().splitlines())
-            for key, v1_key in (("file", "cache"), ("inactive_file", "inactive_file"),
+            for key, v1_key in (("file", "cache"), ("inactive_file", "inactive_file"), ("active_file", "active_file"),
                                 ("shmem", "shmem"), ("file_dirty", "dirty"),
                                 ("file_writeback", "writeback"), ("unevictable", "unevictable")):
                 source = key if version == 2 else f"total_{v1_key}"
@@ -261,7 +262,7 @@ def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
             raise ValueError(
                 "Cgroup RAM reserve violated: "
                 f"raw={cgroup_used / 10**9:.3f} GB, limit={cgroup_limit / 10**9:.3f} GB, "
-                f"clean inactive cache={credit / 10**9:.3f} GB, working={working / 10**9:.3f} GB, "
+                f"clean disk cache={credit / 10**9:.3f} GB, working={working / 10**9:.3f} GB, "
                 f"available={(cgroup_limit - working) / 10**9:.3f} GB; "
                 f"require reserve>={reserve_gb:.3f} GB and working<={ram_cap_gb - reserve_gb:.3f} GB "
                 "(missing/invalid memory.stat counters receive no cache credit)"

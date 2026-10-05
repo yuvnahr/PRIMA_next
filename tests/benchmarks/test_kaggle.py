@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import copy
 import json
+import shutil
 import subprocess
 import time
 import types
@@ -256,7 +257,7 @@ def test_cgroup_disk_cache_is_recorded_and_does_not_trigger_false_reserve_failur
         "memory.usage_in_bytes", "memory.limit_in_bytes")
     (directory / current).write_text(str(24 * 10**9))
     (directory / limit).write_text(str(25 * 10**9))
-    stat = {"file": 12 * 10**9, "inactive_file": 11 * 10**9, "shmem": 10**9,
+    stat = {"file": 12 * 10**9, "inactive_file": 7 * 10**9, "active_file": 4 * 10**9, "shmem": 10**9,
             "file_dirty": 400 * 10**6, "file_writeback": 300 * 10**6, "unevictable": 300 * 10**6}
     aliases = {"file": "cache", "file_dirty": "dirty", "file_writeback": "writeback"}
     (directory / "memory.stat").write_text("\n".join(
@@ -269,22 +270,33 @@ def test_cgroup_disk_cache_is_recorded_and_does_not_trigger_false_reserve_failur
     assert value["ram"]["cgroup_working_set_bytes"] == 14 * 10**9
     assert value["ram"]["cgroup_available_bytes"] == 11 * 10**9
     resource_guard(value)
+    # Model loading promotes the same clean pages; it must not inflate working RAM.
+    stat["active_file"] += stat["inactive_file"]
+    stat["inactive_file"] = 0
+    (directory / "memory.stat").write_text("\n".join(
+        f"{key if version == 2 else 'total_' + aliases.get(key, key)} {value}"
+        for key, value in stat.items()))
+    value["ram"].update(read_cgroup_memory(tmp_path))
+    assert value["ram"]["cgroup_working_set_bytes"] == 14 * 10**9
+    resource_guard(value)
     (directory / "memory.stat").unlink()
     value["ram"].update(read_cgroup_memory(tmp_path))
-    with pytest.raises(ValueError, match="raw=24.000 GB.*clean inactive cache=0.000 GB"):
+    with pytest.raises(ValueError, match="raw=24.000 GB.*clean disk cache=0.000 GB"):
         resource_guard(value)
 
 
-@pytest.mark.parametrize("mutation", ["active", "dirty", "writeback", "shmem", "locked", "missing", "negative"])
+@pytest.mark.parametrize("mutation", ["no-file-lru", "dirty", "writeback", "shmem", "locked", "missing", "negative",
+                                       "active-missing", "active-negative"])
 def test_cgroup_cache_credit_cannot_hide_unreclaimable_memory(mutation):
-    stat = {"file": 5 * 10**9, "inactive_file": 5 * 10**9, "shmem": 0,
+    stat = {"file": 5 * 10**9, "inactive_file": 5 * 10**9, "active_file": 0, "shmem": 0,
             "file_dirty": 0, "file_writeback": 0, "unevictable": 0}
-    key = {"active": "inactive_file", "dirty": "file_dirty", "writeback": "file_writeback",
-           "shmem": "shmem", "locked": "unevictable", "negative": "file_dirty"}.get(mutation)
-    if mutation == "missing":
-        stat.pop("file_writeback")
+    key = {"no-file-lru": "inactive_file", "dirty": "file_dirty", "writeback": "file_writeback",
+           "shmem": "shmem", "locked": "unevictable", "negative": "file_dirty",
+           "active-negative": "active_file"}.get(mutation)
+    if mutation in ("missing", "active-missing"):
+        stat.pop("active_file" if mutation == "active-missing" else "file_writeback")
     else:
-        stat[key] = 0 if mutation == "active" else -1 if mutation == "negative" else 5 * 10**9
+        stat[key] = 0 if mutation == "no-file-lru" else -1 if "negative" in mutation else 5 * 10**9
     value = sample()
     value["ram"].update(cgroup_current_bytes=18 * 10**9, cgroup_limit_bytes=19 * 10**9,
                         cgroup_stat_bytes=stat, cgroup_reclaimable_cache_bytes=18 * 10**9)
@@ -422,6 +434,36 @@ def test_notebook_contract_and_full_gate_no_launch_without_measurement():
         exec(full_cell, ns)  # noqa: S102 - disabled gate must stop before any launch
     assert full_cell.index("budget_gate(") < full_cell.index("execute_campaign(")
     assert "fresh=True" in "".join(notebook["cells"][18]["source"])
+
+
+def test_notebook_persisted_checkout_ignores_missing_external_dirs_but_rejects_source_edits(tmp_path):
+    git_path = shutil.which("git")
+    assert git_path
+
+    def git(*args):
+        return subprocess.run([git_path, *args], cwd=tmp_path, check=True, capture_output=True, text=True)  # noqa: S603  # nosec B603 - fixed Git fixture commands
+
+    git("init", "-q")
+    source = tmp_path / "owned.py"
+    source.write_text("original\n")
+    git("add", "owned.py")
+    commit_args = ("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "-c", "commit.gpgsign=false",
+                   "commit", "-qm", "fixture")
+    git(*commit_args)
+    revision = git("rev-parse", "HEAD").stdout.strip()
+    for benchmark in ("hotpotqa", "locomo", "locomo-v2"):
+        git("update-index", "--add", "--cacheinfo", f"160000,{revision},benchmarks/{benchmark}/external")
+    git(*commit_args)
+    assert "external" in git("status", "--porcelain", "--ignore-submodules=dirty").stdout
+    notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
+    tree = ast.parse(notebook["cells"][8]["source"])
+    checkout = next(node for node in tree.body if isinstance(node, ast.If) and node.orelse)
+    guard = compile(ast.Module(body=checkout.orelse[:2], type_ignores=[]), "notebook-checkout-guard", "exec")
+    ns = {"REPOSITORY_DIR": tmp_path, "run_checked": lambda args, **kwargs: git(*args[1:])}
+    exec(guard, ns)  # noqa: S102 - checked-in guard only; no clone, fetch or dependency installation
+    source.write_text("modified\n")
+    with pytest.raises(RuntimeError, match="tracked edits"):
+        exec(guard, ns)  # noqa: S102
 
 
 def notebook_namespace(*, smoke=False):

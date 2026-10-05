@@ -26,14 +26,27 @@ does not include the counters needed to establish how much cache caused this
 particular failure.
 
 Warm-up, preflight and campaign monitoring now record the same Linux cgroup
-v1/v2 counters. Only clean inactive disk cache receives reclaimable credit;
-active cache, shared/tmpfs memory, dirty/writeback pages and locked memory
-receive none. Missing counters retain the raw-usage guard. The 19 GB planning
+v1/v2 counters. Clean disk cache on both the active and inactive reclaim lists
+receives credit, bounded by filesystem cache minus shared/tmpfs memory.
+Dirty/writeback pages and locked memory receive none. Missing or invalid counters
+retain the raw-usage guard. The 19 GB planning
 cap and 3 GB reserve still apply to the working set, and failure messages give
 raw usage, cache credit, working set and limit. Counter definitions follow the
 [Linux cgroup documentation](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory).
 These accounting changes do
 not establish a 12-hour completion time; the fresh canary must still pass.
+
+The supervised October 5 run exposed a second accounting error: during model
+loading, clean file pages moved from the inactive to the active list. The old
+inactive-only subtraction increased the apparent working set to 16.858 GB
+after 22.569 seconds and aborted loading despite 30.657 GB of system available
+RAM. The failure sample recorded 28.999 GB total cgroup usage, 27.799 GB file
+cache, 0.740 GB shared memory and only 24,576 dirty bytes. After the abort,
+`memory.stat` still showed 14.941 GB active file cache versus 0.799 GB anonymous
+memory. This was a notebook guard failure, not evidence of a kernel OOM.
+The shared guard now credits both clean file reclaim lists while preserving
+the 16 GB working-set ceiling, 3 GB reserve and 12 GiB/GPU ceiling.
+
 Upload the updated canonical notebook and start a fresh Kaggle session rather
 than continuing cells in the failed session with old imports. For any further
 failure, save `/kaggle/working/prima_outputs` together with the notebook so the
