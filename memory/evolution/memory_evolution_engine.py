@@ -34,6 +34,7 @@ class MemoryEvolutionEngine:
     def evolve(self, source_type: MemoryType = MemoryType.EPISODIC) -> EvolutionResult:
         GraphBuilder(self.graph_repository).rebuild_for_type(self.repository, source_type)
         communities = GraphReasoningEngine(self.graph_repository).detect_communities()
+        memory_order = {note.id: index for index, note in enumerate(self.repository.list())}
         evolved: list[MemoryNote] = []
         clusters: list[tuple[str, ...]] = []
 
@@ -49,6 +50,9 @@ class MemoryEvolutionEngine:
             ]
             if len(parents) < self.policy.min_cluster_size:
                 continue
+
+            # Community sets contain random memory IDs; preserve repository order for summaries and lineage.
+            parents.sort(key=lambda note: memory_order[note.id])
 
             summary = self.abstraction_engine.summarize_cluster(parents, self.policy.max_summary_words)
             lineage = self.lineage_tracker.build_lineage(parents)

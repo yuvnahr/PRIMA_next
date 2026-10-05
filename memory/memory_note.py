@@ -10,6 +10,7 @@ import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
+from functools import lru_cache
 from typing import Any
 
 from memory.memory_context import StateSnapshot
@@ -98,6 +99,12 @@ def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
 
 def calculate_smart_overlap(query_chain: Sequence[str], memory_keywords: Sequence[str]) -> int:
     """Preserve exact/substring keyword boosting behavior."""
+    return _smart_overlap(tuple(query_chain), tuple(memory_keywords))
+
+
+@lru_cache(maxsize=65536)
+def _smart_overlap(query_chain: tuple[str, ...], memory_keywords: tuple[str, ...]) -> int:
+    # ponytail: bounded exact-result cache; profile misses before increasing its memory budget.
     overlap = 0
     for query_word in set(query_chain):
         for memory_word in memory_keywords:

@@ -72,6 +72,32 @@ work, so the old 16.98-hour projection is not an accepted timing measurement
 of the repaired profile and cannot certify its speed. Re-measure after the
 remaining performance work, preserving all admission and memory requirements.
 
+### Bounded CPU optimization and reproducibility follow-up
+
+Local profiling of three maintenance batches over 128 LoCoMo source texts
+recorded 79,127 calls to the exact substring keyword-overlap calculation.
+The shared function now uses a standard-library LRU capped at 65,536 entries,
+keyed by immutable keyword tuples. Direction, duplicate handling and substring
+semantics are unchanged; changed keyword lists produce different keys. All
+graph pairs, edges and weights are still calculated or retrieved exactly.
+
+A local comparison repeated five full graph rebuild/index passes over those
+same 128 source texts, three times per implementation. Median time was
+0.602 seconds uncached versus 0.231 seconds cached (2.60x for this component),
+with identical 128 nodes and 1,108 edges/weights/metadata. Cache telemetry
+reported 351,711 hits and 14,049 misses. This microbenchmark does not measure
+Kaggle throughput, total maintenance cost, peak campaign RAM or model inference;
+its speedup is not applied to the 12-hour admission projection.
+
+Graph traversal now resolves equal-weight neighbor ties by node insertion
+order, rather than set iteration over random memory IDs. Evolution orders
+community parents by repository insertion order before constructing summaries,
+concepts and lineage. Regression checks reverse community iteration and alter
+edge weights to verify stable summaries/lineage and correct cache invalidation.
+These correct arbitrary ordering, so fresh pilot identities and measurements
+are required; they do not establish that every saved pilot discrepancy is
+resolved. The full native equality guard remains mandatory.
+
 ## Budget and acceptance criteria
 
 | Work | Target per session |

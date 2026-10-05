@@ -16,6 +16,7 @@ class GraphRepository:
 
     def __init__(self) -> None:
         self.nodes: dict[str, GraphNode] = {}
+        self._node_order: dict[str, int] = {}
         self.edges: dict[tuple[str, str], GraphEdge] = {}
         self._neighbors: dict[str, set[str]] = defaultdict(set)
         self._ordered_neighbors: dict[str, list[str]] = {}
@@ -23,6 +24,8 @@ class GraphRepository:
         self._neighbor_lock = Lock()
 
     def add_node(self, node: GraphNode) -> GraphNode:
+        if node.id not in self._node_order:
+            self._node_order[node.id] = len(self._node_order)
         self.nodes[node.id] = node
         return node
 
@@ -43,7 +46,10 @@ class GraphRepository:
             if ordered is None:
                 ordered = sorted(
                     self._neighbors.get(node_id, ()),
-                    key=lambda neighbor_id: self.edges[tuple(sorted((node_id, neighbor_id)))].weight,
+                    key=lambda neighbor_id: (
+                        self.edges[tuple(sorted((node_id, neighbor_id)))].weight,
+                        -self._node_order[neighbor_id],
+                    ),
                     reverse=True,
                 )
                 self._ordered_neighbors[node_id] = ordered
