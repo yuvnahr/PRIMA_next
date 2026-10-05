@@ -13,8 +13,8 @@ No unmeasured speedup is credited in the launch gate.
 
 ## Redesign after the measured LoCoMo pilot (2026-10-05)
 
-The current pinned 27B profile projects a 16.98-hour campaign and a 17.38-hour
-session from the representative pilot. Both fail admission. Its model already
+The earlier pinned 27B profile projected a 16.98-hour campaign and a 17.38-hour
+session from its representative pilot. Both fail admission. Its model already
 resides entirely on the GPUs; increasing occupied VRAM is not an optimization.
 The two-worker pilot failed prediction/evaluation equivalence and is not an
 accepted production configuration. HotpotQA and GoEmotions remain unmeasured.
@@ -128,6 +128,33 @@ remains explicit. Local routing, wrong-GPU and second-replica residency checks
 are synthetic software regressions, not hardware measurements. All three
 benchmark pilots and complete runs still need real Kaggle time/memory evidence;
 no model-size ratio or assumed twofold speedup enters the admission gate.
+
+### Required 27B remeasurement and pilot coverage (2026-10-06)
+
+Fresh session `20261005T190126Z-17ea6a45` ran commit `3d39683` with the required
+pinned 27B model, 8192 context and full GPU residency. The sequential 15-question
+canary completed in 991.1 seconds and projected 12.9919 campaign hours: it fails
+the 10.5-hour campaign gate before setup and packaging are added. All 1,511
+admitted maintenance events completed without failures or rejected work.
+Initial history flush is now counted once, and QA is measured separately.
+
+The two-worker campaign completed the same 15 cases without execution failures,
+retries or timeouts. Native execution took 858.729 seconds, but telemetry recorded
+only one active model request at a time across its 12 uncached calls. The pilot
+was refused, so no concurrent configuration or speedup was admitted. Conv-42
+became QA-ready after 536.039 seconds and conv-48 after 621.297 seconds; their
+short QA sequences did not produce overlapping requests. The completed session
+was stopped after the expected disabled-full-run gate.
+
+The next representative pilot uses ten questions from each of the same three
+deterministically selected conversations. This extends QA beyond the measured
+85-second history offset and tests more native cases; it does not assert that
+overlap or the time budget will pass. Both sequential and concurrent runs use
+identical fresh selections. Smoke remains two examples, the pilot cap stays
+75 minutes, and full datasets/model/context/evaluation and every resource,
+equivalence, overlap and budget guard remain unchanged. Measure in a fresh
+session and retain sequential mode unless all existing checks pass. HotpotQA
+and GoEmotions still require their own real timing/resource measurements.
 
 ### First real 9B canary and timing allocation correction
 
