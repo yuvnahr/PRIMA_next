@@ -100,6 +100,25 @@ resolved. The full native equality guard remains mandatory.
 
 ## Budget and acceptance criteria
 
+### Explicit single-GPU replicas (implementation, not timing evidence)
+
+The notebook now defaults to a new Qwen3.5 9B Q4_K_M experiment pinned to
+`56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90`.
+Two Ollama servers share one weight cache, each exposing one inference slot
+and seeing only its assigned T4. Sequential warmups verify the GPU allocation
+delta separately; every server must retain the pinned model at 8192 context
+and full GPU residency. Campaign workers use sticky replica routing with a
+one-request semaphore per server. Actual send overlap, not time spent waiting
+on those semaphores, supplies concurrency telemetry. Pilot transitions retain
+warm replicas rather than downloading or reloading them again.
+
+Both server identities are checked during campaign preflight, live resource
+sampling and final artifact validation. Legacy shared-server configuration
+remains explicit. Local routing, wrong-GPU and second-replica residency checks
+are synthetic software regressions, not hardware measurements. All three
+benchmark pilots and complete runs still need real Kaggle time/memory evidence;
+no model-size ratio or assumed twofold speedup enters the admission gate.
+
 | Work | Target per session |
 |---|---:|
 | Cached environment/model setup | 15 minutes |

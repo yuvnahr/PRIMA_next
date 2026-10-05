@@ -19,6 +19,21 @@ DATASET_FILES = {
 }
 
 
+def validate_replica_models(placements: list[dict[str, Any]], endpoints: list[str],
+                            model: str, digest: str, context: int) -> None:
+    """Require every explicit replica to retain the same fully resident model/context."""
+    if len(endpoints) != 2 or len(set(endpoints)) != 2 or [row.get("endpoint") for row in placements] != endpoints:
+        raise ValueError("Replica placement endpoints do not reconcile")
+    for row in placements:
+        active = row.get("model") or {}
+        if (active.get("name", active.get("model")) != model or active.get("digest") != digest
+                or active.get("context_length") != context
+                or not isinstance(active.get("size"), int) or isinstance(active.get("size"), bool)
+                or active["size"] <= 0
+                or int(active.get("size_vram") or 0) < int(active["size"])):
+            raise ValueError(f"Replica model identity/context/residency failed: {row['endpoint']}")
+
+
 def discover_dataset(benchmark: str, configured: Path, input_root: Path = Path("/kaggle/input")) -> Path:
     """Resolve the supplied slug in either Kaggle layout, refusing ambiguous mounts."""
     slug, filename = DATASET_FILES[benchmark]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 import tempfile
 import urllib.error
@@ -11,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from benchmarks.campaign.config import CampaignConfig
+from benchmarks.campaign.kaggle import validate_replica_models
 from benchmarks.campaign.provider_session import SharedProviderSession
 from benchmarks.campaign.registry import effective_generation
 from benchmarks.preflight import capability_report
@@ -58,6 +60,22 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
     else:
         endpoint = {"url": None, "status": "fake"}
 
+    replica_placements = []
+    for origin in config.provider.replica_endpoints:
+        try:
+            with urllib.request.urlopen(origin.rstrip("/") + "/api/ps", timeout=5) as response:  # noqa: S310  # nosec B310 - validated loopback origins
+                loaded = json.load(response)
+            matching = [row for row in loaded.get("models", [])
+                        if row.get("name", row.get("model")) == config.provider.model]
+            if len(matching) != 1:
+                raise ValueError("Expected exactly one resident pinned model per replica")
+            replica_placements.append({"endpoint": origin, "model": matching[0]})
+        except (OSError, ValueError, TimeoutError) as exc:
+            raise ValueError(f"Replica endpoint unavailable/invalid: {origin}: {exc}") from exc
+    if config.provider.replica_endpoints:
+        validate_replica_models(replica_placements, list(config.provider.replica_endpoints),
+                                config.provider.model, str(config.provider.revision), config.provider.context_window)
+
     generations = {mode.id: effective_generation(config, mode) for mode in config.benchmarks}
     requires_schema = any(
         generation.structured_output is StructuredOutputMode.JSON_SCHEMA
@@ -93,6 +111,7 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
         "schema_version": "1.0",
         "datasets": datasets,
         "endpoint": endpoint,
+        "replica_placements": replica_placements,
         "context_window": config.provider.context_window,
         "structured_output": {"required": requires_schema, "available": schema_available},
         "effective_generation": {key: value.to_dict() for key, value in generations.items()},

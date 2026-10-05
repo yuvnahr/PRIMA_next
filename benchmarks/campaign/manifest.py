@@ -70,6 +70,7 @@ class CampaignManifestStore:
                     "kind": config.provider.kind,
                     "model": config.provider.model,
                     "revision": config.provider.revision,
+                    "replica_endpoints": list(config.provider.replica_endpoints),
                 },
                 repository=config.repository.model_dump(mode="json"),
                 preflight=preflight,

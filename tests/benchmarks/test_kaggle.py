@@ -557,7 +557,8 @@ def notebook_namespace(*, smoke=False):
     ns = {}
     exec("".join(notebook["cells"][2]["source"]), ns)  # noqa: S102 - trusted notebook definitions
     ns["CONFIG"]["SMOKE_MODE"] = smoke
-    for index in (16, 18):
+    ns["CONFIG"]["INFERENCE_TOPOLOGY"] = "shared"
+    for index in (10, 12, 16, 18):
         tree = ast.parse("".join(notebook["cells"][index]["source"]))
         tree.body = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.Import, ast.ImportFrom))]
         exec(compile(tree, f"notebook-cell-{index}", "exec"), ns)  # noqa: S102 - imports/functions only

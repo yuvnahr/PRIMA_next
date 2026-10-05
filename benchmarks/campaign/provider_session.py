@@ -64,16 +64,17 @@ class SharedProviderSession:
         runtime_config: RuntimeConfig | None = None,
     ) -> None:
         started = time.perf_counter()
-        provider: Any = (
-            FakeProvider(config.fake_delay_seconds)
-            if config.kind == "fake"
-            else ProviderFactory.get_provider(config.kind)
-        )
-        if config.endpoint and hasattr(provider, "base_url"):
-            provider.base_url = config.endpoint
-        if config.kind in {"ollama", "local"}:
-            provider.context_window = config.context_window
-            provider.keep_alive = "24h"
+        providers = []
+        for endpoint in config.replica_endpoints or (config.endpoint,):
+            provider: Any = (FakeProvider(config.fake_delay_seconds) if config.kind == "fake"
+                             else ProviderFactory.get_provider(config.kind))
+            if endpoint and hasattr(provider, "base_url"):
+                provider.base_url = endpoint
+            if config.kind in {"ollama", "local"}:
+                provider.context_window = config.context_window
+                provider.keep_alive = "24h"
+            providers.append(provider)
+        provider = _ReplicaProvider(providers, config.replica_endpoints) if config.replica_endpoints else providers[0]
         self.provider = _BoundedProvider(provider, max_active_requests)
         self.client = LLMClient(provider_name=config.kind, provider=self.provider)
         self.session_initialization_ms = (time.perf_counter() - started) * 1000
@@ -87,11 +88,58 @@ class SharedProviderSession:
         return PrimaRuntime(**kwargs)
 
     def telemetry(self) -> dict[str, Any]:
+        measured = self.provider.telemetry()
+        if isinstance(self.provider.provider, _ReplicaProvider):
+            replicas = self.provider.provider.telemetry()
+            measured["replicas"] = replicas
+            # Bound acquisition can overlap while one replica is queued; count actual sends only.
+            measured["max_active_requests"] = replicas["max_active_requests"]
         return {
             "provider_session_initialization_ms": self.session_initialization_ms,
             "provider_session_initialization_measurement": "client/provider object construction; not model load",
-            **self.provider.telemetry(),
+            **measured,
         }
+
+
+class _ReplicaProvider(Provider):
+    """Keep each CPU worker on one replica, with at most one send per server."""
+
+    def __init__(self, providers: list[Provider], endpoints: tuple[str, ...]) -> None:
+        self.providers, self.endpoints = providers, endpoints
+        self.name, self.capabilities = providers[0].name, providers[0].capabilities
+        self._slots = [threading.BoundedSemaphore(1) for _ in providers]
+        self._local = threading.local()
+        self._lock = threading.Lock()
+        self._assigned = self._max_active = 0
+        self._active = [0] * len(providers)
+        self._attempts = [0] * len(providers)
+
+    def validate(self, request: LLMRequest) -> None:
+        for provider in self.providers:
+            provider.validate(request)
+
+    def send(self, request: LLMRequest) -> LLMResponse:
+        with self._lock:
+            if not hasattr(self._local, "replica"):
+                self._local.replica = self._assigned % len(self.providers)
+                self._assigned += 1
+            index: int = self._local.replica
+        with self._slots[index]:
+            with self._lock:
+                self._active[index] += 1
+                self._attempts[index] += 1
+                self._max_active = max(self._max_active, sum(self._active))
+            try:
+                return self.providers[index].send(request)
+            finally:
+                with self._lock:
+                    self._active[index] -= 1
+
+    def telemetry(self) -> dict[str, Any]:
+        with self._lock:
+            return {"max_active_requests": self._max_active, "endpoints": [
+                {"endpoint": endpoint, "request_attempts": self._attempts[index], "request_limit": 1}
+                for index, endpoint in enumerate(self.endpoints)]}
 
 
 class _BoundedProvider(Provider):
