@@ -38,6 +38,27 @@ complete histories/examples, native scoring, 8192 context and all memory/time
 guards. No profile is ready until each benchmark's real representative pilot
 passes those guards and leaves room for setup and final artifacts.
 
+The saved Version 1 archive was downloaded and independently verified against
+SHA-256 `e77921d2e9debd130920b322ec6e005fcd52ac9cb71c67add609b6fd97d9d236`.
+Direct comparison found ten differing cases, primarily candidate evidence IDs,
+two candidate-recall/failure-category changes, and one prediction change.
+Native sequential QA records contain seven model calls: 84.307 seconds prompt
+evaluation, 15.466 seconds decode and 0.014 seconds model loading, against
+415.502 seconds total campaign wall time. Those QA sums do not include every
+campaign phase and must not be treated as a complete wall-time breakdown.
+
+The archive also exposes a correctness blocker previously hidden by successful
+campaign status: conv-42 admitted 561 memories but completed only 128
+maintenance events, with 433 `maintenance_queue_full` failures. Queue admission
+currently uses nonblocking `enqueue` in the shared workflow, while synchronous
+history execution can starve the asynchronous worker until a barrier. Fix
+bounded producer backpressure and require completed maintenance in canary
+validation before another readiness claim. Do not enlarge an unbounded queue
+or omit failed work to improve timing. Investigate the maintenance worker's
+embedding context too: it is started outside the runtime's request-scoped
+embedding-pipeline context, and maintenance calls `get_embedding_pipeline()`.
+The observed evidence changes alone do not establish which defect caused them.
+
 ## Budget and acceptance criteria
 
 | Work | Target per session |
