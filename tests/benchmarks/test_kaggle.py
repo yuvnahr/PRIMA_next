@@ -466,6 +466,56 @@ def test_notebook_persisted_checkout_ignores_missing_external_dirs_but_rejects_s
         exec(guard, ns)  # noqa: S102
 
 
+def test_notebook_updates_persisted_shallow_branch_without_discarding_local_commits(tmp_path):
+    git_path = shutil.which("git")
+    assert git_path
+    remote, checkout = tmp_path / "origin", tmp_path / "checkout"
+    remote.mkdir()
+
+    def git(*args, cwd=remote):
+        return subprocess.run([git_path, *args], cwd=cwd, check=True, capture_output=True, text=True)  # noqa: S603  # nosec B603 - fixed local Git fixture commands
+
+    branch = "3.10_to_3.14"
+    git("init", "-q", "-b", branch)
+    commit_args = ("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "-c", "commit.gpgsign=false",
+                   "commit", "-qam", "fixture")
+    source = remote / "owned.py"
+    source.write_text("original\n")
+    git("add", "owned.py")
+    git(*commit_args)
+    notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
+    tree = ast.parse(notebook["cells"][8]["source"])
+    tree.body = tree.body[:next(i for i, node in enumerate(tree.body) if isinstance(node, ast.FunctionDef))]
+    setup = compile(tree, "notebook-branch-setup", "exec")
+    ns = {"CONFIG": {"GIT_REF": branch, "REPOSITORY_URL": remote.as_uri()}, "REPOSITORY_DIR": checkout,
+          "subprocess": subprocess, "time": time,
+          "run_checked": lambda args, cwd=None, **kwargs: git(*args[1:], cwd=cwd or remote)}
+    exec(setup, ns)  # noqa: S102 - checked-in Git setup only, local fixture origin
+    assert git("rev-parse", "--is-shallow-repository", cwd=checkout).stdout.strip() == "true"
+    source.write_text("upstream update\n")
+    git(*commit_args)
+    # Reproduce the old notebook's two disconnected grafted tips.
+    git("fetch", "--depth", "1", "origin", f"+refs/heads/{branch}:refs/remotes/origin/{branch}", cwd=checkout)
+    with pytest.raises(subprocess.CalledProcessError):
+        git("merge", "--ff-only", f"origin/{branch}", cwd=checkout)
+    exec(setup, ns)  # noqa: S102
+    assert (checkout / "owned.py").read_text() == "upstream update\n"
+    assert git("rev-parse", "--is-shallow-repository", cwd=checkout).stdout.strip() == "false"
+    source.write_text("another upstream update\n")
+    git(*commit_args)
+    exec(setup, ns)  # noqa: S102 - subsequent non-shallow update must also work
+    assert (checkout / "owned.py").read_text() == "another upstream update\n"
+    (checkout / "owned.py").write_text("local committed work\n")
+    git(*commit_args, cwd=checkout)
+    local_head = git("rev-parse", "HEAD", cwd=checkout).stdout.strip()
+    source.write_text("divergent upstream update\n")
+    git(*commit_args)
+    with pytest.raises(subprocess.CalledProcessError):
+        exec(setup, ns)  # noqa: S102 - retain fast-forward-only refusal for local commits
+    assert git("rev-parse", "HEAD", cwd=checkout).stdout.strip() == local_head
+    assert (checkout / "owned.py").read_text() == "local committed work\n"
+
+
 def notebook_namespace(*, smoke=False):
     """Load only definitions from checked-in cells; never run setup or inference cells."""
     notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
