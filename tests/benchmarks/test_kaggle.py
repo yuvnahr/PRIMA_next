@@ -56,6 +56,25 @@ def estimate():
                            setup_seconds=30, packaging_seconds=1, safety_margin=0.2)
 
 
+@pytest.mark.parametrize("corrupt", [None, "negative", "missing", "mismatch"])
+def test_history_flush_allocation_must_reconcile(corrupt):
+    rows = events()
+    rows[0].update(history_admission_seconds=8, initial_history_flush_seconds=2, qa_phase_seconds=6)
+    if corrupt == "negative":
+        rows[0]["initial_history_flush_seconds"] = -1
+    elif corrupt == "missing":
+        del rows[0]["qa_phase_seconds"]
+    elif corrupt == "mismatch":
+        rows[0]["qa_phase_seconds"] = 5
+    if corrupt:
+        with pytest.raises(ValueError, match="allocation does not reconcile"):
+            estimate_locomo(rows, {"a": 10, "b": 10}, workers=2, campaign_wall=23,
+                            setup_seconds=30, packaging_seconds=1, safety_margin=0.2)
+    else:
+        assert estimate_locomo(rows, {"a": 10, "b": 10}, workers=2, campaign_wall=23,
+                               setup_seconds=30, packaging_seconds=1, safety_margin=0.2) == estimate()
+
+
 def test_canary_always_fresh_and_partial_resume_exact(tmp_path):
     root = tmp_path / "canary"
     identity = {"repo": "a", "model": "b", "dataset": "c", "ids": ["1"], "config": {"workers": 1}}

@@ -322,6 +322,14 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
     for cid, row in measurements.items():
         count = row["question_count"]
         history, questions, worker = row["history_seconds"], row["qa_seconds"], row["worker_seconds"]
+        allocation_fields = ("history_admission_seconds", "initial_history_flush_seconds", "qa_phase_seconds")
+        if any(field in row for field in allocation_fields):
+            if (not all(field in row and isinstance(row[field], (int, float))
+                        and not isinstance(row[field], bool) and math.isfinite(row[field]) and row[field] >= 0
+                        for field in allocation_fields)
+                    or not math.isclose(history, row["history_admission_seconds"] + row["initial_history_flush_seconds"], abs_tol=0.01)
+                    or not math.isclose(questions + row["initial_history_flush_seconds"], row["qa_phase_seconds"], abs_tol=0.01)):
+                raise ValueError("History/QA timing allocation does not reconcile")
         if (count <= 0 or count > full_counts[cid] or row["historical_turn_count"] <= 0
                 or any(not math.isfinite(value) or value <= 0 for value in (history, questions, worker))
                 or worker + 0.01 < history + questions):

@@ -135,6 +135,50 @@ def reset_fake() -> None:
     FakeRuntime.requests, FakeRuntime.client_count = [], 0
 
 
+def test_initial_history_flush_is_not_extrapolated_as_question_work(monkeypatch):
+    import asyncio
+
+    from benchmarks.locomo import experiment
+    from llm.generation_config import GenerationConfig
+    from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
+
+    clock = [0.0]
+    barriers = []
+
+    class TimedRuntime(FakeRuntime):
+        async def execute(self, request):
+            clock[0] += 2.0 if request.task_kind.value == "factual_qa" else 1.0
+            return make_response(request)
+
+        async def apply_maintenance_barrier(self, mode, barrier):
+            barriers.append(barrier)
+            if barrier is MaintenanceBarrier.BEFORE_QUESTION:
+                clock[0] += 10.0 if barriers.count(barrier) == 1 else 3.0
+            elif barrier is MaintenanceBarrier.BEFORE_FINALIZATION:
+                clock[0] += 5.0
+            return True
+
+    monkeypatch.setattr(experiment.time, "perf_counter", lambda: clock[0])
+    conversation = LoCoMoAdapter().adapt(fixture())[0]
+    records, timings = [], []
+    result = asyncio.run(experiment._run_conversation(
+        conversation, TimedRuntime(), ExecutionProfile.PRIMA_FULL, IngestionPolicy.NORMAL_PRIMA,
+        GenerationConfig(model="fake", provider="fake"), 10, 0, MaintenanceMode.FLUSH_BEFORE_QUESTION,
+        {experiment.question_case_id(conversation.id, q.question_id) for q in conversation.questions},
+        records.append, timing=timings.append,
+    ))
+    assert len(records) == 3
+    assert barriers == [MaintenanceBarrier.AFTER_CONVERSATION,
+                        *([MaintenanceBarrier.BEFORE_QUESTION] * 3), MaintenanceBarrier.BEFORE_FINALIZATION]
+    assert result["history_admission_seconds"] == 2
+    assert result["initial_history_flush_seconds"] == 10
+    assert result["history_seconds"] == 12
+    assert result["qa_phase_seconds"] == 27
+    assert result["qa_seconds"] == 17  # Includes subsequent QA maintenance and finalization.
+    assert result["history_seconds"] + result["qa_seconds"] == clock[0]
+    assert next(row for row in timings if row["phase"] == "initial_history_flush")["seconds"] == 10
+
+
 def test_documented_normalization_exact_match_and_multiplicity() -> None:
     assert normalize_answer("The Friday!") == "friday"
     assert exact_match_score("The Friday!", "friday") == 1.0

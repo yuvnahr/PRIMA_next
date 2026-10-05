@@ -119,6 +119,29 @@ are synthetic software regressions, not hardware measurements. All three
 benchmark pilots and complete runs still need real Kaggle time/memory evidence;
 no model-size ratio or assumed twofold speedup enters the admission gate.
 
+### First real 9B canary and timing allocation correction
+
+Kaggle session `20261005T175611Z-8f8912d4` ran commit `57a0564` with both
+9B replicas fully GPU resident at 8192 context, approximately 6.4 GiB VRAM
+per GPU. Its sequential 15-question canary completed in 859.3 seconds and
+projected a 17.0962-hour campaign under the previous accounting. This fails
+admission. Native timing diagnostics verify 561, 373 and 577 completed
+maintenance events across conv-42, conv-26 and conv-48, with no rejected or
+failed events. History admission timing totals 517.799 seconds; the reported
+QA phase totals 330.745 seconds. These phase totals are not a pure model-time
+breakdown.
+
+The `flush_before_question` mode drains outstanding historical maintenance
+at the first pre-question barrier. Previously that one-time drain was included
+in `qa_seconds`, so extrapolation multiplied it by the full question count.
+Timing now assigns that first drain to history, retaining its original
+execution position and every barrier. Subsequent question maintenance and
+finalization remain in QA work. Extra measured fields reconcile the allocation
+against the original phase totals; inconsistent or incomplete allocations
+fail admission. The timing-only fix does not establish an inference speedup,
+and the existing canary cannot quantify its corrected projection. Re-run
+representative measurements under the new commit before admitting a full run.
+
 | Work | Target per session |
 |---|---:|
 | Cached environment/model setup | 15 minutes |

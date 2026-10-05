@@ -226,6 +226,8 @@ async def _run_conversation(
             timing({"phase": "history_replay", "conversation_id": conversation.id,
                     "seconds": history_seconds, "turns": len(conversation.turns)})
         qa_started = time.perf_counter()
+        initial_history_flush_seconds = 0.0
+        first_question = True
         for question in conversation.questions:
             case_id = question_case_id(conversation.id, question.question_id)
             if case_id not in pending_ids:
@@ -237,7 +239,15 @@ async def _run_conversation(
                     historical_replay_ms=historical_replay_ms,
                 )
             else:
+                barrier_started = time.perf_counter()
                 await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_QUESTION)
+                if first_question:
+                    # This barrier drains historical admissions, before any QA request exists.
+                    initial_history_flush_seconds = time.perf_counter() - barrier_started
+                    first_question = False
+                    if timing:
+                        timing({"phase": "initial_history_flush", "conversation_id": conversation.id,
+                                "seconds": initial_history_flush_seconds})
                 input_text = (
                     _bounded_question(conversation, question, bounded_context_turns)
                     if profile is ExecutionProfile.MODEL_ONLY else question.question
@@ -259,7 +269,8 @@ async def _run_conversation(
                 )
             checkpoint(record)
         await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_FINALIZATION)
-        qa_seconds = time.perf_counter() - qa_started
+        qa_phase_seconds = time.perf_counter() - qa_started
+        qa_seconds = qa_phase_seconds - initial_history_flush_seconds
         maintenance_state = (
             runtime.maintenance_supervisor.diagnostics()
             if hasattr(runtime, "maintenance_supervisor") else {}
@@ -269,7 +280,10 @@ async def _run_conversation(
             "ingestion_policy": policy.value, "memory_growth": len(created_memory_ids),
             "admitted_turn_count": len(admitted_turn_ids), "maintenance": maintenance_state,
             "maintenance_complete": _maintenance_complete(maintenance_state),
-            "history_seconds": history_seconds, "qa_seconds": qa_seconds,
+            "history_seconds": history_seconds + initial_history_flush_seconds, "qa_seconds": qa_seconds,
+            "history_admission_seconds": history_seconds,
+            "initial_history_flush_seconds": initial_history_flush_seconds,
+            "qa_phase_seconds": qa_phase_seconds,
             "question_count": sum(question_case_id(conversation.id, q.question_id) in pending_ids
                                   for q in conversation.questions),
             "historical_turn_count": len(conversation.turns),
