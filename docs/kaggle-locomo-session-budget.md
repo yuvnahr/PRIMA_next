@@ -1,5 +1,22 @@
 # Kaggle LoCoMo session budget
 
+The supervised October 5 run at `c6e11648` completed the fresh 15-question
+sequential canary in 415.5 seconds. Its full-history, full-coverage projection
+was **16.9800 hours for the campaign** and **17.3781 hours for that session**,
+including the 20% safety margin and 15-minute final artifact reserve. The
+two-worker pilot completed its questions but was refused because predictions
+or evaluation decisions differed from the sequential reference. It therefore
+cannot authorize concurrent production. These are conservative projections
+from three sampled conversations, not a completed full benchmark measurement.
+A fresh session does not make the current configuration fit twelve hours;
+HotpotQA and GoEmotions still need their own representative measurements.
+
+The same run exposed a remaining full-launch checkout guard that counted
+missing uninitialized external submodule directories as tracked edits. Setup
+and full launch now use the same submodule exclusion; real owned-source edits
+still block both stages. The timing gate remains unchanged and refuses this
+run independently of the checkout correction.
+
 The canonical `PRIMA_Kaggle_Benchmark.ipynb` preserves all 1,986 questions,
 `prima_full`, `normal_prima_admission`, full historical replay,
 `flush_before_question`, seed 13, 8192 context tokens, 512 output tokens and

@@ -436,7 +436,8 @@ def test_notebook_contract_and_full_gate_no_launch_without_measurement():
     assert "fresh=True" in "".join(notebook["cells"][18]["source"])
 
 
-def test_notebook_persisted_checkout_ignores_missing_external_dirs_but_rejects_source_edits(tmp_path):
+@pytest.mark.parametrize("cell_index,message", [(8, "tracked edits"), (20, "tracked changes")])
+def test_notebook_persisted_checkout_ignores_missing_external_dirs_but_rejects_source_edits(tmp_path, cell_index, message):
     git_path = shutil.which("git")
     assert git_path
 
@@ -456,13 +457,19 @@ def test_notebook_persisted_checkout_ignores_missing_external_dirs_but_rejects_s
     git(*commit_args)
     assert "external" in git("status", "--porcelain", "--ignore-submodules=dirty").stdout
     notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
-    tree = ast.parse(notebook["cells"][8]["source"])
-    checkout = next(node for node in tree.body if isinstance(node, ast.If) and node.orelse)
-    guard = compile(ast.Module(body=checkout.orelse[:2], type_ignores=[]), "notebook-checkout-guard", "exec")
+    tree = ast.parse(notebook["cells"][cell_index]["source"])
+    if cell_index == 8:
+        checkout = next(node for node in tree.body if isinstance(node, ast.If) and node.orelse)
+        checks = checkout.orelse[:2]
+    else:
+        index = next(i for i, node in enumerate(tree.body)
+                     if isinstance(node, ast.Assign) and node.targets[0].id == "tracked_changes")
+        checks = tree.body[index:index + 2]
+    guard = compile(ast.Module(body=checks, type_ignores=[]), "notebook-checkout-guard", "exec")
     ns = {"REPOSITORY_DIR": tmp_path, "run_checked": lambda args, **kwargs: git(*args[1:])}
     exec(guard, ns)  # noqa: S102 - checked-in guard only; no clone, fetch or dependency installation
     source.write_text("modified\n")
-    with pytest.raises(RuntimeError, match="tracked edits"):
+    with pytest.raises(RuntimeError, match=message):
         exec(guard, ns)  # noqa: S102
 
 
