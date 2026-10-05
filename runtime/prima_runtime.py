@@ -273,17 +273,20 @@ class PrimaRuntime:
     async def start_maintenance(self) -> None:
         """Start the local cold-path worker for an async application lifecycle."""
 
-        await self.maintenance_supervisor.start()
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.start()
 
     async def flush_maintenance(self) -> None:
         """Wait for a deterministic maintenance barrier."""
 
-        await self.maintenance_supervisor.flush()
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.flush()
 
     async def stop_maintenance(self, *, graceful: bool = True) -> None:
         """Stop the local cold-path worker and optionally drain queued work."""
 
-        await self.maintenance_supervisor.stop(graceful=graceful)
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.stop(graceful=graceful)
 
     async def apply_maintenance_barrier(
         self,
@@ -292,9 +295,10 @@ class PrimaRuntime:
     ) -> bool:
         """Apply a consistency barrier without importing benchmark concepts."""
 
-        return await self.maintenance_supervisor.apply_barrier(
-            MaintenanceMode(mode), MaintenanceBarrier(barrier)
-        )
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            return await self.maintenance_supervisor.apply_barrier(
+                MaintenanceMode(mode), MaintenanceBarrier(barrier)
+            )
 
     def apply_maintenance_barrier_sync(
         self,

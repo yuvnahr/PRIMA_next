@@ -184,6 +184,12 @@ class BackgroundMaintenanceSupervisor:
             return
         self._worker = asyncio.create_task(self._run(), name="prima-memory-maintenance")
 
+    async def enqueue_wait(self, event: Event) -> bool:
+        """Apply bounded backpressure instead of dropping admitted memory work."""
+        if self.enabled and self._queue.full():
+            await self.flush()
+        return self.enqueue(event)
+
     async def flush(self) -> None:
         """Wait until all work queued before the barrier is complete."""
 

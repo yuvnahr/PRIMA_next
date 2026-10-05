@@ -53,6 +53,38 @@ def test_queue_is_bounded_and_duplicate_events_are_idempotent() -> None:
     assert handled == [first.event_id]
 
 
+def test_async_admission_preserves_every_event_under_queue_pressure() -> None:
+    handled: list[str] = []
+    supervisor = BackgroundMaintenanceSupervisor(lambda event: handled.append(event.event_id), max_queue_size=2)
+
+    async def run() -> None:
+        for index in range(9):
+            assert await supervisor.enqueue_wait(_event(str(index)))
+            assert supervisor.diagnostics()["queue_size"] <= 2
+        await supervisor.stop()
+
+    asyncio.run(run())
+    assert handled == [str(index) for index in range(9)]
+    assert supervisor.diagnostics()["failure_count"] == 0
+
+
+def test_maintenance_worker_uses_its_runtime_embedding_context(tmp_path) -> None:
+    from memory.embedding_pipeline import get_embedding_pipeline
+
+    runtime = PrimaRuntime(memory_repository=InMemoryMemoryRepository(), log_path=tmp_path / "runtime.log")
+    observed = []
+    runtime.maintenance_supervisor.handler = lambda event: observed.append(get_embedding_pipeline())
+
+    async def run() -> None:
+        await runtime.start_maintenance()
+        assert runtime.maintenance_supervisor.enqueue(_event())
+        await runtime.flush_maintenance()
+        await runtime.stop_maintenance()
+
+    asyncio.run(run())
+    assert observed == [runtime.embedding_pipeline]
+
+
 def test_retry_terminal_failure_and_restart_are_traceable() -> None:
     attempts: dict[str, int] = {}
 

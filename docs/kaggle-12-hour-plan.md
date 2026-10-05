@@ -59,6 +59,19 @@ embedding context too: it is started outside the runtime's request-scoped
 embedding-pipeline context, and maintenance calls `get_embedding_pipeline()`.
 The observed evidence changes alone do not establish which defect caused them.
 
+The shared workflow now awaits bounded backpressure when its maintenance queue
+fills instead of dropping events. The explicit nonblocking supervisor API
+retains its saturation behavior for callers that choose it. Runtime worker
+startup and maintenance barriers bind the owning runtime's embedding context;
+background tasks must not inherit the global default pipeline. The notebook
+now rejects a canary whose final conversation diagnostics report incomplete
+maintenance, regardless of otherwise successful campaign status. Local
+regressions cover queue pressure, owning-pipeline identity and rejection of a
+corrupted final-maintenance record. This repair processes previously dropped
+work, so the old 16.98-hour projection is not an accepted timing measurement
+of the repaired profile and cannot certify its speed. Re-measure after the
+remaining performance work, preserving all admission and memory requirements.
+
 ## Budget and acceptance criteria
 
 | Work | Target per session |

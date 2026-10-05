@@ -655,6 +655,15 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     samples, log, wall = ns["execute_campaign"](config_path, root, 4, fresh=True)
     manifest, records, timing = ns["validate_canary"](config, root)
     assert len(records) == ns["STATE"]["canary_measured_items"] == 4
+    child = root / manifest["modes"]["locomo-prima"]["child_manifest"]
+    timing_path = child.parent / "timing.jsonl"
+    original_timing = timing_path.read_bytes()
+    failed_timing = read_jsonl(timing_path)
+    next(event for event in failed_timing if event.get("phase") == "conversation")["maintenance_complete"] = False
+    timing_path.write_text("".join(json.dumps(event) + "\n" for event in failed_timing))
+    with pytest.raises(RuntimeError, match="Canary maintenance incomplete"):
+        ns["validate_canary"](config, root)
+    timing_path.write_bytes(original_timing)
     assert samples and log.is_file() and wall > 0
     assert ns["measure_canary_packaging"](root, manifest) > 0
     assert (root.parent / f"{root.name}-validated.zip").is_file()

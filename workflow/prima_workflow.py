@@ -609,14 +609,14 @@ class MemoryCommitController:
 
 @dataclass(slots=True)
 class MaintenanceEnqueueController:
-    """Publish admitted memories to the bounded cold-path queue without waiting."""
+    """Publish admitted memories with backpressure when the cold-path queue fills."""
 
     repository: MemoryRepository
     supervisor: BackgroundMaintenanceSupervisor
     phase: WorkflowPhase = WorkflowPhase.MAINTENANCE_ENQUEUE
 
     async def execute(self, context: ExecutionContext) -> dict[str, Any]:
-        """Enqueue maintenance events and return immediately."""
+        """Enqueue maintenance events without dropping work on saturation."""
 
         notes = [note for note in context.memory_notes_created if isinstance(note, MemoryNote)]
         ingestion_id = str(getattr(context.ingestion_result, "memory_id", ""))
@@ -635,7 +635,7 @@ class MaintenanceEnqueueController:
                 payload={key: value for key, value in admission.items() if isinstance(value, (str, int, float, bool))},
             )
             await self.supervisor.event_bus.publish(event)
-            if self.supervisor.enqueue(event):
+            if await self.supervisor.enqueue_wait(event):
                 queued_ids.append(event.event_id)
         return {
             "schema_version": "1.0",
