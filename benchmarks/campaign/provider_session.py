@@ -106,6 +106,8 @@ class _BoundedProvider(Provider):
         self._request_local = threading.local()
         self._latencies: list[float] = []
         self._prompt_tokens = self._completion_tokens = 0
+        self._backend_durations_ns: dict[str, int] = {}
+        self._backend_duration_samples: dict[str, int] = {}
         self._cache: dict[str, LLMResponse] = {}
         self._cache_hits = 0
         self._first_started: float | None = None
@@ -148,6 +150,12 @@ class _BoundedProvider(Provider):
                     usage = response.usage or {}
                     self._prompt_tokens += int(usage.get("prompt_tokens", 0) or 0)
                     self._completion_tokens += int(usage.get("completion_tokens", 0) or 0)
+                    for field in ("model_load_duration_ns", "prompt_eval_duration_ns",
+                                  "decode_duration_ns", "provider_total_duration_ns"):
+                        value = usage.get(field)
+                        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                            self._backend_durations_ns[field] = self._backend_durations_ns.get(field, 0) + value
+                            self._backend_duration_samples[field] = self._backend_duration_samples.get(field, 0) + 1
                 return response
             except (ProviderError, TimeoutError) as exc:
                 with self._lock:
@@ -169,6 +177,9 @@ class _BoundedProvider(Provider):
             maximum = self._max_active
             retries, timeouts = self._retries, self._timeouts
             cache_hits = self._cache_hits
+            backend_seconds = {key.removesuffix("_ns"): value / 1e9
+                               for key, value in self._backend_durations_ns.items()}
+            backend_samples = dict(self._backend_duration_samples)
             wall_seconds = (
                 self._last_finished - self._first_started
                 if self._first_started is not None and self._last_finished is not None
@@ -180,6 +191,11 @@ class _BoundedProvider(Provider):
             "retries": retries,
             "timeouts": timeouts,
             "response_cache_hits": cache_hits,
+            "backend_timing": {
+                "summed_request_seconds": backend_seconds,
+                "samples_by_duration_field": backend_samples,
+                "measurement": "Sum of successful uncached requests; concurrent durations overlap, not wall time",
+            },
             "max_active_requests": maximum,
             "latency_ms": {
                 "p50": _percentile(latencies, 0.50),

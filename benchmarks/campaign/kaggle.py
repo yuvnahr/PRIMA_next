@@ -424,5 +424,11 @@ def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, 
         if any(any(key not in row for key in required) for row in rows):
             raise ValueError("Pilot lacks native prediction/evaluation diagnostics")
         return {row[id_field]: {key: row.get(key) for key in fields} for row in rows}
-    if index(sequential) != index(concurrent):
-        raise ValueError("Concurrency changed predictions or evaluation decisions; retain sequential configuration")
+    baseline, candidate = index(sequential), index(concurrent)
+    differences = {
+        case_id: [key for key in fields if baseline[case_id][key] != candidate[case_id][key]]
+        for case_id in selected_ids if baseline[case_id] != candidate[case_id]
+    }
+    if differences:
+        raise ValueError("Concurrency changed predictions or evaluation decisions; retain sequential configuration. "
+                         f"Mismatched fields by case: {json.dumps(differences, sort_keys=True)}")

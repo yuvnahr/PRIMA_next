@@ -11,6 +11,33 @@ Its partial LoCoMo run projected 76,961 seconds (about 21h23m). Dividing that by
 insufficient once setup, validation and the 20% safety margin are included.
 No unmeasured speedup is credited in the launch gate.
 
+## Redesign after the measured LoCoMo pilot (2026-10-05)
+
+The current pinned 27B profile projects a 16.98-hour campaign and a 17.38-hour
+session from the representative pilot. Both fail admission. Its model already
+resides entirely on the GPUs; increasing occupied VRAM is not an optimization.
+The two-worker pilot failed prediction/evaluation equivalence and is not an
+accepted production configuration. HotpotQA and GoEmotions remain unmeasured.
+
+Before another hardware run, retain the saved sequential/concurrent pilot
+records and identify the actual differing fields. `validate_pilot` now reports
+case IDs and field names, without copying answer text into the exception. Every
+existing equality, overlap and resource requirement remains enforced.
+
+Campaign provider telemetry now sums native model-load, prompt-evaluation,
+decode and total durations, with a sample count for each field. Cache hits are
+excluded, missing measurements remain absent, and sums from overlapping
+requests are explicitly distinguished from wall time. These are diagnostics,
+not speedups or permission to reduce the budget projection.
+
+Use the measured dominant cost to select the next change: fix any shared-state
+defect demonstrated by the pilot diff; otherwise evaluate isolated model
+replicas with a uniformly pinned smaller model as a new experiment. Do not
+spend another production session repeating a failed unchanged profile. Keep
+complete histories/examples, native scoring, 8192 context and all memory/time
+guards. No profile is ready until each benchmark's real representative pilot
+passes those guards and leaves room for setup and final artifacts.
+
 ## Budget and acceptance criteria
 
 | Work | Target per session |

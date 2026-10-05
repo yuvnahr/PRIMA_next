@@ -332,6 +332,34 @@ def test_pilot_prediction_change_or_nonoverlap_rejects_concurrency():
     for changed, active, safe in (({**row, "prediction": "Beta"}, 2, True), (row, 1, True), (row, 2, False)):
         with pytest.raises(ValueError):
             validate_pilot([row], [changed], ["a"], resources_validated=safe, max_active_requests=active)
+    with pytest.raises(ValueError, match=r'Mismatched fields by case: .*"a": \["prediction"\]') as error:
+        validate_pilot([row], [{**row, "prediction": "private answer"}], ["a"],
+                       resources_validated=True, max_active_requests=2)
+    assert "private answer" not in str(error.value)
+
+
+def test_provider_backend_timings_count_uncached_successes_only(tmp_path):
+    from benchmarks.campaign.provider_session import SharedProviderSession
+    from llm.generation_config import GenerationConfig
+    from llm.llm_types import LLMRequest, LLMResponse
+    config = CampaignConfig.model_validate(payload(tmp_path))
+    session = SharedProviderSession(config.provider, max_active_requests=1)
+    samples = iter([{"decode_duration_ns": 2_000_000_000, "model_load_duration_ns": 0},
+                    {"decode_duration_ns": -1, "prompt_eval_duration_ns": 500_000_000},
+                    {"decode_duration_ns": True}])
+    session.provider.provider.send = lambda request: LLMResponse(text="Alpha", usage=next(samples))
+    request = LLMRequest(prompt="first", generation=GenerationConfig(model="fixture", provider="fake"))
+    session.provider.send(request)
+    session.provider.send(request)
+    for prompt in ("second", "third"):
+        session.provider.send(LLMRequest(prompt=prompt, generation=request.generation))
+    telemetry = session.telemetry()
+    assert telemetry["response_cache_hits"] == 1
+    timing = telemetry["backend_timing"]
+    assert timing["summed_request_seconds"] == {
+        "decode_duration": 2.0, "model_load_duration": 0.0, "prompt_eval_duration": 0.5}
+    assert timing["samples_by_duration_field"] == {
+        "decode_duration_ns": 1, "model_load_duration_ns": 1, "prompt_eval_duration_ns": 1}
 
 
 def test_fake_provider_measures_real_overlap_at_two_request_limit(tmp_path):
