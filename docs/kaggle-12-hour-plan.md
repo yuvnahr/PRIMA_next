@@ -31,8 +31,8 @@ requests are explicitly distinguished from wall time. These are diagnostics,
 not speedups or permission to reduce the budget projection.
 
 Use the measured dominant cost to select the next change: fix any shared-state
-defect demonstrated by the pilot diff; otherwise evaluate isolated model
-replicas with a uniformly pinned smaller model as a new experiment. Do not
+defect demonstrated by the pilot diff; otherwise optimize measured shared CPU/inference costs while retaining the
+required Qwen3.8 27B model. Do not
 spend another production session repeating a failed unchanged profile. Keep
 complete histories/examples, native scoring, 8192 context and all memory/time
 guards. No profile is ready until each benchmark's real representative pilot
@@ -98,13 +98,23 @@ These correct arbitrary ordering, so fresh pilot identities and measurements
 are required; they do not establish that every saved pilot discrepancy is
 resolved. The full native equality guard remains mandatory.
 
+## Required model (2026-10-06)
+
+The user requires Qwen3.8 27B for every benchmark. The notebook defaults to
+`qwen3.8:27b`, pinned to
+`aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813`,
+with the shared Ollama server distributing the model across both T4 GPUs.
+The 9B pilot was stopped; its measurements cannot authorize these benchmarks.
+LoCoMo, HotpotQA and GoEmotions datasets and evaluation remain unchanged.
+Fresh 27B timing is required before claiming the 12-hour target is met.
+
 ## Budget and acceptance criteria
 
 ### Explicit single-GPU replicas (implementation, not timing evidence)
 
-The notebook now defaults to a new Qwen3.5 9B Q4_K_M experiment pinned to
+The earlier optional Qwen3.5 9B Q4_K_M experiment was pinned to
 `56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90`.
-Two Ollama servers share one weight cache, each exposing one inference slot
+That experimental topology uses two Ollama servers sharing one weight cache, each exposing one inference slot
 and seeing only its assigned T4. Sequential warmups verify the GPU allocation
 delta separately; every server must retain the pinned model at 8192 context
 and full GPU residency. Campaign workers use sticky replica routing with a
