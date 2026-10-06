@@ -119,6 +119,27 @@ def test_loader_validates_schema_and_duplicate_ids(tmp_path: Path) -> None:
         HotpotQADataset(write_fixture(tmp_path, [FIXTURE[0], FIXTURE[0]])).load()
 
 
+def test_loader_accepts_uploaded_column_schema_without_changing_content(tmp_path: Path) -> None:
+    original = FIXTURE[0]
+    uploaded = {**original, "id": original["_id"],
+                "context": {"title": [p[0] for p in original["context"]],
+                            "sentences": [p[1] for p in original["context"]]},
+                "supporting_facts": {"title": [p[0] for p in original["supporting_facts"]],
+                                     "sent_id": [p[1] for p in original["supporting_facts"]]}}
+    uploaded.pop("_id")
+    path = write_fixture(tmp_path, [uploaded])
+    source = path.read_bytes()
+    assert HotpotQADataset(path).load() == [original]
+    assert path.read_bytes() == source
+    uploaded["context"]["title"].append("Unpaired")
+    with pytest.raises(ValueError, match="column schema"):
+        HotpotQADataset(write_fixture(tmp_path, [uploaded])).load()
+    uploaded["context"]["title"].pop()
+    uploaded["supporting_facts"]["sent_id"][0] = True
+    with pytest.raises(ValueError, match="supporting facts"):
+        HotpotQADataset(write_fixture(tmp_path, [uploaded])).load()
+
+
 def test_context_modes_preserve_provenance_and_label_oracle_diagnostic_only() -> None:
     distractor = HotpotQAAdapter("distractor").adapt([FIXTURE[0]])[0]
     official = HotpotQAAdapter("official_retrieved").adapt([FIXTURE[0]])[0]
