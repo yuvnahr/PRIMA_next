@@ -111,7 +111,7 @@ Run sections 1–9 to obtain representative fresh timing:
 
 | Selector | Representative canary | Full selection | Scheduling |
 |---|---|---|---|
-| 1: LoCoMo | Three conversations, five questions each; complete histories | All source conversations and questions; 1,986 required | Sequential or validated faster two-worker pilot |
+| 1: LoCoMo | Three conversations, ten questions each; complete histories | All source conversations and questions; 1,986 required | Sequential or validated faster two-worker pilot |
 | 2: HotpotQA | 20 seed-sampled questions | Every question in the pinned source | Sequential or validated faster two-worker pilot |
 | 3: GoEmotions | 50 seed-sampled test examples | Every test example in the pinned source; validation split checked separately | Sequential or validated faster two-worker pilot |
 
@@ -131,6 +131,15 @@ failure. These guards prevent an unsafe continuation; they do not prove that
 the full workload will finish in time.
 
 ## Execution evidence from this workspace
+
+The table below records the original local-only inspection, not current
+readiness. A later real Kaggle session on `8f54b16` completed both LoCoMo
+30-question pilots, passed native equality/resource/artifact checks and the
+two-worker budget gate (9.2202 campaign hours; 10.1859 total session hours at
+the final check). See [latest measured readiness](kaggle-12-hour-plan.md#latest-measured-readiness-2026-10-06).
+Full LoCoMo completion has not yet been observed. HotpotQA and GoEmotions
+still require their own real representative pilots; they are not certified
+by the LoCoMo measurement.
 
 Inspection started on branch `3.10_to_3.14`, HEAD
 `3a8698294c11d2c9e7870216f4436422686f63c2`. The pre-existing dirty

@@ -11,6 +11,32 @@ Its partial LoCoMo run projected 76,961 seconds (about 21h23m). Dividing that by
 insufficient once setup, validation and the 20% safety margin are included.
 No unmeasured speedup is credited in the launch gate.
 
+## Latest measured readiness (2026-10-06)
+
+Session `20261006T044633Z-3d208184` ran commit `8f54b16` with the required
+pinned Qwen3.8 27B, 8192 context and two T4 GPUs. Both representative pilots
+completed the same 30 questions with zero execution failures and complete
+maintenance. The native equality check passed all 30 predictions, evidence
+and evaluation decisions. The concurrent pilot observed two active requests;
+its resource checks and partial artifact validation passed.
+
+The admitted two-worker estimate is **9.2202 campaign hours**, including the
+20% safety margin and 900-second artifact reserve. Rechecking the native gate
+after result inspection gave **10.1859 total session hours** and `allowed=true`.
+This supports starting a full LoCoMo run, not a claim that full completion has
+already been observed. A new session must obtain its own fresh measurements.
+The one-worker estimate was 11.5958 campaign hours and remains inadmissible.
+
+On the same 15 cases as the previous pilot, native F1 was 14.10% versus 15.18%,
+with unchanged 23.17% final evidence recall and zero execution failures. No
+quality improvement is established. Poor retrieval remains a quality finding,
+not permission to alter gold answers or the evaluator.
+
+Kaggle was fully stopped after inspection, and the temporary diagnostic cell
+was removed. CI for `8f54b16` is green. HotpotQA and GoEmotions remain unmeasured
+on this hardware; LoCoMo timings cannot authorize them. Their native pilots,
+full source coverage, resource checks and measured budget gates remain required.
+
 ## Redesign after the measured LoCoMo pilot (2026-10-05)
 
 The earlier pinned 27B profile projected a 16.98-hour campaign and a 17.38-hour
@@ -271,19 +297,12 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
    Allow the faster setting only after its real pilot passes. Do not enable
    four slots merely because four CPU threads exist.
 
-5. **Choose the model topology from evidence.** First attempt the available,
-   newly pinned 27B model revision with the preceding fixes. If it still cannot meet the gate, the
-   performance fallback is a uniformly pinned smaller model for all three
-   benchmarks, such as Qwen3.5 9B Q4_K_M, with one independent model replica
-   per T4 if measured residency fits. This changes the evaluated model and
-   scores: record a new experiment/model digest, use the same model across
-   all three, and never present its results as the original 27B experiment.
-   Add explicit per-endpoint routing and replica resource checks before
-   enabling that topology; the current both-GPUs-for-one-model check cannot
-   simply be bypassed. Preserve 8192 context, full example/history coverage
-   and native scoring. If even that profile misses the measured gate, choose
-   a smaller uniform model/new experiment or report infeasibility; do not
-   silently truncate workloads. No claim of 9B throughput is made yet.
+5. **Keep the required model.** The user's current requirement is pinned
+   Qwen3.8 27B for every benchmark. Use its measured shared two-T4 topology;
+   historical smaller-model experiments are not an authorized fallback.
+   Preserve 8192 context, full coverage and native scoring. If a benchmark
+   fails its measured gate, optimize the demonstrated bottleneck or report
+   the failure; do not substitute a smaller model or truncate its workload.
 
 6. **Authorize production from real measurements.** Run one representative
    canary and only the necessary candidate pilot per benchmark. Account for
