@@ -146,6 +146,23 @@ became QA-ready after 536.039 seconds and conv-48 after 621.297 seconds; their
 short QA sequences did not produce overlapping requests. The completed session
 was stopped after the expected disabled-full-run gate.
 
+Offline comparison of the archived native records revealed a second blocker:
+`conv-42:1` had a different prediction, while the remaining compared evidence,
+evaluation and maintenance fields matched. Its ordered evidence text was
+identical, but storage UUIDs differed and model prompt counts were 3,131 versus
+3,119 tokens. Shared answer generation serialized those UUIDs in evidence and
+planning identity references, so these were not identical model inputs.
+
+Answer generation now exposes stable evidence/plan/action aliases to the model,
+while keeping original IDs in storage, diagnostics and citation resolution.
+Only identity-reference fields are rewritten; user/evidence text, plan decisions,
+state values and evaluation remain intact. Typed state sections serialize as
+structured dictionaries. Local regression checks exercise real initial/revised
+plans with different storage IDs, identical prompt bytes and correct original
+citation IDs. This repairs a demonstrated input reproducibility defect; it does
+not establish hardware equivalence or a runtime speedup. Re-measure both pilots
+before admitting concurrency or claiming readiness.
+
 The next representative pilot uses ten questions from each of the same three
 deterministically selected conversations. This extends QA beyond the measured
 85-second history offset and tests more native cases; it does not assert that

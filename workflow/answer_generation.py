@@ -18,6 +18,31 @@ from workflow.execution_context import ExecutionContext
 from workflow.workflow_state import WorkflowPhase
 
 
+def _prompt_context(plan: dict[str, Any] | None, state: dict[str, Any], labels: dict[str, str]) -> dict[str, Any]:
+    """Present stable identity references without changing storage or human text."""
+    aliases = {source: label for label, source in labels.items()}
+    if plan:
+        revision = plan.get("revision", 0)
+        aliases[plan["plan_id"]] = f"P{revision}"
+        if plan.get("previous_plan_id"):
+            aliases[plan["previous_plan_id"]] = f"P{revision - 1}"
+        for index, action in enumerate(plan.get("actions", ()), 1):
+            aliases[action["action_id"]] = f"A{index}"
+            if action["action_type"] == "integrate_memory":
+                for source in action["inputs"]:
+                    aliases.setdefault(source, f"M{len(aliases) + 1}")
+
+    def references(value: Any, identity: bool = False) -> Any:
+        if isinstance(value, dict):
+            return {key: references(item, key.endswith(("_id", "_ids")) or key == "inputs")
+                    for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [references(item, identity) for item in value]
+        return aliases.get(value, value) if identity and isinstance(value, str) else value
+
+    return {"plan": references(plan), "state": references(state)}
+
+
 class GenerationOutcome(Enum):
     """Typed terminal outcome of model generation."""
 
@@ -163,9 +188,9 @@ class AnswerGenerationController:
         label_map = {f"E{index}": item.source_id for index, item in enumerate(evidence, 1)}
         plan = context.plan.to_dict() if context.plan is not None and hasattr(context.plan, "to_dict") else None
         state = {
-            "goal": context.cognitive_state.goal_state,
-            "task": context.cognitive_state.task_state,
-            "confidence": context.cognitive_state.confidence_state,
+            "goal": dict(context.cognitive_state.goal_state),
+            "task": dict(context.cognitive_state.task_state),
+            "confidence": dict(context.cognitive_state.confidence_state),
         }
         schema = self._response_schema() if factual else None
         return (
@@ -173,11 +198,11 @@ class AnswerGenerationController:
                 system_policy=self._system_prompt(factual),
                 user_input=context.user_input,
                 evidence=(
-                    PromptEvidence(label, item.source_id, item.text)
+                    PromptEvidence(label, label, item.text)
                     for label, item in zip(label_map, evidence, strict=True)
                 ),
                 tool_results=tuple(str(item) for item in context.metadata.get("tool_results", ())),
-                runtime_context={"plan": plan, "state": state},
+                runtime_context=_prompt_context(plan, state, label_map),
                 response_schema=schema,
             ),
             label_map,
