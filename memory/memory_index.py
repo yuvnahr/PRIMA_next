@@ -26,8 +26,7 @@ class MemoryIndex(MemoryRepository):
     _graph_initialized: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self) -> None:
-        if self.graph_repository is None:
-            self._graph_initialized = True
+        self._graph_initialized = self.graph_repository is None
 
     @classmethod
     def for_repository(cls, repository: MemoryRepository) -> MemoryIndex:

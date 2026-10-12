@@ -83,6 +83,19 @@ All nine valid task/profile combinations enter a workflow-owned route. Conversat
 
 One runtime diagnostics assembler serves every task kind. Standard mode retains measured counters and key decisions; diagnostic mode may retain the complete per-request workflow trace. Secret-like fields, authorization headers, URL credentials, and configured raw prompts are redacted before exposure.
 
+### Interactive consumer prerequisites
+
+Groq is a first-class `ProviderFactory` selection (`groq`), sharing the OpenAI-compatible chat-completions transport with OpenAI and LM Studio. `GROQ_API_KEY` supplies Bearer authentication; `GROQ_URL` defaults to `https://api.groq.com/openai` (the transport appends `/v1/chat/completions`). Configure `DEFAULT_PROVIDER=groq` and `DEFAULT_MODEL=openai/gpt-oss-120b`, or pass an equivalent `GenerationConfig`. Ollama remains selectable with `DEFAULT_PROVIDER=ollama` and an installed model. Provider sessions remain fixed for a runtime lifecycle; choosing the local alternative requires constructing a runtime with an Ollama client/config, rather than an implicit provider switch. Shared HTTP failures expose status codes or exception types without transport exception text or credential-bearing chains.
+
+Conversational generation receives a compact `affect` record in `TRUSTED_RUNTIME_CONTEXT`: dominant emotion, profile confidence and PAD dimensions, evolved `current_pad`, emotional stability/volatility, salience and dissonance. Missing affect is `null`. The stable conversation policy uses these signals for subtle adaptation and continuity, gives low-confidence signals little or no weight, and prohibits asserting inferred emotions as facts. Retrieved memories remain untrusted data, and factual-QA schema policy is unchanged.
+
+Public inspection data is available through `PrimaResponse.output_data` on the canonical route:
+
+- `plan`: `null` when planning did not produce a plan; otherwise plan ID, goal description, status, confidence, revision, actions and constraints. Inputs, metadata and simulation internals are excluded. Text fields are capped at 240 characters, action/constraint lists at 30 entries, with full `action_count`/`constraint_count` values indicating truncation.
+- `retrieval`: the existing audit plus `candidate_count` (fused pool of the latest retrieval), `selected_count` (latest top-k results), `retrieval_confidence` (`null` when retrieval was skipped), and `retrieved_memories` with ID, actual memory type, score and preview. `final_context_count` and `final_context_memories` describe the compressed evidence supplied to generation, including retained earlier-hop evidence; these may differ from the latest selection. Both summary lists are capped at 30 entries, IDs/previews at 240 characters, and counts remain complete. An empty result produces empty lists and zero counts. Existing `PrimaResponse.evidence` retains its original full evidence contract.
+
+These additions do not change routes, planning, world simulation, uncertainty gates, correction, state commits or memory admission. Terminal interfaces and automatic provider failover are outside this phase.
+
 ### Benchmark campaign boundary
 
 Benchmark orchestration remains outside production packages. `benchmarks.common` defines classification and conversation-QA case shapes, a shared preflight-to-finalize lifecycle, exact-resume manifests, and crash-safe artifacts. Gold data remains in benchmark case/evaluation ownership and is never added to `PrimaRequest`, prompts, retrieval, routing, or reflection. A campaign is complete only when its authoritative manifest is atomically replaced after every selected case has a terminal checkpoint.

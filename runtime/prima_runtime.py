@@ -38,6 +38,7 @@ from memory.memory_types import MemoryType
 from memory.repository_factory import RepositorySelection, select_memory_repository
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
+from planning.plan import Plan
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
 from reasoning.models import (
@@ -552,6 +553,7 @@ class PrimaRuntime:
         output_data: dict[str, Any] = {
             "latency_ms": latency_ms,
             "affect_state": affect_state,
+            "plan": _plan_summary(context.plan),
             "memory_ids_created": created_ids,
             "memory_admission": (
                 dict(context.memory_admission)
@@ -575,7 +577,7 @@ class PrimaRuntime:
             ),
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
-            "retrieval": _retrieval_audit(context.retrieval_response),
+            "retrieval": _retrieval_audit(context.retrieval_response, reasoning),
             "context_compression": (
                 context.compressed_context.to_dict() if context.compressed_context is not None else {}
             ),
@@ -872,7 +874,40 @@ class PrimaRuntime:
         return logger
 
 
-def _retrieval_audit(response: Any) -> dict[str, Any]:
+def _plan_summary(plan: Any) -> dict[str, Any] | None:
+    """Expose bounded plan fields without inputs, metadata or simulation objects."""
+    if not isinstance(plan, Plan):
+        return None
+    return {
+        "plan_id": plan.plan_id[:240],
+        "goal": plan.goal.description[:240],
+        "status": plan.status.value,
+        "confidence": plan.evaluation.confidence if plan.evaluation is not None else plan.goal.confidence,
+        "revision": plan.revision,
+        "action_count": len(plan.actions),
+        "actions": [
+            {
+                "action_id": action.action_id[:240],
+                "action_type": action.action_type.value,
+                "description": action.description[:240],
+                "status": action.status.value,
+            }
+            for action in plan.actions[:30]
+        ],
+        "constraint_count": len(plan.constraints),
+        "constraints": [
+            {
+                "constraint_id": constraint.constraint_id[:240],
+                "constraint_type": constraint.constraint_type.value,
+                "description": constraint.description[:240],
+                "required": constraint.required,
+            }
+            for constraint in plan.constraints[:30]
+        ],
+    }
+
+
+def _retrieval_audit(response: Any, reasoning: AnswerResult | None = None) -> dict[str, Any]:
     diagnostics = dict(getattr(response, "diagnostics", {}))
     audit = {
         key: diagnostics[key]
@@ -896,6 +931,32 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         ]
         for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
     }
+    results = tuple(getattr(response, "results", ()) or ())
+    evidence = reasoning.evidence_references if reasoning is not None else ()
+    audit.update({
+        "candidate_count": len(diagnostics.get("hybrid_candidates", ())),
+        "selected_count": len(results),
+        "final_context_count": len(evidence),
+        "retrieval_confidence": getattr(getattr(response, "confidence", None), "confidence", None),
+        "retrieved_memories": [
+            {
+                "id": result.note.id[:240],
+                "memory_type": result.note.memory_type.value,
+                "score": result.score,
+                "preview": result.note.content[:240],
+            }
+            for result in results[:30]
+        ],
+        "final_context_memories": [
+            {
+                "id": item.source_id[:240],
+                "memory_type": item.result.note.memory_type.value if item.result is not None else None,
+                "score": item.retrieval_score,
+                "preview": item.text[:240],
+            }
+            for item in evidence[:30]
+        ],
+    })
     return audit
 
 

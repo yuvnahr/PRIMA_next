@@ -44,7 +44,10 @@ def post_json(
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as exc:
-            raise ProviderError(f"HTTP request failed: {exc}") from exc
+            status = exc.response.status_code if exc.response is not None else None
+            detail = f"HTTP {status}" if status is not None else type(exc).__name__
+            # Transport exception text can contain credentials, headers or response bodies.
+            raise ProviderError(f"HTTP request failed: {detail}") from None
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(  # noqa: S310
         url,
@@ -56,9 +59,11 @@ def post_json(
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        raise ProviderError(f"HTTP request failed: {exc.code}") from exc
+        raise ProviderError(f"HTTP request failed: {exc.code}") from None
     except (urllib.error.URLError, TimeoutError) as exc:
-        raise ProviderError(f"HTTP request failed: {exc}") from exc
+        raise ProviderError(f"HTTP request failed: {type(exc).__name__}") from None
+    except ValueError:
+        raise ProviderError("Provider returned invalid JSON") from None
 
 
 class Provider(ABC):
@@ -118,16 +123,22 @@ _OPENAI_CAPABILITIES = ProviderCapabilities(
 
 
 class OpenAICompatibleProvider(Provider):
-    """Provider for local servers exposing ``/v1/chat/completions``."""
+    """Shared transport for servers exposing ``/v1/chat/completions``."""
 
     capabilities = _OPENAI_CAPABILITIES
     default_base_url = ""
+    requires_api_key = False
 
-    def __init__(self, settings: Settings | None = None, *, base_url: str | None = None) -> None:
+    def __init__(
+        self, settings: Settings | None = None, *, base_url: str | None = None, api_key: str | None = None
+    ) -> None:
         super().__init__(settings)
         self.base_url = base_url or self.default_base_url
+        self.api_key = api_key
 
     def send(self, request: LLMRequest) -> LLMResponse:
+        if self.requires_api_key and not self.api_key:
+            raise ProviderError(f"{self.name} API key is not configured.")
         self.validate(request)
         if not self.base_url:
             raise ProviderError(f"{self.name} base URL is not configured")
@@ -153,10 +164,15 @@ class OpenAICompatibleProvider(Provider):
                 "type": "json_schema",
                 "json_schema": {"name": "prima_response", "schema": request.response_schema},
             }
+        transport_options: dict[str, Any] = {"timeout": config.timeout_seconds}
+        if self.api_key:
+            transport_options["headers"] = {
+                "Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"
+            }
         raw = post_json(
             f"{self.base_url.rstrip('/')}/v1/chat/completions",
             payload,
-            timeout=config.timeout_seconds,
+            **transport_options,
         )
         response = parse_openai_response(raw)
         response.provider = self.name
@@ -167,44 +183,24 @@ class OpenAIProvider(OpenAICompatibleProvider):
     """OpenAI chat-completions adapter."""
 
     name = "openai"
+    requires_api_key = True
 
     def __init__(self, settings: Settings | None = None) -> None:
-        super().__init__(settings, base_url=(settings or get_settings()).openai_url)
-        self.api_key = self.settings.openai_api_key
+        settings = settings or get_settings()
+        super().__init__(settings, base_url=settings.openai_url, api_key=settings.openai_api_key)
 
-    def send(self, request: LLMRequest) -> LLMResponse:
-        if not self.api_key:
-            raise ProviderError("OpenAI API key is not configured.")
-        self.validate(request)
-        config = request.generation
-        messages = []
-        if request.system_prompt:
-            messages.append({"role": "system", "content": request.system_prompt})
-        messages.append({"role": "user", "content": request.prompt})
-        payload: dict[str, Any] = {
-            "model": config.model,
-            "messages": messages,
-            "temperature": config.temperature,
-            "max_tokens": config.max_output_tokens,
-        }
-        if config.top_p is not None:
-            payload["top_p"] = config.top_p
-        if config.seed is not None:
-            payload["seed"] = config.seed
-        if config.structured_output is StructuredOutputMode.JSON_OBJECT:
-            payload["response_format"] = {"type": "json_object"}
-        elif config.structured_output is StructuredOutputMode.JSON_SCHEMA:
-            payload["response_format"] = {
-                "type": "json_schema",
-                "json_schema": {"name": "prima_response", "schema": request.response_schema},
-            }
-        raw = post_json(
-            f"{self.base_url.rstrip('/')}/v1/chat/completions",
-            payload,
-            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
-            timeout=config.timeout_seconds,
+
+class GroqProvider(OpenAICompatibleProvider):
+    """Groq hosted chat-completions adapter with its own provider identity."""
+
+    name = "groq"
+    requires_api_key = True
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        settings = settings or get_settings()
+        super().__init__(
+            settings, base_url=settings.groq_url, api_key=settings.groq_api_key
         )
-        return parse_openai_response(raw)
 
 
 class AnthropicProvider(Provider):
@@ -334,6 +330,7 @@ class ProviderFactory:
 
     _map: dict[str, type[Provider]] = {
         "openai": OpenAIProvider,
+        "groq": GroqProvider,
         "anthropic": AnthropicProvider,
         "ollama": OllamaProvider,
         "lmstudio": LMStudioProvider,
