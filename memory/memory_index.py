@@ -33,8 +33,7 @@ class MemoryIndex(MemoryRepository):
             or note.context.get("source_conversation_id", self.source_conversation_id) == self.source_conversation_id))
 
     def __post_init__(self) -> None:
-        if self.graph_repository is None:
-            self._graph_initialized = True
+        self._graph_initialized = self.graph_repository is None
 
     @classmethod
     def for_repository(cls, repository: MemoryRepository) -> MemoryIndex:

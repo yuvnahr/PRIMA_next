@@ -10,6 +10,7 @@ from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any
 
+from affect.affect_types import AffectUpdate
 from llm.generation_config import FallbackPolicy, GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
 from llm.prompt_builder import PromptBuilder, PromptEvidence
@@ -254,6 +255,21 @@ class AnswerGenerationController:
             "task": dict(context.cognitive_state.task_state),
             "confidence": dict(context.cognitive_state.confidence_state),
         }
+        affect = None
+        if isinstance(context.affect_update, AffectUpdate):
+            update = context.affect_update
+            affect = {
+                "dominant_emotion": update.profile.dominant_emotion,
+                "confidence": update.profile.confidence,
+                "valence": update.profile.valence,
+                "arousal": update.profile.arousal,
+                "dominance": update.profile.dominance,
+                "current_pad": update.emotional_state.current_pad.to_dict(),
+                "emotional_stability": update.emotional_state.emotional_stability,
+                "emotional_volatility": update.emotional_state.emotional_volatility,
+                "salience_score": update.salience_score,
+                "dissonance_score": update.dissonance_score,
+            }
         schema = self._response_schema() if factual else None
         prompt = PromptBuilder.build(
             system_policy=self._system_prompt(factual),
@@ -263,7 +279,7 @@ class AnswerGenerationController:
                 for label, item in zip(label_map, evidence, strict=True)
             ),
             tool_results=tuple(str(item) for item in context.metadata.get("tool_results", ())),
-            runtime_context=_prompt_context(plan, state, label_map),
+            runtime_context={**_prompt_context(plan, state, label_map), "affect": affect},
             response_schema=schema,
         )
         context.prompt_evidence = [
@@ -391,7 +407,16 @@ class AnswerGenerationController:
                     "If support is missing or contradictory, return insufficient_information=true. Never invent facts or citation labels. "
                     "Use explicit source date anchors to resolve omitted months/years only when unambiguous; do not equate every event date with the source date. "
                     "Include every supported requested list item, and compose multi-hop answers only from explicitly supported links.")
-        return "Respond directly to the user. Never repeat the request as the answer."
+        return (
+            "Maintain a consistent, grounded conversational persona. Respond directly to the user's actual request; "
+            "never repeat it as the answer. Use trusted runtime state and relevant memories for continuity with "
+            "previous interactions when useful, without mentioning them in every answer. Treat affect as an "
+            "uncertain adaptive control signal, never a fact about the user: adapt subtly without dramatic "
+            "personality changes, and use little or no affect-based adaptation when confidence is low or affect "
+            "is missing. Negative valence with high arousal can favor calmer structure and lower cognitive load; "
+            "positive energy can be preserved without exaggerated enthusiasm. Never assert inferred emotions, "
+            "memories or uncertain facts as certain. Do not expose internal PRIMA state unless explicitly asked."
+        )
 
     @staticmethod
     def _response_schema() -> dict[str, Any]:

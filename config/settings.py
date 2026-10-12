@@ -32,10 +32,12 @@ class Settings(BaseSettingsCls):
     default_provider: str = "openai"
     default_model: str = "gpt-4o"
     openai_api_key: str | None = None
+    groq_api_key: str | None = None
     anthropic_api_key: str | None = None
     ollama_url: str = "http://localhost:11434"
     lmstudio_url: str = "http://localhost:1234"
     openai_url: str = "https://api.openai.com"
+    groq_url: str = "https://api.groq.com/openai"
     anthropic_url: str = "https://api.anthropic.com"
     rate_limit_per_minute: int = 60
 
