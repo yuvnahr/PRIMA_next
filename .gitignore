@@ -1,7 +1,6 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -16,23 +15,31 @@ venv/
 env/
 .goemotions-venv/
 
-# Local configuration and model/data caches
+# Local configuration, logs, models, and caches
 .env
 *.log
 models/
 cache/
 Finetuned_Langue_Models/
+memory_db/
 
-# OS/editor
+# Editors and operating systems
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 
-cleanup_reports/
+# External benchmark checkouts and downloaded datasets
+benchmarks/goemotions/external/
+benchmarks/hotpotqa/data/*.json
+benchmarks/hotpotqa/data/*.parquet
 
-# Generated benchmark/debug artifacts
-benchmarks/*/external/
+# Generated benchmark and evaluation artifacts
+benchmarks/**/outputs/
+benchmarks/**/results/
+evaluation/**/outputs/
+evaluation/**/results/
+evaluation/qa*/
 evaluation/goemotions/raw/
 evaluation/goemotions/parsed/
 evaluation/goemotions/answers/
@@ -44,90 +51,10 @@ evaluation/goemotions/reports/
 evaluation/goemotions/models/
 evaluation/goemotions/smoke/
 evaluation/goemotions/final/
-benchmarks/locomo/outputs/debug_*/
-benchmarks/locomo/outputs/tmp_*/
-benchmarks/locomo/outputs/**/*.log
-benchmarks/locomo/outputs/**/__pycache__/
-evaluation/results/debug_*/
-evaluation/results/tmp_*/
-evaluation/qa/
-evaluation/qa_baseline_frozen/
-evaluation/qa_validation/
-evaluation/qa_diagnostics/
-evaluation/results/**/*trace*.json
-evaluation/results/**/*localization*.json
-evaluation/results/**/*drift*.json
-evaluation/results/**/*calibration*.json
-evaluation/results/**/*context_analysis*.json
-evaluation/results/**/*stage_statistics*.json
-evaluation/results/**/*stage*.csv
-evaluation/results/**/*creation_validation*.json
-evaluation/results/**/*representation_analysis*.json
-evaluation/results/**/*similarity_analysis*.json
-evaluation/results/**/*candidate_analysis*.json
-evaluation/results/**/*chunking_analysis*.json
-evaluation/results/**/*chunking_hypothesis*.json
-evaluation/results/**/*importance_policy*.json
-evaluation/results/**/*failure_breakdown*.json
-evaluation/results/**/*dense_investigation*.json
-evaluation/results/**/*event*.json
-evaluation/results/**/*event*.md
-evaluation/results/reasoning_reflection_integration_validation.json
-evaluation/results/legacy_reflection_audit.json
-evaluation/results/procedural_memory_isolation_validation.json
-evaluation/results/**/*embedding_backend_audit*.json
-evaluation/results/**/*embedding_ablation*.json
-evaluation/results/**/*embedding_ablation*.csv
-evaluation/results/**/*embedding_ablation*.md
-evaluation/results/**/*representation_ablation*.json
-evaluation/results/**/*representation_ablation*.csv
-evaluation/results/**/*representation_ablation*.md
-evaluation/results/**/*identity_normalization*.json
-evaluation/results/**/*semantic_representation*.json
-evaluation/results/**/*semantic_representation*.md
-evaluation/results/**/*phase10*.json
-evaluation/results/**/*phase10*.csv
-evaluation/results/**/*phase10*.md
-benchmarks/locomo/outputs/**/*event*.json
-benchmarks/locomo/outputs/**/*event*.md
-*.tmp.json
-*.tmp.csv
-# Request-local reasoning validation output
-evaluation/results/reasoning_controller_validation.json
-evaluation/results/reasoning_smoke_results.json
-
-benchmarks/hotpotqa/data/*.parquet
-
-# Large generated/data blobs
-evaluation/qa/raw/responses.json
-evaluation/goemotions/final/prima_qwen/raw/responses.json
-benchmarks/locomo/outputs/retrieval_trace.json
-benchmarks/hotpotqa/data/hotpot_dev_fullwiki_v1.json
-benchmarks/hotpotqa/data/hotpot_dev_distractor_v1.json
-evaluation/results/reflection_utility.json
+cleanup_reports/
 pytest-tmp/
 pytest-cache-files-*/
-benchmarks/goemotions/external/
-benchmarks/locomo-v2/external/
-
-# Generated large reports and documents
-evaluation/**/results/**/*.json
-evaluation/**/results/**/*.csv
-evaluation/**/results/**/*.md
-evaluation/**/results/**/*.txt
-evaluation/**/results/**/*.html
-evaluation/**/results/**/*.pdf
-benchmarks/**/outputs/**/*.json
-benchmarks/**/outputs/**/*.csv
-benchmarks/**/outputs/**/*.md
-benchmarks/**/outputs/**/*.txt
-benchmarks/**/outputs/**/*.html
-benchmarks/**/outputs/**/*.pdf
-benchmarks/**/results/**/*.json
-benchmarks/**/results/**/*.csv
-benchmarks/**/results/**/*.md
-benchmarks/**/results/**/*.txt
-benchmarks/**/results/**/*.html
-benchmarks/**/results/**/*.pdf
 *.generated.json
 *.generated.md
+*.tmp.json
+*.tmp.csv

@@ -12,7 +12,7 @@ class GraphReasoningEngine:
     def centrality_scores(self) -> dict[str, float]:
         total_nodes = max(1, len(self.graph_repository.nodes) - 1)
         return {
-            node_id: round(len(self.graph_repository.get_neighbors(node_id)) / total_nodes, 6)
+            node_id: round(self.graph_repository.degree(node_id) / total_nodes, 6)
             for node_id in self.graph_repository.nodes
         }
 

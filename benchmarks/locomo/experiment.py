@@ -16,8 +16,8 @@ import time
 from collections import Counter
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -39,6 +39,7 @@ from benchmarks.common import (
     atomic_write_json,
     resume_manifest,
 )
+from benchmarks.common.artifacts import append_jsonl
 from benchmarks.locomo.config import (
     MAX_CONVERSATIONS,
     MAX_QUESTIONS,
@@ -76,7 +77,7 @@ LOCOMO_PROFILES = (
 )
 
 
-class IngestionPolicy(str, Enum):
+class IngestionPolicy(StrEnum):
     """Explicit treatment of conversation turns before questions."""
 
     CONTROLLED_DOCUMENT = "controlled_document_ingestion"
@@ -176,7 +177,7 @@ def _turn_request(
     text = _turn_text(turn)
     if policy is IngestionPolicy.NORMAL_PRIMA:
         return PrimaRequest(
-            task_kind=TaskKind.CONVERSATION, profile=ExecutionProfile.PRIMA_FULL,
+            task_kind=TaskKind.HISTORICAL_REPLAY, profile=ExecutionProfile.PRIMA_FULL,
             input_text=text, session_id=conversation_id, generation_config=generation,
             metadata={
                 "turn_id": turn.turn_id, "source_session_id": turn.session_id,
@@ -195,15 +196,20 @@ async def _run_conversation(
     generation: GenerationConfig, top_k: int, bounded_context_turns: int,
     maintenance: MaintenanceMode, pending_ids: set[str],
     checkpoint: Callable[[dict[str, Any]], None], context_budget: int = 1600,
+    timing: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
     ingestion_failure: PrimaResponse | None = None
+    historical_replay_ms = 0.0
+    history_started = time.perf_counter()
     if hasattr(runtime, "start_maintenance"):
         await runtime.start_maintenance()
     try:
         for turn in conversation.turns:
+            replay_started = time.perf_counter()
             response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation))
+            historical_replay_ms += (time.perf_counter() - replay_started) * 1000
             if response.status is not ExecutionStatus.COMPLETED:
                 ingestion_failure = response
                 break
@@ -215,6 +221,13 @@ async def _run_conversation(
             if memory_id or (isinstance(admission, dict) and admission.get("stored")):
                 admitted_turn_ids.add(str(turn.turn_id))
         await _barrier(runtime, maintenance, MaintenanceBarrier.AFTER_CONVERSATION)
+        history_seconds = time.perf_counter() - history_started
+        if timing:
+            timing({"phase": "history_replay", "conversation_id": conversation.id,
+                    "seconds": history_seconds, "turns": len(conversation.turns)})
+        qa_started = time.perf_counter()
+        initial_history_flush_seconds = 0.0
+        first_question = True
         for question in conversation.questions:
             case_id = question_case_id(conversation.id, question.question_id)
             if case_id not in pending_ids:
@@ -223,9 +236,18 @@ async def _run_conversation(
                 record = _question_record(
                     conversation, question, profile, policy, None, admitted_turn_ids,
                     created_memory_ids, ingestion_failure=ingestion_failure,
+                    historical_replay_ms=historical_replay_ms,
                 )
             else:
+                barrier_started = time.perf_counter()
                 await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_QUESTION)
+                if first_question:
+                    # This barrier drains historical admissions, before any QA request exists.
+                    initial_history_flush_seconds = time.perf_counter() - barrier_started
+                    first_question = False
+                    if timing:
+                        timing({"phase": "initial_history_flush", "conversation_id": conversation.id,
+                                "seconds": initial_history_flush_seconds})
                 input_text = (
                     _bounded_question(conversation, question, bounded_context_turns)
                     if profile is ExecutionProfile.MODEL_ONLY else question.question
@@ -243,9 +265,12 @@ async def _run_conversation(
                 record = _question_record(
                     conversation, question, profile, policy, response, admitted_turn_ids,
                     created_memory_ids, elapsed_ms=(time.perf_counter() - started) * 1000,
+                    historical_replay_ms=historical_replay_ms,
                 )
             checkpoint(record)
         await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_FINALIZATION)
+        qa_phase_seconds = time.perf_counter() - qa_started
+        qa_seconds = qa_phase_seconds - initial_history_flush_seconds
         maintenance_state = (
             runtime.maintenance_supervisor.diagnostics()
             if hasattr(runtime, "maintenance_supervisor") else {}
@@ -255,6 +280,13 @@ async def _run_conversation(
             "ingestion_policy": policy.value, "memory_growth": len(created_memory_ids),
             "admitted_turn_count": len(admitted_turn_ids), "maintenance": maintenance_state,
             "maintenance_complete": _maintenance_complete(maintenance_state),
+            "history_seconds": history_seconds + initial_history_flush_seconds, "qa_seconds": qa_seconds,
+            "history_admission_seconds": history_seconds,
+            "initial_history_flush_seconds": initial_history_flush_seconds,
+            "qa_phase_seconds": qa_phase_seconds,
+            "question_count": sum(question_case_id(conversation.id, q.question_id) in pending_ids
+                                  for q in conversation.questions),
+            "historical_turn_count": len(conversation.turns),
         }
     finally:
         if hasattr(runtime, "stop_maintenance"):
@@ -277,6 +309,7 @@ def _question_record(
     policy: IngestionPolicy, response: PrimaResponse | None,
     admitted_turn_ids: set[str], created_memory_ids: set[str],
     *, elapsed_ms: float = 0.0, ingestion_failure: PrimaResponse | None = None,
+    historical_replay_ms: float = 0.0,
 ) -> dict[str, Any]:
     expected_evidence = tuple(str(item) for item in question.evidence)
     response_dict = response.to_dict() if response is not None else {}
@@ -324,6 +357,7 @@ def _question_record(
             response.diagnostics.maintenance if response is not None else {}
         ),
         "latency_ms": round(elapsed_ms or (response.diagnostics.latency_ms if response else 0.0), 3),
+        "historical_replay_ms": round(historical_replay_ms, 3),
         "retrieval_count": response.diagnostics.retrieval_count if response else 0,
         "reflection_interventions": response.diagnostics.reflection_count if response else 0,
         "model_call_count": response.diagnostics.model_call_count if response else 0,
@@ -374,7 +408,7 @@ def _failure_record(record: dict[str, Any]) -> FailureRecord | None:
 
 def _prediction_record(record: dict[str, Any]) -> PredictionRecord:
     usage = record.get("model_usage", {})
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return PredictionRecord(
         case_id=record["case_id"], mode=BenchmarkMode.CONVERSATION_QA,
         prediction=record["prediction"],
@@ -444,7 +478,7 @@ def _manifest(
         ),
         source_fingerprint=None if commit else fingerprint(Path(__file__)), git_commit=commit,
         dataset_hash=fingerprint(dataset), selected_ids=tuple(selected_ids),
-        provider=generation.provider, model=generation.model,
+        provider=generation.provider, model=generation.model, model_revision=generation.revision,
         generation_config=generation.to_dict(), benchmark_config=config,
         runtime_profile=profile.value,
         active_capabilities={
@@ -547,26 +581,42 @@ def run_locomo_experiment(
     pending_ids = set(selected_ids) - completed_ids
     pool = _runtime_pool or SharedRuntimeFactory(runtime_factory)
     conversation_diagnostics = []
+    timing_lock = threading.Lock()
+
+    def timing(event: dict[str, Any]) -> None:
+        with timing_lock:
+            append_jsonl(root / "timing.jsonl", {"timestamp": datetime.now(UTC).isoformat(), **event})
 
     def execute(conversation: Any) -> dict[str, Any]:
         if not any(question_case_id(conversation.id, q.question_id) in pending_ids for q in conversation.questions):
             return {"schema_version": "1.0", "conversation_id": conversation.id, "resumed": True}
+        worker_started = time.perf_counter()
         runtime = pool.create(
             mode=RuntimeMode.BENCHMARK, memory_backend="in_memory",
             maintenance_enabled=maintenance is not MaintenanceMode.DISABLED,
             generation_config=generation,
         )
-        return asyncio.run(_run_conversation(
+        diagnostics = asyncio.run(_run_conversation(
             conversation, runtime, profile, policy, generation, top_k,
             bounded_context_turns, maintenance, pending_ids,
-            lambda record: _checkpoint(store, record), context_budget,
+            lambda record: _checkpoint(store, record), context_budget, timing,
         ))
+        timing({"phase": "conversation", **diagnostics,
+                "worker_seconds": time.perf_counter() - worker_started})
+        return diagnostics
 
+    execution_started = time.perf_counter()
     if parallel_workers > 1 and len(conversations) > 1:
+        # Start larger independent workloads first; each conversation remains serial.
+        scheduled = sorted(conversations, key=lambda c: (len(c.turns) + len(c.questions), c.id), reverse=True)
         with ThreadPoolExecutor(max_workers=parallel_workers) as executor:
-            conversation_diagnostics = list(executor.map(execute, conversations))
+            results = dict(zip((c.id for c in scheduled), executor.map(execute, scheduled), strict=True))
+        conversation_diagnostics = [results[c.id] for c in conversations]
     else:
         conversation_diagnostics = [execute(conversation) for conversation in conversations]
+    timing({"phase": "execution", "seconds": time.perf_counter() - execution_started,
+            "parallel_workers": parallel_workers})
+    finalization_started = time.perf_counter()
     records = _records(store)
     evaluator = LoCoMoEvaluator(
         include_rouge_l=include_rouge_l, include_bertscore=include_bertscore,
@@ -585,6 +635,7 @@ def run_locomo_experiment(
         failed_cases=failed, cancelled_cases=0, metrics=metrics,
         started_at=manifest.created_at,
     ))
+    timing({"phase": "finalization", "seconds": time.perf_counter() - finalization_started})
     return {
         "dataset_scope": scope, "full_dataset": full_dataset,
         "runtime_profile": profile.value, "ingestion_policy": policy.value,

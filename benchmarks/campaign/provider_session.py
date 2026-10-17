@@ -64,13 +64,17 @@ class SharedProviderSession:
         runtime_config: RuntimeConfig | None = None,
     ) -> None:
         started = time.perf_counter()
-        provider: Any = (
-            FakeProvider(config.fake_delay_seconds)
-            if config.kind == "fake"
-            else ProviderFactory.get_provider(config.kind)
-        )
-        if config.endpoint and hasattr(provider, "base_url"):
-            provider.base_url = config.endpoint
+        providers = []
+        for endpoint in config.replica_endpoints or (config.endpoint,):
+            provider: Any = (FakeProvider(config.fake_delay_seconds) if config.kind == "fake"
+                             else ProviderFactory.get_provider(config.kind))
+            if endpoint and hasattr(provider, "base_url"):
+                provider.base_url = endpoint
+            if config.kind in {"ollama", "local"}:
+                provider.context_window = config.context_window
+                provider.keep_alive = "24h"
+            providers.append(provider)
+        provider = _ReplicaProvider(providers, config.replica_endpoints) if config.replica_endpoints else providers[0]
         self.provider = _BoundedProvider(provider, max_active_requests)
         self.client = LLMClient(provider_name=config.kind, provider=self.provider)
         self.session_initialization_ms = (time.perf_counter() - started) * 1000
@@ -84,11 +88,58 @@ class SharedProviderSession:
         return PrimaRuntime(**kwargs)
 
     def telemetry(self) -> dict[str, Any]:
+        measured = self.provider.telemetry()
+        if isinstance(self.provider.provider, _ReplicaProvider):
+            replicas = self.provider.provider.telemetry()
+            measured["replicas"] = replicas
+            # Bound acquisition can overlap while one replica is queued; count actual sends only.
+            measured["max_active_requests"] = replicas["max_active_requests"]
         return {
             "provider_session_initialization_ms": self.session_initialization_ms,
             "provider_session_initialization_measurement": "client/provider object construction; not model load",
-            **self.provider.telemetry(),
+            **measured,
         }
+
+
+class _ReplicaProvider(Provider):
+    """Keep each CPU worker on one replica, with at most one send per server."""
+
+    def __init__(self, providers: list[Provider], endpoints: tuple[str, ...]) -> None:
+        self.providers, self.endpoints = providers, endpoints
+        self.name, self.capabilities = providers[0].name, providers[0].capabilities
+        self._slots = [threading.BoundedSemaphore(1) for _ in providers]
+        self._local = threading.local()
+        self._lock = threading.Lock()
+        self._assigned = self._max_active = 0
+        self._active = [0] * len(providers)
+        self._attempts = [0] * len(providers)
+
+    def validate(self, request: LLMRequest) -> None:
+        for provider in self.providers:
+            provider.validate(request)
+
+    def send(self, request: LLMRequest) -> LLMResponse:
+        with self._lock:
+            if not hasattr(self._local, "replica"):
+                self._local.replica = self._assigned % len(self.providers)
+                self._assigned += 1
+            index: int = self._local.replica
+        with self._slots[index]:
+            with self._lock:
+                self._active[index] += 1
+                self._attempts[index] += 1
+                self._max_active = max(self._max_active, sum(self._active))
+            try:
+                return self.providers[index].send(request)
+            finally:
+                with self._lock:
+                    self._active[index] -= 1
+
+    def telemetry(self) -> dict[str, Any]:
+        with self._lock:
+            return {"max_active_requests": self._max_active, "endpoints": [
+                {"endpoint": endpoint, "request_attempts": self._attempts[index], "request_limit": 1}
+                for index, endpoint in enumerate(self.endpoints)]}
 
 
 class _BoundedProvider(Provider):
@@ -103,6 +154,8 @@ class _BoundedProvider(Provider):
         self._request_local = threading.local()
         self._latencies: list[float] = []
         self._prompt_tokens = self._completion_tokens = 0
+        self._backend_durations_ns: dict[str, int] = {}
+        self._backend_duration_samples: dict[str, int] = {}
         self._cache: dict[str, LLMResponse] = {}
         self._cache_hits = 0
         self._first_started: float | None = None
@@ -145,6 +198,12 @@ class _BoundedProvider(Provider):
                     usage = response.usage or {}
                     self._prompt_tokens += int(usage.get("prompt_tokens", 0) or 0)
                     self._completion_tokens += int(usage.get("completion_tokens", 0) or 0)
+                    for field in ("model_load_duration_ns", "prompt_eval_duration_ns",
+                                  "decode_duration_ns", "provider_total_duration_ns"):
+                        value = usage.get(field)
+                        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                            self._backend_durations_ns[field] = self._backend_durations_ns.get(field, 0) + value
+                            self._backend_duration_samples[field] = self._backend_duration_samples.get(field, 0) + 1
                 return response
             except (ProviderError, TimeoutError) as exc:
                 with self._lock:
@@ -166,6 +225,9 @@ class _BoundedProvider(Provider):
             maximum = self._max_active
             retries, timeouts = self._retries, self._timeouts
             cache_hits = self._cache_hits
+            backend_seconds = {key.removesuffix("_ns"): value / 1e9
+                               for key, value in self._backend_durations_ns.items()}
+            backend_samples = dict(self._backend_duration_samples)
             wall_seconds = (
                 self._last_finished - self._first_started
                 if self._first_started is not None and self._last_finished is not None
@@ -177,6 +239,11 @@ class _BoundedProvider(Provider):
             "retries": retries,
             "timeouts": timeouts,
             "response_cache_hits": cache_hits,
+            "backend_timing": {
+                "summed_request_seconds": backend_seconds,
+                "samples_by_duration_field": backend_samples,
+                "measurement": "Sum of successful uncached requests; concurrent durations overlap, not wall time",
+            },
             "max_active_requests": maximum,
             "latency_ms": {
                 "p50": _percentile(latencies, 0.50),

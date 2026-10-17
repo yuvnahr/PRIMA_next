@@ -14,9 +14,9 @@ import subprocess  # nosec B404
 import threading
 import time
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -205,10 +205,10 @@ async def _execute_case(
             session_id=conversation.id,
             generation_config=generation,
             diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
-            options=ExecutionOptions(
-                top_k=top_k, max_hops=max_hops, max_retrieval_calls=max_hops,
-                reasoning_mode=reasoning_mode, max_context_tokens=context_budget,
-            ),
+            options=ExecutionOptions.model_validate({
+                "top_k": top_k, "max_hops": max_hops, "max_retrieval_calls": max_hops,
+                "reasoning_mode": reasoning_mode, "max_context_tokens": context_budget,
+            }),
         ))
         return None, answer, ingestion_ms, (time.perf_counter() - started) * 1000
     finally:
@@ -338,7 +338,7 @@ def _prediction_record(record: dict[str, Any], started_at: datetime) -> Predicti
         case_id=record["sample_id"], mode=BenchmarkMode.CONVERSATION_QA,
         prediction=record["prediction"],
         timing=ItemTiming(
-            started_at=started_at, finished_at=datetime.now(timezone.utc),
+            started_at=started_at, finished_at=datetime.now(UTC),
             total_ms=record["total_latency_ms"], provider_ms=record["reasoning_time_ms"],
         ),
         tokens=TokenUsage(
@@ -359,7 +359,7 @@ def _checkpoint(store: BenchmarkArtifactStore, record: dict[str, Any]) -> None:
             case_id=record["sample_id"], status=RunStatus.FAILED, failure=failure,
         ))
         return
-    prediction = _prediction_record(record, datetime.now(timezone.utc))
+    prediction = _prediction_record(record, datetime.now(UTC))
     store.append_checkpoint(CheckpointRecord(
         case_id=record["sample_id"], status=RunStatus.COMPLETE,
         prediction=prediction, failure=failure,
@@ -407,7 +407,7 @@ def _manifest(
         ),
         source_fingerprint=None if commit else fingerprint(Path(__file__)), git_commit=commit,
         dataset_hash=fingerprint(dataset), selected_ids=tuple(selected_ids),
-        provider=generation.provider, model=generation.model,
+        provider=generation.provider, model=generation.model, model_revision=generation.revision,
         generation_config=generation.to_dict(), benchmark_config=benchmark_config,
         runtime_profile=profile.value,
         active_capabilities={
@@ -535,7 +535,7 @@ def run_hotpotqa_experiment(
         "top_k": top_k, "max_hops": max_hops, "output_dir": output_dir, "resume": resume,
     }
     reporter.header(report_config)
-    campaign_started, wall_started = datetime.now(timezone.utc), time.perf_counter()
+    campaign_started, wall_started = datetime.now(UTC), time.perf_counter()
 
     def execute(item: Any) -> dict[str, Any]:
         return run_sample(
@@ -543,7 +543,7 @@ def run_hotpotqa_experiment(
             max_hops, pool, maintenance, context_budget,
         )
 
-    iterator = map(execute, pending)
+    iterator: Iterator[dict[str, Any]] = map(execute, pending)
     executor = None
     if parallel_workers > 1:
         executor = ThreadPoolExecutor(max_workers=parallel_workers)

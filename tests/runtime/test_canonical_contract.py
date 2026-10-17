@@ -55,7 +55,7 @@ def test_contract_serialization_round_trip() -> None:
 
 def test_all_task_profile_pairs_have_deterministic_decisions() -> None:
     matrix = route_matrix()
-    assert len(matrix) == len(TaskKind) * len(ExecutionProfile) == 25
+    assert len(matrix) == len(TaskKind) * len(ExecutionProfile) == 30
 
     valid = 0
     for task_kind in TaskKind:
@@ -70,7 +70,7 @@ def test_all_task_profile_pairs_have_deterministic_decisions() -> None:
             assert len(planned.components) == len(set(planned.components))
             assert set(planned.components).isdisjoint(planned.skipped_components)
             assert set(planned.components) | set(planned.skipped_components) == set(RuntimeComponent)
-    assert valid == 9
+    assert valid == 10
 
 
 def test_every_valid_contract_route_has_a_workflow_phase_plan() -> None:
@@ -87,7 +87,7 @@ def test_every_valid_contract_route_has_a_workflow_phase_plan() -> None:
         assert plan.phases
         assert len(plan.phases) == len(set(plan.phases))
         plans.append(plan)
-    assert len(plans) == 9
+    assert len(plans) == 10
 
 
 def test_short_routes_exclude_irrelevant_qa_components() -> None:

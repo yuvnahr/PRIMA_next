@@ -1,49 +1,71 @@
-$ErrorActionPreference = 'Stop'
-
+$ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
-$venvPython = Join-Path $PSScriptRoot 'venv\Scripts\python.exe'
-$venvReady = Test-Path $venvPython
-if ($venvReady) {
-    & $venvPython --version 2>$null
-    $venvReady = $LASTEXITCODE -eq 0
-}
 
-if (-not $venvReady) {
-    $venvCreator = $null
-    if (Get-Command py -ErrorAction SilentlyContinue) {
-        & py -3 --version 2>$null
-        if ($LASTEXITCODE -eq 0) { $venvCreator = 'py' }
+function Test-Python {
+    param(
+        [string]$Executable,
+        [string[]]$Prefix = @()
+    )
+    try {
+        & $Executable @Prefix -c "import sys; raise SystemExit(sys.version_info[:2] != (3, 14))" 2>$null
+        return $LASTEXITCODE -eq 0
     }
-    if (-not $venvCreator -and (Get-Command python -ErrorAction SilentlyContinue)) {
-        & python --version 2>$null
-        if ($LASTEXITCODE -eq 0) { $venvCreator = 'python' }
+    catch {
+        return $false
     }
-    if (-not $venvCreator) {
-        throw 'Python 3 is required to create venv.'
+}
+
+$pythonExecutable = $null
+$pythonPrefix = @()
+if ((Get-Command py -ErrorAction SilentlyContinue) -and (Test-Python "py" @("-3.14"))) {
+    $pythonExecutable = "py"
+    $pythonPrefix = @("-3.14")
+}
+else {
+    $userPython314 = Join-Path $env:LocalAppData "Programs\Python\Python314\python.exe"
+    if ((Test-Path -LiteralPath $userPython314) -and (Test-Python $userPython314)) {
+        $pythonExecutable = $userPython314
     }
-    if (Test-Path 'venv') { Remove-Item -Recurse -Force 'venv' }
-    if ($venvCreator -eq 'py') { & py -3 -m venv venv } else { & python -m venv venv }
-    if ($LASTEXITCODE) { throw 'Failed to create venv.' }
+}
+if (-not $pythonExecutable -and (Get-Command python -ErrorAction SilentlyContinue) -and (Test-Python "python")) {
+    $pythonExecutable = "python"
+}
+if (-not $pythonExecutable) {
+    throw "Python 3.14 is required. Install CPython 3.14, then run setup.ps1 again."
 }
 
-& git -c core.protectNTFS=false submodule update --init --recursive
-if ($LASTEXITCODE) { throw 'Failed to initialize git submodules.' }
-
-$goEmotions = Join-Path $PSScriptRoot 'benchmarks\goemotions\external'
-if (-not (Test-Path $goEmotions)) {
-    New-Item -ItemType Directory -Force (Split-Path $goEmotions) | Out-Null
-    & git clone --depth 1 --filter=blob:none --sparse --no-checkout https://github.com/google-research/google-research.git $goEmotions
-    if ($LASTEXITCODE) { throw 'Failed to clone GoEmotions.' }
+$venvPath = Join-Path $PSScriptRoot ".venv"
+$venvPython = Join-Path $venvPath "Scripts\python.exe"
+if (Test-Path -LiteralPath $venvPython) {
+    & $venvPython -c "import sys; raise SystemExit(sys.version_info[:2] != (3, 14))" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Remove-Item -LiteralPath $venvPath -Recurse -Force
+    }
 }
-if (-not (Test-Path (Join-Path $goEmotions '.git'))) {
-    throw "$goEmotions exists but is not a Git checkout."
+if (-not (Test-Path -LiteralPath $venvPython)) {
+    & $pythonExecutable @pythonPrefix -m venv $venvPath
+    if ($LASTEXITCODE -ne 0) { throw "Failed to create .venv." }
 }
-& git -C $goEmotions sparse-checkout set goemotions
-if ($LASTEXITCODE) { throw 'Failed to configure the GoEmotions sparse checkout.' }
-& git -C $goEmotions checkout
-if ($LASTEXITCODE) { throw 'Failed to checkout GoEmotions.' }
 
-& $venvPython -m pip install -r (Join-Path $PSScriptRoot 'requirements.txt')
-if ($LASTEXITCODE) { throw 'Failed to install requirements.' }
-& $venvPython -m pip install -r (Join-Path $PSScriptRoot 'requirements-goemotions.txt')
-if ($LASTEXITCODE) { throw 'Failed to install GoEmotions requirements.' }
+& $venvPython -m pip install --upgrade pip
+if ($LASTEXITCODE -ne 0) { throw "Failed to upgrade pip." }
+& $venvPython -m pip install -r (Join-Path $PSScriptRoot "requirements.txt")
+if ($LASTEXITCODE -ne 0) { throw "Failed to install project requirements." }
+
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot ".git")) {
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        throw "Git is required to initialize benchmark submodules."
+    }
+    & git -c core.protectNTFS=false submodule update --init --recursive
+    if ($LASTEXITCODE -ne 0) { throw "Failed to initialize benchmark submodules." }
+}
+
+$envPath = Join-Path $PSScriptRoot ".env"
+if (-not (Test-Path -LiteralPath $envPath)) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot ".env.example") -Destination $envPath
+}
+
+Write-Host ""
+Write-Host "PRIMA-NEXT is ready."
+Write-Host "Activate it with: . .\.venv\Scripts\Activate.ps1"
+Write-Host "Run checks with:  python -m pytest -q"

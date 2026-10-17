@@ -13,10 +13,16 @@ class EventStore:
     """Append-only in-memory event store."""
 
     _events: list[Event] = field(default_factory=list)
+    _by_execution: dict[str | None, list[Event]] = field(default_factory=dict, init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        for event in self._events:
+            self._by_execution.setdefault(event.execution_id, []).append(event)
 
     def append(self, event: Event) -> None:
         """Append one event to the store."""
         self._events.append(event)
+        self._by_execution.setdefault(event.execution_id, []).append(event)
 
     def all(self) -> tuple[Event, ...]:
         """Return all stored events in insertion order."""
@@ -31,13 +37,11 @@ class EventStore:
         source: str | None = None,
     ) -> tuple[Event, ...]:
         """Return events matching optional filters."""
-        events = self._events
+        events = self._events if execution_id is None else self._by_execution.get(execution_id, [])
         if event_type is not None:
             events = [event for event in events if event.event_type == EventType(event_type)]
         if topic is not None:
             events = [event for event in events if event.topic == topic]
-        if execution_id is not None:
-            events = [event for event in events if event.execution_id == execution_id]
         if source is not None:
             events = [event for event in events if event.source == source]
         return tuple(events)
@@ -45,3 +49,4 @@ class EventStore:
     def clear(self) -> None:
         """Remove all stored events."""
         self._events.clear()
+        self._by_execution.clear()

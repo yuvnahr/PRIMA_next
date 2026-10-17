@@ -7,7 +7,7 @@ import inspect
 import json
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -19,7 +19,7 @@ from events.maintenance_events import MAINTENANCE_EVENT_TYPES, maintenance_event
 MaintenanceHandler = Callable[[Event], None | Awaitable[None]]
 
 
-class MaintenanceMode(str, Enum):
+class MaintenanceMode(StrEnum):
     """Benchmark-visible maintenance consistency modes."""
 
     DISABLED = "disabled"
@@ -29,7 +29,7 @@ class MaintenanceMode(str, Enum):
     FLUSH_BEFORE_FINALIZATION = "flush_before_finalization"
 
 
-class MaintenanceBarrier(str, Enum):
+class MaintenanceBarrier(StrEnum):
     """Lifecycle points at which a benchmark may request a deterministic flush."""
 
     AFTER_CONVERSATION = "after_conversation"
@@ -183,6 +183,12 @@ class BackgroundMaintenanceSupervisor:
         if not self.enabled or self.running:
             return
         self._worker = asyncio.create_task(self._run(), name="prima-memory-maintenance")
+
+    async def enqueue_wait(self, event: Event) -> bool:
+        """Apply bounded backpressure instead of dropping admitted memory work."""
+        if self.enabled and self._queue.full():
+            await self.flush()
+        return self.enqueue(event)
 
     async def flush(self) -> None:
         """Wait until all work queued before the barrier is complete."""

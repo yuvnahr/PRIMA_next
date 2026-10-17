@@ -12,11 +12,12 @@ import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from affect.taxonomies.goemotions import LABELS
 from benchmarks.common import (
     BenchmarkArtifactStore,
     BenchmarkManifest,
@@ -34,7 +35,13 @@ from benchmarks.common import (
     atomic_write_json,
     resume_manifest,
 )
-from benchmarks.goemotions.dataset import DEFAULT_DATASET_PATH, GoEmotionsExample, load_examples, load_labels
+from benchmarks.goemotions.dataset import (
+    DEFAULT_DATASET_PATH,
+    GoEmotionsExample,
+    load_examples,
+    load_labels,
+    validate_json_splits,
+)
 from benchmarks.goemotions.metrics import (
     evaluate,
     paired_bootstrap_sample_f1,
@@ -118,10 +125,18 @@ def run_goemotions_experiment(
 
     requested = Path(dataset_path)
     data_dir = requested.parent
-    split_validation = validate_splits(data_dir)
-    selected_path = data_dir / f"{split}.tsv"
-    labels = load_labels(data_dir / "emotions.txt")
-    examples = load_examples(selected_path, data_dir / "emotions.txt")
+    if requested.suffix.lower() == ".json":
+        if requested.name != "goemotions_test.json" or split != "test":
+            raise ValueError("The Kaggle GoEmotions JSON dataset supports test evaluation only.")
+        selected_path = data_dir / "goemotions_test.json"
+        split_validation = validate_json_splits(data_dir)
+        labels = list(LABELS)
+        examples = load_examples(selected_path)
+    else:
+        split_validation = validate_splits(data_dir)
+        selected_path = data_dir / f"{split}.tsv"
+        labels = load_labels(data_dir / "emotions.txt")
+        examples = load_examples(selected_path, data_dir / "emotions.txt")
     if sample_manifest:
         examples = _examples_from_manifest(examples, selected_path, sample_manifest)
     elif max_samples > 0:
@@ -182,7 +197,7 @@ def run_goemotions_experiment(
             case_id=example.example_id,
             mode=BenchmarkMode.CLASSIFICATION,
             prediction=tuple(record["predicted_labels"]),
-            timing=ItemTiming(started_at=started_at, finished_at=datetime.now(timezone.utc), total_ms=elapsed),
+            timing=ItemTiming(started_at=started_at, finished_at=datetime.now(UTC), total_ms=elapsed),
             tokens=TokenUsage(
                 prompt_tokens=_usage(usage, "prompt_tokens", "prompt_eval_count"),
                 completion_tokens=_usage(usage, "completion_tokens", "eval_count"),
@@ -195,7 +210,7 @@ def run_goemotions_experiment(
         )
 
     def execute(example: GoEmotionsExample) -> None:
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         started = time.perf_counter()
         try:
             raw, details = active_system.predict(example.text, labels)
@@ -224,7 +239,7 @@ def run_goemotions_experiment(
     if hasattr(active_system, "predict_many"):
         for offset in range(0, len(pending), batch_size):
             chunk = pending[offset : offset + batch_size]
-            started_at = datetime.now(timezone.utc)
+            started_at = datetime.now(UTC)
             started = time.perf_counter()
             try:
                 responses = active_system.predict_many([row.text for row in chunk], labels)
@@ -314,6 +329,12 @@ def _classify_response(
     final = metadata.get("final_scored_labels")
     if isinstance(final, list) and all(isinstance(value, str) and value in labels for value in final):
         predicted = frozenset(final)
+    response_hash = hashlib.sha256(
+        str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
+    ).hexdigest()
+    recorded_hash = metadata.get("raw_model_response_hash")
+    if recorded_hash is not None and str(recorded_hash) != response_hash:
+        raise ValueError("GoEmotions paired scoring refused: cached raw-response hashes do not match")
     return {
         "id": example.example_id,
         "text": example.text,
@@ -321,9 +342,7 @@ def _classify_response(
         "predicted_labels": sorted(predicted),
         "prompt": prompt,
         "raw_response": raw_response,
-        "response_hash": hashlib.sha256(
-            str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
-        ).hexdigest(),
+        "response_hash": response_hash,
         **metadata,
         "parse_error": parse_error,
         "latency_ms": latency_ms,
@@ -426,6 +445,7 @@ def _manifest(
         selected_ids=tuple(row.example_id for row in examples),
         provider=generation.provider,
         model=generation.model,
+        model_revision=generation.revision,
         generation_config=generation.to_dict(),
         benchmark_config={
             "system": system.name,

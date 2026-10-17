@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-16",
+  "head": "4cd51950b22abbab22a0553348df51a36ac20c30",
+  "owned_python_files": 385,
+  "owned_python_lines": 44720,
+  "owned_definitions": 2735,
+  "ledger_rows": 450,
+  "non_python_assets": 62,
+  "third_party_tree_boundaries": 3,
+  "research_families": 24,
+  "highlights_mapped": 56,
+  "pdf_pages": 42,
+  "words_markdown": 15233,
+  "outputs": [
+    "C:\\PRIMA_next\\output\\pdf\\PRIMA_Patent_Research_Foundation.pdf",
+    "C:\\PRIMA_next\\output\\pdf\\PRIMA_Patent_Research_Foundation.md",
+    "C:\\PRIMA_next\\output\\pdf\\PRIMA_Patent_Research_Foundation_Ranked_Opportunities.csv",
+    "C:\\PRIMA_next\\output\\pdf\\PRIMA_Patent_Research_Foundation_File_Ledger.csv"
+  ],
+  "validation": "Complete: all code hashes and anchors checked; CSVs reloaded with exact 385-file coverage; all 24 ranks and 56 highlights present; original/annotated source hashes unchanged; all 42 rendered pages visually inspected; no out-of-page text.",
+  "pdf_link_annotations": 172,
+  "output_sha256": {
+    "PRIMA_Patent_Research_Foundation.pdf": "15e75b1aab9d645b07343461ddbb5c41d001c80c3f277a5c3ed9e7b82405e8d5",
+    "PRIMA_Patent_Research_Foundation.md": "d4000bc8b4ba46baba2b828f29b78d26d14d77d3965a2f92165d6bc3780192ea",
+    "PRIMA_Patent_Research_Foundation_Ranked_Opportunities.csv": "8c01cfc79daf4ab459a0685ed4a3897342842f9be1de223d1a501532dc70b396",
+    "PRIMA_Patent_Research_Foundation_File_Ledger.csv": "9dfcb43028ab724e3952dabd5017f2dd37961b0f96babec46d4c718a7f7eb031"
+  }
+}

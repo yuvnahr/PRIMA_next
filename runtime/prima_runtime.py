@@ -261,8 +261,7 @@ class PrimaRuntime:
                 "timestamp": event.timestamp.isoformat(),
                 "payload": dict(event.payload),
             }
-            for event in self.workflow.engine.event_bus.events
-            if event.execution_id == execution_context.execution_id
+            for event in self.workflow.engine.event_bus.events_for_execution(execution_context.execution_id)
         ]
         return self._response_from_execution(
             request,
@@ -274,17 +273,20 @@ class PrimaRuntime:
     async def start_maintenance(self) -> None:
         """Start the local cold-path worker for an async application lifecycle."""
 
-        await self.maintenance_supervisor.start()
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.start()
 
     async def flush_maintenance(self) -> None:
         """Wait for a deterministic maintenance barrier."""
 
-        await self.maintenance_supervisor.flush()
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.flush()
 
     async def stop_maintenance(self, *, graceful: bool = True) -> None:
         """Stop the local cold-path worker and optionally drain queued work."""
 
-        await self.maintenance_supervisor.stop(graceful=graceful)
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            await self.maintenance_supervisor.stop(graceful=graceful)
 
     async def apply_maintenance_barrier(
         self,
@@ -293,9 +295,10 @@ class PrimaRuntime:
     ) -> bool:
         """Apply a consistency barrier without importing benchmark concepts."""
 
-        return await self.maintenance_supervisor.apply_barrier(
-            MaintenanceMode(mode), MaintenanceBarrier(barrier)
-        )
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            return await self.maintenance_supervisor.apply_barrier(
+                MaintenanceMode(mode), MaintenanceBarrier(barrier)
+            )
 
     def apply_maintenance_barrier_sync(
         self,
@@ -997,6 +1000,8 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.OUTPUT_SHAPER)
     if WorkflowPhase.MEMORY_COMMIT in completed:
         executed.add(RuntimeComponent.MEMORY_COMMIT)
+        if str(context.metadata.get("task_kind")) == TaskKind.HISTORICAL_REPLAY.value:
+            executed.add(RuntimeComponent.MEMORY_INDEX)
     if (
         WorkflowPhase.MAINTENANCE_ENQUEUE in completed
         and int(context.maintenance_result.get("queued_count", 0)) > 0
@@ -1111,6 +1116,11 @@ def _route_diagnostics(
         )
         for component in (RuntimeComponent.WORLD_MODEL, RuntimeComponent.UNCERTAINTY_ESTIMATOR)
     }
+    for component in route.skipped_components:
+        component_details.setdefault(
+            component.value,
+            {"status": "task_inapplicable", "reason": f"not applicable to task '{route.task_kind.value}'"},
+        )
     component_details[RuntimeComponent.AFFECT_ENGINE.value] = {
         "status": (
             "executed" if RuntimeComponent.AFFECT_ENGINE in executed else "enabled_not_executed"

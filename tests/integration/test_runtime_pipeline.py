@@ -20,6 +20,7 @@ from runtime import (
     ExecutionStatus,
     PrimaRequest,
     PrimaRuntime,
+    RuntimeComponent,
     RuntimeResult,
     TaskKind,
 )
@@ -127,6 +128,57 @@ def test_ingestion_uses_workflow_without_generation(tmp_path) -> None:
     assert WorkflowPhase.DOCUMENT_INGESTION in completed
     assert WorkflowPhase.ANSWER_GENERATION not in completed
     assert client.calls == []
+
+
+def test_historical_replay_updates_state_affect_and_memory_without_llm_then_qa_retrieves(tmp_path) -> None:
+    client = FakeLLMClient()
+    repository = InMemoryMemoryRepository()
+    runtime = _runtime(tmp_path, client=client, repository=repository)
+
+    replay = asyncio.run(
+        runtime.execute(
+            PrimaRequest(
+                task_kind=TaskKind.HISTORICAL_REPLAY,
+                profile=ExecutionProfile.PRIMA_FULL,
+                input_text="[2024-01-01] Nate: I love jasmine tea and want you to remember it.",
+                session_id="conversation-1",
+                metadata={"turn_id": "turn-1"},
+            )
+        )
+    )
+
+    assert replay.status is ExecutionStatus.COMPLETED
+    assert replay.outcome is ExecutionOutcome.INGESTED
+    assert replay.output_text is None
+    assert replay.state_delta.changes["committed"] is True
+    assert replay.output_data["affect_state"]
+    assert replay.output_data["memory_ids_created"]
+    assert client.calls == []
+    assert runtime.memory_index.graph_repository is not None
+    assert runtime.memory_index.graph_repository.find_by_memory_id(
+        replay.output_data["memory_ids_created"][0]
+    ) is not None
+    assert RuntimeComponent.MODEL_EXECUTOR in replay.diagnostics.skipped_components
+    assert replay.diagnostics.component_details[RuntimeComponent.MODEL_EXECUTOR.value]["status"] == "task_inapplicable"
+    assert RuntimeComponent.REFLECTION in replay.diagnostics.skipped_components
+    assert RuntimeComponent.TOOL_EXECUTOR in replay.diagnostics.skipped_components
+
+    answer = asyncio.run(
+        runtime.execute(
+            PrimaRequest(
+                task_kind=TaskKind.FACTUAL_QA,
+                profile=ExecutionProfile.PRIMA_FULL,
+                input_text="What tea does Nate love?",
+                session_id="conversation-1",
+                options=ExecutionOptions(reasoning_mode="single_pass"),
+            )
+        )
+    )
+
+    assert answer.status is ExecutionStatus.COMPLETED
+    assert answer.evidence
+    assert any("jasmine tea" in item.text for item in answer.evidence)
+    assert len(client.calls) == 1
 
 
 def test_provider_failure_and_abstention_are_typed(tmp_path) -> None:

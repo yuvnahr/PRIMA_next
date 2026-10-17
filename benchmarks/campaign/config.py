@@ -7,6 +7,7 @@ import os
 import re
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -24,6 +25,7 @@ class ProviderConfig(ConfigModel):
     model: str = Field(min_length=1)
     revision: str | None = None
     endpoint: str | None = None
+    replica_endpoints: tuple[str, ...] = ()
     health_path: str = ""
     context_window: int = Field(gt=0)
     structured_output: bool = True
@@ -34,6 +36,32 @@ class ProviderConfig(ConfigModel):
     retries: int = Field(default=0, ge=0)
     fake_delay_seconds: float = Field(default=0.0, ge=0.0)
 
+    @model_validator(mode="after")
+    def validate_replicas(self) -> ProviderConfig:
+        if not self.replica_endpoints:
+            return self
+        if self.kind != "ollama" or len(self.replica_endpoints) != 2 or self.endpoint != self.replica_endpoints[0]:
+            raise ValueError("Replicas require two explicit Ollama endpoints with endpoint equal to the first")
+        ports = []
+        for endpoint in self.replica_endpoints:
+            parsed = urlsplit(endpoint)
+            if (parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost"}
+                    or not parsed.port or parsed.username or parsed.password or parsed.query or parsed.fragment
+                    or parsed.path not in {"", "/"}):
+                raise ValueError("Replica endpoints must be explicit loopback HTTP origins with ports")
+            ports.append(parsed.port)
+        if len(set(ports)) != 2:
+            raise ValueError("Replica endpoints must use different ports")
+        if not self.revision or not re.fullmatch(r"[0-9a-f]{64}", self.revision):
+            raise ValueError("Replicas require one pinned model digest")
+        return self
+
+
+class RepositoryConfig(ConfigModel):
+    url: str | None = None
+    requested_ref: str | None = None
+    commit_sha: str | None = None
+
 
 class SchedulerConfig(ConfigModel):
     mode: Literal["sequential", "interleaved"] = "sequential"
@@ -41,6 +69,7 @@ class SchedulerConfig(ConfigModel):
     cpu_workers: int = Field(default=3, gt=0)
     gpu_devices: tuple[str, ...] = ()
     allow_api_concurrency: bool = False
+    ollama_parallel_slots: int = Field(default=1, ge=1, le=2)
     min_free_disk_gb: float = Field(default=0.1, ge=0.0)
 
 
@@ -106,8 +135,10 @@ class ComparisonConfig(ConfigModel):
 
 class CampaignConfig(ConfigModel):
     schema_version: Literal["1.0"] = "1.0"
+    run_kind: Literal["benchmark", "smoke"] = "benchmark"
     output_root: Path
     provider: ProviderConfig
+    repository: RepositoryConfig = Field(default_factory=RepositoryConfig)
     scheduler: SchedulerConfig = Field(default_factory=SchedulerConfig)
     failure_policy: FailurePolicyConfig = Field(default_factory=FailurePolicyConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)
@@ -119,6 +150,18 @@ class CampaignConfig(ConfigModel):
     def validate_campaign(self) -> CampaignConfig:
         if not self.benchmarks:
             raise ValueError("campaign requires at least one benchmark mode")
+        if self.run_kind == "smoke":
+            if len(self.benchmarks) != 1 or self.comparisons:
+                raise ValueError("Smoke requires one benchmark mode without paired comparisons")
+            mode = self.benchmarks[0]
+            count = mode.max_items
+            if mode.benchmark == "locomo":
+                conversations = mode.options.get("max_conversations", 0)
+                if type(conversations) is not int or conversations <= 0 or mode.options.get("full_dataset"):
+                    raise ValueError("Smoke LoCoMo requires bounded conversations and questions")
+                count *= conversations
+            if not 0 < count <= 3:
+                raise ValueError("Smoke must select at most three examples, with a positive limit")
         modes = {mode.id: mode for mode in self.benchmarks}
         if len(modes) != len(self.benchmarks):
             raise ValueError("benchmark mode IDs must be unique")
@@ -136,11 +179,30 @@ class CampaignConfig(ConfigModel):
                 raise ValueError(f"comparison {comparison.id!r} requires the same selected-item limit")
             if _uses_schema(left) != _uses_schema(right):
                 raise ValueError(f"comparison {comparison.id!r} requires the same generation configuration")
+        if self.provider.replica_endpoints and (
+            self.scheduler.ollama_parallel_slots != 1 or self.scheduler.max_gpu_requests not in {1, 2}
+            or len(set(self.scheduler.gpu_devices)) != 2
+        ):
+            raise ValueError("Replica campaigns require one slot per server and two distinct GPU devices")
         if self.scheduler.max_gpu_requests > 1:
             validated = self.provider.kind in {"openai", "anthropic"} and self.scheduler.allow_api_concurrency
-            if not validated:
+            pilot = (
+                self.provider.kind in {"ollama", "fake"}
+                and self.scheduler.max_gpu_requests == 2
+                and (self.scheduler.ollama_parallel_slots == 2
+                     or (bool(self.provider.replica_endpoints) and self.scheduler.ollama_parallel_slots == 1))
+                and self.scheduler.mode == "sequential"
+                and self.scheduler.cpu_workers == 2
+                and all(
+                    mode.options.get("parallel_workers") == 2
+                    and not (mode.benchmark == "goemotions" and mode.variant == "trained_encoder")
+                    for mode in self.benchmarks
+                )
+            )
+            if not (validated or pilot):
                 raise ValueError(
-                    "max_gpu_requests > 1 requires explicit endpoint routing with validated API concurrency"
+                    "max_gpu_requests > 1 requires a bounded two-worker native pilot or validated API concurrency; "
+                    "other local providers require explicit endpoint routing"
                 )
         return self
 
@@ -157,7 +219,7 @@ def load_campaign_config(path: str | Path, environment: dict[str, str] | None = 
         try:
             import yaml  # type: ignore[import-untyped]
         except ImportError as exc:
-            raise RuntimeError("YAML campaign configs require PyYAML from requirements-benchmark.txt") from exc
+            raise RuntimeError("YAML campaign configs require PyYAML from requirements.txt") from exc
         payload = yaml.safe_load(source.read_text(encoding="utf-8"))
     else:
         raise ValueError("Campaign config must be JSON, YAML, or YML")

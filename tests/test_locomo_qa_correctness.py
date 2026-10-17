@@ -67,13 +67,14 @@ def write_fixture(tmp_path: Path) -> Path:
 def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaResponse:
     ingestion = request.profile is ExecutionProfile.INGESTION_ONLY
     conversation = request.task_kind.value == "conversation"
+    historical_replay = request.task_kind.value == "historical_replay"
     evidence = ()
     output_data = {}
     text = None
     if ingestion:
         output_data = {"memory_id": f"memory-{request.metadata['document_metadata']['source_turn_id']}"}
-    elif conversation:
-        text = "acknowledged"
+    elif conversation or historical_replay:
+        text = None if historical_replay else "acknowledged"
         output_data = {"memory_ids_created": [f"memory-{request.metadata['turn_id']}"], "memory_admission": {"stored": True}}
     else:
         text = "Alpha"
@@ -91,15 +92,17 @@ def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaRespon
         request_id=request.request_id, task_kind=request.task_kind, profile=request.profile,
         status=ExecutionStatus.FAILED if failed else ExecutionStatus.COMPLETED,
         outcome=ExecutionOutcome.FAILED if failed else (
-            ExecutionOutcome.INGESTED if ingestion else ExecutionOutcome.ANSWERED
+            ExecutionOutcome.INGESTED if ingestion or historical_replay else ExecutionOutcome.ANSWERED
         ),
         output_text=text, output_data=output_data, evidence=evidence,
         diagnostics=RuntimeDiagnostics(
             route_name=f"{request.task_kind.value}:{request.profile.value}",
             latency_ms=3.0, retrieval_count=len(evidence),
             reflection_count=1 if request.profile is ExecutionProfile.PRIMA_FULL else 0,
-            model_call_count=0 if ingestion else 1,
-            model_usage={"prompt_tokens": 4, "completion_tokens": 1, "total_tokens": 5},
+            model_call_count=0 if ingestion or historical_replay else 1,
+            model_usage={} if ingestion or historical_replay else {
+                "prompt_tokens": 4, "completion_tokens": 1, "total_tokens": 5,
+            },
             maintenance={"enabled": False, "queue_size": 0, "failure_count": 0},
         ),
         errors=("synthetic failure",) if failed else (),
@@ -130,6 +133,50 @@ class ExplodingRuntime(FakeRuntime):
 
 def reset_fake() -> None:
     FakeRuntime.requests, FakeRuntime.client_count = [], 0
+
+
+def test_initial_history_flush_is_not_extrapolated_as_question_work(monkeypatch):
+    import asyncio
+
+    from benchmarks.locomo import experiment
+    from llm.generation_config import GenerationConfig
+    from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
+
+    clock = [0.0]
+    barriers = []
+
+    class TimedRuntime(FakeRuntime):
+        async def execute(self, request):
+            clock[0] += 2.0 if request.task_kind.value == "factual_qa" else 1.0
+            return make_response(request)
+
+        async def apply_maintenance_barrier(self, mode, barrier):
+            barriers.append(barrier)
+            if barrier is MaintenanceBarrier.BEFORE_QUESTION:
+                clock[0] += 10.0 if barriers.count(barrier) == 1 else 3.0
+            elif barrier is MaintenanceBarrier.BEFORE_FINALIZATION:
+                clock[0] += 5.0
+            return True
+
+    monkeypatch.setattr(experiment.time, "perf_counter", lambda: clock[0])
+    conversation = LoCoMoAdapter().adapt(fixture())[0]
+    records, timings = [], []
+    result = asyncio.run(experiment._run_conversation(
+        conversation, TimedRuntime(), ExecutionProfile.PRIMA_FULL, IngestionPolicy.NORMAL_PRIMA,
+        GenerationConfig(model="fake", provider="fake"), 10, 0, MaintenanceMode.FLUSH_BEFORE_QUESTION,
+        {experiment.question_case_id(conversation.id, q.question_id) for q in conversation.questions},
+        records.append, timing=timings.append,
+    ))
+    assert len(records) == 3
+    assert barriers == [MaintenanceBarrier.AFTER_CONVERSATION,
+                        *([MaintenanceBarrier.BEFORE_QUESTION] * 3), MaintenanceBarrier.BEFORE_FINALIZATION]
+    assert result["history_admission_seconds"] == 2
+    assert result["initial_history_flush_seconds"] == 10
+    assert result["history_seconds"] == 12
+    assert result["qa_phase_seconds"] == 27
+    assert result["qa_seconds"] == 17  # Includes subsequent QA maintenance and finalization.
+    assert result["history_seconds"] + result["qa_seconds"] == clock[0]
+    assert next(row for row in timings if row["phase"] == "initial_history_flush")["seconds"] == 10
 
 
 def test_documented_normalization_exact_match_and_multiplicity() -> None:
@@ -183,12 +230,50 @@ def test_timestamp_schema_category_and_evidence_validation() -> None:
         LoCoMoAdapter().adapt(invalid)
 
 
+@pytest.mark.parametrize(
+    ("conversation_id", "source_evidence", "expected_evidence"),
+    [
+        (
+            "conv-42", ("D2:14", "D9:12", "D9:14", "D10:11", "D19:17", "D27:23", "D10:19"),
+            ("D2:14", "D9:12", "D9:14", "D10:11", "D19:17", "D27:23", "D20:15"),
+        ),
+        ("conv-42", ("D1:18", "D", "D1:20"), ("D1:18", "D1:20")),
+        (
+            "conv-43", ("D1:14", "D2:7", "D4:7", "D5:15", "D:11:26", "D20:21", "D26:36"),
+            ("D1:14", "D2:7", "D4:7", "D5:15", "D11:26", "D20:21", "D26:36"),
+        ),
+        ("conv-47", ("D4:36", "D18:1", "D18:7"), ("D13:3", "D18:1", "D18:7")),
+        ("conv-50", ("D30:05",), ("D30:5",)),
+    ],
+)
+def test_canonical_locomo_evidence_errata_are_corrected(
+    conversation_id: str, source_evidence: tuple[str, ...], expected_evidence: tuple[str, ...],
+) -> None:
+    record = fixture()[0]
+    record["sample_id"] = conversation_id
+    record["conversation"] = {
+        "speaker_a": "A", "speaker_b": "B", "session_1_date_time": "2023-05-08",
+        "session_1": [
+            {"speaker": "A", "dia_id": identifier, "text": f"Evidence {identifier}"}
+            for identifier in expected_evidence
+        ],
+    }
+    record["qa"] = [{
+        "id": "q1", "question": "What happened?", "answer": "Answer",
+        "evidence": list(source_evidence), "category": 1,
+    }]
+    question = LoCoMoAdapter().adapt([record])[0].questions[0]
+    assert question.evidence == expected_evidence
+    assert question.metadata["source_evidence"] == source_evidence
+
+
 def test_optional_metrics_are_opt_in_and_bertscore_uses_device_and_batch(monkeypatch) -> None:
     records = [{"prediction": "alpha", "expected_answer": "alpha", "category": "3", "execution_failed": False}]
     core = LoCoMoEvaluator().evaluate(records)
     assert core["rouge_l"] is None and core["rouge_l_status"] == "disabled"
     assert core["bertscore"] is None and core["bertscore_status"] == "disabled"
     assert LoCoMoEvaluator(include_rouge_l=True).evaluate(records)["rouge_l"] == 1.0
+    monkeypatch.setattr("benchmarks.locomo.evaluate.missing_modules", lambda _modules: ("bert_score",))
     unavailable = LoCoMoEvaluator(include_bertscore=True).evaluate(records)
     assert str(unavailable["bertscore_status"]).startswith(("unavailable", "available"))
     calls = {}
@@ -258,7 +343,7 @@ def test_profiles_use_execute_and_explicit_ingestion_policies(tmp_path: Path, pr
     for request in FakeRuntime.requests[:-1]:
         policy = (
             request.metadata["ingestion_policy"]
-            if request.task_kind.value == "conversation"
+            if request.task_kind.value in {"conversation", "historical_replay"}
             else request.metadata["document_metadata"]["ingestion_policy"]
         )
         assert policy == DEFAULT_POLICIES[profile].value

@@ -16,19 +16,21 @@ class GraphBuilder:
 
     def rebuild_for_type(self, repository: MemoryRepository, memory_type: MemoryType) -> GraphRepository:
         notes = repository.list(memory_type)
-        for note in notes:
+        keywords = [note.keywords for note in notes]
+        for note, context_chain in zip(notes, keywords, strict=True):
             self.graph_repository.add_node(
                 GraphNode(
                     id=f"node_{note.id}",
                     memory_id=note.id,
                     labels=(note.memory_type.value, note.memory_level.value),
-                    metadata={"keywords": note.keywords},
+                    metadata={"keywords": context_chain},
                 )
             )
 
         for left_index, left in enumerate(notes):
-            for right in notes[left_index + 1 :]:
-                overlap = calculate_smart_overlap(left.keywords, right.keywords)
+            for right_index in range(left_index + 1, len(notes)):
+                right = notes[right_index]
+                overlap = calculate_smart_overlap(keywords[left_index], keywords[right_index])
                 if overlap <= 0:
                     continue
                 weight = min(1.0, 0.35 + overlap * 0.2)

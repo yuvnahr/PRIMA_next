@@ -1,0 +1,9 @@
+{
+  "scope": "Actual compressor class/function AST executed with a minimal frozen evidence fixture; not an integration test or quality benchmark.",
+  "checks_passed": 4,
+  "input": "Valve is open only when sensor is not faulty",
+  "budget": 3,
+  "retained": "Valve is open",
+  "implication": "Source-ID preservation does not preserve conditions or negation. Counts are whitespace words.",
+  "focused_suite": "Attempted five-file pytest suite returned no result and was interrupted; no fresh integration-test pass claimed."
+}

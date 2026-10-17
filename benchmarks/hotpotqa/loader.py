@@ -29,6 +29,14 @@ class HotpotQADataset(BenchmarkDataset):
             raise ValueError(f"Invalid HotpotQA schema at {path}: top-level value must be a list")
         seen: set[str] = set()
         for index, record in enumerate(data):
+            if isinstance(record, dict) and "_id" not in record and "id" in record:
+                from benchmarks.hotpotqa.convert_to_json import _row_to_record
+
+                try:
+                    record = _row_to_record(record)
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ValueError(f"Invalid HotpotQA column schema at {path}, sample {index}: {exc}") from exc
+                data[index] = record
             self._validate_record(record, index, seen)
         self._records = data
         return data

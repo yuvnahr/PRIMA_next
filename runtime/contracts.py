@@ -19,6 +19,7 @@ class TaskKind(Enum):
     """Supported classes of work accepted by the public runtime boundary."""
 
     CONVERSATION = "conversation"
+    HISTORICAL_REPLAY = "historical_replay"
     FACTUAL_QA = "factual_qa"
     DOCUMENT_INGESTION = "document_ingestion"
     EMOTION_CLASSIFICATION = "emotion_classification"

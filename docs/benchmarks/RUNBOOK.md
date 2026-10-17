@@ -7,12 +7,12 @@ provider session. It does not imply that every task invokes every PRIMA componen
 GoEmotions uses the bounded affect route; ingestion never generates; `model_only`
 never retrieves.
 
-Use the repository Python 3.10 environment directly:
+Use the repository Python 3.14 environment directly:
 
 ```powershell
-venv\Scripts\python.exe --version
-venv\Scripts\python.exe -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
-venv\Scripts\python.exe -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
+.venv\Scripts\python.exe --version
+.venv\Scripts\python.exe -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml
+.venv\Scripts\python.exe -m benchmarks.campaign.cli run --config benchmarks/campaign/smoke.yaml --resume
 ```
 
 The smoke configuration uses fixture data and a fake provider. Remove or choose a

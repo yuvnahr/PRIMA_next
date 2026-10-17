@@ -1,3 +1,0 @@
-condition,average,median,p95,recall_at_5
-before_retrieval_v2,266.591837,265.5,320.0,0.010204
-after_retrieval_v2,205.989796,209.0,283.0,0.333333

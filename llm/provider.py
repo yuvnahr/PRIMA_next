@@ -277,6 +277,8 @@ class OllamaProvider(Provider):
     def __init__(self, settings: Settings | None = None) -> None:
         super().__init__(settings)
         self.base_url = self.settings.ollama_url
+        self.context_window: int | None = None
+        self.keep_alive: str | None = None
 
     def send(self, request: LLMRequest) -> LLMResponse:
         self.validate(request)
@@ -285,6 +287,8 @@ class OllamaProvider(Provider):
             "temperature": config.temperature,
             "num_predict": config.max_output_tokens,
         }
+        if self.context_window is not None:
+            options["num_ctx"] = self.context_window
         for key in ("top_p", "top_k", "repeat_penalty", "seed"):
             value = getattr(config, key)
             if value is not None:
@@ -296,6 +300,8 @@ class OllamaProvider(Provider):
             "think": False,
             "options": options,
         }
+        if self.keep_alive is not None:
+            payload["keep_alive"] = self.keep_alive
         if request.system_prompt:
             payload["system"] = request.system_prompt
         if config.structured_output is StructuredOutputMode.JSON_OBJECT:
@@ -312,7 +318,16 @@ class OllamaProvider(Provider):
             response.usage = {
                 "prompt_tokens": int(raw.get("prompt_eval_count", 0)),
                 "completion_tokens": int(raw.get("eval_count", 0)),
+                "total_tokens": int(raw.get("prompt_eval_count", 0)) + int(raw.get("eval_count", 0)),
             }
+            for source, field in (
+                ("load_duration", "model_load_duration_ns"),
+                ("prompt_eval_duration", "prompt_eval_duration_ns"),
+                ("eval_duration", "decode_duration_ns"),
+                ("total_duration", "provider_total_duration_ns"),
+            ):
+                if raw.get(source) is not None:
+                    response.usage[field] = int(raw[source])
         return response
 
 

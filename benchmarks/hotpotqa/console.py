@@ -62,7 +62,8 @@ class HotpotQATerminalReporter:
             return
         count = len(records); completed = sum(not row.get("execution_failed") for row in records)
         passed = sum(not row.get("execution_failed") and score_hotpot_record(row).get("em") == 1.0 for row in records)
-        average = lambda key: sum(float(row.get(key, 0) or 0) for row in records) / count if count else 0.0
+        def average(key: str) -> float:
+            return sum(float(row.get(key, 0) or 0) for row in records) / count if count else 0.0
         self._rule(); print("HotpotQA Aggregate Summary"); self._rule()
         print("Run completion")
         for label, value in (("Selected samples", config.get("sample_count", count)), ("Completed samples", completed), ("Scored samples", metrics.get("scored", 0)), ("Questions passed", f"{passed}/{int(metrics.get('scored', 0))}"), ("Execution failures", count - completed), ("Elapsed run time", f"{elapsed:.2f} seconds"), ("Average latency", f"{average('total_latency_ms'):.2f} ms")):

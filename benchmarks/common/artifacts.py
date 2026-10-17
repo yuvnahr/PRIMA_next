@@ -148,13 +148,12 @@ class BenchmarkArtifactStore:
 
     def _append_unique(self, path: Path, key: str, payload: dict[str, Any]) -> bool:
         with self._lock:
-            existing = self._indexes.setdefault(
-                path,
-                {
+            if path not in self._indexes:
+                self._indexes[path] = {
                     str(row.get("case_id") or row.get("_record_key", ""))
                     for row in read_jsonl(path)
-                },
-            )
+                }
+            existing = self._indexes[path]
             if key in existing:
                 return False
             append_jsonl(path, payload)

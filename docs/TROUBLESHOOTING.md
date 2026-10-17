@@ -20,9 +20,10 @@ case IDs indicate artifact corruption and must block result use.
 
 ## Optional metrics are unavailable
 
-LoCoMo core metrics still run. Install the semantic-metric extras only when ROUGE-L
-or BERTScore is intentionally enabled; configure BERTScore device and batch size.
-Capability errors should remain visible rather than changing the metric silently.
+LoCoMo core metrics do not depend on BERTScore. The BERTScore package is included in
+`requirements.txt`, but the metric remains opt-in; configure its device and batch
+size when enabling it. Capability errors should remain visible rather than changing
+the metric silently.
 
 ## Runtime item failures
 

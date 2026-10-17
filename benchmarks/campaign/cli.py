@@ -35,7 +35,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         for item, handler in previous.items():
             signal.signal(item, handler)
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 0 if result["status"] == "complete" else 1
+    return 0 if result["status"] == "complete" or result["smoke_execution_complete"] else 1
 
 
 if __name__ == "__main__":

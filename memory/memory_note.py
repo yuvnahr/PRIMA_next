@@ -5,10 +5,12 @@ from __future__ import annotations
 import importlib.util
 import logging
 import re
+import threading
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
+from functools import lru_cache
 from typing import Any
 
 from memory.memory_context import StateSnapshot
@@ -16,6 +18,7 @@ from memory.memory_lineage import MemoryLineage
 from memory.memory_types import MemoryLevel, MemoryType
 
 logger = logging.getLogger(__name__)
+_context_models = threading.local()
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
 GENERIC_NOUNS = {
@@ -46,17 +49,25 @@ def tokenize(text: str) -> list[str]:
     return [token.lower().strip("'") for token in TOKEN_RE.findall(text)]
 
 
+def _context_nlp() -> Any:
+    """Load optional spaCy once per worker, including a missing-model result."""
+    if not hasattr(_context_models, "nlp"):
+        nlp = None
+        if importlib.util.find_spec("spacy") is not None:
+            import spacy
+
+            try:
+                nlp = spacy.load("en_core_web_sm")
+            except OSError:
+                pass
+        _context_models.nlp = nlp
+    return _context_models.nlp
+
+
 def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
     """Preserve A-MEM dominant context chain extraction without requiring spaCy."""
     try:
-        if importlib.util.find_spec("spacy") is None:
-            raise ImportError("spacy unavailable")
-        import spacy
-
-        try:
-            nlp = spacy.load("en_core_web_sm")
-        except OSError:
-            nlp = None
+        nlp = _context_nlp()
         if nlp is not None:
             doc = nlp(text)
             chunks = []
@@ -88,6 +99,12 @@ def extract_dominant_context_chain(text: str, top_k: int = 5) -> list[str]:
 
 def calculate_smart_overlap(query_chain: Sequence[str], memory_keywords: Sequence[str]) -> int:
     """Preserve exact/substring keyword boosting behavior."""
+    return _smart_overlap(tuple(query_chain), tuple(memory_keywords))
+
+
+@lru_cache(maxsize=65536)
+def _smart_overlap(query_chain: tuple[str, ...], memory_keywords: tuple[str, ...]) -> int:
+    # ponytail: bounded exact-result cache; profile misses before increasing its memory budget.
     overlap = 0
     for query_word in set(query_chain):
         for memory_word in memory_keywords:

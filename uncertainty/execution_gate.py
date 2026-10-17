@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from uncertainty.confidence_signal import OverallConfidence
@@ -11,7 +11,7 @@ from uncertainty.uncertainty_types import ConfidenceSource
 from world.prediction_result import PredictionResult
 
 
-class ExecutionDecision(str, Enum):
+class ExecutionDecision(StrEnum):
     """Typed decisions available at the workflow confidence branch."""
 
     CONTINUE = "continue"

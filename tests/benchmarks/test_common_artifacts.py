@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -34,7 +34,7 @@ from benchmarks.goemotions.dataset import GoEmotionsExample
 from benchmarks.hotpotqa.adapter import HotpotQAAdapter
 from benchmarks.locomo.adapter import LoCoMoAdapter
 
-NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _manifest(**updates) -> BenchmarkManifest:
@@ -59,7 +59,7 @@ def _manifest(**updates) -> BenchmarkManifest:
         "prompt_hashes": {"answer": "prompt-sha256"},
         "seed": 13,
         "dependencies": {"pydantic": "2"},
-        "python_version": "3.10.11",
+        "python_version": "3.14.0",
         "hardware": {"machine": "test"},
         "created_at": NOW,
         "updated_at": NOW,

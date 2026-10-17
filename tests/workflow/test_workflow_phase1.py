@@ -1,6 +1,7 @@
 import unittest
 
 from affect.affect_engine import DynamicAffectEngine
+from events import EventBus, EventType
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
 from memory.memory_types import MemoryType
@@ -12,7 +13,7 @@ from workflow.controller_registry import ControllerRegistry
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import OrchestrationEngine, RetryPolicy
 from workflow.prima_workflow import PrimaWorkflow
-from workflow.workflow_events import WorkflowEventBus, WorkflowEventType
+from workflow.workflow_events import WorkflowEvent, WorkflowEventBus, WorkflowEventType
 from workflow.workflow_state import WorkflowPhase, WorkflowStatus
 
 
@@ -47,6 +48,20 @@ class CancellingController:
 
 
 class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
+    async def test_indexed_trace_retains_workflow_types_and_isolates_execution(self) -> None:
+        shared_bus = EventBus()
+        bus = WorkflowEventBus(shared_bus)
+        first = WorkflowEvent(WorkflowEventType.WORKFLOW_STARTED, "first", WorkflowStatus.RUNNING)
+        second = WorkflowEvent(WorkflowEventType.WORKFLOW_COMPLETED, "first", WorkflowStatus.COMPLETED)
+        await bus.publish(first)
+        await bus.publish(WorkflowEvent(WorkflowEventType.WORKFLOW_STARTED, "other", WorkflowStatus.RUNNING))
+        await shared_bus.publish_type(EventType.MEMORY_ADMITTED, source="maintenance", topic="workflow",
+                                      execution_id="first")
+        await bus.publish(second)
+
+        self.assertEqual(bus.events_for_execution("first"), [first, second])
+        self.assertEqual(bus.events_for_execution("missing"), [])
+
     async def test_workflow_owns_lifecycle_routes_outputs_and_events(self) -> None:
         event_bus = WorkflowEventBus()
         registry = ControllerRegistry(

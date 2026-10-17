@@ -89,9 +89,14 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     store = CampaignManifestStore(config.output_root)
     manifest = store.read()
     assert len(manifest.preflight["runtime_config_fingerprint"]) == 64
+    assert manifest.repository == {"url": None, "requested_ref": None, "commit_sha": None}
     assert manifest.preflight["effective_generation"]["hotpot"]["structured_output"] == "json_schema"
     assert all(
         state.child_manifest and not Path(state.child_manifest).is_absolute()
+        for state in manifest.modes.values()
+    )
+    assert all(
+        json.loads((config.output_root / state.child_manifest).read_text())["model_revision"] == "fixture-v1"
         for state in manifest.modes.values()
     )
     artifact_text = "\n".join(
@@ -107,6 +112,30 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     checkpoint = config.output_root / "modes" / "hotpot" / "distractor" / "model_only" / "checkpoints" / "records.jsonl"
     case_ids = [row["case_id"] for row in read_jsonl(checkpoint)]
     assert len(case_ids) == len(set(case_ids)) == 2
+
+
+def test_campaign_uses_published_goemotions_json_pair(tmp_path: Path) -> None:
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "goemotions_val.json").write_text(
+        json.dumps([{"text": "validation", "labels": [17], "id": "val-1"}]), encoding="utf-8"
+    )
+    test_path = data / "goemotions_test.json"
+    test_path.write_text(
+        json.dumps([{"text": "joyful", "labels": [17], "id": "test-1"}]), encoding="utf-8"
+    )
+    payload = _payload(tmp_path / "campaign")
+    payload["benchmarks"] = [payload["benchmarks"][0]]
+    payload["benchmarks"][0]["dataset_path"] = str(test_path)
+
+    result = run_campaign(CampaignConfig.model_validate(payload))
+
+    assert result["status"] == "complete"
+    preflight = CampaignManifestStore(Path(payload["output_root"])).read().preflight
+    assert set(preflight["datasets"]["go"]["hashes"]) == {
+        "goemotions_val.json",
+        "goemotions_test.json",
+    }
 
 
 def test_comparison_with_different_seed_is_refused_during_validation(tmp_path: Path) -> None:
@@ -270,3 +299,22 @@ def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, 
     predictions = read_jsonl(checkpoint.parents[1] / "predictions" / "records.jsonl")
     assert len(checkpoints) == len({row["case_id"] for row in checkpoints}) == len(interrupt_rows)
     assert len(predictions) == len({row["case_id"] for row in predictions}) == len(interrupt_rows)
+
+
+def test_manifest_keeps_model_and_repository_revisions_separate(tmp_path: Path) -> None:
+    payload = _payload(tmp_path / "revisions")
+    payload["benchmarks"] = [payload["benchmarks"][1]]
+    payload["provider"]["revision"] = "sha256:model-digest"
+    payload["repository"] = {
+        "url": "https://example.invalid/repository.git",
+        "requested_ref": "master",
+        "commit_sha": "a" * 40,
+    }
+
+    config = CampaignConfig.model_validate(payload)
+    store = CampaignManifestStore(config.output_root)
+    manifest = store.initialize(config, {}, resume=False)
+
+    assert manifest.provider["revision"] == "sha256:model-digest"
+    assert manifest.repository["commit_sha"] == "a" * 40
+    assert manifest.provider["revision"] != manifest.repository["commit_sha"]
