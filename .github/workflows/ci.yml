@@ -45,7 +45,7 @@ jobs:
         run: python -m benchmarks.preflight --json
 
       - name: Compile Owned Python Sources
-        run: python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
+        run: python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external|pytest-tmp|tmp)([\\/]|$)' .
 
       - name: Run Pytest
         run: python -m pytest -q

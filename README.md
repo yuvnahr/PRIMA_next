@@ -79,7 +79,7 @@ Run the same quality checks used by CI:
 
 ```powershell
 python -m benchmarks.preflight --json
-python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external)([\\/]|$)' .
+python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external|pytest-tmp|tmp)([\\/]|$)' .
 python -m pytest -q
 python -m ruff check .
 python scripts/run_xenon.py
