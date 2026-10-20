@@ -14,6 +14,7 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from memory.embedding_backend import embedding_backend_config
 from memory.embedding_pipeline import current_embedding_metadata
 from memory.memory_metadata import decode_metadata, encode_metadata
 from memory.memory_note import MemoryNote
@@ -52,7 +53,7 @@ class InMemoryMemoryRepository(MemoryRepository):
 
     def add(self, note: MemoryNote) -> MemoryNote:
         previous = self._notes[note.memory_type].get(note.id)
-        if previous is None or previous.embedding != note.embedding:
+        if previous is None or previous.embedding != note.embedding or previous.retrieval_metadata.get("backend_fingerprint") != note.retrieval_metadata.get("backend_fingerprint"):
             self._normalized_vectors.pop((note.memory_type, note.id), None)
         self._notes[note.memory_type][note.id] = note
         return note
@@ -78,10 +79,21 @@ class InMemoryMemoryRepository(MemoryRepository):
 
     def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
         query = np.array(list(embedding), dtype="float32")
+        if query.ndim != 1 or not query.size or not np.isfinite(query).all():
+            raise ValueError("Query embedding must be a finite nonempty vector")
+        notes = self.list(memory_type)
+        learned = embedding_backend_config().name != "stable"
+        expected = current_embedding_metadata()["backend_fingerprint"] if learned or any(note.retrieval_metadata.get("backend_fingerprint") for note in notes) else None
+        for note in notes:
+            found = note.retrieval_metadata.get("backend_fingerprint")
+            if len(note.embedding) != len(query) or not np.isfinite(note.embedding).all():
+                raise ValueError("Stored embedding dimension/values are incompatible; rebuild the in-memory index")
+            if (found is not None and found != expected) or (learned and found is None):
+                raise RuntimeError("Embedding fingerprint mismatch; rebuild the in-memory index before retrieval")
         query_norm = np.linalg.norm(query) or 1.0
         query = query / query_norm
         scored: list[tuple[MemoryNote, float]] = []
-        for note in self.list(memory_type):
+        for note in notes:
             key = (note.memory_type, note.id)
             vector = self._normalized_vectors.get(key)
             if vector is None:

@@ -13,8 +13,9 @@ class DenseRetrievalStrategy(RetrievalStrategy):
 
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
         results: list[RetrievalResult] = []
+        embedding = request.embedding()
         for memory_type in request.memory_types:
-            for note, score in repository.query(request.embedding(), memory_type=memory_type, limit=request.top_k):
+            for note, score in repository.query(embedding, memory_type=memory_type, limit=request.top_k):
                 bounded_score = max(0.0, min(1.0, (score + 1.0) / 2.0 if score < 0 else score))
                 results.append(
                     RetrievalResult(

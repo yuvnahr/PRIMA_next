@@ -121,7 +121,9 @@ class LoCoMoAdapter:
                     raise ValueError(f"{location}: duplicate dia_id {turn_id!r}")
                 ids.add(turn_id)
                 metadata = {key: value for key, value in turn.items() if key not in {"speaker", "text", "dia_id"}}
-                metadata.update(source_turn_id=turn_id, source_session_id=session_id, source_timestamp=timestamp)
+                metadata.update(source_turn_id=turn_id, source_session_id=session_id, source_timestamp=timestamp,
+                                source_timestamp_original=timestamp_value, speaker=speaker.strip(),
+                                timestamp_precision="date" if len(timestamp_value.strip()) == 10 else "datetime")
                 turns.append(ConversationTurn(speaker.strip(), text.strip(), turn_id, session_id, timestamp, metadata))
         return turns, ids
 

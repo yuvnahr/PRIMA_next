@@ -18,7 +18,12 @@ from config.settings import get_settings
 from events.event_bus import EventBus
 from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
-from memory.embedding_backend import BACKEND_ALIASES, MODEL_BY_BACKEND, EmbeddingBackendConfig
+from memory.embedding_backend import (
+    BACKEND_ALIASES,
+    EmbeddingBackendConfig,
+    get_embedding_backend,
+    use_embedding_backend_config,
+)
 from memory.embedding_pipeline import CanonicalEmbeddingPipeline, use_embedding_pipeline
 from memory.experiment_config import EmbeddingExperimentConfig
 from memory.maintenance.background_supervisor import (
@@ -36,6 +41,7 @@ from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.repository_factory import RepositorySelection, select_memory_repository
+from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
 from reasoning.config import reasoning_mode as configured_reasoning_mode
@@ -112,9 +118,17 @@ class PrimaRuntime:
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
-        self.memory_repository, self.repository_selection = select_memory_repository(
-            self.mode, memory_repository, backend=memory_backend, path=memory_path
+        self.runtime_config = runtime_config or RuntimeConfig.from_environment()
+        embedding_name = BACKEND_ALIASES.get(self.runtime_config.embedding_backend, self.runtime_config.embedding_backend)
+        self.embedding_backend_config = EmbeddingBackendConfig.from_runtime_config(self.runtime_config)
+        self.embedding_pipeline = CanonicalEmbeddingPipeline(
+            EmbeddingExperimentConfig(backend=embedding_name, representation_mode=self.runtime_config.representation_mode,
+                                      identity_enabled=self.runtime_config.identity_normalization)
         )
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            self.memory_repository, self.repository_selection = select_memory_repository(
+                self.mode, memory_repository, backend=memory_backend, path=memory_path
+            )
         self.memory_index = MemoryIndex.for_repository(self.memory_repository)
         self._owns_maintenance_supervisor = maintenance_supervisor is None
         self._maintenance_enabled = maintenance_enabled
@@ -132,21 +146,6 @@ class PrimaRuntime:
             self.state_manager = JsonStateManager(state_path)
         else:
             self.state_manager = InMemoryStateManager()
-        self.runtime_config = runtime_config or RuntimeConfig.from_environment()
-        embedding_name = BACKEND_ALIASES.get(
-            self.runtime_config.embedding_backend, self.runtime_config.embedding_backend
-        )
-        embedding_model = self.runtime_config.embedding_model or MODEL_BY_BACKEND[embedding_name]
-        self.embedding_backend_config = EmbeddingBackendConfig(
-            embedding_name, embedding_model, self.runtime_config.embedding_dimensions
-        )
-        self.embedding_pipeline = CanonicalEmbeddingPipeline(
-            EmbeddingExperimentConfig(
-                backend=embedding_name,
-                representation_mode=self.runtime_config.representation_mode,
-                identity_enabled=self.runtime_config.identity_normalization,
-            )
-        )
         self.affect_engine = affect_engine or DynamicAffectEngine(
             classifier=create_affect_classifier(
                 self.runtime_config.affect_backend,
@@ -170,10 +169,15 @@ class PrimaRuntime:
         self.retrieval_controller = RetrievalController(
             self.memory_index,
             candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+            strategy_names=self.runtime_config.retrieval_strategies,
+            fusion=HybridFusion(HybridFusionConfig(self.runtime_config.retrieval_weights) if self.runtime_config.retrieval_weights is not None else HybridFusionConfig.from_file()),
             reranker=Reranker(
                 enabled=self.runtime_config.reranker_enabled,
                 backend=self.runtime_config.reranker_backend,
                 model_name=self.runtime_config.reranker_model,
+                revision=self.runtime_config.reranker_revision, device=self.runtime_config.reranker_device,
+                local_snapshot=self.runtime_config.reranker_local_snapshot, batch_size=self.runtime_config.reranker_batch_size,
+                cpu_threads=self.runtime_config.retrieval_cpu_threads,
             ),
         )
         self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
@@ -253,6 +257,9 @@ class PrimaRuntime:
                 execution_context = await self.workflow.run(request.input_text, execution_context)
         except WorkflowExecutionError as exc:
             execution_context = exc.context
+        except (TypeError, ValueError) as exc:
+            execution_context.workflow_state.status = WorkflowStatus.FAILED
+            execution_context.workflow_state.errors.append(str(exc))
         execution_context.metadata["workflow_trace"] = [
             {
                 "event_type": event.event_type.value,
@@ -349,10 +356,15 @@ class PrimaRuntime:
             self.retrieval_controller = RetrievalController(
                 self.memory_index,
                 candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+                strategy_names=self.runtime_config.retrieval_strategies,
+                fusion=HybridFusion(HybridFusionConfig(self.runtime_config.retrieval_weights) if self.runtime_config.retrieval_weights is not None else HybridFusionConfig.from_file()),
                 reranker=Reranker(
                     enabled=self.runtime_config.reranker_enabled,
                     backend=self.runtime_config.reranker_backend,
                     model_name=self.runtime_config.reranker_model,
+                    revision=self.runtime_config.reranker_revision, device=self.runtime_config.reranker_device,
+                    local_snapshot=self.runtime_config.reranker_local_snapshot, batch_size=self.runtime_config.reranker_batch_size,
+                    cpu_threads=self.runtime_config.retrieval_cpu_threads,
                 ),
             )
             self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
@@ -461,6 +473,8 @@ class PrimaRuntime:
     def runtime_manifest(self) -> dict[str, Any]:
         """Return schema-versioned runtime/storage configuration for benchmark manifests."""
 
+        with use_embedding_backend_config(self.embedding_backend_config):
+            embedding = get_embedding_backend().info()
         return {
             "schema_version": "1.0",
             "runtime_mode": self.mode.value,
@@ -473,6 +487,8 @@ class PrimaRuntime:
             "maintenance": self.maintenance_supervisor.diagnostics(),
             "runtime_config": self.runtime_config.model_dump(mode="json"),
             "runtime_config_fingerprint": self.runtime_config.fingerprint,
+            "embedding": embedding, "reranker": self.retrieval_controller.reranker.diagnostics(),
+            "retrieval_weights": dict(self.retrieval_controller.fusion.config.weights),
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
@@ -889,6 +905,8 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
             "graph_reasoning_invoked",
             "memory_index",
             "reranker",
+            "timings_ms",
+            "fusion_weights",
         )
         if key in diagnostics
     }

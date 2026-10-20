@@ -2,7 +2,7 @@
 
 ## Checkpoint and provenance
 
-Goal 1 (A1): implementation complete; mandatory deterministic, caller, lint and diff checks passed. Goals 2–4 have not started.
+Goal 1 (A1): complete at `728709be17f7f8b08f67d01fb06e07c160bd612b`. Goal 2 (A2): implementation and available CPU validation complete; its checkpoint SHA is reported in the completion message. Goals 3–4 have not started. The Goal 1 ledger below records that checkpoint's validation; Goal 2 has its own ledger at the end.
 Actual base: `c25a178d6308bc48b3a5e44d9519316a5179c499` (the planning snapshot); no intervening tracked implementation changes.
 Predecessor: none. The completed checkpoint SHA is reported in the completion message, not inside its own commit.
 
@@ -11,7 +11,7 @@ This is a clean local clone of the assigned branch because the original `C:/PRIM
 The interpreter is `C:/PRIMA_next/.venv/Scripts/python.exe`, Python 3.14.8. Sandbox execution could not access its base installation; approved execution outside that boundary uses the same existing environment, without dependency changes.
 
 Scope source: `Person_1_LoCoMo_Runtime_Implementation.md`, SHA-256 `43bf76b274adba04947e630eef9fea767d493c2b4976a72090656b4b7f914dab`.
-The attachment invokes Goal 1 only. The newer four-goal operating contract supersedes the source plan's intermediate PR/merge workflow.
+The first attachment invoked Goal 1; the subsequent attachment `1ae70693-1579-4147-9fbc-5d1d0d20f96e/pasted-text-1.txt` invokes Goal 2 only. The newer four-goal operating contract supersedes the source plan's intermediate PR/merge workflow.
 The LoCoMo external checkout was initialized from the existing local pinned repository, without a download or external-source edit. Other external submodules remain uninitialized in this delivery clone.
 
 ## Requirement coverage and affected callers
@@ -115,3 +115,140 @@ Goal 2 requires this committed checkpoint and tests, then historical provenance/
 Person 2 can implement old/new contract consumers using the committed fixtures. Final actual producer/consumer integration waits for Person 1 Goal 4, in a separate integration checkout at pinned parent/candidate SHAs. Production remains disabled until human-reviewed integration and fresh measured identity/resource/time gates; full LoCoMo acceptance remains all 10 conversations / 1,986 questions exactly once.
 
 Rollback: scoped revert of this checkpoint, preserving evidence artifacts. Use a new run identity after a schema/scorer change; never resume incompatible checkpoints or reset `dev`. No storage migration, embedding default, answer-gate policy or reflection threshold was changed.
+
+## Goal 2 — provenance and native semantic retrieval
+
+Implementation predecessor/base: `728709be17f7f8b08f67d01fb06e07c160bd612b`, verified as HEAD and ancestor before editing. There were no intervening changes or staged work. The same isolated `dev-p1` clone is used; the original checkout and Person 2's files remain untouched.
+
+### Requirement coverage
+
+| Source requirement | Producer/config changes | Evidence |
+|---|---|---|
+| A2.1 historical timestamps and numbered sessions | Adapter preserves normalized/original time, precision and speaker; workflow validates replay time before any state/admission work and passes `timestamp=` to `MemoryNote.create` in normal and controlled ingestion | All three ingestion policies; malformed/empty/missing/non-string time failures; live-time default; record and metadata-codec reload |
+| Conversation identity separate from source session | `source_conversation_id` is forced from request isolation; `source_session_id` retains the numbered session; retrieval requests exclude explicitly foreign conversation sources before fusion | Two conversations sharing a repository; existing integration replay/QA test |
+| Source-relative temporal signals | `RetrievalRequest.reference_time/historical` and corresponding query analysis fields; historical unanchored queries use neutral time signals, not today's clock | Source-year vs execution-year check; old histories are not aged out using the execution date |
+| A2.2 caption representation | Explicit `include_captions=False`; only the pinned dataset's supplied `blip_caption` is appended with `Image caption:` | Caption switch/fingerprint tests; original dataset hash remains unchanged; answer/gold changes cannot affect replay representation |
+| A2.3 native learned dimensions and model identities | Existing backend no longer resizes learned vectors; explicit device/revision/local snapshot/batch/thread settings; staged-only loading, no remote code; exact artifact hashes | Wrong dimensions/nonfinite/zero vectors rejected; cached pinned MiniLM CPU execution and held-out paraphrase ranking measured |
+| Caches and stale state | Bounded loaded-model caches keyed by identity/revision/device/snapshot/thread limit; vector metadata includes learned identity; in-memory retrieval rejects incompatible vectors/fingerprints; explicit `rebuild_embeddings` preserves content/time/context | Revision/device separation, stale fingerprint/dimension rejection and explicit rebuild tests; incompatible experiment resume rejected |
+| A2.4 fusion/reranker and costs | Typed strategy/weight overrides; existing cross-encoder gains pinned CPU/local-only loading and bounded batches; invalid counts/nonfinite scores fail; stable source-ID ties; stage timing diagnostics | Empty/constant/tie tests; fake cross-encoder cache and CPU-option checks; frozen real-data CPU ladder |
+| Person 2 staging/configuration and compatibility | Runtime construction/reset, embedding context, retrieval calls, manifest, LoCoMo experiment, CLI and resume identity all consume the typed settings | Roundtrip/override tests, affected caller checks, old/new Goal 1 audit/scorer regressions |
+
+Caller searches covered all `EmbeddingBackendConfig`, `embed_text`/`stable_embedding`, model loader/cache, `current_embedding_metadata`, repository query/rebuild, `RetrievalRequest`, temporal agreement, fusion/reranker, `MemoryNote.create`/reload, ingestion/replay controllers, runtime construction/reset and LoCoMo experiment/CLI users. Existing benchmark/preflight/notebook/dependency/CI files owned by Person 2 were not edited. The shared integration replay fixture continues to work through its explicit `[ISO date]` transcript prefix; missing metadata never substitutes the execution clock.
+
+### Frozen typed configuration and producer contract
+
+Defaults retain stable-hash 64-dimensional embeddings, semantic representation, identity normalization and lexical reranking. Learned native dimension is required explicitly in candidate configurations (384 for MiniLM); a wrong 64-dimensional learned configuration fails instead of changing a learned vector. Environment-based learned selection defaults to 384, while ordinary stable selection stays 64. No answer gate, generation budget, admission threshold or reflection policy changed.
+
+| Added `RuntimeConfig` field | Default |
+|---|---|
+| `embedding_revision` | null; a learned loader requires an immutable 40-hex revision |
+| `embedding_device` | `cpu` |
+| `embedding_local_snapshot` | null: resolve the pinned revision from the existing HF cache only |
+| `embedding_batch_size` | 16 |
+| `retrieval_cpu_threads` | 2 (process-wide PyTorch CPU thread bound when loading an auxiliary model) |
+| `retrieval_strategies` | null: retain existing profile routing |
+| `retrieval_weights` | null: retain existing `config/retrieval.yaml` weights |
+| `reranker_revision` | null; required for actual learned loading |
+| `reranker_device` | `cpu` |
+| `reranker_local_snapshot` | null: pinned local HF cache only |
+| `reranker_batch_size` | 8 |
+
+`EmbeddingBackendConfig.from_runtime_config` is the shared conversion used by runtime and experiments. Context overrides retain all fields when only dimension changes. Runtime repository preflight now runs inside the effective embedding/pipeline context, so persistent fingerprint checks see typed representation settings. Runtime reset reconstructs retrieval using the same typed controls. `runtime_manifest()` records actual loaded embedding identity/device/artifact hashes, reranker diagnostics and effective fusion weights.
+
+Both learned loaders always set `local_files_only=True`, `trust_remote_code=False` and the explicit device. There is no constructor fallback that drops these settings. Legacy `nomic` selection cannot enable remote code and will fail if its artifact requires that capability. Device `auto` is rejected by these auxiliary constructors. CPU thread settings are process-wide; a future overlapping workload must use a compatible bound and fresh measurements, not assume per-model independent CPU budgets.
+
+Stage diagnostics add `timings_ms` for query embedding, dense lookup, sparse lookup, fusion and reranking. Compact Goal 1 hops carry this additive field. Query embedding is computed once per retrieval call, rather than once per memory type. Source-qualified candidate/accumulated/supplied/cited fields, audit version 1.0 and question/metric version 2.0 retain their Goal 1 meanings.
+
+Normal/controlled replay notes preserve `source_timestamp`, `source_timestamp_original`, `timestamp_precision`, `source_timestamp_source`, numbered `source_session_id`, `source_turn_id`, `speaker` and `source_conversation_id`. Legacy callers with no timestamp metadata may use an explicit leading ISO transcript timestamp; malformed supplied metadata fails, and missing numbered sessions remain unknown. Ordinary live ingestion retains current time. Explicitly conversation-tagged memories cannot cross request conversations; legacy unscoped documents retain their existing shared behavior. In production LoCoMo each history still has its own runtime/repository.
+
+Historical QA requests set `historical_context=true`. Optional ISO `reference_time` is an explicit source/question anchor; there is no fabricated last-session anchor when a question provides none. Temporal ranking uses source-session timestamps conservatively and does not claim to resolve every event date embedded in prose. Caption inclusion is an input ablation, with no image downloads, vision inference or generated captions.
+
+### Model staging and exact identities
+
+Measured embedding candidate: `sentence-transformers/all-MiniLM-L6-v2`, revision `c9745ed1d9f207416be6d2e6f8de32d1f16199bf`, CPU, native 384 dimensions, batch 16, two CPU threads. Actual artifact-set SHA-256: `7550e754abbd9086d0f997f2fda4ff22744ac6815bea4550123b73e40b528a7e`. Model files already existed locally; nothing was downloaded.
+
+The optional cross-encoder candidate explicitly selects the canonical repository spelling `cross-encoder/ms-marco-MiniLM-L6-v2`, revision `233902d25c440f23af6f7d6e94d2946bac0bee0a`, CPU, batch 8, two threads. This is separate from the unchanged legacy default string with `L-6`. The canonical repository/history was verified through [its official history](https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2/commits/main) and [model metadata](https://huggingface.co/api/models/cross-encoder/ms-marco-MiniLM-L6-v2). Cross-encoder files are not cached locally; actual execution remains explicitly pending, and lexical output is never labeled cross-encoder output.
+
+Person 2 must stage the exact revisions before production, including configuration, tokenizer, pooling (for MiniLM), and weight files. A configured custom `*_local_snapshot` directory requires `prima_model_manifest.json` with `model_identifier`, `revision` and a complete `files` mapping of relative paths to SHA-256 values. The loader enumerates actual non-hidden files (excluding the manifest itself), compares the entire map and rejects identity/hash mismatch; it never trusts manifest paths as file-operation targets. For a pinned HF cache, the loader resolves the exact revision locally and hashes the artifacts actually supplied to the model. Full model/file identities are stored once in runtime/experiment manifests, while each learned note stores the aggregate snapshot hash.
+
+Model cache limit is four entries per loader; keys include revision, explicit device, local snapshot and CPU thread setting. No new general vector cache was added. Existing in-memory normalized-vector caching invalidates on vector or fingerprint changes. Explicit in-memory rebuild computes replacement vectors before applying them and retains historical fields. No storage migration or persistent collection-dimension migration is performed by this checkpoint.
+
+Learned embedding fingerprints include model, native dimension, revision, device, snapshot artifact hash, L2-float32 normalization, representation/identity version, batch and thread settings. Stable-hash fingerprints retain their existing values. LoCoMo manifests additionally freeze full typed runtime settings, auxiliary artifact identities, `retrieval_contract_version=2.0` and `locomo-replay-v2` input representation identity/caption policy. Changed model/revision/device/dimension/representation/policy/configuration invalidates resume; old artifacts remain readable rather than silently mixed into a new run.
+
+### Development controls and measurements
+
+Committed controls: `tests/fixtures/locomo_review/goal2_development_manifest.json` and `goal2_retrieval_candidates.json`. Original dataset SHA-256: `553cd5a15e25f2ceccc6ed185221eba645080c93e5b91087560a91aa5961f365`; pinned dataset has 5,882 turns and 1,986 questions. The supplied caption field is `blip_caption` (1,226 string entries). Original data/submodule files were not changed.
+
+Frozen before comparisons: seed 20261020; development conversations `conv-26`, `conv-30`, `conv-41`, `conv-43`, `conv-47`, `conv-49`; validation `conv-42`, `conv-44`, `conv-48`, `conv-50`. All 3,329 turns of the development histories are replayed. Fixed per-category sampling selects 116 questions (at most four per category per conversation), including 91 annotated answerable questions. All ten conversations were previously exposed; validation is held out only from this tuning and is not an untouched independent test set.
+
+The small ladder predeclares sparse-only versus hash fusion; learned dense+sparse at existing weights; one sparse-dominant alternative; disabled versus lexical reranking; then the optional CPU cross-encoder. All use top-k 5, candidate pool 30, semantic representation and captions off. No top-k/pool/context/hop increase or rank-fusion implementation was introduced. Queries contain no answer/evidence labels; gold IDs enter only retrieval evaluation after a real controller response.
+
+The existing large legacy investigation scripts were not rerun: the bounded `retrieval_development` entry point reuses canonical replay/runtime/retrieval and the Goal 1 compact audit, without unrelated report generation or synthetic fallback datasets. Identical replay stores are reused only by embedding/representation identity; the post-history identity-normalizer state is copied before each candidate's queries. Reports separate actual replay work, effective cold replay cost, query cost and cache provenance, and verify that QA does not change the memory population. Controlled-document ingestion is explicitly an ablation, not the normal-admission headline.
+
+Real cached MiniLM preflight passed held-out paraphrase-vs-distractor comparisons: 0.798727 vs 0.106003 and 0.562012 vs 0.023116. Initial load plus checks took 21.964 seconds locally. This validates actual learned CPU execution and a small semantic sanity check; it does not establish LoCoMo answer quality. Raw preflight identity/results: `benchmarks/locomo/outputs/goal2/embedding_preflight.json` (generated artifact, not committed).
+
+Measured mean annotation recall over the same 91 annotated answerable development questions (all 116 queries contribute to timing):
+
+| Frozen candidate | Dense R@30 | Sparse R@30 | Fused R@30 | Returned R@5 | Mean query ms | Effective full replay s |
+|---|---:|---:|---:|---:|---:|---:|
+| L1 sparse only, lexical | unavailable | 0.412171 | 0.412171 | 0.217116 | 33.436 | 16.412 |
+| L0 hash fusion, lexical | 0.077839 | 0.412171 | 0.317849 | 0.187812 | 44.379 | 16.412 |
+| L2 learned fusion, lexical | 0.452464 | 0.412171 | 0.465368 | 0.291209 | 114.188 | 259.028 |
+| L2 sparse-dominant, lexical | 0.452464 | 0.412171 | 0.483600 | 0.292208 | 111.527 | 259.028 |
+| L2 learned fusion, disabled | 0.452464 | 0.412171 | 0.465368 | 0.260989 | 91.302 | 259.028 |
+| L3 CPU cross-encoder | pending | pending | pending | pending | pending | pending |
+
+The sparse-only trace records an observed empty dense list because that strategy is disabled; it is not a measured dense-retrieval zero. Reranking preserves all 30 pool candidates, so its pool recall equals fused recall; returned R@5 measures its ordering. Default weights are dense 0.4, sparse 0.3, temporal/graph 0.15 each; the single sparse-dominant alternative uses 0.2/0.5/0.15/0.15. Only dense/sparse execute under this matched `simple_rag` profile.
+
+| Candidate | Embedding ms | Dense lookup ms | Sparse lookup ms | Fusion ms | Reranking ms |
+|---|---:|---:|---:|---:|---:|
+| L1 sparse only | 0 | 0 | 29.523 | 1.116 | 1.284 |
+| L0 hash fusion | 0.412 | 4.700 | 33.839 | 1.645 | 1.776 |
+| L2 learned fusion | 43.391 | 22.391 | 41.981 | 1.725 | 1.706 |
+| L2 sparse-dominant | 43.391 | 21.728 | 39.695 | 1.774 | 1.833 |
+| L2 disabled | 42.491 | 21.465 | 22.807 | 1.712 | 0.006 |
+
+These are sequential local observations, not repeated controlled latency estimates. The 22.887 ms overall difference for disabled vs lexical includes sparse/cache/order variation; it must not be attributed entirely to reranking (measured reranking difference is about 1.7 ms). Model load is separate from replay; no system/cgroup peak-memory or Kaggle resource acceptance was measured. Actual replay work was 16.412 s for the first stable candidate and 259.028 s for the first learned candidate; other candidates reuse those histories. Their short wall times are not cold end-to-end costs.
+
+Disposition: retain the safe production defaults and freeze `L2_learned_fusion` as a reproducible semantic candidate for later answer/resource gates. Sparse dominance improved pool recall slightly but barely changed returned recall; this one development sample does not justify a production weight change. Lexical ordering outperformed disabled ordering on returned recall here. No additional vector cache or rank-fusion method is justified by these measurements. No validation-conversation queries, Qwen inference, answer-score gain or normal-admission headline is claimed.
+
+All 580 traces reconcile: exactly the frozen 116 IDs once per measured candidate, all six complete histories totaling 3,329 turns, unchanged post-query memory populations, top-k 5 and fused pool at most 30. L3 has no trace and is explicitly `externally_pending` because its exact snapshot is absent.
+
+Generated artifacts live under `C:/PRIMA_next/tmp/person1-dev-p1/benchmarks/locomo/outputs/goal2/` and are intentionally ignored, not committed:
+
+| Artifact/control | SHA-256 |
+|---|---|
+| `embedding_preflight.json` | `0a6b2f1555d6cf5d478c361304979340cdbbfd1c1b4e6bb97121e232726cb710` |
+| `development/development_report.json` | `b8011e6b4e0d8c9f6760ac618094fdd71a07b87637ddfd89e2b05e3e682af81b` |
+| `development/traces.jsonl` | `956b69fde2d95729218fa44d14289b4f4d10375e0148efe3229f3f025bb5d2a8` |
+| `execution_identity.json` (base plus changed implementation/config hashes and artifact/control hashes) | `7f5bc84fb5e28dc6746daec386ed9bdada330a8ced00f5da2c712aa4678719a2` |
+| committed `goal2_development_manifest.json` | `daf4445adab089683e236c1dc81f311684f78d0c2422ac6df90be6515c0cfcf3` |
+| committed `goal2_retrieval_candidates.json` | `3bf91753aef668e3bd2d638d35452678a8fe925b8bb13aa3100f5549b8be1ea4` |
+
+Hashes above use raw working-tree bytes, including the controls' original line endings. Loaded versions observed: PyTorch 2.14.1, sentence-transformers 6.1.0, transformers 5.18.0, huggingface-hub 1.33.0; no environment changes were made.
+
+### Goal 2 validation ledger and remaining gates
+
+Initial affected Goal 1/embedding/alignment suites: 82 passed. The first new suite found one synthetic admission test patching the runtime's unused importance-engine instance; it now patches the actual shared importance class. The corrected provenance/embedding/LoCoMo/shared integration selection passed 91 tests. The development split/ladder suite subsequently passed 49 tests; mypy initially identified two third-party/dictionary annotations, now corrected.
+
+Final expanded affected regression suite: **290 passed in 81.46 s**, including Goal 1 audit/scorer cases and the shared integration replay/QA test (read-only test ownership). A final test-only review added four controlled-ingestion malformed-time cases and explicit non-unit-vector normalization coverage; the affected embedding/native replay recheck passed **38 tests in 27.09 s**. No measured inference implementation changed. Opt-in actual pinned CPU model smoke, including exact artifact/revision identity, finite values and unit norm: **1 passed, 1 deselected in 23.31 s**; deselected test is the separate Ollama smoke. The only real-cache warning is the upstream rename of `get_sentence_embedding_dimension`; native dimension still verifies correctly. Ruff: **all checks passed**. Strict affected mypy: **no issues in 50 source files**, with existing unused override-section notes. Staged and unstaged `git diff --check` passed, including all new files; the pinned external checkout is clean. An earlier long-running check's output was unavailable after context compaction; no live Python remained, so the final suite/smoke was rerun with saved logs rather than assuming success.
+
+Reproduction commands (repository root; use the existing interpreter above):
+
+```powershell
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/test_locomo_review_regressions.py tests/test_locomo_qa_correctness.py tests/test_embedding_backend.py tests/test_answer_prompt_identity.py tests/reasoning tests/retrieval tests/memory tests/evolution tests/lineage tests/workflow tests/reflection tests/runtime tests/evaluation tests/integration/test_runtime_pipeline.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/retrieval/test_locomo_native_replay.py tests/test_embedding_backend.py
+$env:PRIMA_RUN_LEARNED_EMBEDDING_SMOKE='1'
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/test_production_embedding_smoke.py -k pinned_cpu
+Remove-Item Env:PRIMA_RUN_LEARNED_EMBEDDING_SMOKE
+C:/PRIMA_next/.venv/Scripts/python.exe -m ruff check benchmarks/locomo memory reasoning workflow uncertainty reflection runtime config/runtime_config.py tests/test_embedding_backend.py tests/test_production_embedding_smoke.py tests/test_locomo_qa_correctness.py tests/retrieval/test_locomo_native_replay.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m mypy config/runtime_config.py memory/embedding_backend.py memory/embedding_pipeline.py memory/embedding_rebuild.py memory/memory_repository.py memory/retrieval runtime workflow reasoning
+C:/PRIMA_next/.venv/Scripts/python.exe -m benchmarks.locomo.retrieval_development --dataset benchmarks/locomo/external/data/locomo10.json --manifest tests/fixtures/locomo_review/goal2_development_manifest.json --candidates tests/fixtures/locomo_review/goal2_retrieval_candidates.json --output benchmarks/locomo/outputs/goal2/development
+git diff --check
+git diff --cached --check
+git -C benchmarks/locomo/external status --porcelain
+```
+
+The measured output namespace already exists; use a fresh suffix when reproducing it. For Person 2, deserialize one complete candidate mapping with `RuntimeConfig.model_validate`, stage its immutable model revision, and supply `runtime_config=` to the canonical experiment. Shared preflight must invoke the selected auxiliary backend validation/load before admitting a campaign; missing files cannot trigger network loading or hash/lexical substitution. Exact candidate JSON, representation flag/hash, artifact identity and full typed configuration must travel with the run manifest, and persistent dimension changes require an explicitly rebuilt compatible collection. The cross-encoder's real-cache sanity/ranking and resource pilot remain pending after its artifacts are staged.
+
+No Qwen answer generation, GPU allocation, full benchmark, policy promotion, source publication or dependency upgrade is part of Goal 2. Cross-encoder real loading/ranking, fresh integrated Kaggle timing/resources, normal-admission headline answer quality and frozen full evaluations remain later measured gates. Goal 3 starts only after this checkpoint is committed and its final checks pass. Rollback is a scoped Goal 2 revert or an explicitly selected prior safe configuration with a fresh run identity; never reuse incompatible checkpoints or reset `dev`.

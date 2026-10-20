@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from typing import Any
 
 from action import ActionContext, ActionExecutor, ExecutionPolicy
@@ -52,6 +54,38 @@ from workflow.task_router import TaskRouter
 from workflow.workflow_events import WorkflowEventBus
 from workflow.workflow_state import WorkflowPhase
 from world import PredictionResult, SimulationContext, StateSimulator
+
+
+def _set_source_provenance(context: ExecutionContext) -> None:
+    document = context.metadata.get("document_metadata", {})
+    historical = context.metadata.get("task_kind") == "historical_replay"
+    metadata = context.metadata if historical else document
+    if not historical and "source_timestamp" not in metadata:
+        return
+    raw = metadata.get("source_timestamp", metadata.get("timestamp"))
+    source = "metadata"
+    if raw is None and historical and "source_timestamp" not in metadata and "timestamp" not in metadata:
+        # Older replay callers used the explicit ISO transcript prefix instead of metadata.
+        match = re.match(r"^\[([^\]]+)\]", context.user_input)
+        raw = match.group(1) if match else None
+        source = "transcript_iso_prefix"
+    if not isinstance(raw, str) or not raw.strip():
+        raise ValueError("Historical replay requires a valid source timestamp")
+    try:
+        timestamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"Invalid historical source timestamp: {raw!r}") from exc
+    context.source_timestamp = timestamp.replace(tzinfo=timestamp.tzinfo or UTC).astimezone(UTC)
+    context.source_provenance = {
+        "source_timestamp": context.source_timestamp.isoformat(),
+        "source_timestamp_original": metadata.get("source_timestamp_original", raw),
+        "timestamp_precision": metadata.get("timestamp_precision", "date" if len(raw) == 10 else "datetime"),
+        "source_timestamp_source": source,
+        "source_conversation_id": str(context.metadata.get("session_id", "")),
+        "source_session_id": metadata.get("source_session_id"),
+        "source_turn_id": metadata.get("source_turn_id", metadata.get("turn_id", "")),
+        "speaker": metadata.get("speaker"),
+    }
 
 
 @dataclass(slots=True)
@@ -165,6 +199,10 @@ class EvidenceAcquisitionController:
                     memory_types=tuple(item for item in MemoryType if item is not MemoryType.PROCEDURAL),
                     profile=str(context.metadata.get("profile", "prima_full")),
                     task_kind=str(context.metadata.get("task_kind", "factual_qa")),
+                    session_id=str(context.metadata.get("session_id", "")),
+                    historical=bool(context.metadata.get("historical_context", False)),
+                    reference_time=(datetime.fromisoformat(str(context.metadata["reference_time"]).replace("Z", "+00:00"))
+                                    if context.metadata.get("reference_time") else None),
                     required_reranker_backend=context.metadata.get("required_reranker_backend"),
                 )
             )
@@ -480,7 +518,10 @@ class DocumentIngestionController:
                 "source": "document_ingestion",
                 "explicit_import": memory_type is MemoryType.PROCEDURAL,
                 **document_metadata,
+                **context.source_provenance,
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
             },
+            timestamp=context.source_timestamp,
         )
         return IngestionResult(self.repository.add(note).id, memory_type)
 
@@ -521,9 +562,12 @@ class MemoryCommitController:
                 "execution_id": context.execution_id,
                 "source_session_id": str(context.metadata.get("session_id", "")),
                 "source_turn_id": str(context.metadata.get("turn_id", "")),
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
+                **context.source_provenance,
             },
             state_snapshot=getattr(context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+            timestamp=context.source_timestamp,
         )
         if str(context.metadata.get("task_kind")) == "historical_replay":
             saved = self.repository.add(user_note)
@@ -544,6 +588,7 @@ class MemoryCommitController:
                 "execution_id": context.execution_id,
                 "source_session_id": str(context.metadata.get("session_id", "")),
                 "source_turn_id": str(context.metadata.get("turn_id", "")),
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
             },
         )
         notes = (self.repository.add(user_note), self.repository.add(assistant_note))
@@ -759,6 +804,7 @@ class PrimaWorkflow:
         execution_context = context or ExecutionContext(user_input=user_input)
         if context is not None:
             execution_context.user_input = user_input
+        _set_source_provenance(execution_context)
         return await self.engine.execute(execution_context)
 
     async def cancel(self, context: ExecutionContext) -> None:

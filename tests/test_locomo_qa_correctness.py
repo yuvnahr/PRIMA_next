@@ -29,6 +29,7 @@ from benchmarks.locomo.experiment import (
     run_paired_locomo_experiment,
     select_conversations,
 )
+from config.runtime_config import RuntimeConfig
 from runtime.contracts import (
     EvidenceReference,
     ExecutionOutcome,
@@ -386,6 +387,11 @@ def test_question_checkpoint_resume_and_exact_duplicate_prevention(tmp_path: Pat
             max_conversations=1, runtime_factory=FakeRuntime, resume=True, model="changed",
             provider="test",
         )
+    for updates in ({"runtime_config": RuntimeConfig(embedding_dimensions=32)}, {"include_captions": True}):
+        with pytest.raises(ValueError):
+            run_locomo_experiment(dataset_path=str(dataset), output_path=str(output), runtime_profile=profile,
+                                  max_conversations=1, runtime_factory=FakeRuntime, resume=True,
+                                  provider="test", model="fixture-model", **updates)
 
 
 def test_paired_modes_reconcile_metrics_memory_maintenance_and_selection(tmp_path: Path) -> None:

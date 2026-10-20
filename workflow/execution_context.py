@@ -24,6 +24,8 @@ class ExecutionContext:
     retrieval_response: Any | None = None
     retrieval_hops: list[dict[str, Any]] = field(default_factory=list)
     prompt_evidence: list[dict[str, Any]] = field(default_factory=list)
+    source_timestamp: datetime | None = None
+    source_provenance: dict[str, Any] = field(default_factory=dict)
     compressed_context: Any | None = None
     reasoning_result: Any | None = None
     plan: Any | None = None

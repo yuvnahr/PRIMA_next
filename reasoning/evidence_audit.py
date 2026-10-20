@@ -47,6 +47,7 @@ def retrieval_hop(response: RetrievalResponse, *, conversation_id: str, query: s
         "added_source_turn_ids": [], "added_memory_ids": [], "excluded_memory_ids": [],
         "untraceable_added_memory_count": 0, "untraceable_added_memory_ids": [],
         "elapsed_ms": elapsed_ms, "stop_reason": None,
+        "timings_ms": dict(diagnostics.get("timings_ms", {})),
     }
 
 

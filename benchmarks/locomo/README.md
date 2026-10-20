@@ -24,8 +24,8 @@ LoCoMo JSON
 -> evaluate.py metrics
 ```
 
-The LoCoMo integration does not import or call PRIMA memory internals. It only prepares normalized
-conversation objects and consumes generic runner outputs.
+The adapter and generic runner use benchmark-neutral conversation objects. The canonical
+`experiment.py` and retrieval development entry point use the actual PRIMA runtime.
 
 ## Expected Outputs
 
@@ -56,3 +56,34 @@ The adapted official scorer retains snap-research/LoCoMo attribution and its
 BERTScore import or model download. See the
 [implementation handoff](../../docs/locomo-review-remediation.md) for exact versions,
 compatibility aliases, fixtures, resume rules and validation limits.
+
+## Historical replay and CPU retrieval candidates
+
+Replay preserves source time, numbered session, turn, speaker and conversation identity.
+Malformed historical time fails before admission. `experiment --include-captions` appends
+only supplied `blip_caption` strings; the default is off. Caption policy and replay text
+have a separate representation fingerprint while the original dataset hash is retained.
+
+The stable-hash 64-dimensional default remains unchanged. Learned selection requires an
+immutable model revision and native dimension (384 for MiniLM). Auxiliary loaders use
+explicit devices and staged local files only. The typed settings, exact model revisions,
+custom snapshot manifest format and Person 2 staging requirements are in the handoff.
+Select a complete measured candidate with `RuntimeConfig.model_validate(candidate)` from
+`tests/fixtures/locomo_review/goal2_retrieval_candidates.json`, then pass it as
+`runtime_config=` to `run_locomo_experiment`. Changed identities require fresh runs/index
+rebuilds; incompatible checkpoints cannot resume.
+
+Reproduce the frozen retrieval-only development ladder from the repository root with a
+fresh output directory and the exact cached MiniLM revision already staged:
+
+```powershell
+python -m benchmarks.locomo.retrieval_development --dataset benchmarks/locomo/external/data/locomo10.json --manifest tests/fixtures/locomo_review/goal2_development_manifest.json --candidates tests/fixtures/locomo_review/goal2_retrieval_candidates.json --output benchmarks/locomo/outputs/goal2/development-new
+```
+
+This replays complete development histories through controlled ingestion and performs no
+answer generation. Five CPU candidates were measured; the pinned cross-encoder is pending
+local artifacts. Reports include stage recall, separate stage costs and replay reuse.
+All candidates remain unpromoted. The opt-in real-cache test is
+`PRIMA_RUN_LEARNED_EMBEDDING_SMOKE=1` with
+`pytest -q tests/test_production_embedding_smoke.py -k pinned_cpu`; ordinary tests use fake
+models and do not download artifacts.

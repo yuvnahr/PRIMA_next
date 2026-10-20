@@ -61,8 +61,15 @@ from benchmarks.locomo.evaluate import (
 )
 from benchmarks.locomo.loader import LoCoMoDataset
 from benchmarks.locomo.official_scoring import official_locomo_score, scorer_identity
+from config.runtime_config import RuntimeConfig
 from config.runtime_mode import RuntimeMode
 from llm.generation_config import GenerationConfig
+from memory.embedding_backend import (
+    EmbeddingBackendConfig,
+    get_embedding_backend,
+    model_snapshot,
+    use_embedding_backend_config,
+)
 from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
 from runtime.contracts import (
     DiagnosticMode,
@@ -166,20 +173,31 @@ def select_conversations(
     return selected
 
 
-def _bounded_question(conversation: Any, question: Any, turns: int) -> str:
+def _bounded_question(conversation: Any, question: Any, turns: int, include_captions: bool = False) -> str:
     context = conversation.turns[-turns:] if turns else ()
-    transcript = "\n".join(_turn_text(turn) for turn in context)
+    transcript = "\n".join(_turn_text(turn, include_captions) for turn in context)
     return f"Bounded conversation context:\n{transcript}\n\nQuestion: {question.question}"
 
 
-def _turn_text(turn: Any) -> str:
-    return f"[{turn.timestamp}] {turn.speaker}: {turn.text}"
+def _turn_text(turn: Any, include_captions: bool = False) -> str:
+    text = f"[{turn.timestamp}] {turn.speaker}: {turn.text}"
+    caption = turn.metadata.get("blip_caption") if include_captions else None
+    if caption is not None and not isinstance(caption, str):
+        raise ValueError("Supplied blip_caption must be a string")
+    return f"{text}\nImage caption: {caption.strip()}" if caption and caption.strip() else text
+
+
+def representation_identity(conversations: list[Any], include_captions: bool = False) -> dict[str, Any]:
+    payload = [(conversation.id, [(turn.turn_id, _turn_text(turn, include_captions)) for turn in conversation.turns]) for conversation in conversations]
+    return {"version": "locomo-replay-v2", "include_captions": include_captions,
+            "sha256": hashlib.sha256(json.dumps({"include_captions": include_captions, "turns": payload}, ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
 
 
 def _turn_request(
     conversation_id: str, turn: Any, policy: IngestionPolicy, generation: GenerationConfig,
+    include_captions: bool = False,
 ) -> PrimaRequest:
-    text = _turn_text(turn)
+    text = _turn_text(turn, include_captions)
     if policy is IngestionPolicy.NORMAL_PRIMA:
         return PrimaRequest(
             task_kind=TaskKind.HISTORICAL_REPLAY, profile=ExecutionProfile.PRIMA_FULL,
@@ -187,6 +205,7 @@ def _turn_request(
             metadata={
                 "turn_id": turn.turn_id, "source_session_id": turn.session_id,
                 "timestamp": turn.timestamp, "ingestion_policy": policy.value,
+                **{key: turn.metadata[key] for key in ("source_timestamp", "source_timestamp_original", "timestamp_precision", "speaker") if key in turn.metadata},
             },
         )
     return PrimaRequest(
@@ -202,6 +221,7 @@ async def _run_conversation(
     maintenance: MaintenanceMode, pending_ids: set[str],
     checkpoint: Callable[[dict[str, Any]], None], context_budget: int = 1600,
     timing: Callable[[dict[str, Any]], None] | None = None,
+    include_captions: bool = False,
 ) -> dict[str, Any]:
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
@@ -213,7 +233,7 @@ async def _run_conversation(
     try:
         for turn in conversation.turns:
             replay_started = time.perf_counter()
-            response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation))
+            response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation, include_captions))
             historical_replay_ms += (time.perf_counter() - replay_started) * 1000
             if response.status is not ExecutionStatus.COMPLETED:
                 ingestion_failure = response
@@ -254,13 +274,14 @@ async def _run_conversation(
                         timing({"phase": "initial_history_flush", "conversation_id": conversation.id,
                                 "seconds": initial_history_flush_seconds})
                 input_text = (
-                    _bounded_question(conversation, question, bounded_context_turns)
+                    _bounded_question(conversation, question, bounded_context_turns, include_captions)
                     if profile is ExecutionProfile.MODEL_ONLY else question.question
                 )
                 started = time.perf_counter()
                 response = await runtime.execute(PrimaRequest(
                     task_kind=TaskKind.FACTUAL_QA, profile=profile,
                     input_text=input_text, session_id=conversation.id,
+                    metadata={"historical_context": True, **({"reference_time": question.metadata["reference_time"]} if question.metadata.get("reference_time") else {})},
                     generation_config=generation, diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
                     options=ExecutionOptions(
                         top_k=top_k, reasoning_mode="adaptive", max_hops=3,
@@ -563,6 +584,8 @@ def run_locomo_experiment(
     resume: bool = False, runtime_factory: Callable[..., Any] = PrimaRuntime,
     generation_config: GenerationConfig | None = None,
     _runtime_pool: SharedRuntimeFactory | None = None,
+    runtime_config: RuntimeConfig | None = None,
+    include_captions: bool = False,
 ) -> dict[str, Any]:
     """Run one canonical LoCoMo profile with exact per-question resume."""
     if parallel_workers < 1 or bounded_context_turns < 1:
@@ -576,6 +599,12 @@ def run_locomo_experiment(
     if max_conversations < 0 or max_questions < 0:
         raise ValueError("question/conversation limits cannot be negative")
     dataset = LoCoMoDataset(Path(dataset_path)) if dataset_path else LoCoMoDataset()
+    runtime_config = runtime_config or RuntimeConfig.from_environment()
+    with use_embedding_backend_config(EmbeddingBackendConfig.from_runtime_config(runtime_config)):
+        embedding_identity = get_embedding_backend().info()
+    reranker_identity = (model_snapshot(runtime_config.reranker_model, runtime_config.reranker_revision,
+                                        runtime_config.reranker_local_snapshot)[1]
+                         if runtime_config.reranker_enabled and runtime_config.reranker_backend == "cross_encoder" else None)
     conversations = select_conversations(
         list(dataset.conversations()), seed=seed, max_conversations=max_conversations,
         max_questions=max_questions, full_dataset=full_dataset,
@@ -601,6 +630,10 @@ def run_locomo_experiment(
         "context_budget": context_budget,
         "evidence_schema_version": "1.0", "question_schema_version": "2.0",
         "scorer_identity": scorer_identity(),
+        "runtime_config": runtime_config.model_dump(mode="json"), "runtime_config_fingerprint": runtime_config.fingerprint,
+        "input_representation": representation_identity(conversations, include_captions),
+        "retrieval_contract_version": "2.0",
+        "embedding_identity": embedding_identity, "reranker_identity": reranker_identity,
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)
     if resume:
@@ -625,11 +658,12 @@ def run_locomo_experiment(
             mode=RuntimeMode.BENCHMARK, memory_backend="in_memory",
             maintenance_enabled=maintenance is not MaintenanceMode.DISABLED,
             generation_config=generation,
+            runtime_config=runtime_config,
         )
         diagnostics = asyncio.run(_run_conversation(
             conversation, runtime, profile, policy, generation, top_k,
             bounded_context_turns, maintenance, pending_ids,
-            lambda record: _checkpoint(store, record), context_budget, timing,
+            lambda record: _checkpoint(store, record), context_budget, timing, include_captions,
         ))
         timing({"phase": "conversation", **diagnostics,
                 "worker_seconds": time.perf_counter() - worker_started})
@@ -713,6 +747,7 @@ def main() -> None:
     parser.add_argument("--dataset-path")
     parser.add_argument("--output-path", default=str(OUTPUT_PATH))
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--include-captions", action="store_true")
     parser.add_argument("--rouge-l", action="store_true")
     parser.add_argument("--bertscore", action="store_true")
     parser.add_argument("--bertscore-device", default="cpu")

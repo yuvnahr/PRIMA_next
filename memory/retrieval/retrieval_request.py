@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 from memory.embedding_pipeline import get_embedding_pipeline
@@ -25,6 +26,9 @@ class RetrievalRequest:
     profile: str = "prima_full"
     task_kind: str = "factual_qa"
     required_reranker_backend: str | None = None
+    session_id: str = ""
+    reference_time: datetime | None = None
+    historical: bool = False
 
     def embedding(self) -> tuple[float, ...]:
         return self.query_embedding or get_embedding_pipeline().embed_query(self.query).vector

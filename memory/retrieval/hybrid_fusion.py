@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -18,6 +19,10 @@ class HybridFusionConfig:
             "graph": 0.15,
         }
     )
+
+    def __post_init__(self) -> None:
+        if not self.weights or any(not math.isfinite(value) or value < 0 for value in self.weights.values()) or not sum(self.weights.values()):
+            raise ValueError("Fusion weights must be finite, nonnegative and have positive total weight")
 
     @classmethod
     def from_file(cls, path: str | Path = "config/retrieval.yaml") -> HybridFusionConfig:
@@ -54,6 +59,8 @@ class HybridFusion:
         normalized_by_strategy = self._normalize(results_by_strategy)
 
         for strategy_name, results in normalized_by_strategy.items():
+            if not self.config.weights.get(strategy_name, 0):
+                continue
             for result in results:
                 merged[result.note.id] = result
                 scores.setdefault(result.note.id, {})[strategy_name] = max(
@@ -74,7 +81,8 @@ class HybridFusion:
             ) / total_weight
             fused.append(result.with_score(weighted, strategy_scores=strategy_scores))
 
-        return sorted(fused, key=lambda item: item.score, reverse=True)[:top_k]
+        return sorted(fused, key=lambda item: (-item.score, str(item.note.context.get("source_conversation_id", "")),
+                                               str(item.note.context.get("source_turn_id") or item.note.id)))[:top_k]
 
     def _normalize(self, results_by_strategy: dict[str, list[RetrievalResult]]) -> dict[str, list[RetrievalResult]]:
         normalized: dict[str, list[RetrievalResult]] = {}

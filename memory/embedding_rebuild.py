@@ -6,7 +6,18 @@ import argparse
 import json
 
 from memory.embedding_pipeline import current_embedding_metadata, get_embedding_pipeline
-from memory.memory_repository import ChromaMemoryRepository
+from memory.memory_repository import ChromaMemoryRepository, MemoryRepository
+
+
+def rebuild_embeddings(repository: MemoryRepository) -> int:
+    """Explicitly rebuild vectors and metadata, preserving source content/time/lineage."""
+    pipeline = get_embedding_pipeline()
+    notes = repository.list()
+    replacements = [(note, pipeline.embed_memory(note.content)) for note in notes]
+    for note, embedded in replacements:
+        repository.update(note.with_updates(embedding=embedded.vector,
+                                           retrieval_metadata={**note.retrieval_metadata, **embedded.metadata}))
+    return len(replacements)
 
 
 def main(argv=None):
