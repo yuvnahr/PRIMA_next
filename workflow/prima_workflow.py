@@ -177,6 +177,8 @@ class EvidenceAcquisitionController:
             max_retrieval_calls=int(context.metadata.get("max_retrieval_calls", 3)),
             max_context_tokens=int(context.metadata.get("max_context_tokens", 1600)),
         )
+        attempt = int(context.metadata.get("evidence_acquisition_attempts", 0))
+        context.metadata["evidence_acquisition_attempts"] = attempt + 1
         result = self.reasoning_controller.answer(
             ReasoningRequest(
                 question=active_query,
@@ -186,6 +188,8 @@ class EvidenceAcquisitionController:
             ),
             retrieve=retrieve,
             synthesize=lambda _question, _evidence: ("", False, (), {}),
+            retrieval_hops=context.retrieval_hops,
+            attempt_index=attempt,
         )
         compression_enabled = context.metadata.get("context_compression_enabled", True)
         if not isinstance(compression_enabled, bool):

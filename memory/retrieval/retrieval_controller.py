@@ -209,6 +209,7 @@ class RetrievalController:
         strategy_names = tuple(by_strategy)
         return {
             "question": request.query,
+            "stage_limits": {"candidate_pool": max(request.top_k, self.candidate_pool_size, request.top_k * self.candidate_pool_multiplier), "returned": request.top_k},
             "expanded_query": expanded.to_dict() if expanded is not None else {"text": request.query, "terms": [], "expansion_map": {}},
             "query_rewrite": request.query_rewrite.to_dict() if request.query_rewrite is not None else {},
             "query_analysis": analysis.to_dict() if analysis is not None else {},

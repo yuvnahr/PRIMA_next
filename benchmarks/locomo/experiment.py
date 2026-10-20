@@ -53,10 +53,14 @@ from benchmarks.locomo.config import (
 from benchmarks.locomo.evaluate import (
     LoCoMoEvaluator,
     answer_token_coverage,
+    bleu_score,
+    classify_failure,
     evidence_recall,
+    f1_score,
     normalized_exact_match,
 )
 from benchmarks.locomo.loader import LoCoMoDataset
+from benchmarks.locomo.official_scoring import official_locomo_score, scorer_identity
 from config.runtime_mode import RuntimeMode
 from llm.generation_config import GenerationConfig
 from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
@@ -94,6 +98,7 @@ FAILURE_STAGES = {
     "INGESTION_FAILURE": "ingestion",
     "RUNTIME_FAILURE": "runtime",
     "ANSWER_PARSE_FAILURE": "answer",
+    "ADMISSION_COVERAGE_GAP": "ingestion",
     "RETRIEVAL_MISS": "retrieval",
     "EVIDENCE_SELECTION_FAILURE": "retrieval",
     "ANSWER_SCORING_FAILURE": "scoring",
@@ -313,17 +318,15 @@ def _question_record(
 ) -> dict[str, Any]:
     expected_evidence = tuple(str(item) for item in question.evidence)
     response_dict = response.to_dict() if response is not None else {}
-    retrieval = response.output_data.get("retrieval", {}) if response is not None else {}
-    stages = retrieval.get("stage_source_ids", {}) if isinstance(retrieval, dict) else {}
-    candidate_ids = set(stages.get("fused_top30", ()))
-    if not candidate_ids:
-        candidate_ids = set(stages.get("dense_top30", ())) | set(stages.get("sparse_top30", ()))
+    audit = response.output_data.get("evidence_audit") if response is not None else None
+    audit = audit if isinstance(audit, dict) else {}
+    candidate_ids = audit.get("candidate_source_turn_ids")
     final_ids, final_texts = set(), []
     selected_source_ids = set()
     if response is not None:
         generation = response.output_data.get("generation", {})
         if isinstance(generation, dict):
-            selected_source_ids = {str(item) for item in generation.get("selected_source_ids", ())}
+            selected_source_ids = {str(item) for item in generation.get("selected_source_ids", ())} if not generation.get("fallback_used") else set()
         for evidence in response.evidence:
             if evidence.source_id not in selected_source_ids:
                 continue
@@ -337,21 +340,50 @@ def _question_record(
     runtime_error = None
     if ingestion_failure is None and (response is None or response.status is not ExecutionStatus.COMPLETED):
         runtime_error = "; ".join(response.errors if response else ()) or "runtime returned no response"
+    generation = response.output_data.get("generation", {}) if response else {}
+    parse_error = None
+    if generation.get("failure_kind") == "parse":
+        parse_error = "; ".join(generation.get("errors", ())) or "Invalid model response"
+        if response is not None and not (set(response.errors) - set(generation.get("errors", ()))):
+            runtime_error = None
+    elif generation.get("failure_kind") in {"provider", "generation"}:
+        runtime_error = "; ".join(generation.get("errors", ())) or "Generation failed"
     prediction = response.output_text if response and response.output_text else ""
+    qualified_gold = [f"{conversation.id}:{turn}" for turn in expected_evidence]
+
+    def recall(found: Any) -> float | None:
+        return evidence_recall(qualified_gold, found) if expected_evidence and found is not None else None
+
     record = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "case_id": question_case_id(conversation.id, question.question_id),
         "conversation_id": conversation.id, "question_id": question.question_id,
         "runtime_profile": profile.value, "ingestion_policy": policy.value,
         "question": question.question, "expected_answer": question.answer,
         "category": question.category, "expected_evidence": list(expected_evidence),
+        "reference_metadata": dict(question.metadata.get("reference_metadata", {})),
         "prediction": prediction, "outcome": response.outcome.value if response and response.outcome else None,
-        "candidate_evidence_ids": sorted(candidate_ids), "final_evidence_ids": sorted(final_ids),
+        "answer_scores": {
+            "legacy_normalized_exact_match": normalized_exact_match(prediction, question.answer),
+            "legacy_squad_f1": f1_score(prediction, question.answer),
+            "smoothed_sentence_bleu": bleu_score(prediction, question.answer),
+            "official_locomo_f1": official_locomo_score(prediction, question.metadata.get("reference_metadata", {}).get("answer", question.answer), question.category),
+        },
+        "evidence_audit": audit or None,
+        "candidate_source_turn_ids": candidate_ids,
+        "accumulated_source_turn_ids": audit.get("accumulated_source_turn_ids"),
+        "supplied_source_turn_ids": audit.get("supplied_source_turn_ids"),
+        "cited_source_turn_ids": audit.get("cited_source_turn_ids"),
+        "candidate_evidence_ids": None if candidate_ids is None else [turn.removeprefix(f"{conversation.id}:") for turn in candidate_ids],
+        "final_evidence_ids": sorted(final_ids),
         "admitted_evidence_ids": sorted(admitted_turn_ids),
-        "candidate_evidence_recall": evidence_recall(expected_evidence, candidate_ids),
-        "final_evidence_recall": evidence_recall(expected_evidence, final_ids),
-        "memory_admission_recall": evidence_recall(expected_evidence, admitted_turn_ids),
-        "answer_token_coverage": answer_token_coverage(question.answer or "", final_texts),
+        "candidate_evidence_recall": recall(candidate_ids),
+        "accumulated_evidence_recall": recall(audit.get("accumulated_source_turn_ids")),
+        "supplied_evidence_recall": recall(audit.get("supplied_source_turn_ids")),
+        "cited_evidence_recall": recall(audit.get("cited_source_turn_ids")),
+        "final_evidence_recall": evidence_recall(expected_evidence, final_ids) if expected_evidence else None,
+        "memory_admission_recall": evidence_recall(expected_evidence, admitted_turn_ids) if expected_evidence else None,
+        "answer_token_coverage": answer_token_coverage(question.answer or "", final_texts) if expected_evidence else None,
         "memory_growth": len(created_memory_ids),
         "maintenance_complete": _maintenance_complete(
             response.diagnostics.maintenance if response is not None else {}
@@ -363,8 +395,20 @@ def _question_record(
         "model_call_count": response.diagnostics.model_call_count if response else 0,
         "model_usage": dict(response.diagnostics.model_usage) if response else {},
         "raw_runtime_response": response_dict,
-        "ingestion_error": ingestion_error, "runtime_error": runtime_error,
-        "execution_failed": bool(ingestion_error or runtime_error), "scored": True,
+        "ingestion_error": ingestion_error, "runtime_error": runtime_error, "parse_error": parse_error,
+        "execution_failed": bool(ingestion_error or runtime_error or parse_error), "scored": True,
+    }
+    record["evidence_diagnostics_status"] = (
+        "not_applicable" if not expected_evidence else "unavailable" if not audit
+        else "available" if all(audit.get(f"{stage}_source_turn_ids") is not None for stage in ("candidate", "accumulated", "supplied", "cited"))
+        else "partial"
+    )
+    record["evidence_flags"] = {
+        name: None if record[field] is None else record[field] < 1.0
+        for name, field in (("admission_incomplete", "memory_admission_recall"),
+                            ("candidate_incomplete", "candidate_evidence_recall"),
+                            ("supplied_incomplete", "supplied_evidence_recall"),
+                            ("cited_incomplete", "cited_evidence_recall"))
     }
     record["failure_category"] = _classify_failure(record, profile)
     record["failure_stage"] = FAILURE_STAGES.get(str(record["failure_category"]))
@@ -372,23 +416,7 @@ def _question_record(
 
 
 def _classify_failure(record: dict[str, Any], profile: ExecutionProfile) -> str | None:
-    if record["ingestion_error"]:
-        return "INGESTION_FAILURE"
-    if record["runtime_error"]:
-        return "RUNTIME_FAILURE"
-    if str(record.get("category")) == "5" and record.get("outcome") == "abstained":
-        return None
-    if not str(record["prediction"]).strip():
-        record["execution_failed"] = True
-        return "ANSWER_PARSE_FAILURE"
-    if profile is not ExecutionProfile.MODEL_ONLY and record["expected_evidence"]:
-        if record["candidate_evidence_recall"] == 0:
-            return "RETRIEVAL_MISS"
-        if record["final_evidence_recall"] < record["candidate_evidence_recall"]:
-            return "EVIDENCE_SELECTION_FAILURE"
-    if not normalized_exact_match(str(record["prediction"]), str(record["expected_answer"])):
-        return "ANSWER_SCORING_FAILURE"
-    return None
+    return classify_failure(record, profile.value)
 
 
 def _failure_record(record: dict[str, Any]) -> FailureRecord | None:
@@ -571,6 +599,8 @@ def run_locomo_experiment(
         "bertscore_device": bertscore_device,
         "bertscore_batch_size": bertscore_batch_size,
         "context_budget": context_budget,
+        "evidence_schema_version": "1.0", "question_schema_version": "2.0",
+        "scorer_identity": scorer_identity(),
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)
     if resume:

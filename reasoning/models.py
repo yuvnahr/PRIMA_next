@@ -128,6 +128,7 @@ class EvidenceState:
     last_reflection_advice: str = ""
     reflection_advice_confidence: float = 0.0
     trace: list[ReasoningTraceEvent] = field(default_factory=list)
+    retrieval_hops: list[dict[str, Any]] = field(default_factory=list)
 
     @property
     def context_tokens(self) -> int:

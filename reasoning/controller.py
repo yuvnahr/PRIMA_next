@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from time import perf_counter
 from typing import Any
 
 from memory.retrieval.retrieval_controller import RetrievalResponse
+from reasoning.evidence_audit import evidence_ids, retrieval_hop, summarize_hops
 from reasoning.evidence_integrator import EvidenceIntegrator
 from reasoning.information_need_generator import InformationNeedGenerator
 from reasoning.models import AnswerResult, EvidenceState, ReasoningRequest, Route, SufficiencyStatus
@@ -30,8 +32,11 @@ class ReasoningController:
     stopping_policy: StoppingPolicy = field(default_factory=StoppingPolicy)
 
     reflection_advisor: ReflectionAdvisor | None = None
-    def answer(self, request: ReasoningRequest, *, retrieve: Retriever, synthesize: Synthesizer) -> AnswerResult:
-        state = EvidenceState(request=request)
+    def answer(
+        self, request: ReasoningRequest, *, retrieve: Retriever, synthesize: Synthesizer,
+        retrieval_hops: list[dict[str, Any]] | None = None, attempt_index: int = 0,
+    ) -> AnswerResult:
+        state = EvidenceState(request=request, retrieval_hops=retrieval_hops if retrieval_hops is not None else [])
         route = self.task_analyzer.route(request)
         state.add_trace("ReasoningStarted", 0, mode=request.mode.value, session_id=request.session_id)
         state.add_trace("TaskRouted", 0, route=route.value)
@@ -48,12 +53,30 @@ class ReasoningController:
         while True:
             try:
                 state.add_trace("RetrievalStarted", hop, query=query)
+                started = perf_counter()
                 response = retrieve(query)
                 state.retrieval_calls += 1
             except Exception as exc:
                 state.add_trace("ReasoningFailed", hop, error_category=type(exc).__name__)
                 return self._result(state, "", SufficiencyStatus.ERROR, "error", (str(exc),))
-            integration = self.evidence_integrator.integrate(state, response, hop=hop, query=query)
+            audit = retrieval_hop(response, conversation_id=request.session_id, query=query, hop=hop,
+                                  elapsed_ms=round((perf_counter() - started) * 1000, 3))
+            audit.update(hop_index=len(state.retrieval_hops), attempt_index=attempt_index)
+            if attempt_index:
+                audit["attempt_kind"] = "workflow_retry"
+            state.retrieval_hops.append(audit)
+            before = len(state.evidence_items)
+            try:
+                integration = self.evidence_integrator.integrate(state, response, hop=hop, query=query)
+            except Exception:
+                audit["stop_reason"] = "integration_error"
+                raise
+            added = evidence_ids(state.evidence_items[before:], request.session_id)
+            audit["added_source_turn_ids"] = added["source_turn_ids"]
+            audit["added_memory_ids"] = added["memory_ids"]
+            audit["untraceable_added_memory_count"] = added["untraceable_memory_count"]
+            audit["untraceable_added_memory_ids"] = sorted({item.source_id for item in state.evidence_items[before:] if not item.provenance.get("source_turn_id")})
+            audit["excluded_memory_ids"] = sorted({item.note.id for item in response.results if not item.note.context.get("evidence_eligible", True)})
             state.attempted_queries.append(query)
             state.add_trace(
                 "EvidenceRetrieved", hop, source_ids=[item.note.id for item in response.results],
@@ -208,6 +231,9 @@ class ReasoningController:
                             "reflection_interventions": state.reflection_interventions,
                         })
         result_diagnostics = dict(diagnostics or {})
+        if state.retrieval_calls:
+            state.retrieval_hops[-1]["stop_reason"] = stop_reason
+        result_diagnostics["evidence_audit"] = summarize_hops(state.retrieval_hops)
         result_diagnostics["reflection_attempts"] = [
             event.to_dict()
             for event in state.trace

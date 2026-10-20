@@ -579,6 +579,7 @@ class PrimaRuntime:
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
             "retrieval": _retrieval_audit(context.retrieval_response),
+            "evidence_audit": _request_evidence_audit(context),
             "context_compression": (
                 context.compressed_context.to_dict() if context.compressed_context is not None else {}
             ),
@@ -891,6 +892,7 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         )
         if key in diagnostics
     }
+    audit["scope"] = "last_retrieval_call"
     audit["stage_source_ids"] = {
         stage: [
             str(item["source_turn_id"])
@@ -899,6 +901,27 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         ]
         for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
     }
+    return audit
+
+
+def _request_evidence_audit(context: ExecutionContext) -> dict[str, Any]:
+    from reasoning.evidence_audit import summarize_hops
+
+    audit = summarize_hops(context.retrieval_hops)
+    supplied = context.prompt_evidence
+    generation = context.generation_result
+    cited = set(getattr(generation, "selected_source_ids", ())) if not getattr(generation, "fallback_used", False) else set()
+    if isinstance(context.output, dict) and context.output.get("outcome") != "answered":
+        cited = set()
+    audit.update({
+        "supplied_source_turn_ids": sorted({item["source_turn_id"] for item in supplied if item["source_turn_id"]}),
+        "supplied_memory_ids": sorted({item["memory_id"] for item in supplied}),
+        "cited_source_turn_ids": sorted({item["source_turn_id"] for item in supplied if item["memory_id"] in cited and item["source_turn_id"]}),
+        "cited_memory_ids": sorted(cited),
+        "untraceable_supplied_memory_count": len({item["memory_id"] for item in supplied if not item["source_turn_id"]}),
+        "untraceable_cited_memory_count": len({item["memory_id"] for item in supplied if item["memory_id"] in cited and not item["source_turn_id"]}),
+        "untraceable_accumulated_memory_count": len({memory for hop in audit["hops"] for memory in hop["untraceable_added_memory_ids"]}),
+    })
     return audit
 
 
@@ -1211,7 +1234,7 @@ def _route_diagnostics(
     budget_usage = {}
     if reasoning is not None and reasoning.trace_summary:
         budget_usage = dict(reasoning.trace_summary[-1].fields.get("budget_usage", {}))
-    retrieval_call_count = int(budget_usage.get("retrieval_calls", 0))
+    retrieval_call_count = len(context.retrieval_hops)
     provider_details = {
         "name": str(getattr(generation, "provider", "")),
         "model": str(getattr(generation, "model", "")),

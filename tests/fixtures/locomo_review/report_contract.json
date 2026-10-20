@@ -1,0 +1,232 @@
+[
+  {
+    "record": {
+      "schema_version": "1.0",
+      "conversation_id": "conv",
+      "prediction": "green",
+      "expected_answer": "green",
+      "category": "2",
+      "expected_evidence": [
+        "D1:1"
+      ],
+      "candidate_evidence_recall": 0.0,
+      "final_evidence_recall": 0.0,
+      "failure_category": "RETRIEVAL_MISS",
+      "execution_failed": false
+    },
+    "expected_metrics": {
+      "candidate_evidence_recall": null,
+      "supplied_evidence_recall": null,
+      "exact_match": 1.0
+    }
+  },
+  {
+    "record": {
+      "schema_version": "2.0",
+      "case_id": "conv:q",
+      "conversation_id": "conv",
+      "question_id": "q",
+      "runtime_profile": "simple_rag",
+      "ingestion_policy": "simple_vector_memory_baseline",
+      "question": "What color is Oak?",
+      "expected_answer": "green",
+      "category": "2",
+      "expected_evidence": [
+        "D2:1"
+      ],
+      "reference_metadata": {},
+      "prediction": "green",
+      "outcome": "answered",
+      "answer_scores": {
+        "legacy_normalized_exact_match": 1.0,
+        "legacy_squad_f1": 1.0,
+        "smoothed_sentence_bleu": 0.1778279410038923,
+        "official_locomo_f1": 1.0
+      },
+      "evidence_audit": {
+        "schema_version": "1.0",
+        "scope": "request_all_hops",
+        "hops": [
+          {
+            "hop_index": 0,
+            "attempt_kind": "initial",
+            "query": "What color is Oak?",
+            "stage_source_ids": {
+              "dense": [
+                "conv:D1:1",
+                "conv:D2:1"
+              ],
+              "sparse": [
+                "conv:D1:1",
+                "conv:D2:1"
+              ],
+              "fused": [
+                "conv:D1:1",
+                "conv:D2:1"
+              ],
+              "reranked": [
+                "conv:D1:1",
+                "conv:D2:1"
+              ],
+              "returned": [
+                "conv:D1:1",
+                "conv:D2:1"
+              ]
+            },
+            "stage_memory_ids": {
+              "dense": [
+                "one",
+                "two"
+              ],
+              "sparse": [
+                "one",
+                "two"
+              ],
+              "fused": [
+                "one",
+                "two"
+              ],
+              "reranked": [
+                "one",
+                "two"
+              ],
+              "returned": [
+                "one",
+                "two"
+              ]
+            },
+            "stage_limits": {
+              "candidate_pool": 30,
+              "returned": 5
+            },
+            "added_source_turn_ids": [
+              "conv:D1:1",
+              "conv:D2:1"
+            ],
+            "added_memory_ids": [
+              "one",
+              "two"
+            ],
+            "excluded_memory_ids": [],
+            "elapsed_ms": 0.0,
+            "stop_reason": "single_pass",
+            "untraceable_added_memory_count": 0,
+            "untraceable_added_memory_ids": [],
+            "attempt_index": 0
+          }
+        ],
+        "stage_source_turn_ids": {
+          "dense": [
+            "conv:D1:1",
+            "conv:D2:1"
+          ],
+          "sparse": [
+            "conv:D1:1",
+            "conv:D2:1"
+          ],
+          "fused": [
+            "conv:D1:1",
+            "conv:D2:1"
+          ],
+          "reranked": [
+            "conv:D1:1",
+            "conv:D2:1"
+          ],
+          "returned": [
+            "conv:D1:1",
+            "conv:D2:1"
+          ]
+        },
+        "candidate_source_turn_ids": [
+          "conv:D1:1",
+          "conv:D2:1"
+        ],
+        "accumulated_source_turn_ids": [
+          "conv:D1:1",
+          "conv:D2:1"
+        ],
+        "accumulated_memory_ids": [
+          "one",
+          "two"
+        ],
+        "supplied_source_turn_ids": [
+          "conv:D1:1"
+        ],
+        "supplied_memory_ids": [
+          "one"
+        ],
+        "cited_source_turn_ids": [
+          "conv:D1:1"
+        ],
+        "cited_memory_ids": [
+          "one"
+        ],
+        "untraceable_supplied_memory_count": 0,
+        "untraceable_cited_memory_count": 0,
+        "untraceable_accumulated_memory_count": 0
+      },
+      "candidate_source_turn_ids": [
+        "conv:D1:1",
+        "conv:D2:1"
+      ],
+      "accumulated_source_turn_ids": [
+        "conv:D1:1",
+        "conv:D2:1"
+      ],
+      "supplied_source_turn_ids": [
+        "conv:D1:1"
+      ],
+      "cited_source_turn_ids": [
+        "conv:D1:1"
+      ],
+      "candidate_evidence_ids": [
+        "D1:1",
+        "D2:1"
+      ],
+      "final_evidence_ids": [
+        "D1:1"
+      ],
+      "admitted_evidence_ids": [
+        "D1:1",
+        "D2:1"
+      ],
+      "candidate_evidence_recall": 1.0,
+      "accumulated_evidence_recall": 1.0,
+      "supplied_evidence_recall": 0.0,
+      "cited_evidence_recall": 0.0,
+      "final_evidence_recall": 0.0,
+      "memory_admission_recall": 1.0,
+      "answer_token_coverage": 1.0,
+      "memory_growth": 2,
+      "maintenance_complete": true,
+      "latency_ms": 0.0,
+      "historical_replay_ms": 0.0,
+      "retrieval_count": 1,
+      "reflection_interventions": 0,
+      "model_call_count": 1,
+      "model_usage": {},
+      "ingestion_error": null,
+      "runtime_error": null,
+      "parse_error": null,
+      "execution_failed": false,
+      "scored": true,
+      "evidence_diagnostics_status": "available",
+      "evidence_flags": {
+        "admission_incomplete": false,
+        "candidate_incomplete": false,
+        "supplied_incomplete": true,
+        "cited_incomplete": true
+      },
+      "correctness_rule": "legacy_normalized_exact_match_or_structured_category_5_abstention",
+      "answer_correct": true,
+      "failure_category": null,
+      "failure_stage": null
+    },
+    "expected_metrics": {
+      "candidate_evidence_recall": 1.0,
+      "accumulated_evidence_recall": 1.0,
+      "supplied_evidence_recall": 0.0,
+      "exact_match": 1.0
+    }
+  }
+]

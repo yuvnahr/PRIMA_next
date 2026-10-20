@@ -169,6 +169,7 @@ class LoCoMoAdapter:
                 key: value for key, value in raw.items()
                 if key not in {"question", "answer", "category", "evidence", "question_id", "id"}
             }
+            metadata["reference_metadata"] = {key: value for key, value in raw.items() if key not in {"question", "evidence", "question_id", "id"}}
             if source_values is not None and corrected_evidence != source_values:
                 metadata["source_evidence"] = tuple(source_values)
             questions.append(ConversationQuestion(

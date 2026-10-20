@@ -13,6 +13,7 @@ from llm.generation_config import FallbackPolicy, GenerationConfig, StructuredOu
 from llm.llm_client import LLMClient
 from llm.prompt_builder import PromptBuilder, PromptEvidence
 from llm.provider import ProviderError
+from reasoning.evidence_audit import source_turn_id
 from reasoning.models import AnswerResult, SufficiencyStatus
 from workflow.execution_context import ExecutionContext
 from workflow.workflow_state import WorkflowPhase
@@ -68,6 +69,7 @@ class GenerationResult:
     fallback_used: bool = False
     fallback_reason: str | None = None
     provider_capabilities: dict[str, Any] | None = None
+    failure_kind: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible generation record."""
@@ -86,6 +88,7 @@ class GenerationResult:
             "fallback_used": self.fallback_used,
             "fallback_reason": self.fallback_reason,
             "provider_capabilities": dict(self.provider_capabilities or {}),
+            "failure_kind": self.failure_kind,
         }
 
 
@@ -145,6 +148,7 @@ class AnswerGenerationController:
         prompt, label_map = self._prompt(context, reasoning, factual)
         started = time.perf_counter()
         context.metadata["model_call_count"] = int(context.metadata.get("model_call_count", 0)) + 1
+        failure_kind = "provider"
         try:
             response = await asyncio.to_thread(
                 self.llm_client.chat,
@@ -159,6 +163,7 @@ class AnswerGenerationController:
             for key, value in (response.usage or {}).items():
                 aggregate_usage[str(key)] = int(aggregate_usage.get(str(key), 0)) + int(value)
             context.metadata["model_usage"] = aggregate_usage
+            failure_kind = "parse"
             return self._parse(
                 raw,
                 context.user_input,
@@ -176,6 +181,7 @@ class AnswerGenerationController:
                 config,
                 str(exc),
                 round((time.perf_counter() - started) * 1000, 3),
+                failure_kind=failure_kind,
             )
 
     def _prompt(
@@ -186,6 +192,7 @@ class AnswerGenerationController:
     ) -> tuple[Any, dict[str, str]]:
         evidence = reasoning.evidence_references if reasoning is not None else ()
         label_map = {f"E{index}": item.source_id for index, item in enumerate(evidence, 1)}
+        conversation_id = str(context.metadata.get("session_id", ""))
         plan = context.plan.to_dict() if context.plan is not None and hasattr(context.plan, "to_dict") else None
         state = {
             "goal": dict(context.cognitive_state.goal_state),
@@ -193,20 +200,22 @@ class AnswerGenerationController:
             "confidence": dict(context.cognitive_state.confidence_state),
         }
         schema = self._response_schema() if factual else None
-        return (
-            PromptBuilder.build(
-                system_policy=self._system_prompt(factual),
-                user_input=context.user_input,
-                evidence=(
-                    PromptEvidence(label, label, item.text)
-                    for label, item in zip(label_map, evidence, strict=True)
-                ),
-                tool_results=tuple(str(item) for item in context.metadata.get("tool_results", ())),
-                runtime_context=_prompt_context(plan, state, label_map),
-                response_schema=schema,
+        prompt = PromptBuilder.build(
+            system_policy=self._system_prompt(factual),
+            user_input=context.user_input,
+            evidence=(
+                PromptEvidence(label, label, item.text)
+                for label, item in zip(label_map, evidence, strict=True)
             ),
-            label_map,
+            tool_results=tuple(str(item) for item in context.metadata.get("tool_results", ())),
+            runtime_context=_prompt_context(plan, state, label_map),
+            response_schema=schema,
         )
+        context.prompt_evidence = [
+            {"memory_id": item.source_id, "source_turn_id": source_turn_id(item.provenance, conversation_id)}
+            for item in evidence
+        ]
+        return prompt, label_map
 
     def _parse(
         self,
@@ -272,6 +281,7 @@ class AnswerGenerationController:
         config: GenerationConfig,
         reason: str,
         latency_ms: float,
+        *, failure_kind: str = "generation",
     ) -> GenerationResult:
         def result(
             outcome: GenerationOutcome,
@@ -293,6 +303,7 @@ class AnswerGenerationController:
                 fallback_used=fallback_used,
                 fallback_reason=reason,
                 provider_capabilities=dict(getattr(self.llm_client, "capabilities", {})),
+                failure_kind=failure_kind,
             )
         if config.fallback_policy is FallbackPolicy.EXTRACTIVE and reasoning is not None:
             evidence = reasoning.evidence_references

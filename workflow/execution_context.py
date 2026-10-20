@@ -22,6 +22,8 @@ class ExecutionContext:
     workflow_state: WorkflowState = field(default_factory=WorkflowState)
     affect_update: Any | None = None
     retrieval_response: Any | None = None
+    retrieval_hops: list[dict[str, Any]] = field(default_factory=list)
+    prompt_evidence: list[dict[str, Any]] = field(default_factory=list)
     compressed_context: Any | None = None
     reasoning_result: Any | None = None
     plan: Any | None = None
