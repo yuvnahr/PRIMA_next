@@ -367,11 +367,15 @@ class LegacyAffectClassifier:
 
         tokens = tokenize(text)
         scores, keywords = self._classify_by_lexical_match(text, tokens)
+        evidence_source = "literal_span"
         if not scores:
             scores, keywords = self._classify_by_similarity(text)
+            evidence_source = "hash_neighbour"
 
         resolved_scores = canonicalize_scores(resolve_modifiers_and_negations(tokens, scores) or scores)
-        profile = EmotionProfile.from_scores(resolved_scores, emotional_keywords=tuple(keywords))
+        profile = EmotionProfile.from_scores(
+            resolved_scores, emotional_keywords=tuple(keywords), evidence_source=evidence_source
+        )
         self.cache.set(text, profile)
         return profile
 

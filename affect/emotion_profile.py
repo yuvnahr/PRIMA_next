@@ -27,6 +27,7 @@ class EmotionProfile:
     valence: float
     arousal: float
     dominance: float
+    evidence_source: str = "unavailable"
 
     def __post_init__(self) -> None:
         immutable_scores = _immutable_scores(self.emotions)
@@ -43,6 +44,7 @@ class EmotionProfile:
         scores: Mapping[str, float],
         emotional_keywords: tuple[str, ...] = (),
         confidence: float | None = None,
+        evidence_source: str = "unavailable",
     ) -> EmotionProfile:
         if scores:
             def _key_fn(k: str) -> float:
@@ -61,6 +63,7 @@ class EmotionProfile:
             valence=valence,
             arousal=arousal,
             dominance=dominance,
+            evidence_source=evidence_source,
         )
 
     def to_dict(self) -> dict[str, object]:
@@ -72,6 +75,7 @@ class EmotionProfile:
             "valence": self.valence,
             "arousal": self.arousal,
             "dominance": self.dominance,
+            "evidence_source": self.evidence_source,
         }
 
 

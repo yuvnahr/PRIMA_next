@@ -1,0 +1,153 @@
+{
+  "artifacts": {
+    "model.joblib": "00622b00061d4a3dbabc9b883e3c3b0ab1d92923b9df7bf5596740880e15f752",
+    "thresholds.json": "857e9a6e99a819eb0962ad847c159d6566e9a8f07435fee41573e8a05b36c5d5"
+  },
+  "calibrated": false,
+  "configuration": {
+    "balanced": false,
+    "features": "word",
+    "labels": [
+      "admiration",
+      "amusement",
+      "anger",
+      "annoyance",
+      "approval",
+      "caring",
+      "confusion",
+      "curiosity",
+      "desire",
+      "disappointment",
+      "disapproval",
+      "disgust",
+      "embarrassment",
+      "excitement",
+      "fear",
+      "gratitude",
+      "grief",
+      "joy",
+      "love",
+      "nervousness",
+      "optimism",
+      "pride",
+      "realization",
+      "relief",
+      "remorse",
+      "sadness",
+      "surprise",
+      "neutral"
+    ],
+    "seed": 13
+  },
+  "dataset_identity": {
+    "counts": {
+      "dev": 5426,
+      "test": 5427,
+      "train": 43410
+    },
+    "duplicates": {
+      "dev": 0,
+      "test": 0,
+      "train": 0
+    },
+    "exact_text_overlap": {
+      "dev_test": 10,
+      "train_dev": 41,
+      "train_test": 32
+    },
+    "fingerprint": "4ae16dde0dc5f9503c7e216f5cdc59ab89d800cf51a425eb683bfe863a6b44b5",
+    "hashes": {
+      "dev": "8f629aa53c1b1d6dd023b168e3762a09f4d1f4e575fcd9035c02bd74170ef56b",
+      "test": "dc3aab545d76079817c3002a77239d53accc11ec8f16313aa19d8e1a8f2e412e",
+      "train": "a8336fed4b2f651b11c6a6c65e4dab122fa9da28f49b200a892c71094eeba109"
+    },
+    "label_sha256": "932218ae8b67b25341eec30f785580207e952fa8eb2c917807ad5eb439a8f901",
+    "labels": [
+      "admiration",
+      "amusement",
+      "anger",
+      "annoyance",
+      "approval",
+      "caring",
+      "confusion",
+      "curiosity",
+      "desire",
+      "disappointment",
+      "disapproval",
+      "disgust",
+      "embarrassment",
+      "excitement",
+      "fear",
+      "gratitude",
+      "grief",
+      "joy",
+      "love",
+      "nervousness",
+      "optimism",
+      "pride",
+      "realization",
+      "relief",
+      "remorse",
+      "sadness",
+      "surprise",
+      "neutral"
+    ],
+    "overlap": {
+      "dev_test": [],
+      "train_dev": [],
+      "train_test": []
+    },
+    "repeated_text_rows": {
+      "dev": 3,
+      "test": 6,
+      "train": 183
+    }
+  },
+  "dependencies": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.3",
+    "python": "3.14.8",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "feature_settings": {
+    "word": {
+      "analyzer": "word",
+      "lowercase": true,
+      "max_df": 1.0,
+      "max_features": 80000,
+      "min_df": 2,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "norm": "l2",
+      "smooth_idf": true,
+      "strip_accents": null,
+      "sublinear_tf": true,
+      "token_pattern": "(?u)\\b\\w\\w+\\b",
+      "use_idf": true
+    }
+  },
+  "fingerprint": "99ab7a9a3afee350e3ef192a8be05b930605613c6b135da079db42688c8a8376",
+  "logistic_settings": {
+    "C": 1.0,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 200,
+    "n_jobs": null,
+    "penalty": "deprecated",
+    "random_state": 13,
+    "solver": "liblinear",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "system_family": "trained_baseline",
+  "threshold_split": "dev",
+  "training_split": "train",
+  "version": 1
+}

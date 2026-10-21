@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
 from benchmarks.common import atomic_write_json
+from benchmarks.common.artifacts import read_json, read_jsonl
+from benchmarks.common.reporting import classification_report, locomo_report
 from security.redaction import redact
 
 
@@ -25,6 +28,38 @@ def write_aggregate(
     }
     safe_comparisons = redact(comparisons, redact_prompts=False)
     safe_telemetry = redact(telemetry, redact_prompts=False)
+    report_semantics = {}
+    for mode_id, item in modes.items():
+        if not item.child_manifest:
+            continue
+        child = root / item.child_manifest
+        manifest = read_json(child)
+        benchmark = manifest["benchmark"]["name"]
+        if benchmark not in {"GoEmotions", "LoCoMo"}:
+            continue
+        key = "goemotions_record" if benchmark == "GoEmotions" else "locomo_record"
+        records = []
+        checkpoints = read_jsonl(child.parent / "checkpoints/records.jsonl")
+        for checkpoint in checkpoints:
+            prediction, failure = checkpoint.get("prediction") or {}, checkpoint.get("failure") or {}
+            record = (prediction.get("diagnostics") or failure.get("details") or {}).get(key)
+            if isinstance(record, dict):
+                records.append(record)
+        if benchmark == "GoEmotions":
+            report_semantics[mode_id] = classification_report(records, item.summary.get("metrics"))
+        else:
+            replay = child.parent / "raw/conversation_diagnostics.json"
+            try:
+                replay_records = read_json(replay)
+            except FileNotFoundError:
+                replay_records = None
+            admission_dir = child.parent / "admission"
+            admission_audits = [read_json(path) for path in sorted(admission_dir.glob("*.json"))] if admission_dir.is_dir() else None
+            report_semantics[mode_id] = locomo_report(records, replay_records, admission_audits)
+        report_semantics[mode_id]["selected_id_count"] = len(manifest["selected_ids"])
+        report_semantics[mode_id]["checkpoint_count"] = len(checkpoints)
+        report_semantics[mode_id]["embedded_record_count"] = len(records)
+        report_semantics[mode_id]["unavailable_embedded_records"] = len(checkpoints) - len(records)
     aggregate = {
         "schema_version": "1.0",
         "run_kind": run_kind,
@@ -33,6 +68,7 @@ def write_aggregate(
         "included_modes": included,
         "comparisons": safe_comparisons,
         "telemetry": safe_telemetry,
+        "report_semantics": redact(report_semantics, redact_prompts=False),
     }
     atomic_write_json(root / "aggregate.json", aggregate)
     lines = [f"# Campaign {campaign_id}", "", "## Benchmark modes", ""]
@@ -55,11 +91,12 @@ def write_aggregate(
                 lines.append(f"- `{name}`: **refused** — {item.get('error', 'invalid pair')}")
     else:
         lines.append("- No paired comparisons configured.")
-    lines.extend(["", "## Inference telemetry", "", f"- Requests: {safe_telemetry.get('request_attempts', 0)}"])
-    lines.append(f"- Maximum concurrent inference requests: {safe_telemetry.get('max_active_requests', 0)}")
+    lines.extend(["", "## Inference telemetry", "", f"- Requests: {safe_telemetry.get('request_attempts', 'unavailable')}"])
+    lines.append(f"- Maximum overlapping provider requests: {safe_telemetry.get('max_active_requests', 'unavailable')}")
     lines.append(
-        f"- Prompt/completion tokens: {safe_telemetry.get('prompt_tokens', 0)}/"
-        f"{safe_telemetry.get('completion_tokens', 0)}"
+        f"- Observed successful uncached prompt/completion tokens: {safe_telemetry.get('prompt_tokens', 'unavailable')}/"
+        f"{safe_telemetry.get('completion_tokens', 'unavailable')} (complete usage: {safe_telemetry.get('actual_token_usage_complete', 'unavailable')})"
     )
+    lines.extend(["", "## Benchmark report semantics", "", "```json", json.dumps(aggregate["report_semantics"], indent=2), "```"])
     (root / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     return aggregate

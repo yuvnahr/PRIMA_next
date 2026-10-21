@@ -31,7 +31,7 @@ def main() -> None:
     if args.fit_thresholds:
         result = fit_thresholds_from_dev(args.data_dir, args.fit_thresholds, args.output_dir / "thresholds.json", model_id=args.model_id)
     elif args.fit_calibration:
-        result = fit_calibration_from_dev(args.data_dir, args.fit_calibration, args.output_dir / "calibration.json", model_id=args.model_id)
+        result = fit_calibration_from_dev(args.data_dir, args.fit_calibration, args.output_dir / "calibration.json", model_id=args.model_id, model_revision=args.revision)
     else:
         config = TrainingConfig(model_id=args.model_id, revision=args.revision, device=args.device, epochs=args.epochs, loss=args.loss)
         result = train(args.data_dir, args.output_dir, config) if args.full else smoke_train(args.data_dir, args.output_dir, config, args.limit)

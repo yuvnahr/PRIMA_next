@@ -1,6 +1,7 @@
 # Native Ollama benchmarks with the notebook's stable embeddings, legacy affect
 # classifier and lexical reranker. Reuse compatible Kaggle packages; no upgrades.
-# Encoder/HF backends and BERTScore use the full requirements.txt instead.
+# Optional CPU learned retrieval uses requirements-kaggle-retrieval.txt.
+# Training and supplementary BERTScore have separate measured dependency phases.
 numpy>=1.24
 networkx>=3.2
 spacy>=3.7

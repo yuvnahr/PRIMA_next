@@ -57,6 +57,10 @@ class CampaignManifestStore:
                 raise ValueError("Campaign configuration changed; resume refused")
             if manifest.preflight.get("datasets") != preflight.get("datasets"):
                 raise ValueError("Campaign dataset identity changed; resume refused")
+            old_source = (manifest.preflight.get("source_identity") or {}).get("source_fingerprint")
+            new_source = (preflight.get("source_identity") or {}).get("source_fingerprint")
+            if old_source != new_source:
+                raise ValueError("Campaign executed source identity changed; resume refused")
             manifest = manifest.model_copy(update={"status": "partial", "updated_at": _now()})
         else:
             if self.path.exists():

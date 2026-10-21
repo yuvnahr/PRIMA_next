@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0",
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "implementation_acceptance": true,
+  "measured_benchmark_acceptance": false,
+  "planning_base": "c25a178d6308bc48b3a5e44d9519316a5179c499",
+  "person2_checkpoints": {
+    "goal1": "e0dd105484a2f78fc7a13811c83ef4e04aaad440",
+    "goal2": "def8f76dbe25699e63fd10cedcb9a6afe311ac93",
+    "goal3": "e926c4f0286cc193e3026bd2323cde8f8c0d58f7",
+    "goal4": "containing delivery commit; exact SHA is in completion response"
+  },
+  "person1_checkpoint": "4d4b76b1462f18d70450d51a4ee1c2714d558dd9",
+  "candidate_snapshot": "274edec66fc66655b33637f2edfe3800b280c146",
+  "tested_integration": "1e994cc364b6ed2bf493456b17b9bed2d5eb7d5e",
+  "tested_parents": [
+    "4d4b76b1462f18d70450d51a4ee1c2714d558dd9",
+    "274edec66fc66655b33637f2edfe3800b280c146"
+  ],
+  "integration_tree": "cadfc2b5c8b71e4b9cc8fcd0bdd81d753a95bc62",
+  "integration_source_fingerprint": "35f1a8ca272f43f73332561b6b726b111a5cb0f562f7b16a15b18592fcc1e6de",
+  "notebook_sha256_utf8_lf": "d30c3a6cf85af53b8371ea8eba691709b08a32e0782fe04eba157fcb315900cf",
+  "normalization": "SHA-256 over UTF-8 LF Git blob bytes; docs review prose excluded from implementation manifest",
+  "implementation_files": {
+    "PRIMA_Kaggle_Benchmark.ipynb": {
+      "git_blob": "e52496f5511e318b6ffcbb4e1934fd5362b0b01c",
+      "sha256_utf8_lf": "d30c3a6cf85af53b8371ea8eba691709b08a32e0782fe04eba157fcb315900cf"
+    },
+    "benchmarks/campaign/aggregation.py": {
+      "git_blob": "2136585fbdcf93b2066f32b382a4b3f7918d4dad",
+      "sha256_utf8_lf": "5113cec9b4e0b2bee4675da89d86f70184236932815bd547c14cd6f01067de57"
+    },
+    "benchmarks/campaign/comparison.py": {
+      "git_blob": "65e8bed103616604fc89a1431f7e197dfc3adb1d",
+      "sha256_utf8_lf": "c0f0d37904357828f551bd0cd518ad4a12e78f2691301db0bd9551c06c0e1564"
+    },
+    "benchmarks/campaign/config.py": {
+      "git_blob": "b376ba02e8b9e3367edefb854356d7daa6acfc4a",
+      "sha256_utf8_lf": "0599b316e3bf396727e0ad3b370305ebe1c5d7ca0f9ddc41b6310dfc92646966"
+    },
+    "benchmarks/campaign/full_gpu.example.yaml": {
+      "git_blob": "ed6f84dd5d9434d52bbd48ea5f8ed547ec3b91bd",
+      "sha256_utf8_lf": "b7200477d623043f77c4686f202875f8613ee80a052c71d42b93ece84704d89e"
+    },
+    "benchmarks/campaign/kaggle.py": {
+      "git_blob": "715fd0bfdb1bc595d03c4fd7d0535f3775d3308e",
+      "sha256_utf8_lf": "22972db82aa9caafc3e254abe61e1e87c5a76e8df38e0e4c49da41f908513559"
+    },
+    "benchmarks/campaign/manifest.py": {
+      "git_blob": "670a4784f756b5d9e4ff31bc35b69fcdacd63dae",
+      "sha256_utf8_lf": "ec4d7a9d9ad78cf77b406671743492f016191284ac61e28ff2c6544f1e778c94"
+    },
+    "benchmarks/campaign/orchestrator.py": {
+      "git_blob": "de2e994bf1033204d55eca876bcd583130d06a84",
+      "sha256_utf8_lf": "c216a0fb07c69356199139313caeb39346c46f319c535fc5aa74b7ce90072621"
+    },
+    "benchmarks/campaign/preflight.py": {
+      "git_blob": "b20494380f5fc5afc7460faf7080e4c21bf1753c",
+      "sha256_utf8_lf": "ea44af8cb3e4939872196c948c411b253d00aaef4aac2b3ee43594d2bb704f0d"
+    },
+    "benchmarks/campaign/provider_session.py": {
+      "git_blob": "86810178aba1e4157c1dc74fa2e58f4e9736d7cb",
+      "sha256_utf8_lf": "c3188ac400a2174ad41ca49279c1b7d6aa32c3672de1f71d205b3be6b2cf0ece"
+    },
+    "benchmarks/campaign/registry.py": {
+      "git_blob": "83b060967d00a47eabcd13b19bc0d57d4e8f9314",
+      "sha256_utf8_lf": "9679941fa12f6823dceb80a58856b78b1a1347b4812fc41ea0a437afc398bc2e"
+    },
+    "benchmarks/common/artifacts.py": {
+      "git_blob": "0a3c65c899792709335a55c37887f7102ca1f8c8",
+      "sha256_utf8_lf": "cb3b26e44d4554402f5401339a14d160b14ecb6e2b2fb43b823eaf8daeb86b6c"
+    },
+    "benchmarks/common/bundle.py": {
+      "git_blob": "814886b5f0657d670f460ca4967134e4f93d0bf6",
+      "sha256_utf8_lf": "d27536105696ed9d015e60a3c0f58770e06392344af84bd8de91521242c2d0f5"
+    },
+    "benchmarks/common/reporting.py": {
+      "git_blob": "7653cd5123a1d4ebb47009e102483eacf8d9a35f",
+      "sha256_utf8_lf": "cf01f9bc315974cbb809b7f6b887edfb5f2a1c5fa4d5edc0ec2ff6722a094b7d"
+    },
+    "benchmarks/common/source_identity.py": {
+      "git_blob": "d79b7bd1ccee41b18995327f7ecbe69a24ac21c2",
+      "sha256_utf8_lf": "3ab0266eba741c88277c78d375918e3a0e5de3ada6aef4780a9be8301d500777"
+    },
+    "benchmarks/goemotions/experiment.py": {
+      "git_blob": "f6c0165d61c4344b92d25d0224d4b9be7180fdcb",
+      "sha256_utf8_lf": "4e7d0b3c54682c965e331e8a653bbedbf8b02cb8328a2521892d03b22aa11b72"
+    },
+    "benchmarks/goemotions/training/data.py": {
+      "git_blob": "11c055fbc53557cacaaa29c4f36ed0b2a6bec7c4",
+      "sha256_utf8_lf": "29636fe9f81e3dd898dd724e07a10ceaa9e7d48155db09657ab2421165740c7e"
+    },
+    "requirements-kaggle-retrieval.txt": {
+      "git_blob": "2774aff3ad1568dca0e6cb99fe49ce07398a87dd",
+      "sha256_utf8_lf": "0cc83b4466e645120ac8a06006ff8866ea4b490f950fa9ae8da86279836b7f83"
+    },
+    "requirements-kaggle.txt": {
+      "git_blob": "3c9545b665b1450a2aedfcf2951e1f829276cb4c",
+      "sha256_utf8_lf": "2e074325b0df0d844e47f669cdac030a4eb98d2f49ef61db5695cad7207984e7"
+    },
+    "tests/benchmarks/test_campaign.py": {
+      "git_blob": "7e451ac8e7b2221fd2f4e547887d7122a70a211c",
+      "sha256_utf8_lf": "02ee1f4c4e327a1d450bafe2334d05b3849bd05995fe9e6ea1df93967d3764f6"
+    },
+    "tests/benchmarks/test_goemotions_development.py": {
+      "git_blob": "3cc79a382bbbf33cf1f48f4852eda066e40166e4",
+      "sha256_utf8_lf": "92da6ac65bc81d3a27c1c796f8a1e8f83ed39d794d3cf898c2d8f994f015d4b2"
+    },
+    "tests/benchmarks/test_kaggle.py": {
+      "git_blob": "e3038e860c836c907f02c98225aa30197cb73081",
+      "sha256_utf8_lf": "e5104e7d8b8ff271e88f9e06021803dc327a06452d711c7cbd60cf77039680a6"
+    },
+    "tests/benchmarks/test_kaggle_remediation.py": {
+      "git_blob": "f17503ffbbc2c1461d77a4adc23da17b5c23f0fa",
+      "sha256_utf8_lf": "0a8f8b779eb8571f7213474022107270d6d9c875b3d2e14cf8a6a074baf7e57f"
+    },
+    "tests/benchmarks/test_kaggle_smoke.py": {
+      "git_blob": "936fa5f89b6429501624f69a1231bf68c1e1d895",
+      "sha256_utf8_lf": "10450383b43e1f2023cb416b3e9544c367304cfb98a6af3d26c1b8e68e2da395"
+    },
+    "tests/integration/test_person1_person2_contracts.py": {
+      "git_blob": "3b5c100eec45ff898d71b4db25dbcc698c9e5d36",
+      "sha256_utf8_lf": "f1fdd68c567bca91ed7c8a37e2f5178e463e8647ef422234a629589bbfbd1fb3"
+    }
+  },
+  "commands": [
+    "python -m benchmarks.preflight --json",
+    "python -m compileall -q -x '(^|[\\\\/])(\\.git|\\.venv|venv|external|pytest-tmp|tmp)([\\\\/]|$)' .",
+    "python -m pytest -q --tb=short -o faulthandler_timeout=60",
+    "python -m ruff check .",
+    "python scripts/run_xenon.py",
+    "python -m mypy .",
+    "python -m bandit -q -c bandit.yaml -r .",
+    "python -m pip check"
+  ],
+  "validation": {
+    "pytest": {
+      "passed": 726,
+      "skipped": 2,
+      "warnings": 2,
+      "seconds": 187.45,
+      "deselected": 0
+    },
+    "quality_exit_codes": {
+      "preflight": 0,
+      "bandit": 0,
+      "xenon": 0,
+      "compileall": 0,
+      "ruff": 0,
+      "mypy": 0
+    },
+    "mypy_source_files": 236,
+    "pip_check_exit_code": 0,
+    "notebook_json_compile_outputs": "passed"
+  },
+  "evidence_directory": "evaluation/goemotions/smoke/b4",
+  "log_sha256": {
+    "full-pytest-5.log": "1f2cb5639d1c8d72374f0f794dff942cc73e3439c2604dd0e7a044c6890389cc",
+    "quality-5.json": "56098d9a98fc23d47d73d95aa39a6738d526513d3b011cc44ae6dcd1d2efec90",
+    "preflight-5.log": "863dfb598e623318a8bedc6c3688523a5880e6d7d39c9b2430e83f0f7d12ef4f",
+    "compileall-5.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ruff-5.log": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+    "xenon-5.log": "de48ee6e517b45c8fd80d88a57b3c504158893d34f22d7738148b6e9c9f78351",
+    "mypy-5.log": "534791e1b043378cc1c4ca8387482a022f42b26a9bfe25a4eafcdc3e50e14515",
+    "bandit-5.log": "6d7bbc4b96c7c04763e8a79807cb110b64d503ef98e4104837996ba43ed80e4d",
+    "pip-check-local.log": "672aec65a45bed50e70229c70934a7eebf0462595c459b83023027645d57cccf",
+    "pip-freeze-local.txt": "1c9c267c89531e26e3bec77cc87df4c732fa8ef165d40ff18e8b3a3b24047140",
+    "local-pinned-model.json": "d4218471e030e036fbcf5ca8b31473a443d35af688eecfc8647869fca6d151a3"
+  },
+  "submodule_pins": {
+    "benchmarks/hotpotqa/external": "3635853403a8735609ee997664e1528f4480762a",
+    "benchmarks/locomo-v2/external": "63d8fe08befccfa0967dcd10fd42961ecd8d03af",
+    "benchmarks/locomo/external": "3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376"
+  },
+  "submodule_checkout_status": "uninitialized in integration checkout; frozen scorer-core fixtures used, no fresh external verification",
+  "safe_defaults": {
+    "goemotions": "affect_telemetry_preserve_labels; definitions_schema; same_response",
+    "locomo": "stable64_normal_admission_reflection_off; unpromoted",
+    "full_execution": false,
+    "workers": 1,
+    "model": "qwen3.8:27b",
+    "context": 8192,
+    "max_output_tokens": 512
+  },
+  "pending": [
+    "Human review and later merged/pinned dev",
+    "Actual Kaggle Python/dependency compatibility and live quota",
+    "Pinned CPU learned-model snapshot unavailable in local-only offline lookup; optional real model smoke pending",
+    "Configured Ollama endpoint/model unavailable; production/persistence smoke pending",
+    "Fresh representative two-T4 model/resource/time pilot",
+    "Separate full GoEmotions 5427-ID and LoCoMo 1986-question sessions including failures",
+    "Matched quality/adversarial/correction/reflection/cost promotion gates"
+  ],
+  "warnings": [
+    "Deliberate duplicate ZIP-path rejection warning",
+    "Existing Chroma asyncio.iscoroutinefunction deprecation warning"
+  ],
+  "publication": "No push, PR or merge to dev; validation commits remain separate"
+}

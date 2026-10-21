@@ -19,6 +19,11 @@ DATASET_FILES = {
 }
 
 
+
+def _finite_nonnegative(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value >= 0
+
+
 def validate_replica_models(placements: list[dict[str, Any]], endpoints: list[str],
                             model: str, digest: str, context: int) -> None:
     """Require every explicit replica to retain the same fully resident model/context."""
@@ -87,7 +92,7 @@ def selected_case_ids(mode: dict[str, Any]) -> list[str]:
 
 
 def validate_coverage(manifest: dict[str, Any], checkpoints: list[dict[str, Any]], expected_ids: list[str],
-                      *, expected_count: int, dataset_sha256: str) -> None:
+                      *, expected_count: int, dataset_sha256: str, require_success: bool = True) -> None:
     """Fail closed against independently selected source IDs, count, and dataset hash."""
     selected = manifest.get("selected_ids", [])
     completed = [row.get("case_id") for row in checkpoints]
@@ -97,8 +102,11 @@ def validate_coverage(manifest: dict[str, Any], checkpoints: list[dict[str, Any]
         raise ValueError("Dataset coverage mismatch: missing, duplicate, unexpected or truncated IDs/count")
     if manifest.get("dataset_hash") != dataset_sha256:
         raise ValueError("Dataset identity mismatch during coverage validation")
-    if any(row.get("status") != "complete" or not row.get("prediction") for row in checkpoints):
+    if require_success and any(row.get("status") != "complete" or not row.get("prediction") for row in checkpoints):
         raise ValueError("Dataset coverage contains unsuccessful/incomplete checkpoints")
+    if any(row.get("status") not in {"complete", "failed", "cancelled"}
+           or not (row.get("prediction") or row.get("failure")) for row in checkpoints):
+        raise ValueError("Dataset coverage contains nonterminal or unauditable checkpoints")
 
 
 def require_production_identity(repository_sha: str, model_digest: str, dataset_sha: str) -> None:
@@ -254,7 +262,9 @@ def resource_guard(sample: dict[str, Any], *, vram_gib: float = 12.0,
     gpus, ram = sample.get("gpus", []), sample.get("ram", {})
     if len(gpus) != 2 or len({gpu["index"] for gpu in gpus}) != 2:
         raise ValueError("Exactly two GPUs must be observed")
-    if any(not math.isfinite(gpu["memory_used_mib"]) or gpu["memory_used_mib"] < 0 for gpu in gpus):
+    if any("T4" not in str(gpu.get("name", "")).upper() for gpu in gpus):
+        raise ValueError("Exactly two observed Tesla T4 devices are required")
+    if any(not _finite_nonnegative(gpu.get("memory_used_mib")) for gpu in gpus):
         raise ValueError("GPU safety measurement is invalid")
     if any(gpu["memory_used_mib"] > vram_gib * 1024 for gpu in gpus):
         raise ValueError("Observed per-GPU VRAM exceeds 12 GiB ceiling")
@@ -391,7 +401,9 @@ def estimate_locomo(events: list[dict[str, Any]], full_counts: dict[str, int], *
 
 
 def budget_gate(estimate: dict[str, Any], *, elapsed_seconds: float, session_hours: float = 12,
-                campaign_hours: float = 10.5) -> dict[str, Any]:
+                campaign_hours: float = 10.5, require_live: bool = False,
+                remaining_quota_seconds: float | None = None, quota_age_seconds: float | None = None,
+                pilot_age_seconds: float | None = None) -> dict[str, Any]:
     if not estimate.get("fresh") or not estimate.get("resources_validated"):
         raise ValueError("Full run blocked: fresh complete timing and resource validation required")
     values = [elapsed_seconds, session_hours, campaign_hours,
@@ -401,6 +413,18 @@ def budget_gate(estimate: dict[str, Any], *, elapsed_seconds: float, session_hou
         raise ValueError("Full run blocked: missing/invalid runtime estimate")
     if not 0 < campaign_hours <= 10.5 or not 0 < session_hours <= 12:
         raise ValueError("Budgets cannot exceed 10.5h campaign / 12h session")
+    if require_live:
+        observations = (remaining_quota_seconds, quota_age_seconds, pilot_age_seconds)
+        if any(not _finite_nonnegative(value) for value in observations):
+            raise ValueError("Full run blocked: live quota and fresh pilot observations required")
+        if quota_age_seconds is None or pilot_age_seconds is None or remaining_quota_seconds is None:
+            raise ValueError("Full run blocked: live quota and fresh pilot observations required")
+        if quota_age_seconds > 900 or pilot_age_seconds > 900:
+            raise ValueError("Full run blocked: quota/pilot observations are stale")
+        if estimate.get("final_artifact_reserve_seconds", 0) < 900 or estimate.get("safety_margin", 0) < .2:
+            raise ValueError("Full run blocked: explicit 20% margin and 900-second reserve required")
+        if remaining_quota_seconds < estimate["projected_remaining_seconds"]:
+            raise ValueError("Full run blocked: live accelerator quota is insufficient")
     campaign = estimate["projected_campaign_seconds"]
     session = max(estimate["projected_session_seconds"], elapsed_seconds + estimate["projected_remaining_seconds"])
     shortfall = max(0, campaign - campaign_hours * 3600, session - session_hours * 3600)
@@ -414,10 +438,11 @@ def budget_gate(estimate: dict[str, Any], *, elapsed_seconds: float, session_hou
 
 def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, Any]],
                    selected_ids: list[str], *, resources_validated: bool, max_active_requests: int,
-                   benchmark: str = "locomo") -> None:
+                   benchmark: str = "locomo", cpu_pipeline: bool = False, require_overlap: bool = True) -> None:
     """Match fixed predictions and evaluation decisions, excluding timing/random memory IDs."""
-    if not resources_validated or max_active_requests != 2:
-        raise ValueError("Two-worker pilot did not validate resources and actual overlapping model requests")
+    if (not resources_validated or max_active_requests not in {0, 1, 2}
+            or (require_overlap and not (max_active_requests == 2 or (cpu_pipeline and benchmark == "locomo" and max_active_requests == 1)))):
+        raise ValueError("Two-worker pilot did not validate resources and bounded observed requests")
     fields: tuple[str, ...] = ("prediction", "outcome", "execution_failed", "failure_category", "category",
               "candidate_evidence_ids", "final_evidence_ids", "admitted_evidence_ids",
               "candidate_evidence_recall", "final_evidence_recall", "memory_admission_recall",
@@ -455,3 +480,100 @@ def validate_pilot(sequential: list[dict[str, Any]], concurrent: list[dict[str, 
     if differences:
         raise ValueError("Concurrency changed predictions or evaluation decisions; retain sequential configuration. "
                          f"Mismatched fields by case: {json.dumps(differences, sort_keys=True)}")
+
+
+def observed_backend_slots(log_text: str) -> int | None:
+    """Only observed runner diagnostics count; environment requests are not observations."""
+    import re
+
+    values = re.findall(r"\bn_slots\s*=\s*(\d+)\b", log_text)
+    return int(values[-1]) if values and int(values[-1]) > 0 else None
+
+
+def choose_pilot_workers(baseline: dict[str, Any], candidate: dict[str, Any] | None,
+                         *, benchmark: str, elapsed_seconds: float, min_wall_improvement: float = 0.05) -> dict[str, Any]:
+    """Retain one on missing/noisy/slower evidence; never infer slots from HTTP overlap."""
+    decision: dict[str, Any] = {"workers": 1, "reason": "no_admitted_two_worker_pilot",
+                                "actual_inference_overlap": None}
+    if not candidate:
+        return decision
+    if not 0 <= min_wall_improvement < 1:
+        raise ValueError("Wall improvement tolerance must be predeclared in [0, 1)")
+    try:
+        if baseline.get("workers") != 1 or candidate.get("workers") != 2:
+            raise ValueError("Fresh one-worker reference must precede a two-worker pilot")
+        if not baseline.get("identity") or baseline["identity"] != candidate.get("identity"):
+            raise ValueError("Pilot source/model/data/prompt/runtime identities changed")
+        if baseline.get("selected_ids") != candidate.get("selected_ids") or not baseline.get("selected_ids"):
+            raise ValueError("Pilot populations differ")
+        pipeline = benchmark == "locomo" and candidate.get("cpu_pipeline") is True
+        slots = candidate.get("observed_backend_slots")
+        if slots is None or (slots < 2 and not (slots == 1 and pipeline)):
+            raise ValueError("Unknown/single-slot backend retains one worker")
+        if candidate.get("inference_topology") != "shared":
+            raise ValueError("Matched 27B campaigns require one shared model")
+        validate_pilot(baseline["records"], candidate["records"], baseline["selected_ids"],
+                       resources_validated=baseline.get("resources_validated") is True and candidate.get("resources_validated") is True,
+                       max_active_requests=candidate["max_outstanding_requests"], benchmark=benchmark,
+                       cpu_pipeline=pipeline)
+        times = [baseline.get("wall_seconds_repeats", []), candidate.get("wall_seconds_repeats", [])]
+        if any(len(values) < 2 or any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0
+                                      for value in values) for values in times):
+            raise ValueError("Repeated finite matched wall measurements required")
+        if max(times[1]) >= min(times[0]) * (1 - min_wall_improvement):
+            raise ValueError("Two-worker wall benefit is slower/noisy/inconclusive")
+        budget_gate(candidate["estimate"], elapsed_seconds=elapsed_seconds)
+        return {"workers": 2, "reason": "reproducible_wall_and_budget_win",
+                "observed_backend_slots": slots, "max_outstanding_requests": candidate["max_outstanding_requests"],
+                "actual_inference_overlap": candidate.get("actual_inference_overlap"),
+                "scheduling": "CPU overlap with serialized inference" if pipeline else "two clients; execution overlap observed separately"}
+    except (ValueError, KeyError, TypeError) as exc:
+        return {**decision, "reason": str(exc)}
+
+
+def resource_cadence(samples: list[dict[str, Any]], target_seconds: float, max_gap_seconds: float) -> dict[str, Any]:
+    from statistics import median
+
+    if not math.isfinite(target_seconds) or not 0 < target_seconds <= max_gap_seconds <= 2:
+        raise ValueError("Safety cadence requires a positive target and at most two-second maximum gap")
+    observations: list[Any] = [row.get("elapsed_seconds") for row in samples]
+    if any(not _finite_nonnegative(value) for value in observations):
+        raise ValueError("Missing/nonfinite resource observation time")
+    times = [float(value) for value in observations]
+    gaps = [right - left for left, right in zip(times[:-1], times[1:], strict=True)]
+    if any(gap <= 0 for gap in gaps):
+        raise ValueError("Resource observation times must increase")
+    return {"source": "periodic_nvidia_smi_and_system_cgroup", "target_seconds": target_seconds,
+            "max_allowed_gap_seconds": max_gap_seconds, "sample_count": len(samples),
+            "median_gap_seconds": median(gaps) if gaps else None, "max_gap_seconds": max(gaps) if gaps else None,
+            "missed_deadlines": sum(gap > max_gap_seconds for gap in gaps),
+            "coverage_seconds": times[-1] - times[0] if gaps else 0.0,
+            "complete": len(samples) >= 2 and all(gap <= max_gap_seconds for gap in gaps)}
+
+
+def estimate_independent(records: list[dict[str, Any]], *, full_items: int, workers: int,
+                         campaign_wall: float, packaging_seconds: float, setup_seconds: float,
+                         safety_margin: float) -> dict[str, Any]:
+    """Use measured effective overlap and uncached cost, never divide by requested workers."""
+    if not records or full_items < len(records) or workers not in (1, 2):
+        raise ValueError("Valid full population and measured native records required")
+    timings: list[Any] = [row.get("total_latency_ms", row.get("latency_ms")) for row in records
+               if not (row.get("classification_provider") or {}).get("cache_hits")]
+    values = [campaign_wall, packaging_seconds, setup_seconds, safety_margin, *timings]
+    if (not timings or any(not _finite_nonnegative(value) for value in values)
+            or campaign_wall <= 0 or packaging_seconds <= 0 or safety_margin < .2):
+        raise ValueError("Finite uncached case/wall/packaging observations and 20% margin required")
+    latency_seconds = [float(value) / 1000 for value in timings]
+    if min(latency_seconds) <= 0:
+        raise ValueError("Positive uncached case latency required")
+    measured_factor = min(1.0, campaign_wall / sum(latency_seconds))
+    work = max(campaign_wall * full_items / len(records), max(latency_seconds) * full_items * measured_factor)
+    packaging = packaging_seconds * full_items / len(records)
+    remaining = (work + packaging) * (1 + safety_margin)
+    return {"fresh": True, "workers": workers, "full_items": full_items, "measured_items": len(records),
+            "uncached_timed_cases": len(timings), "measured_schedule_factor": measured_factor,
+            "projection_note": "max of observed wall scaling and uncached slowest-case floor at measured overlap; no assumed slot speedup",
+            "projected_execution_seconds": work, "projected_packaging_seconds": packaging,
+            "safety_margin": safety_margin, "setup_seconds": setup_seconds,
+            "projected_campaign_seconds": remaining, "projected_remaining_seconds": remaining,
+            "projected_session_seconds": setup_seconds + remaining}

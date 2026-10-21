@@ -35,6 +35,8 @@ def execute_mode(
         "generation_config": generation,
     }
     if mode.benchmark == "goemotions":
+        if options.get("sample_manifest"):
+            options["sample_manifest"] = Path(options["sample_manifest"])
         run_goemotions_experiment = import_module("benchmarks.goemotions.experiment").run_goemotions_experiment
         return cast(dict[str, Any], run_goemotions_experiment(
             dataset_path=mode.dataset_path,
@@ -69,6 +71,7 @@ def execute_mode(
         dataset_path=str(mode.dataset_path),
         runtime_profile=mode.profile,
         ingestion_policy=mode.variant,
+        runtime_config=campaign.runtime,
         max_questions=mode.max_items,
         max_conversations=options.pop("max_conversations", None),
         full_dataset=bool(options.pop("full_dataset", False)),
