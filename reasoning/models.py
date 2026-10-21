@@ -8,6 +8,7 @@ from time import time
 from typing import Any
 from uuid import uuid4
 
+from llm.request_budget import RequestBudget
 from memory.retrieval.retrieval_result import RetrievalResult
 
 
@@ -44,6 +45,7 @@ class ReasoningBudget:
     max_context_tokens: int = 1600
     time_budget_seconds: float = 15.0
     no_progress_limit: int = 1
+    answer_reserve_seconds: float = 3.0
 
     max_reflection_interventions: int = 1
     reflection_confidence_threshold: float = 0.6
@@ -59,6 +61,7 @@ class ReasoningRequest:
     budget: ReasoningBudget = field(default_factory=ReasoningBudget)
     caller_metadata: dict[str, Any] = field(default_factory=dict)
     request_id: str = field(default_factory=lambda: f"reasoning_{uuid4()}")
+    shared_budget: RequestBudget | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         forbidden = {"ground_truth", "gold_answer", "expected_answer", "gold_supporting_facts", "correct_answer", "is_gold", "truth"}
@@ -129,6 +132,12 @@ class EvidenceState:
     reflection_advice_confidence: float = 0.0
     trace: list[ReasoningTraceEvent] = field(default_factory=list)
     retrieval_hops: list[dict[str, Any]] = field(default_factory=list)
+    shared_budget: RequestBudget = field(init=False)
+
+    def __post_init__(self) -> None:
+        limits = self.request.budget
+        self.shared_budget = self.request.shared_budget or RequestBudget(
+            limits.max_llm_calls, limits.time_budget_seconds, limits.answer_reserve_seconds)
 
     @property
     def context_tokens(self) -> int:
@@ -150,6 +159,7 @@ class AnswerResult:
     trace_summary: tuple[ReasoningTraceEvent, ...] = ()
     errors: tuple[str, ...] = ()
     answer_diagnostics: dict[str, Any] = field(default_factory=dict)
+    answer_attempt_permitted: bool | None = None
 
     @property
     def final_response(self) -> str:
@@ -182,4 +192,5 @@ class AnswerResult:
             "trace_summary": [event.to_dict() for event in self.trace_summary],
             "errors": list(self.errors),
             "answer_diagnostics": dict(self.answer_diagnostics),
+            "answer_attempt_permitted": self.answer_attempt_permitted,
         }

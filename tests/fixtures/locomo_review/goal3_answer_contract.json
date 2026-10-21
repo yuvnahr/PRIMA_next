@@ -1,0 +1,35 @@
+{
+  "description": "Actual canonical fake-provider output subset; timing is the observed local value, not a performance claim.",
+  "examples": [
+    {
+      "name": "old_unavailable",
+      "runtime_output_data": {}
+    },
+    {
+      "name": "new_bounded_attempt",
+      "runtime_output_data": {
+        "answer_attempt": {
+          "attempted": true,
+          "blocked_reason": null,
+          "outcome": "answered",
+          "permitted": true,
+          "retrieval_stop_reason": "single_pass",
+          "schema_version": "1.0"
+        },
+        "answer_attempt_permitted": true,
+        "request_budget": {
+          "answer_reserve_seconds": 3.0,
+          "bounded_answer_attempts": 1,
+          "llm_calls": 1,
+          "max_llm_calls": 4,
+          "remaining_seconds": 14.995218600000953,
+          "retrieval_calls": 1,
+          "schema_version": "1.0",
+          "time_budget_seconds": 15.0
+        },
+        "stop_reason": "single_pass",
+        "sufficiency_status": "need_more_evidence"
+      }
+    }
+  ]
+}

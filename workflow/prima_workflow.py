@@ -16,6 +16,7 @@ from events.event_types import EventType
 from events.maintenance_events import maintenance_event
 from llm.generation_config import GenerationConfig
 from llm.llm_client import LLMClient
+from llm.request_budget import RequestBudget
 from memory.maintenance.background_supervisor import BackgroundMaintenanceSupervisor
 from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 from memory.maintenance.memory_importance import MemoryImportanceEngine
@@ -214,18 +215,24 @@ class EvidenceAcquisitionController:
             max_hops=int(context.metadata.get("max_hops", 3)),
             max_retrieval_calls=int(context.metadata.get("max_retrieval_calls", 3)),
             max_context_tokens=int(context.metadata.get("max_context_tokens", 1600)),
+            max_llm_calls=int(context.metadata.get("max_llm_calls", 4)),
+            time_budget_seconds=float(context.metadata.get("time_budget_seconds", 15.0)),
+            answer_reserve_seconds=float(context.metadata.get("answer_reserve_seconds", 3.0)),
         )
+        if context.request_budget is None:
+            context.request_budget = RequestBudget(budget.max_llm_calls, budget.time_budget_seconds, budget.answer_reserve_seconds)
         attempt = int(context.metadata.get("evidence_acquisition_attempts", 0))
         context.metadata["evidence_acquisition_attempts"] = attempt + 1
         result = self.reasoning_controller.answer(
             ReasoningRequest(
-                question=active_query,
+                question=context.user_input,
                 session_id=str(context.metadata.get("session_id", "")),
                 mode=mode,
                 budget=budget,
+                caller_metadata={"initial_query": active_query},
+                shared_budget=context.request_budget,
             ),
             retrieve=retrieve,
-            synthesize=lambda _question, _evidence: ("", False, (), {}),
             retrieval_hops=context.retrieval_hops,
             attempt_index=attempt,
         )
@@ -235,10 +242,18 @@ class EvidenceAcquisitionController:
         compressor = replace(self.context_compressor, enabled=compression_enabled)
         compressed = compressor.compress(result.evidence_references, budget.max_context_tokens)
         context.compressed_context = compressed
+        permitted = bool(result.answer_attempt_permitted and compressed.evidence
+                         and compressed.compressed_tokens <= budget.max_context_tokens)
+        attempt_diagnostics = dict(result.answer_diagnostics.get("answer_attempt", {}))
+        attempt_diagnostics["permitted"] = permitted
+        if not permitted:
+            attempt_diagnostics["outcome"] = "blocked"
         result = replace(
             result,
             evidence_references=compressed.evidence,
-            answer_diagnostics={**result.answer_diagnostics, "context_compression": compressed.to_dict()},
+            answer_attempt_permitted=permitted,
+            answer_diagnostics={**result.answer_diagnostics, "context_compression": compressed.to_dict(),
+                                "answer_attempt": attempt_diagnostics},
         )
         return EvidenceAcquisitionResult(result, latest_retrieval)
 
@@ -361,7 +376,10 @@ class ExecutionDecisionController:
         result = self.gate.evaluate(
             context.uncertainty,
             context.world_prediction,
-            retrieval_retry_count=int(context.metadata.get("retrieval_retry_count", 0)),
+            retrieval_retry_count=(self.gate.policy.max_retrieval_retries
+                if context.request_budget is not None and (context.request_budget.retrieval_time_exhausted
+                    or context.request_budget.retrieval_calls >= int(context.metadata.get("max_retrieval_calls", 3)))
+                else int(context.metadata.get("retrieval_retry_count", 0))),
             clarification_required=bool(context.metadata.get("clarification_required", False)),
         )
         history = context.metadata.setdefault("execution_decision_history", [])
@@ -380,6 +398,9 @@ class ReflectionController:
 
     async def execute(self, context: ExecutionContext) -> Any:
         """Run reflection using only workflow-routed subsystem outputs."""
+        if context.request_budget is not None and context.request_budget.remaining_seconds <= 0:
+            context.metadata["reflection_suppressed_reason"] = "time_budget"
+            return None
         retrieval_confidence = getattr(context.retrieval_response, "confidence", None)
         retrieved_memories = tuple(getattr(context.retrieval_response, "results", ()))
         affect_signals = (
@@ -805,6 +826,11 @@ class PrimaWorkflow:
         if context is not None:
             execution_context.user_input = user_input
         _set_source_provenance(execution_context)
+        if execution_context.request_budget is None:
+            execution_context.request_budget = RequestBudget(
+                int(execution_context.metadata.get("max_llm_calls", 4)),
+                float(execution_context.metadata.get("time_budget_seconds", 15.0)),
+                float(execution_context.metadata.get("answer_reserve_seconds", 3.0)))
         return await self.engine.execute(execution_context)
 
     async def cancel(self, context: ExecutionContext) -> None:

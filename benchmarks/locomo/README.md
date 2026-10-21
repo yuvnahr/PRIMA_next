@@ -87,3 +87,18 @@ All candidates remain unpromoted. The opt-in real-cache test is
 `PRIMA_RUN_LEARNED_EMBEDDING_SMOKE=1` with
 `pytest -q tests/test_production_embedding_smoke.py -k pinned_cpu`; ordinary tests use fake
 models and do not download artifacts.
+
+## Grounded answer attempts
+
+Canonical acquisition preserves the original question in supported follow-ups and defers
+generation to the workflow. Eligible low-overlap evidence can receive one bounded attempt
+without being labeled sufficient; the model can still abstain. Shared typed call/deadline
+controls apply before generation and provider retries, with answer time reserved before
+another retrieval hop. Empty evidence, contradiction, hard errors and exhausted budgets
+prevent speculative calls.
+
+Responses and question records add `answer_attempt_permitted`, `answer_attempt` and
+`request_budget`; old observations remain null. The evidence/scorer contract is unchanged.
+`answer_contract_version=1.0` invalidates incompatible experiment resumes. See the
+[Goal 3 handoff](../../docs/locomo-review-remediation.md#goal-3--bounded-grounded-attempts-and-question-preserving-follow-ups)
+for defaults, consumer fixtures, exact checks and pending quality/timing gates.

@@ -35,14 +35,14 @@ def test_adaptive_two_hop_acquires_explicit_bridge() -> None:
     calls: list[str] = []
     responses = {
         "What fact is linked to Alpha?": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge": _response("bridge", "Bridge has the linked fact C."),
+        "What fact is linked to Alpha? Source bridge: Bridge": _response("bridge", "Bridge has the linked fact C."),
     }
     result = ReasoningController().answer(
         ReasoningRequest("What fact is linked to Alpha?", mode=ReasoningMode.DIAGNOSTIC),
         retrieve=lambda query: calls.append(query) or responses[query],
         synthesize=_answer,
     )
-    assert calls == ["What fact is linked to Alpha?", "Bridge"]
+    assert calls == ["What fact is linked to Alpha?", "What fact is linked to Alpha? Source bridge: Bridge"]
     assert result.status is SufficiencyStatus.SUFFICIENT
     assert result.hop_count == 2
     assert [item.source_id for item in result.evidence_references] == ["alpha", "bridge"]

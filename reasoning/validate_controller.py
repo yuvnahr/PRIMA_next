@@ -21,7 +21,7 @@ def _response(note_id: str, text: str) -> RetrievalResponse:
 
 
 def _fixture() -> dict[str, RetrievalResponse]:
-    return {"What fact is linked to Alpha?": _response("a", "Alpha identifies Bridge."), "Bridge": _response("b", "Bridge has the linked fact C.")}
+    return {"What fact is linked to Alpha?": _response("a", "Alpha identifies Bridge."), "What fact is linked to Alpha? Source bridge: Bridge": _response("b", "Bridge has the linked fact C.")}
 
 
 def main() -> int:
@@ -33,7 +33,7 @@ def main() -> int:
         synthesize=lambda _question, evidence: (evidence[-1].note.content, False, (), {"llm_used": False}),
     )
     passed = (
-        calls == ["What fact is linked to Alpha?", "Bridge"]
+        calls == ["What fact is linked to Alpha?", "What fact is linked to Alpha? Source bridge: Bridge"]
         and result.hop_count == 2
         and result.stop_reason == "sufficient"
     )

@@ -391,6 +391,9 @@ def _question_record(
             "official_locomo_f1": official_locomo_score(prediction, question.metadata.get("reference_metadata", {}).get("answer", question.answer), question.category),
         },
         "evidence_audit": audit or None,
+        "answer_attempt_permitted": response.output_data.get("answer_attempt_permitted") if response else None,
+        "answer_attempt": response.output_data.get("answer_attempt") if response else None,
+        "request_budget": response.output_data.get("request_budget") if response else None,
         "candidate_source_turn_ids": candidate_ids,
         "accumulated_source_turn_ids": audit.get("accumulated_source_turn_ids"),
         "supplied_source_turn_ids": audit.get("supplied_source_turn_ids"),
@@ -633,6 +636,7 @@ def run_locomo_experiment(
         "runtime_config": runtime_config.model_dump(mode="json"), "runtime_config_fingerprint": runtime_config.fingerprint,
         "input_representation": representation_identity(conversations, include_captions),
         "retrieval_contract_version": "2.0",
+        "answer_contract_version": "1.0",
         "embedding_identity": embedding_identity, "reranker_identity": reranker_identity,
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)

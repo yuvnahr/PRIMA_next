@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from dataclasses import replace
 from typing import Any
 
 from config.settings import Settings, get_settings
@@ -10,6 +11,7 @@ from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_types import LLMRequest, LLMResponse
 from llm.provider import Provider, ProviderError, ProviderFactory
 from llm.rate_limiter import RateLimiter
+from llm.request_budget import before_provider_call
 from security.output_validator import validate_output
 
 
@@ -81,7 +83,10 @@ class LLMClient:
             if not self.rate_limiter.allow():
                 raise RuntimeError("Rate limit exceeded")
             try:
-                response = self.provider.send(request)
+                budget = before_provider_call()
+                bounded_request = (replace(request, generation=config.with_overrides(
+                    timeout_seconds=min(config.timeout_seconds, budget.remaining_seconds))) if budget else request)
+                response = self.provider.send(bounded_request)
                 validate_output(response.text)
                 return response
             except ProviderError as exc:

@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from llm.request_budget import RequestBudget
+from reasoning.information_need_generator import InformationNeedGenerator
+from reasoning.models import AnswerResult, EvidenceState, ReasoningRequest, SufficiencyDecision, SufficiencyStatus
 from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice
 
 
@@ -89,6 +92,10 @@ class CorrectionLoop:
         query = str(context.metadata.get("retrieval_query_override", context.user_input))
         candidate = " ".join(advice.suggested_query.split())
         action = advice.action
+        if action in _QUERY_ACTIONS and isinstance(context.reasoning_result, AnswerResult):
+            state = EvidenceState(ReasoningRequest(context.user_input), evidence_items=list(context.reasoning_result.evidence_references))
+            decision = SufficiencyDecision(context.reasoning_result.status, context.reasoning_result.confidence, False)
+            candidate = InformationNeedGenerator().supported_query(state, decision, candidate) or ""
         reason = self._rejection_reason(context, advice, query, candidate)
         accepted = not reason
         if accepted:
@@ -140,6 +147,20 @@ class CorrectionLoop:
         query: str,
         candidate: str,
     ) -> str:
+        budget: RequestBudget | None = getattr(context, "request_budget", None)
+        if budget is not None:
+            if budget.remaining_seconds <= 0:
+                return "time_budget"
+            if advice.action is ReflectionAction.REGENERATE:
+                if budget.denial_reason():
+                    return budget.denial_reason()
+                reasoning = getattr(context, "reasoning_result", None)
+                if (isinstance(reasoning, AnswerResult) and reasoning.status is not SufficiencyStatus.SUFFICIENT
+                        and budget.bounded_answer_attempts):
+                    return "answer_attempt_exhausted"
+            if advice.action in _QUERY_ACTIONS and (budget.retrieval_time_exhausted
+                    or budget.retrieval_calls >= int(context.metadata.get("max_retrieval_calls", 3))):
+                return "retrieval_budget_exhausted"
         if not advice.trigger or advice.action is ReflectionAction.NO_ACTION:
             return "no_intervention"
         if advice.contains_evaluation_leakage():

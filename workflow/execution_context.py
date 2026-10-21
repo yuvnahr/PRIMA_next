@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from llm.request_budget import RequestBudget
 from state.cognitive_state import CognitiveState
 from workflow.correction_loop import CorrectionAttempt
 from workflow.workflow_state import WorkflowState
@@ -26,6 +27,8 @@ class ExecutionContext:
     prompt_evidence: list[dict[str, Any]] = field(default_factory=list)
     source_timestamp: datetime | None = None
     source_provenance: dict[str, Any] = field(default_factory=dict)
+    request_budget: RequestBudget | None = None
+    hard_error: str | None = None
     compressed_context: Any | None = None
     reasoning_result: Any | None = None
     plan: Any | None = None

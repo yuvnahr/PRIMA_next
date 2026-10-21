@@ -2,7 +2,7 @@
 
 ## Checkpoint and provenance
 
-Goal 1 (A1): complete at `728709be17f7f8b08f67d01fb06e07c160bd612b`. Goal 2 (A2): implementation and available CPU validation complete; its checkpoint SHA is reported in the completion message. Goals 3–4 have not started. The Goal 1 ledger below records that checkpoint's validation; Goal 2 has its own ledger at the end.
+Goal 1 (A1): complete at `728709be17f7f8b08f67d01fb06e07c160bd612b`. Goal 2 (A2): complete at `6e6f968aa9c219b0ffe86d4d3fa2e4d534830f39`. Goal 3 (A3): implementation and deterministic acceptance complete; its checkpoint SHA is reported in the completion message. Goal 4 has not started. Each goal's ledger records its own checks and limitations.
 Actual base: `c25a178d6308bc48b3a5e44d9519316a5179c499` (the planning snapshot); no intervening tracked implementation changes.
 Predecessor: none. The completed checkpoint SHA is reported in the completion message, not inside its own commit.
 
@@ -11,7 +11,7 @@ This is a clean local clone of the assigned branch because the original `C:/PRIM
 The interpreter is `C:/PRIMA_next/.venv/Scripts/python.exe`, Python 3.14.8. Sandbox execution could not access its base installation; approved execution outside that boundary uses the same existing environment, without dependency changes.
 
 Scope source: `Person_1_LoCoMo_Runtime_Implementation.md`, SHA-256 `43bf76b274adba04947e630eef9fea767d493c2b4976a72090656b4b7f914dab`.
-The first attachment invoked Goal 1; the subsequent attachment `1ae70693-1579-4147-9fbc-5d1d0d20f96e/pasted-text-1.txt` invokes Goal 2 only. The newer four-goal operating contract supersedes the source plan's intermediate PR/merge workflow.
+The first attachment invoked Goal 1; `1ae70693-1579-4147-9fbc-5d1d0d20f96e/pasted-text-1.txt` invoked Goal 2; the latest `3674c88a-9fbf-4d05-9518-a3fa63f0a7ac/pasted-text-1.txt` invokes Goal 3 only. The newer four-goal operating contract supersedes the source plan's intermediate PR/merge workflow.
 The LoCoMo external checkout was initialized from the existing local pinned repository, without a download or external-source edit. Other external submodules remain uninitialized in this delivery clone.
 
 ## Requirement coverage and affected callers
@@ -252,3 +252,86 @@ git -C benchmarks/locomo/external status --porcelain
 The measured output namespace already exists; use a fresh suffix when reproducing it. For Person 2, deserialize one complete candidate mapping with `RuntimeConfig.model_validate`, stage its immutable model revision, and supply `runtime_config=` to the canonical experiment. Shared preflight must invoke the selected auxiliary backend validation/load before admitting a campaign; missing files cannot trigger network loading or hash/lexical substitution. Exact candidate JSON, representation flag/hash, artifact identity and full typed configuration must travel with the run manifest, and persistent dimension changes require an explicitly rebuilt compatible collection. The cross-encoder's real-cache sanity/ranking and resource pilot remain pending after its artifacts are staged.
 
 No Qwen answer generation, GPU allocation, full benchmark, policy promotion, source publication or dependency upgrade is part of Goal 2. Cross-encoder real loading/ranking, fresh integrated Kaggle timing/resources, normal-admission headline answer quality and frozen full evaluations remain later measured gates. Goal 3 starts only after this checkpoint is committed and its final checks pass. Rollback is a scoped Goal 2 revert or an explicitly selected prior safe configuration with a fresh run identity; never reuse incompatible checkpoints or reset `dev`.
+
+## Goal 3 — bounded grounded attempts and question-preserving follow-ups
+
+Actual base/predecessor: `6e6f968aa9c219b0ffe86d4d3fa2e4d534830f39`, the clean `dev-p1` HEAD on entry. Its parent is Goal 1 (`728709be17f7f8b08f67d01fb06e07c160bd612b`). Both checkpoints and their handoff/test ledgers were inspected before editing; current affected suites recheck their audit, scoring, provenance and retrieval contracts. Work remains in the isolated delivery clone. No Person 2 files, external sources, dependency/CI/notebook files or admission/reflection thresholds were edited.
+
+### Requirement and caller coverage
+
+| Requirement | Implementation/callers | Behavioral evidence |
+|---|---|---|
+| Preserve question subject/relation/time | `InformationNeedGenerator` reuses `QueryAnalyzer`, explicit missing-information/unresolved-entity fields, source spans and entity metadata; appends one supported bridge to the exact original question | Multi-hop controller/runtime fixtures; explicit unresolved entity and unsupported/generic-word cases; normalized duplicate checks |
+| Remove both premature gates without claiming sufficiency | `ReasoningController._synthesize`, nullable `AnswerResult.answer_attempt_permitted`, `EvidenceAcquisitionController`, `AnswerGenerationController` | Low-overlap date evidence reaches one actual fake-provider call under default, single-pass, simple-RAG and full routes; status remains `need_more_evidence` |
+| Guard useful-evidence attempts | Same two gates, post-compression permission/size validation and existing eligibility flag | Empty/missing/ineligible evidence, contradiction, hard error, exhausted call budget and expired deadline yield no speculative call; compressed final-prompt audit remains exact |
+| Reserve time and share pre-call accounting | Existing reasoning limits plus `llm/request_budget.py`, execution context, runtime typed options and `LLMClient` retry loop | Answer reserve stops another retrieval while time remains; every retry/correction uses the same allowance; deadline reached during retrieval/provider retry suppresses later calls |
+| Keep canonical generation single-owned | Acquisition calls `ReasoningController.answer` with no synthesis callback; workflow owns the single final model attempt | Four route tests observe exactly one model call; a bounded attempt cannot regenerate or retry the provider |
+| Suppress late reflection/corrections | Reasoning advisor boundary, workflow reflection phase/controller and correction review | Expired deadline prevents advisor/evaluate calls and rejects correction advice; recovered phase failures remain distinguishable from unresolved hard errors |
+| Preserve grounded outputs and audit | Existing factual schema, stricter citation validation, explicit source anchor in evidence text before compression, bounded factual policy | Model abstention accepted; unknown/unreported inline citation labels rejected; actual serialized and cited source IDs still satisfy Goal 1 fixtures |
+| Export compatible consumer fields | Runtime response/compatibility adapter, LoCoMo question records/manifests and fixture | Missing old observations remain null; new attempt/budget fields survive prediction checkpoint roundtrip |
+
+Caller searches covered `ReasoningController.answer`, synthesis callbacks, `InformationNeedGenerator`, verifier/stopping policies, all direct model/provider sends, runtime `execute`/`answer_question`, typed options, acquisition/compression, reflection, phase retries, correction routes, output validation and LoCoMo record/checkpoint consumers. Existing deterministic `reasoning.validate_controller` and `validate_reflection_integration` fixtures now use original-question-preserving queries. Shared integration/provider tests were run read-only.
+
+### Query and answer behavior
+
+A follow-up has the form `Which hospital treated Maya's friend last year? Source bridge: Cedar`, retaining the original question unchanged. A bridge is at most six words/80 characters and must occur in an anchored source span, either as an explicit unresolved/structured entity or after a supported linking expression such as `identifies`, `named` or `friend is`. Capitalization alone grants nothing. Acknowledgements/pronouns, punctuation/case/whitespace variants, unsupported entities and duplicate normalized queries are rejected. No useful expansion stops as `no_supported_expansion` and enters bounded answerability evaluation. Reasoning reflection and workflow query corrections use the same source-supported construction; they cannot replace the question with a generic standalone phrase. No planner/model call was added.
+
+Lexical coverage retains its existing diagnostic/continuation threshold; the verifier and uncertainty/world-risk thresholds are unchanged. New controller results explicitly grant or deny `answer_attempt_permitted` independently of evidence sufficiency. At a normal retrieval stop, eligible nonempty evidence can receive one bounded attempt even with `NEED_MORE_EVIDENCE`. Contradiction, ambiguity, unanswerability, unresolved hard error, unavailable context/call/time budget still block it. Source time is included as labeled evidence data when absent from the source text, before word-budget compression; it is not a fabricated event date. The factual policy permits unambiguous anchored date resolution, complete supported lists and explicit multi-hop composition while requiring abstention when support is missing.
+
+Acquisition defers model execution using an absent synthesis callback. Its final permission is checked after canonical compression. A standalone reasoning caller with an actual synthesis callback must fit the context budget before callback invocation. Workflow generation rechecks eligibility, status, final compressed size, shared budget and hard errors immediately before a call. A phase exception that successfully retries clears its unresolved-error marker while retaining historical error/audit records; an unresolved failure cannot use that recovery path.
+
+One bounded low-coverage attempt disables provider retries even if the supplied generation config requested them, consumes `bounded_answer_attempts=1`, and cannot regenerate after invalid output or model abstention. Ordinary sufficient/conversation correction behavior remains bounded by the existing correction limits and the shared call allowance. All non-abstaining factual memory-grounded answers must report supplied citation labels; unknown labels and inline labels omitted from the evidence list fail parsing. The existing MODEL_ONLY profile remains the explicit benchmark baseline using user-supplied bounded transcript context; it does not receive new memory-evidence permission. Missing reasoning on other factual routes fails closed.
+
+### Typed budget and diagnostic contract
+
+| New/defaulted field | Default and meaning |
+|---|---|
+| `ExecutionOptions.max_llm_calls` | 4, nonnegative; zero explicitly disables model calls |
+| `ExecutionOptions.time_budget_seconds` | 15.0, positive finite; one monotonic deadline for the workflow execution, not one deadline per reasoning pass |
+| `ExecutionOptions.answer_reserve_seconds` | 3.0, finite/nonnegative; effective retrieval reserve is capped at 20% of the total deadline, so short requests remain bounded |
+| `ReasoningBudget.answer_reserve_seconds` | 3.0; standalone factory additionally supports `PRIMA_REASONING_ANSWER_RESERVE_SECONDS` |
+| `AnswerResult.answer_attempt_permitted` | null for old/unobserved results; explicit boolean for new decisions, without renaming/changing sufficiency status |
+| `GenerationResult.blocked_reason` | null unless an actual call is prevented or a late result discarded, e.g. `time_budget`, `max_llm_calls`, `context_budget` |
+
+Canonical callers use the typed `ExecutionOptions` fields; metadata cannot override these controls. The request-owned `RequestBudget` survives phase retries, acquisition retries, reflection corrections and model generations. Retrieval calls are charged before invocation, including failed attempts, against the shared retrieval cap. Existing hop/no-progress limits still apply within each reasoning pass. Context uses the existing approximate word-token accounting and compressor; the context limit, candidate pool and top-k are not increased.
+
+An answer call reserves its allowance before dispatch. The client receives this first prepaid call through a request-local context variable propagated to the worker; each additional provider retry checks the same deadline and charges another allowance before `provider.send`. Actual provider timeout is clamped to the remaining request time. Rate-limit/provider/config failures can conservatively consume a reserved attempt even if no request reaches a server; they never undercharge retries. Standalone non-model synthesis callbacks retain the existing `llm_used=False` convention and release their reservation; production acquisition uses no callback at all. Direct `LLMClient` users outside the canonical request keep their existing standalone retry behavior.
+
+The deadline prevents new retrieval/generation/reflection/correction work and discards late model answers. The async wait is bounded and provider HTTP timeouts are clamped, but a remote server's already-started computation cannot be forcibly cancelled by this client. A worker or synchronous adapter can still drain an in-flight request; integrated wall-time/resource gates remain required. This checkpoint does not claim server-side cancellation or a measured 15-second Qwen service time.
+
+Runtime `output_data` and LoCoMo question records add:
+
+- `answer_attempt_permitted`: true/false, or null when old/unobserved.
+- `answer_attempt` version 1.0: `permitted`, `retrieval_stop_reason`, actual `attempted`, terminal `outcome`, and `blocked_reason`.
+- `request_budget` version 1.0: declared call/time/reserve limits, shared `llm_calls`/`retrieval_calls`, current `remaining_seconds`, and `bounded_answer_attempts`.
+
+Runtime also reports `reflection_suppressed_reason` when a workflow reflection phase is suppressed by the deadline. Existing `stop_reason` remains the retrieval stop reason; it is never replaced with the model answer/abstention outcome. `model_call_count` now includes every charged provider retry and generation/correction attempt, rather than only chat invocations. The final response's `request_budget` is authoritative; the reasoning diagnostic snapshot precedes workflow generation. Permission does not promise that a later call will still have time available.
+
+Old records without these observations export null, not zero or a denial inferred from their outcome. Legacy `AnswerResult` instances with unobserved permission can retain the old `SUFFICIENT` route, but low-coverage permission is never inferred for them; an explicit new denial is authoritative. Evidence audit remains 1.0; question/metric schema stays 2.0 with additive fields and unchanged evidence unions/scorer meanings. LoCoMo manifests add `answer_contract_version=1.0`, so incompatible pre-A3 experiments cannot silently resume under the changed prompt/query/attempt policy. Goal 2 model/vector/representation identities and defaults are unchanged.
+
+Committed consumer examples: `tests/fixtures/locomo_review/goal3_answer_contract.json`, SHA-256 (raw working-tree bytes) `4eb266402af6be397aa8a5ed1e2650c5317be77513f1ae025cce7aadc02ed618`. The new example is an actual canonical fake-provider output subset with observed timing, not a performance measurement. Tests verify old null observations, new low-coverage permission/status separation and checkpoint preservation. Person 2 should consume these fields directly and keep retrieval stop, permission, call accounting and model outcome distinct.
+
+### Goal 3 validation ledger and remaining gates
+
+Initial focused suite: 85 passed / six failed. Five fixtures encoded the old standalone/unsupported query behavior and were updated with supported question-preserving bridges. The sixth exposed an overbroad hard-error check; recovered phase errors now retain audit history without being treated as unresolved failures. Corrected existing focused suite: **91 passed**. New route/budget/citation/query tests then passed **121**, followed by the expanded LoCoMo selection at **149 passed**.
+
+The first broad run passed 341 and failed the unchanged Goal 1 compression/prompt audit: an explicit denial had been computed before compression. The fix defers final context-size permission to the canonical compressor and still checks size before every actual provider call. Broad affected recheck: **342 passed in 41.10 s**. The focused missing-reasoning/legacy-null checks passed **160 in 14.24 s**; the explicit bounded-provider-retry selection passed **43 in 6.89 s**. The last review removed the redundant wall-clock stop check so all deadline decisions use the same monotonic request clock; the final affected route/LoCoMo/workflow/runtime recheck passed **161 in 14.02 s**. Strict affected mypy: **39 source files clean**, with only existing unused override-section notes. Ruff and staged/unstaged diff checks passed, including new files. Both deterministic reasoning validation entry points returned **PASS**. The pinned external checkout is clean. No failing check is being treated as acceptance evidence.
+
+Commands from the delivery checkout, using the existing Python environment:
+
+```powershell
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/test_locomo_review_regressions.py tests/test_locomo_qa_correctness.py tests/test_embedding_backend.py tests/test_answer_prompt_identity.py tests/reasoning tests/retrieval tests/memory tests/evolution tests/lineage tests/workflow tests/reflection tests/runtime tests/evaluation tests/integration/test_runtime_pipeline.py tests/integration/test_release_readiness.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/reasoning tests/test_locomo_review_regressions.py tests/test_locomo_qa_correctness.py tests/workflow tests/runtime tests/test_answer_prompt_identity.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m pytest -q tests/reasoning/test_grounded_answers.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m ruff check benchmarks/locomo memory reasoning workflow uncertainty reflection runtime llm tests/reasoning tests/workflow tests/runtime tests/test_locomo_review_regressions.py tests/test_locomo_qa_correctness.py tests/test_answer_prompt_identity.py
+C:/PRIMA_next/.venv/Scripts/python.exe -m mypy reasoning workflow runtime llm
+C:/PRIMA_next/.venv/Scripts/python.exe -m reasoning.validate_controller
+C:/PRIMA_next/.venv/Scripts/python.exe -c "from reasoning.validate_reflection_integration import main; raise SystemExit(main())"
+git diff --check
+git diff --cached --check
+git -C benchmarks/locomo/external status --porcelain
+```
+
+No matched L4 Qwen development comparison, answer-quality gain, Kaggle timing/resource claim, GPU allocation, model download or production promotion is made. These are deterministic implementation checks using fake providers, including the real `LLMClient` retry boundary with a synthetic provider. Goal 2's cached-model evidence remains its own retrieval-only measurement; it cannot establish quality or cost for the new A3 answer policy. Later matched L4 evaluation must reuse the frozen development controls/candidate identities, report answerable official/legacy F1 and unsupported adversarial outcomes together with actual call/time costs, and pass shared resource/identity gates before any promotion.
+
+Goal 4 requires this committed checkpoint and passing A1–A3 checks, then owns evidence eligibility, admission/reflection policy investigation and final integrated review. Those policies were not started here. Person 2's final integration still waits for Person 1 Goal 4 in a separate pinned integration checkout. Rollback: scoped revert of this Goal 3 checkpoint, preserving prior checkpoints/artifacts and using a fresh run identity; no reset, storage migration or archive rewriting.

@@ -246,6 +246,9 @@ class PrimaRuntime:
                 "max_hops": request.options.max_hops,
                 "max_retrieval_calls": request.options.max_retrieval_calls,
                 "max_context_tokens": request.options.max_context_tokens,
+                "max_llm_calls": request.options.max_llm_calls,
+                "time_budget_seconds": request.options.time_budget_seconds,
+                "answer_reserve_seconds": request.options.answer_reserve_seconds,
                 "context_compression_enabled": request.options.context_compression_enabled,
                 "required_reranker_backend": request.options.required_reranker_backend,
                 "execution_policy": request.options.execution_policy,
@@ -585,6 +588,16 @@ class PrimaRuntime:
                 dict(reason) for reason in getattr(context.reflection_result, "trigger_reasons", ())
             ],
             "generation": generation.to_dict() if generation is not None else {},
+            "answer_attempt": {
+                "schema_version": "1.0",
+                "permitted": reasoning.answer_attempt_permitted if reasoning is not None else None,
+                "retrieval_stop_reason": reasoning.stop_reason if reasoning is not None else None,
+                "attempted": bool(getattr(generation, "llm_called", False)),
+                "outcome": getattr(getattr(generation, "outcome", None), "value", None),
+                "blocked_reason": getattr(generation, "blocked_reason", None),
+            },
+            "request_budget": context.request_budget.to_dict() if context.request_budget is not None else None,
+            "reflection_suppressed_reason": context.metadata.get("reflection_suppressed_reason"),
             "world_prediction": (
                 context.world_prediction.to_dict() if context.world_prediction is not None else {}
             ),
@@ -608,6 +621,7 @@ class PrimaRuntime:
             output_data.update(
                 {
                     "sufficiency_status": reasoning.status.value,
+                    "answer_attempt_permitted": reasoning.answer_attempt_permitted,
                     "hop_count": reasoning.hop_count,
                     "stop_reason": reasoning.stop_reason,
                     "effective_budget": reasoning.effective_budget.to_dict(),
@@ -688,6 +702,8 @@ class PrimaRuntime:
             max_llm_calls=int(budget_data.get("max_llm_calls", 4)),
             max_documents=int(budget_data.get("max_documents", 12)),
             max_context_tokens=int(budget_data.get("max_context_tokens", 1600)),
+            time_budget_seconds=float(budget_data.get("time_budget_seconds", 15.0)),
+            answer_reserve_seconds=float(budget_data.get("answer_reserve_seconds", 3.0)),
         )
         return AnswerResult(
             answer=response.output_text or "",
@@ -704,6 +720,7 @@ class PrimaRuntime:
                 **dict(response.output_data),
                 "runtime_diagnostics": response.diagnostics.model_dump(mode="json"),
             },
+            answer_attempt_permitted=response.output_data.get("answer_attempt_permitted"),
         )
 
     def _runtime_result_from_response(self, response: PrimaResponse) -> RuntimeResult:
@@ -1029,7 +1046,9 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.REFLECTION)
     if WorkflowPhase.ACTION in completed and str(context.metadata.get("task_kind")) == "tool_request":
         executed.add(RuntimeComponent.TOOL_EXECUTOR)
-    if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
+    if WorkflowPhase.ANSWER_GENERATION in completed and (
+        int(context.metadata.get("model_call_count", 0)) > 0 or bool(getattr(context.generation_result, "llm_called", False))
+    ):
         executed.add(RuntimeComponent.MODEL_EXECUTOR)
     if WorkflowPhase.OUTPUT_VALIDATION in completed:
         executed.add(RuntimeComponent.OUTPUT_VALIDATOR)

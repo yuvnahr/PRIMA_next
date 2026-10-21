@@ -22,7 +22,7 @@ def _response(source_id: str, text: str) -> RetrievalResponse:
 def test_runtime_uses_production_retrieval_for_every_adaptive_hop(tmp_path) -> None:
     responses = {
         "What fact is linked to Alpha?": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge": _response("bridge", "Bridge has the linked fact C."),
+        "What fact is linked to Alpha? Source bridge: Bridge": _response("bridge", "Bridge has the linked fact C."),
     }
 
     class FakeRetrievalController:
@@ -48,7 +48,7 @@ def test_runtime_uses_production_retrieval_for_every_adaptive_hop(tmp_path) -> N
     acquisition.retrieval_controller = fake
     result = runtime.answer_question("What fact is linked to Alpha?", reasoning_mode="adaptive", diagnostics=True)
 
-    assert fake.calls == ["What fact is linked to Alpha?", "Bridge"]
+    assert fake.calls == ["What fact is linked to Alpha?", "What fact is linked to Alpha? Source bridge: Bridge"]
     assert result.hop_count == 2
     assert result.stop_reason == "sufficient"
     assert [item.source_id for item in result.evidence_references] == ["alpha", "bridge"]
