@@ -54,7 +54,7 @@ from benchmarks.goemotions.metrics import (
     render_figures,
     same_response_eligible,
 )
-from benchmarks.goemotions.prompts import build_prompt
+from benchmarks.goemotions.prompts import PROMPT_VARIANTS, build_prompt
 from benchmarks.goemotions.schemas import parse_label_response
 from benchmarks.goemotions.systems import (
     LABEL_AUDIT_SCHEMA_VERSION,
@@ -108,6 +108,7 @@ def run_goemotions_experiment(
     provider: str = "ollama",
     model: str = DEFAULT_MODEL,
     system: str = DEFAULT_SYSTEM,
+    prompt_variant: str = "definitions_schema",
     split: str = "test",
     sample_manifest: Path | None = None,
     write_sample_manifest: Path | None = None,
@@ -121,6 +122,8 @@ def run_goemotions_experiment(
 ) -> dict[str, Any]:
     """Run a split-safe affect/classification campaign with per-example resume."""
 
+    if prompt_variant not in PROMPT_VARIANTS:
+        raise ValueError("Unsupported GoEmotions prompt variant")
     attempt_started = time.perf_counter()
     if split not in {"train", "dev", "test"}:
         raise ValueError("split must be train, dev, or test.")
@@ -131,6 +134,9 @@ def run_goemotions_experiment(
     canonical_name = SYSTEM_ALIASES.get(system, system)
     if canonical_name not in SYSTEMS:
         raise ValueError(f"Unsupported GoEmotions system: {system}")
+
+    if canonical_name == "trained_encoder" and prompt_variant != "definitions_schema":
+        raise ValueError("Prompt variants apply only to LLM classification systems")
 
     requested = Path(dataset_path)
     data_dir = requested.parent
@@ -167,6 +173,7 @@ def run_goemotions_experiment(
     if llm_client is None:
         _preflight_provider(provider, canonical_name, generation.model)
     active_system = _system(canonical_name, generation, classifier, llm_client)
+    active_system.prompt_variant = prompt_variant
     root = Path(output_path) / canonical_name
     store = BenchmarkArtifactStore(root)
     if not resume and store.layout.manifest.exists():
@@ -520,6 +527,7 @@ def _manifest(
         benchmark_config={
             "system": system.name,
             "system_family": system.system_family,
+            "prompt_variant": getattr(system, "prompt_variant", "definitions_schema"),
             "label_audit_schema_version": LABEL_AUDIT_SCHEMA_VERSION,
             "label_policy_version": LABEL_POLICY_VERSION if system.system_family != "trained_encoder" else None,
             "legacy_correction_enabled": False,
@@ -686,6 +694,10 @@ def _examples_from_manifest(
     examples: list[GoEmotionsExample], dataset_path: Path, manifest_path: Path
 ) -> list[GoEmotionsExample]:
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if "fingerprint" in payload:
+        from benchmarks.goemotions.development import read_frozen_json
+
+        payload = read_frozen_json(manifest_path)
     if payload.get("dataset_sha256") != _sha256(dataset_path):
         raise ValueError("Sample manifest belongs to a different dataset split.")
     by_id = {example.example_id: example for example in examples}
@@ -798,6 +810,7 @@ def main() -> None:
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--system", choices=SYSTEMS + tuple(SYSTEM_ALIASES), default=DEFAULT_SYSTEM)
+    parser.add_argument("--prompt-variant", choices=PROMPT_VARIANTS, default="definitions_schema")
     parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
     parser.add_argument("--sample-manifest", type=Path)
     parser.add_argument("--write-sample-manifest", type=Path)

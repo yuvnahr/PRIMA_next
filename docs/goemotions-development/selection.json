@@ -1,0 +1,49 @@
+{
+  "classical_trials": [
+    {
+      "balanced": false,
+      "features": "word",
+      "seed": 13
+    }
+  ],
+  "correction_policy": "preserve_labels_v1",
+  "criteria": {
+    "correction_95pct_lower_bound": "strictly_positive",
+    "integrated_cost_required": true,
+    "macro_f1": "nondecreasing",
+    "micro_f1": "strictly_higher",
+    "paired_bootstrap_samples": 1000,
+    "parse_failure_rate_tolerance": 0.0,
+    "per_label_harm_tolerance": 0.0,
+    "seed": 13
+  },
+  "dev_manifest_fingerprint": "a52f38cb539216e2e70f51c9a2b23ff7cac27ffd2a428af3ab555099af7be172",
+  "fingerprint": "e650c545e01e57cdf452ed55ec342c41b356b3bd9058aa9624326592598cacf2",
+  "generation_config": {
+    "fallback_policy": "fail",
+    "max_output_tokens": 512,
+    "model": "qwen3.8:27b",
+    "provider": "ollama",
+    "repeat_penalty": null,
+    "retries": 0,
+    "revision": null,
+    "seed": 13,
+    "structured_output": "json_schema",
+    "temperature": 0.0,
+    "timeout_seconds": 60.0,
+    "top_k": null,
+    "top_p": null
+  },
+  "model_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+  "production_promoted": false,
+  "prompt_templates": {
+    "definitions_schema": "Classify the Reddit comment using the GoEmotions taxonomy.\nReturn every applicable label and no labels that are not applicable.\nReturn one schema-valid JSON object and nothing else: {\"labels\": [\"label\"]}.\nLabels are independent; neutral may coexist with emotion labels.\nAllowed labels: admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral\nDefinitions:\n- admiration: Finding something impressive or worthy of respect.\n- amusement: Finding something funny or being entertained.\n- anger: A strong feeling of displeasure or antagonism.\n- annoyance: Mild anger or irritation.\n- approval: Having or expressing a favorable opinion.\n- caring: Displaying kindness and concern for others.\n- confusion: Lack of understanding or uncertainty.\n- curiosity: A strong desire to know or learn something.\n- desire: A strong feeling of wanting something or wishing for something to happen.\n- disappointment: Sadness or displeasure caused by the nonfulfillment of hopes or expectations.\n- disapproval: Having or expressing an unfavorable opinion.\n- disgust: Revulsion or strong disapproval aroused by something unpleasant or offensive.\n- embarrassment: Self-consciousness, shame, or awkwardness.\n- excitement: A feeling of great enthusiasm and eagerness.\n- fear: Being afraid or worried.\n- gratitude: A feeling of thankfulness and appreciation.\n- grief: Intense sorrow, especially caused by someone's death.\n- joy: A feeling of pleasure and happiness.\n- love: A strong positive emotion of regard and affection.\n- nervousness: Apprehension, worry, or anxiety.\n- optimism: Hopefulness and confidence about the future or the success of something.\n- pride: Pleasure or satisfaction due to one's own achievements or those of someone closely associated.\n- realization: Becoming aware of something.\n- relief: Reassurance and relaxation following release from anxiety or distress.\n- remorse: Regret or a guilty feeling.\n- sadness: Emotional pain or sorrow.\n- surprise: Feeling astonished or startled by something unexpected.\n- neutral: No particular emotion is expressed.\n\nComment: {comment}",
+    "expressed_evidence": "Classify the Reddit comment using the GoEmotions taxonomy.\nSelect every emotion expressed by the comment's author, using evidence in the comment. A topic or quoted emotion alone is not evidence of the author's emotion. Avoid speculative extra labels; preserve all independently supported labels.\nReturn one schema-valid JSON object and nothing else: {\"labels\": [\"label\"]}.\nLabels are independent; neutral may coexist with emotion labels.\nAllowed labels: admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral\nDefinitions:\n- admiration: Finding something impressive or worthy of respect.\n- amusement: Finding something funny or being entertained.\n- anger: A strong feeling of displeasure or antagonism.\n- annoyance: Mild anger or irritation.\n- approval: Having or expressing a favorable opinion.\n- caring: Displaying kindness and concern for others.\n- confusion: Lack of understanding or uncertainty.\n- curiosity: A strong desire to know or learn something.\n- desire: A strong feeling of wanting something or wishing for something to happen.\n- disappointment: Sadness or displeasure caused by the nonfulfillment of hopes or expectations.\n- disapproval: Having or expressing an unfavorable opinion.\n- disgust: Revulsion or strong disapproval aroused by something unpleasant or offensive.\n- embarrassment: Self-consciousness, shame, or awkwardness.\n- excitement: A feeling of great enthusiasm and eagerness.\n- fear: Being afraid or worried.\n- gratitude: A feeling of thankfulness and appreciation.\n- grief: Intense sorrow, especially caused by someone's death.\n- joy: A feeling of pleasure and happiness.\n- love: A strong positive emotion of regard and affection.\n- nervousness: Apprehension, worry, or anxiety.\n- optimism: Hopefulness and confidence about the future or the success of something.\n- pride: Pleasure or satisfaction due to one's own achievements or those of someone closely associated.\n- realization: Becoming aware of something.\n- relief: Reassurance and relaxation following release from anxiety or distress.\n- remorse: Regret or a guilty feeling.\n- sadness: Emotional pain or sorrow.\n- surprise: Feeling astonished or startled by something unexpected.\n- neutral: No particular emotion is expressed.\n\nComment: {comment}",
+    "taxonomy_distinctions": "Classify the Reddit comment using the GoEmotions taxonomy.\nSelect every emotion expressed by the comment's author, using evidence in the comment. A topic or quoted emotion alone is not evidence of the author's emotion. Avoid speculative extra labels; preserve all independently supported labels.\nReturn one schema-valid JSON object and nothing else: {\"labels\": [\"label\"]}.\nLabels are independent; neutral may coexist with emotion labels.\nDisapproval is an unfavorable opinion; annoyance is irritation. Admiration finds something impressive; approval expresses a favorable opinion. Neutral means no particular emotion is expressed; it is not a default extra label. Retain neutral together with emotion labels when independently supported.\nAllowed labels: admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral\nDefinitions:\n- admiration: Finding something impressive or worthy of respect.\n- amusement: Finding something funny or being entertained.\n- anger: A strong feeling of displeasure or antagonism.\n- annoyance: Mild anger or irritation.\n- approval: Having or expressing a favorable opinion.\n- caring: Displaying kindness and concern for others.\n- confusion: Lack of understanding or uncertainty.\n- curiosity: A strong desire to know or learn something.\n- desire: A strong feeling of wanting something or wishing for something to happen.\n- disappointment: Sadness or displeasure caused by the nonfulfillment of hopes or expectations.\n- disapproval: Having or expressing an unfavorable opinion.\n- disgust: Revulsion or strong disapproval aroused by something unpleasant or offensive.\n- embarrassment: Self-consciousness, shame, or awkwardness.\n- excitement: A feeling of great enthusiasm and eagerness.\n- fear: Being afraid or worried.\n- gratitude: A feeling of thankfulness and appreciation.\n- grief: Intense sorrow, especially caused by someone's death.\n- joy: A feeling of pleasure and happiness.\n- love: A strong positive emotion of regard and affection.\n- nervousness: Apprehension, worry, or anxiety.\n- optimism: Hopefulness and confidence about the future or the success of something.\n- pride: Pleasure or satisfaction due to one's own achievements or those of someone closely associated.\n- realization: Becoming aware of something.\n- relief: Reassurance and relaxation following release from anxiety or distress.\n- remorse: Regret or a guilty feeling.\n- sadness: Emotional pain or sorrow.\n- surprise: Feeling astonished or startled by something unexpected.\n- neutral: No particular emotion is expressed.\n\nComment: {comment}"
+  },
+  "safe_default": "affect_telemetry_preserve_labels",
+  "schema_sha256": "59c17e2f50bba826e17d538d3525679b507ccf020871850499df954773355d9f",
+  "split": "dev",
+  "test_inference_enabled": false,
+  "version": 1
+}

@@ -25,7 +25,7 @@ class GoEmotionsExample:
 
 def load_labels(path: Path = DEFAULT_LABEL_PATH) -> list[str]:
     labels = [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    if len(labels) != 28 or labels[-1] != "neutral":
+    if labels != list(LABELS):
         raise ValueError(f"Expected the official 28 GoEmotions labels in {path}.")
     return labels
 
@@ -51,6 +51,8 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
                     raise ValueError("text and example ID must be non-empty strings")
                 if not isinstance(indices, list) or not indices or any(type(index) is not int for index in indices):
                     raise ValueError("labels must be a non-empty integer list")
+                if any(index < 0 or index >= len(LABELS) for index in indices):
+                    raise ValueError("label indices must be in official range")
                 if len(indices) != len(set(indices)):
                     raise ValueError("label indices must be unique")
                 example_labels = frozenset(LABELS[index] for index in indices)
@@ -65,6 +67,8 @@ def load_examples(dataset_path: Path = DEFAULT_DATASET_PATH, label_path: Path | 
         try:
             text, raw_labels, example_id = line.split("\t", 2)
             indices = [int(index) for index in raw_labels.split(",")]
+            if any(index < 0 or index >= len(LABELS) for index in indices):
+                raise ValueError("label indices must be in official range")
             if not text.strip() or not example_id.strip():
                 raise ValueError("text and example ID must be non-empty")
             if len(indices) != len(set(indices)):

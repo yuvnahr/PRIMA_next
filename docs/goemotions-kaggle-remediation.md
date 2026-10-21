@@ -425,3 +425,244 @@ to Goal 4. Full CI/Kaggle Python, GPU resource/time gates, account quota, fresh
 inference, trained-model quality and final notebook migration are not inferred
 from local fake-provider tests or offline metric profiling. No push, PR, merge
 to `dev`, Goal 3 tuning or full production run is part of B2.
+
+## Goal 3: frozen development comparisons and CPU baseline
+
+Delivery branch: `dev-p2`; successful predecessors are Goal 1
+`e0dd105484a2f78fc7a13811c83ef4e04aaad440` and Goal 2
+`def8f76dbe25699e63fd10cedcb9a6afe311ac93`. B3 was implemented in the
+isolated `goemotions-b3` worktree from the exact Goal 2 head. The historical
+planning base remains `c25a178d6308bc48b3a5e44d9519316a5179c499`.
+Status: **Goal 3 implementation acceptance complete; candidates unpromoted**.
+This is the third checkpoint, not Goal 4 or measured release acceptance.
+Its final commit SHA belongs in the completion response.
+
+### Requirement and evidence map
+
+| B3 requirement | Implementation / evidence |
+|---|---|
+| Official labels, split identities, repeated texts | `dataset.py` enforces exact official order and valid nonnegative indices; `training/data.py` validates unique/disjoint IDs and records raw hashes, counts, label-file hash, repeated-text rows and cross-split exact-text overlap |
+| Fixed dev population before scores | `development.freeze_development()` freezes rarest-label proportional-deficit stratification, seed 13, immutable 512 IDs/text hashes/gold, dataset identity and criteria in `docs/goemotions-development/` |
+| Three bounded prompts | `prompts.py` has definitions/schema baseline, expressed-evidence and taxonomy-distinction variants; mixed neutral remains valid; no few-shot examples or test tuning |
+| Exact request/cache and comparison identity | Existing bounded-provider cache already keys exact prompt/system/schema/GenerationConfig; tests verify separate calls for changed variants/text/model/decoding/schema and reuse only exact requests |
+| Separate inference versus same-response policy | `compare_development()` checks frozen dev IDs/order/text/gold, raw-response hashes, prompt/model/schema/generation identities and request/cache provenance; same-response mode rejects changed prompts/raw hashes and parse failures; trained comparisons have a separately attributed frozen artifact identity |
+| Actual CPU baseline and freeze | Existing TF-IDF/logistic pipeline fits train only and thresholds on dev; word/unbalanced/seed13 is the sole preregistered real trial; all 5,426 dev rows were scored and frozen reload metrics matched exactly |
+| Fix incorrect frozen feature declaration | `freeze_tfidf_candidate()` copies the exact fitted artifact instead of always refitting combined features; mismatching features/balance/seed are rejected; word/char/combined synthetic paths are covered |
+| Freeze/load integrity | Artifact manifest binds complete split/label identities, feature settings, logistic parameters, Python/package versions, model and threshold hashes; checks run before joblib unpickling; dev/model/config threshold binding and externally pinned fingerprint are supported |
+| Optional encoder | Explicitly not admitted: no matching live T4 allocation, account quota, sequence smoke or validation/export pilot; existing pinned revision/config recorded; no encoder training/calibration/load-integrity claim |
+| Optional correction | Explicitly not admitted; no allowed edits; no calibrated per-label evidence or integrated cost; preserve-label gain is the tested zero-gain invariant, not a fresh Qwen measurement |
+| Gates, ledger and Goal 4 handoff | Frozen criteria require higher micro F1, nondecreasing macro F1 and zero parse-rate tolerance; paired sample-F1 uncertainty, exact set, precision/recall/cardinality and separate correction populations are reported; compute ledger and exact safe candidate identity remain unpromoted |
+
+All new deterministic regression coverage is in
+`tests/benchmarks/test_goemotions_development.py`. No Person 1 producer/config,
+external submodule/data, canonical notebook, dependency or CI file was changed.
+The original checkout's unrelated documents/directories were preserved.
+
+### Immutable data and preregistration
+
+The four supplied plan documents were read; the source plan's B3 section is
+implemented under the newer four-checkpoint operating contract. Existing CLI
+help was inspected for experiment, classical training and optional training
+before experiments. Existing training/freezing/threshold helpers were reused;
+no new dependency, encoder framework, GPU training or Cartesian search was added.
+
+Available data was read unchanged from the preserved local backup:
+`C:\Users\galad\OneDrive\Desktop\Capstone\code\PRIMA_next\.local-sync-backup-20260831\benchmarks\goemotions\external\goemotions\data`.
+The backup was neither modified nor copied into tracked source. Counts are
+train **43,410**, dev **5,426**, test **5,427**; all IDs are unique within and
+disjoint between splits. Test was read for identity/count/overlap validation,
+never fitted, scored or used for candidate selection. Prior test exposure is
+explicit in the manifest.
+
+| Input | SHA-256 |
+|---|---|
+| train.tsv | `a8336fed4b2f651b11c6a6c65e4dab122fa9da28f49b200a892c71094eeba109` |
+| dev.tsv | `8f629aa53c1b1d6dd023b168e3762a09f4d1f4e575fcd9035c02bd74170ef56b` |
+| test.tsv | `dc3aab545d76079817c3002a77239d53accc11ec8f16313aa19d8e1a8f2e412e` |
+| emotions.txt | `932218ae8b67b25341eec30f785580207e952fa8eb2c917807ad5eb439a8f901` |
+
+Exact-text overlaps count distinct shared text strings: train/dev **41**,
+train/test **32**, dev/test **10**. Repeated rows beyond unique texts are
+train **183**, dev **3**, test **6**. None were removed or merged.
+
+`dev_manifest.json` fingerprint:
+`a52f38cb539216e2e70f51c9a2b23ff7cac27ffd2a428af3ab555099af7be172`.
+`selection.json` fingerprint:
+`e650c545e01e57cdf452ed55ec342c41b356b3bd9058aa9624326592598cacf2`.
+The latter was written before CPU scoring; the driver start record pins it.
+The frozen 512 IDs are the future prompt population. CPU comparisons also
+expanded to all dev, retaining the same predeclared criteria. Raw dev prediction
+and ID-sequence hashes are retained in `cpu_evidence.json`.
+
+The safe candidate is existing `affect_telemetry_preserve_labels`, policy
+`preserve_labels_v1`, prompt `definitions_schema`, matched `qwen3.8:27b` digest
+`aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813`,
+context 8,192, output 512, seed13, temperature0, schema output, one worker and
+full GPU residency required. Production/test execution remains disabled.
+`candidate_status.json` pins its exact configuration and source files (UTF-8/LF normalization, matching
+Git text blobs so Windows/Linux checkout line endings do not alter identity);
+its fingerprint is
+`b1cedd430c8fd341208fefb1500d271ce95cb65c746856d0358828cb677f2013`.
+The final source pin includes a protocol annotation added after scoring; that
+annotation changes no prompt, prediction, model, threshold or selection gate.
+
+### Actual CPU measurements and decisions
+
+Environment: existing Python **3.14.8**, package versions frozen in
+`classical_artifact_manifest.json`; OMP/OpenBLAS/MKL thread limits were each 1.
+Real trial: word TF-IDF, word unigrams/bigrams, min_df2, max_features80,000,
+sublinear TF, unbalanced one-vs-rest liblinear logistic regression, max_iter200,
+seed13. All features/coefficients are fitted from train; thresholds use dev
+per-label F1 on the existing 0.10–0.90 grid in steps of 0.05, minimum support5.
+No alternate real feature/balance trial was added after observing scores.
+
+| Full dev metric | Global 0.5 thresholds | Dev-selected thresholds |
+|---|---:|---:|
+| Micro precision | 0.4791931674 | 0.5063643596 |
+| Micro recall | 0.4133228840 | 0.5985893417 |
+| Micro F1 | 0.4438273163 | 0.5486280707 |
+| Macro F1 | 0.2062097772 | 0.4193352866 |
+| Sample F1 | 0.4570708932 | 0.5633299984 |
+| Exact-set accuracy | 0.4122742352 | 0.3903427940 |
+| Prediction cardinality | 1.0141909325 | 1.3899741983 |
+
+Paired full-dev sample-F1 delta **0.1062591052**, 1,000-resample seeded interval
+**[0.0951362926, 0.1178988293]**. The frozen 512-case comparison also passes the
+metric gate: delta **0.0962890625**, interval **[0.0575520833, 0.1311848958]**.
+There are 2,641 changed predictions: 527 exact-set improvements, **646 exact-set
+regressions**, and 2,785 unchanged. The exact-set loss is retained, not hidden.
+Parse failures are inapplicable to this non-text trained predictor; no parser
+improvement is claimed. Full metrics/per-label distributions remain in the
+ignored result and dev records.
+
+These are **dev threshold-fit gains**, not independent validation or evidence
+that the classifier beats Qwen. Bootstrap resampling of the same threshold-fit
+dev rows does not account for model/threshold selection optimism. The trained
+candidate is frozen but **unpromoted**; it provides no calibrated correction
+scores. No fresh Qwen prompt result, helpful PRIMA correction, encoder result or
+production-default improvement is claimed. Exact-set loss is a review concern.
+
+Fit plus initial dev scoring/threshold analysis took **93.406 s** before the
+batch-loop repair. A subsequent reload and concurrently running broader tests
+stalled with live processes, flat CPU, no artifact progress and waiting loopback
+sockets. Only those task processes were stopped; the completed fit and hashes
+were retained. The exact cause of the Windows socket stall was not established.
+Those incomplete checks are not reported as successes or measured full timings.
+
+The existing CPU helper created one asyncio loop per row. It now uses one loop
+per batch, retaining a separate runtime/affect state per independent example.
+New tests prove both the single-loop behavior and absence of emotional carryover.
+The repaired frozen reload scored **all 5,426 dev IDs**, reproduced every full
+metric exactly, and took **34.0458719000 s**. Sampled process RSS peaked at
+**405,929,984 bytes**, cadence target0.1s. This is current-process RSS only;
+fit peak memory is unavailable because its monitor was interrupted. Neither is
+a system/cgroup/Kaggle memory gate. No speedup ratio or GPU-feasibility claim is
+made from these differently scoped timings.
+
+### Frozen artifacts, compatibility and optional decisions
+
+The trained artifact fingerprint is
+`99ab7a9a3afee350e3ef192a8be05b930605613c6b135da079db42688c8a8376`.
+Model SHA-256:
+`00622b00061d4a3dbabc9b883e3c3b0ab1d92923b9df7bf5596740880e15f752`;
+threshold SHA-256:
+`857e9a6e99a819eb0962ad847c159d6566e9a8f07435fee41573e8a05b36c5d5`.
+The exact fit and frozen model files are byte-identical. Weights (~15.4 MB each),
+full outputs and diagnostics are ignored, not committed. Durable compact evidence,
+selection, ledger, artifact manifest and candidate status are committed under
+`docs/goemotions-development/`.
+
+`freeze_tfidf_candidate()` retains its parameters with optional `source_model`,
+but now requires a fitted companion model and model-bound dev thresholds.
+Legacy unbound artifacts must be rebuilt; no unverifiable legacy model is silently
+accepted. `load_frozen_model()` adds optional dataset/threshold/fingerprint
+checks. `run_frozen_tfidf()` and CLI support `expected_fingerprint` /
+`--expected-fingerprint`; pin it when moving the candidate. Checksums do not make
+untrusted pickle files safe: these are trusted local artifacts.
+`evaluate_frozen_tfidf()` retains its public test-scoring API and settings but
+loads the matching frozen fit instead of refitting. It was not invoked on real
+test data in B3.
+
+The prompt default is byte-identical to Goal 2 (eight old/new combinations checked
+against its committed source and a frozen regression hash). New variants are
+keyword/default-compatible and recorded in runtime metadata/experiment identity;
+changed variants reject stale resumes. New sealed dev manifests are verified
+before any request. Legacy sample manifests remain readable under their earlier
+validation semantics. Classifier decisions receive only text/taxonomy, never gold
+or split fields; dev metadata is attached for evaluation afterward.
+
+Local GPU inspection observed **RTX 3050 Laptop, 4,096 MiB**, not the required
+T4 allocation; localhost Ollama tags timed out. No model was loaded or downloaded.
+Live Kaggle quota/session information is unavailable. DeBERTa-v3-small remains
+not admitted with existing pinned revision
+`a59be8aa63396e73dbb45a1487e4cde4be98bfa4`, max_length128, ceiling3 epochs.
+A future admission requires a documented need after the cheap baseline, Qwen
+unloaded, actual sequence-length smoke, memory/step/validation/export timing and
+an independent bounded session. No optional training, temperature/threshold
+calibration or encoder load-integrity validation was performed or claimed.
+The existing encoder utilities remain unchanged; this checkpoint does not certify
+them for an admitted encoder campaign.
+
+Replacement correction remains not admitted, with **no allowed edits**. Actual
+calibrated scores, immutable training/calibration/revision identities, predeclared
+label edits/margins, neutral-only/mixed/other paired analyses, positive mean and
+95% lower bound above zero, acceptable per-label harm and integrated cost are all
+required before a later proposal. A trained classifier or dev threshold win alone
+cannot authorize it. Preserve-label correction gain remains zero by invariant.
+
+### Validation and next checkpoint
+
+Completed commands use the existing root `.venv\\Scripts\\python.exe` from the
+isolated worktree; no dependency changes or downloads:
+
+```powershell
+& $py -m benchmarks.goemotions.experiment --help
+& $py -m benchmarks.goemotions.training.classical --help
+& $py -m benchmarks.goemotions.training.cli --help
+& $py -m evaluation.goemotions.smoke.b3_cpu.driver
+& $py -m evaluation.goemotions.smoke.b3_cpu.reload
+& $py -m pytest -q tests/benchmarks/test_goemotions_development.py tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks/test_goemotions_metrics_reporting.py --tb=short
+& $py -m pytest -q tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks tests/integration --deselect 'tests/benchmarks/test_kaggle_smoke.py::test_notebook_smoke_stages_native_artifacts_and_partial_packages[goemotions]' -o faulthandler_timeout=45 --tb=short
+& $py -m pytest -q tests/benchmarks/test_goemotions_development.py --tb=short
+& $py -m pytest -q tests/benchmarks/test_goemotions_development.py tests/test_goemotions_upgrade.py --tb=short
+& $py -m ruff check affect benchmarks/goemotions benchmarks/common benchmarks/campaign tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks/test_goemotions_development.py
+& $py -m compileall -q benchmarks/goemotions
+git diff --check --ignore-submodules=all
+```
+
+The CPU driver command produced a completed train/dev fit, then was interrupted
+during reload; the second command is the successful verified reload. Focused
+safety/affect/report regressions passed **139 tests in 20.65 s** before the final
+boundary additions. The final broader affected suite passed **307 tests with
+1 explicitly deselected in 87.57 s**. All then-current 31 B3 tests were included.
+After adding delivery-manifest and baseline-byte checks, **33 B3 tests passed in
+19.15 s**. The final protocol-only/source-pin adjustment was rechecked separately
+below. Ruff, compileall and diff whitespace checks passed.
+
+The sole broader exclusion remains the pre-existing worktree notebook child-Git
+identity test documented/reproduced in B1/B2; it is assigned to Goal 4, not claimed
+fixed here. No full-repository CI, Kaggle Python, full test inference or real GPU
+resource/latency validation is claimed. Person 1 completion remains the user's
+status; its actual producer-consumer integration is a Goal 4 requirement.
+
+Goal 4 must consume the exact safe unpromoted identity and frozen evidence,
+finish notebook/campaign/report consumers and safeguards, and validate its entire
+proposed snapshot with Person 1's pinned final checkpoint in a separate checkout.
+It must resolve the known notebook identity issue, complete required wider checks,
+and keep full execution disabled pending reviewed merged source, fresh matching
+resource/time pilots and live quota. Qwen dev comparisons and independent full
+5,427-ID test evaluation remain pending; all future production sessions must keep
+the original digest/context/coverage and hard resource/reserve limits.
+No push, PR, merge to `dev`, Goal 4 work or full production run belongs to B3.
+Rollback is a scoped revert/new explicit run identity; do not reuse incompatible
+manifests, reset the user's checkout, or discard negative evidence.
+
+Final post-annotation consumer/source checks: **50 passed in 19.26 s**.
+Two final identity/baseline checks passed in **1.01 s** after making source hashes
+explicitly UTF-8/LF-normalized to match Git text blobs across platforms. Selection
+criteria, data identities, prompts and model/threshold bytes were unchanged.
+The exact original checkpoint/ledger files were validated again before staging.
+Local ignored model/evidence directories are preserved in the original checkout:
+`evaluation/goemotions/models/b3_word_unbalanced`,
+`evaluation/goemotions/models/b3_word_frozen`, and
+`evaluation/goemotions/smoke/b3_cpu`. No existing destination was overwritten.

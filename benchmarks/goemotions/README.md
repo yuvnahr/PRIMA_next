@@ -37,9 +37,46 @@ Full development validation:
 .venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system affect_telemetry_preserve_labels --provider ollama --model qwen3.5:4b --split dev --output-path evaluation/goemotions/dev/preserve_labels --seed 13 --parallel-workers 1
 ```
 
-The locally frozen TF-IDF PRIMA candidate is ignored by Git. Build it once, then run its full test split with:
+Goal 3 development selection is frozen in `docs/goemotions-development/selection.json`
+and `dev_manifest.json`: official split/label hashes, 512 stratified dev IDs,
+exactly three templates (`definitions_schema`, `expressed_evidence`,
+`taxonomy_distinctions`) and preregistered promotion rules. The test set was
+previously exposed; it is never used for tuning. Duplicate texts remain distinct
+examples. These manifests contain evaluation metadata; do not pass them into
+classification decisions.
+
+`--prompt-variant` selects the template; it is recorded in the experiment identity
+and invalidates incompatible resumes. Exact prompt/model/decoding/schema/text
+changes invalidate provider caching. Changed prompts require separate requests;
+same-response correction comparisons require identical raw response hashes.
+`compare_development()` checks the frozen IDs, texts/gold, request identities and
+comparison mode, reports paired uncertainty and always leaves production
+promotion disabled. Matched Qwen comparisons use the frozen GenerationConfig
+through the Python/campaign API (512 output tokens), context 8,192, one worker,
+and the exact expected digest. The small-model CLI examples above are smoke
+examples, not matched Qwen quality evidence.
+
+The CPU TF-IDF/logistic system is a separately attributed **trained baseline**.
+Train on train and fit thresholds on dev, using the preregistered word variant:
 
 ```powershell
-.venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --train --data-dir benchmarks/goemotions/external/goemotions/data --output-dir evaluation/goemotions/models/final_candidate
-.venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --model evaluation/goemotions/models/final_candidate/model.joblib --thresholds evaluation/goemotions/models/final_candidate/thresholds.json --data-dir benchmarks/goemotions/external/goemotions/data --split test --output-dir evaluation/goemotions/final/prima_tfidf
+.venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --help
+.venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --train --features word --unbalanced --seed 13 --data-dir benchmarks/goemotions/external/goemotions/data --output-dir evaluation/goemotions/models/word_dev
+.venv\Scripts\python.exe -m benchmarks.goemotions.training.classical --model evaluation/goemotions/models/word_dev/model.joblib --thresholds evaluation/goemotions/models/word_dev/thresholds.json --data-dir benchmarks/goemotions/external/goemotions/data --split dev --output-dir evaluation/goemotions/smoke/word_dev_reload
 ```
+
+Use a new empty training/freeze destination. `freeze_tfidf_candidate()` now copies
+the exact fitted model beside its matching dev thresholds and rejects settings
+that differ from the fit; it no longer silently builds combined features.
+`artifact_manifest.json` pins dependencies, feature settings, seed, label order,
+model/threshold hashes and all split identities. Pin its fingerprint with
+`--expected-fingerprint` at handoff. Loading checks hashes before unpickling;
+use trusted local artifacts only. Legacy unbound models/thresholds must be
+rebuilt through this path. `evaluate_frozen_tfidf()` retains its test-scoring API
+but loads an existing frozen fit instead of retraining. Test inference remains
+for reviewed integration and a later admitted final evaluation.
+
+The measured full-dev CPU result, explicit optional-encoder/correction
+non-admission, selected safe configuration and pending Qwen/cost gates are in
+`docs/goemotions-kaggle-remediation.md`. Dev threshold-fit gains are not
+independent validation, Qwen improvements or PRIMA correction gains.

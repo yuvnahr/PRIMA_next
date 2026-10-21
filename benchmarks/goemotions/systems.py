@@ -42,6 +42,7 @@ class ClassifierSettings:
 
 class GoEmotionsSystem(Protocol):
     name: str
+    prompt_variant: str
     system_family: str
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
@@ -64,12 +65,14 @@ class _LLMPredictionSource:
     include_definitions: bool
     schema_constrained: bool
     client: LLMClient = field(repr=False)
+    prompt_variant: str = field(default="definitions_schema", kw_only=True)
     last_raw: str = field(default="", init=False)
     last_metadata: dict[str, Any] = field(default_factory=dict, init=False)
 
     def predict(self, text: str) -> EmotionPrediction:
         prompt = build_prompt(
-            text, list(LABELS), include_definitions=self.include_definitions, structured=self.schema_constrained
+            text, list(LABELS), include_definitions=self.include_definitions, structured=self.schema_constrained,
+            variant=self.prompt_variant,
         )
         if hasattr(self.client.provider, "reset_request_metrics"):
             self.client.provider.reset_request_metrics()
@@ -82,6 +85,7 @@ class _LLMPredictionSource:
         self.last_raw = response.text
         self.last_metadata = {
             "benchmark_prompt": prompt,
+            "prompt_variant": self.prompt_variant,
             "provider_response": response.raw,
             "provider_usage": dict(response.usage or {}),
             "probabilities_available": False,
@@ -168,6 +172,7 @@ class _RuntimeClassificationSystem:
     generation: GenerationConfig
     name: str
     system_family: str
+    prompt_variant: str = field(default="definitions_schema", kw_only=True)
     _client_instance: LLMClient | None = field(default=None, init=False, repr=False)
     _runtime_local: threading.local = field(default_factory=threading.local, init=False, repr=False)
 
@@ -267,7 +272,7 @@ class ModelOnlyZeroShotSystem(_RuntimeClassificationSystem):
     system_family: str = "model_only"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, False, False, self._client()))
+        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, False, False, self._client(), prompt_variant=self.prompt_variant))
         metadata["final_scored_labels"] = list(metadata.get("baseline_labels", []))
         return raw, metadata
 
@@ -278,7 +283,7 @@ class SchemaConstrainedModelOnlySystem(_RuntimeClassificationSystem):
     system_family: str = "model_only"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, True, True, self._client()))
+        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, True, True, self._client(), prompt_variant=self.prompt_variant))
         metadata["final_scored_labels"] = list(metadata.get("baseline_labels", []))
         return raw, metadata
 
@@ -312,7 +317,7 @@ class BoundedAffectDecisionSystem(SchemaConstrainedModelOnlySystem):
     system_family: str = "bounded_affect_decision"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        return self._execute(text, _BoundedLLMPredictionSource(self.generation, True, True, self._client()))
+        return self._execute(text, _BoundedLLMPredictionSource(self.generation, True, True, self._client(), prompt_variant=self.prompt_variant))
 
 
 @dataclass(slots=True)

@@ -1,0 +1,3770 @@
+{
+  "algorithm": "rarest_label_proportional_deficit_v1",
+  "dataset_identity": {
+    "counts": {
+      "dev": 5426,
+      "test": 5427,
+      "train": 43410
+    },
+    "duplicates": {
+      "dev": 0,
+      "test": 0,
+      "train": 0
+    },
+    "exact_text_overlap": {
+      "dev_test": 10,
+      "train_dev": 41,
+      "train_test": 32
+    },
+    "fingerprint": "4ae16dde0dc5f9503c7e216f5cdc59ab89d800cf51a425eb683bfe863a6b44b5",
+    "hashes": {
+      "dev": "8f629aa53c1b1d6dd023b168e3762a09f4d1f4e575fcd9035c02bd74170ef56b",
+      "test": "dc3aab545d76079817c3002a77239d53accc11ec8f16313aa19d8e1a8f2e412e",
+      "train": "a8336fed4b2f651b11c6a6c65e4dab122fa9da28f49b200a892c71094eeba109"
+    },
+    "label_sha256": "932218ae8b67b25341eec30f785580207e952fa8eb2c917807ad5eb439a8f901",
+    "labels": [
+      "admiration",
+      "amusement",
+      "anger",
+      "annoyance",
+      "approval",
+      "caring",
+      "confusion",
+      "curiosity",
+      "desire",
+      "disappointment",
+      "disapproval",
+      "disgust",
+      "embarrassment",
+      "excitement",
+      "fear",
+      "gratitude",
+      "grief",
+      "joy",
+      "love",
+      "nervousness",
+      "optimism",
+      "pride",
+      "realization",
+      "relief",
+      "remorse",
+      "sadness",
+      "surprise",
+      "neutral"
+    ],
+    "overlap": {
+      "dev_test": [],
+      "train_dev": [],
+      "train_test": []
+    },
+    "repeated_text_rows": {
+      "dev": 3,
+      "test": 6,
+      "train": 183
+    }
+  },
+  "dataset_sha256": "8f629aa53c1b1d6dd023b168e3762a09f4d1f4e575fcd9035c02bd74170ef56b",
+  "fingerprint": "a52f38cb539216e2e70f51c9a2b23ff7cac27ffd2a428af3ab555099af7be172",
+  "label_support": {
+    "admiration": 48,
+    "amusement": 28,
+    "anger": 20,
+    "annoyance": 22,
+    "approval": 37,
+    "caring": 15,
+    "confusion": 16,
+    "curiosity": 26,
+    "desire": 7,
+    "disappointment": 18,
+    "disapproval": 29,
+    "disgust": 8,
+    "embarrassment": 3,
+    "excitement": 9,
+    "fear": 9,
+    "gratitude": 30,
+    "grief": 1,
+    "joy": 16,
+    "love": 22,
+    "nervousness": 2,
+    "neutral": 160,
+    "optimism": 18,
+    "pride": 1,
+    "realization": 12,
+    "relief": 2,
+    "remorse": 6,
+    "sadness": 15,
+    "surprise": 13
+  },
+  "prior_test_exposure": true,
+  "samples": [
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "eczegcw",
+      "text_sha256": "064de0487892acf1b01afb2839f79e7439507ad6065182b52de3b34553ee6047"
+    },
+    {
+      "gold_labels": [
+        "desire"
+      ],
+      "id": "eczlibq",
+      "text_sha256": "963d0ec83e0a653f6a7c681fbdb4b1d10326f3d172ca252820e77eb47122b201"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ed00f1z",
+      "text_sha256": "67ac737f83f722a0fc27ebd67f85115ffc864079d0c945df3b6dc6c13250d8d7"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ed04vcn",
+      "text_sha256": "59ea2f587f8615ea4f67f255a4d9f5d02fc05a22d57e79d5e9e01ba5138f0738"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "ed052gn",
+      "text_sha256": "074e2ca313eb37e618f03569666eb921ba9964ff63cfa36c7943c6ce4adaeadb"
+    },
+    {
+      "gold_labels": [
+        "fear",
+        "sadness"
+      ],
+      "id": "ed08f83",
+      "text_sha256": "b702c7d16116e84149bbdc216a5575805deab84ae8a81b654140e54efd0f5c5b"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ed0ckbc",
+      "text_sha256": "f678b577c967d724c025b8bde95f836cdfd93171994cea5ef2aacbf22dcb0585"
+    },
+    {
+      "gold_labels": [
+        "excitement",
+        "joy"
+      ],
+      "id": "ed0ht04",
+      "text_sha256": "debc4c85a5772b766642783caad06860e3df1770d8d4bc0a26b60ea13d933ebb"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed0p4fj",
+      "text_sha256": "1ca030d337553d5f07ace800e86782d24a191cab6f4ceb4f091823c219b639df"
+    },
+    {
+      "gold_labels": [
+        "nervousness"
+      ],
+      "id": "ed0qc9b",
+      "text_sha256": "596de61c027e33b90277e0a907db3ef54fa7a81d74e6e3171e0eeeff779e03fd"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed10389",
+      "text_sha256": "d0d57163d4c036a9c370e3577ca28dd428511ef8501b91ca47a8609ef137df2b"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ed1iyxq",
+      "text_sha256": "0eaf63239be791b68c20f3279c716a78f7c3e3d92a1dabc0a9a0a653180655f8"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "optimism"
+      ],
+      "id": "ed1khya",
+      "text_sha256": "e283632f09b9b264f42035ed683aa06827d2e319b5b2519b3306078737bbae94"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed1rhc1",
+      "text_sha256": "271df521725221e292c2d79fcd315b3f5da2ae2447aa7a609e5cd8f7ccee9895"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed1vkck",
+      "text_sha256": "e7139fa2775fcaac968fd727a4b88aa0c348aa9da21ae136ae6d7be430438cc3"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "ed268zj",
+      "text_sha256": "80540ce6995786fd25c12cd619e99cffb26698aea480fb826ebcaeb2cdb5ab00"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "excitement"
+      ],
+      "id": "ed28149",
+      "text_sha256": "ef96333bffea10fa0c6205cef98972501dbd23c0052d2841915e0a27c4ab29b9"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "ed2dfq8",
+      "text_sha256": "b8dcfb53c7215520f6eb3ab51b10026a727e6f1a459507bb7f771dc38fd83c90"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ed2i5q7",
+      "text_sha256": "0d2e415c5d25912c2765babc205d44690283592682f3957c781823aeed4b45c8"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "ed2p75a",
+      "text_sha256": "3866a644ce8f8544e58391408a88ced731db8112cb4606cfcdc07fcb1e0a2a1e"
+    },
+    {
+      "gold_labels": [
+        "gratitude",
+        "love"
+      ],
+      "id": "ed2rmrl",
+      "text_sha256": "d4cb6343abfa8b0e80654127c91e69934896266b822b0ab48d87b0b24b205b14"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ed2v3de",
+      "text_sha256": "1ed40f33339745517da980c8869e735e2c87d0768284a71e724ab17e71b9a9ab"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ed30q3l",
+      "text_sha256": "e5d1ece8c4ebf695517b647a8a69cfa01b6e96990f7a6563c3db707ca666bd4c"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "ed33qer",
+      "text_sha256": "c7deb5b161a71b3d8ea123dbf8f8d4ac1739f3c7c1c7f050f0c194d08ac95e10"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ed3esh5",
+      "text_sha256": "909416b69a302752ddb1e084c06b6c5446f9e57abc932bf0436652210ecda177"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ed3p6dr",
+      "text_sha256": "de35ed4bb2333416c89469c461ee9642424c1072d7f17358350b01ae7067186f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed3prrk",
+      "text_sha256": "93fdeb9e387cc33765e24727cddc97593071bd094ef04a4185155417b3ad604b"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed43nr8",
+      "text_sha256": "b597925880066d1146016d9e0c4169ddc2d6caa5ac2b415c6f79bb165e83f6ba"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed448cc",
+      "text_sha256": "44b149c0a0976117249cc8df0bbf602db016368f3354efcb4bbb7d43d90bed9a"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "neutral"
+      ],
+      "id": "ed49znk",
+      "text_sha256": "2c696ef5cb03b52139c94b15023cde1c2a9a35ed88d007b572cc874f85a58389"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ed4bi2a",
+      "text_sha256": "67a4b8816b01c69a2a390510e24bfe1d51a1ef736377ced4849b0bd5b1d8363e"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ed4il7w",
+      "text_sha256": "45d56b5365a66235a60f221b98a8d2740a3af9cb9f7bef3ca768d285308797af"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "ed4rcx5",
+      "text_sha256": "de2fab2ef4649a4333c3c27a411bb12fb5da8a21f4042c27d9c5b3396a9c4460"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed4vnbs",
+      "text_sha256": "84d55d359971a49358a5b87da68f9851bda61dbfcf9235ff901ec378bf989671"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ed53xeo",
+      "text_sha256": "078009666eeaeb091bc6223dcd00cd05d63f139f888feddd9a1bc042599c0b8d"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "ed54njm",
+      "text_sha256": "76c2519761d8bdeab0460d6f42cb57eb4f320052ba0c1d94d9d08954b0965589"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed5bawt",
+      "text_sha256": "f48447f8d137e620d77f7db90b50d55c9b3df9bd95de14d5a81c154e23b3c128"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed5cuw6",
+      "text_sha256": "9e2ee0d2f38e79d20136d305747808e7ead3ff49947dac8ac2c226df0c0f99aa"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed5dbu7",
+      "text_sha256": "1853b5cd4a5928dc4becf62ca7d3b4157b91ead3f69b2381a30797070c4da338"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ed63d0e",
+      "text_sha256": "3536794ea69b39f233f449b97b791377aa1009e1269362ad6a630f85b3d279c8"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "love"
+      ],
+      "id": "ed69y9w",
+      "text_sha256": "b23fa13c4fe2f5f78adc8b62b82614dfca1110e9997ecf2b5841333793c359b4"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "love"
+      ],
+      "id": "ed6b050",
+      "text_sha256": "10e53b324633b5e654621f565a592d7da28fedc7351fad7e959dad311c9a3485"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "gratitude"
+      ],
+      "id": "ed6c84a",
+      "text_sha256": "7b1761af90750fa6e922aaca08c3ed40bc9aa3ee2710120eb102437620e302d9"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed6snhc",
+      "text_sha256": "f4c41d0b4a4dd96bdb7259deb511b2c1f8e7a51c8bc8158fc209661d7bad17b3"
+    },
+    {
+      "gold_labels": [
+        "excitement",
+        "joy"
+      ],
+      "id": "ed6vhp6",
+      "text_sha256": "b33898a6d87269c053abb0160c45bba8329ff32ef8c16de7ff364fd75cda45e8"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ed70lwg",
+      "text_sha256": "369ac790e9235fd6b3e12f091c3b79d459bf829aff0298ed6df26c2c201ce3e1"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "ed7yj4s",
+      "text_sha256": "83de519010777235b5c6d21fbb5c71ae6ca770ecf50c0b49cae6114309d13d01"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed82v4u",
+      "text_sha256": "f13c553453db05a39151246118b628d876f127ab5539bc30aa1b66c7deaa353e"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "ed8dv0o",
+      "text_sha256": "50ca867cc05d9aa6522bfd202cbec4a3c39ce62dcd49f23c90b17dfb6ed826d6"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "curiosity"
+      ],
+      "id": "ed8dwyi",
+      "text_sha256": "007b51d4ff8f310972c8ada2031a1dbe8e0eb702691150b5b5d6f177d36c3beb"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ed8fnik",
+      "text_sha256": "15364960f5b564b7d2f9b734739e071d454ff5162a62bb7b9ec9fac2e9459c52"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed8i7ql",
+      "text_sha256": "b9024b78a614e3d54b287cbc3701544941fd34a516591fe1429501e68ff4be9c"
+    },
+    {
+      "gold_labels": [
+        "confusion",
+        "realization"
+      ],
+      "id": "ed8nrpl",
+      "text_sha256": "d18356dcb28e0fdc77fa360872c3cef98efc338c855277258993fbfa2708beed"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ed8p8um",
+      "text_sha256": "e86dd40bcb04da76367099709610327ced078a7f4c8e2c8fe442248e96e866f8"
+    },
+    {
+      "gold_labels": [
+        "confusion",
+        "curiosity"
+      ],
+      "id": "ed8pz0b",
+      "text_sha256": "87abc6591e21670b9629d56b1db8bc4a548a62486884d603f101ef65f3fd98e4"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed93cct",
+      "text_sha256": "439990d5808c9140626310c41da22254986dede68e30f648b77bb5a7b7f675f5"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ed9g8qx",
+      "text_sha256": "73cb96d750155e78fd4c8985c6bec879aa352e865d3184a7da824e1a04b7e372"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ed9ugmn",
+      "text_sha256": "f4865d8510987033b9dfa42faeb0350683da632bd46f1300626950b2554fef76"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eda1xr0",
+      "text_sha256": "69c887e5eefc5386dab585b6a65912750a4ffe247f2c377d4cf0176a34b5c26d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eda6yn6",
+      "text_sha256": "cea0ced9e61b3466b42dfcc86971715366601e5338804cbdd0d68278cb287ba4"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edagpsw",
+      "text_sha256": "801201221792918d181e6391452c5a75001d589262f1836a957105669cac8506"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "edahxv0",
+      "text_sha256": "45783084c4a78bdc5e04c73b7b91036722d73ebc134949688d520415541fd6ec"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "edahy1i",
+      "text_sha256": "999094b23177f0ccbf09f870fc8f30009758e112f394571d7ca71a0d1f353586"
+    },
+    {
+      "gold_labels": [
+        "curiosity",
+        "excitement"
+      ],
+      "id": "edao790",
+      "text_sha256": "86ca6ad0a3a3aacf875c1797cf0161caad93c27daafff7f9379dbe6560774332"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edap66u",
+      "text_sha256": "0ef539ef720e3eb244f6d466a0681349af5bdb1eb9b28402340632d518b91751"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edaso61",
+      "text_sha256": "3909f3ba1a87db7c6fcf99bb33dfb4ca9ed109d663310f15ba2f5c6ef0d8021e"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edb516f",
+      "text_sha256": "43dfa0994ef8d64cf76a09f3385cb690e2a6be1c61c8bce26acc2f968042190f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edbd21h",
+      "text_sha256": "fa17b927d64cbaec0581e8f8ed29925ee24db8c0e4df19c1a8b2accfb1931b42"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edbgruk",
+      "text_sha256": "632f94d9c2d2560042273af79fc4b1e70f0d40956cb84172003ac536021a9d21"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edboeho",
+      "text_sha256": "9805bd0bc4eac567330ca6313c6bcaa31c01179cad6806a9c698af46c0d9c593"
+    },
+    {
+      "gold_labels": [
+        "neutral",
+        "optimism"
+      ],
+      "id": "edbq7pd",
+      "text_sha256": "611f607523d4d33034935b019486e217c40005809faf76a0c8b66da092b7112a"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edbt0hf",
+      "text_sha256": "5fc56341f45c1cb151b35e2c0a4186f1b9e6539b2c5ff0c9e010283484b3d001"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "edbw2gj",
+      "text_sha256": "8cc45df90e268d34c6658de79685f6e7ed40e5bdc3b4525812d7363405907bdb"
+    },
+    {
+      "gold_labels": [
+        "disapproval",
+        "relief"
+      ],
+      "id": "edbwyh3",
+      "text_sha256": "dcbef4aab8b3b478cfb9dbfab41d7c6f46b44c33d11880a918810db8d63c7098"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "edbys2f",
+      "text_sha256": "cfa791613e56db32e70500289cd2e618ef07cef97d49feafc541a59f0167a376"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edc52hm",
+      "text_sha256": "f3bb11645cdd612859367a5c763a3ea9262dfe94010088469d558e19804e3f01"
+    },
+    {
+      "gold_labels": [
+        "desire"
+      ],
+      "id": "edc7r5w",
+      "text_sha256": "45da84d114e56c42927f2d77872bbf10862fa84856c87d1518a70a01c178059a"
+    },
+    {
+      "gold_labels": [
+        "gratitude",
+        "remorse"
+      ],
+      "id": "edce553",
+      "text_sha256": "195ce00d4f83075ea0945e224e39656ca9f1c291560dae2efa1b3827f403f704"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edchkwv",
+      "text_sha256": "b27b5c002941453eb978d9963f639f07a8bebb09140934bba09f6127dd2c6a39"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edclq07",
+      "text_sha256": "d322c7d108e03d0a9dc2552155bc5e744e0104249c44f38609e3e5d088d5eacc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edclxfh",
+      "text_sha256": "e89bf70719bb892b3fe8c2673c3b4d46a4c08768c1ecf9f866ea3f864466b935"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edcx5mn",
+      "text_sha256": "9616f17be1d56f3b48ed6a9b67cac9284c4f4d8b4beb82b2716619029a277ec8"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edd09ir",
+      "text_sha256": "df8f667cb39b0d0df77f5bbe23e129c9d8c0a9ee6a15ac23fd64c8185e22a5ff"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "joy"
+      ],
+      "id": "edd64rq",
+      "text_sha256": "831a19a0469410bb0823cc6c9a5a9595f04b6bdc49cbb56516a1512d8efdeab9"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eddfj5p",
+      "text_sha256": "d2c8fb6bd4beca5d11732850e0d81fb2fa9e55c473dc7e26ca554471b4530784"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "eddjzwg",
+      "text_sha256": "dc4c4adf3090a519879b77b0d392409cdb4f2659865af0f77d4adcf36aef3b7a"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eddovr8",
+      "text_sha256": "d1e7327d88c4ab0d95a1fbccb42f7c4dcc4bbb7855d8aa029f03c370568ba957"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "eddplp2",
+      "text_sha256": "6b2213ed4f283bd93c7658a424ac73f56a9994bd7e4e23189878b4cef567cd13"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eddy0y0",
+      "text_sha256": "dda9483fc39dc3c3c640387c509716983e7c6a407e16eea38a21ec392f7dc061"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ede0374",
+      "text_sha256": "56f60481bd06d2cc79fc952364dd3d8d62f488769063ff206b886cfb0dcd7c87"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ede0kvr",
+      "text_sha256": "33788ad651eabc803846d60d446235264dadbf36871f42456a26e8bf5e3f6823"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ede7csf",
+      "text_sha256": "19b77355eddc22e0885555703c3d70b8ed3bd3e344408b781559032ac4b07b7c"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "edem48z",
+      "text_sha256": "705d82518b90f3cb2c9d50a7870ee1ce46b7768fef39689b83cf26622309cf43"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "edet9yg",
+      "text_sha256": "428ab818cf4c2b890dc2635afb279fc1a97517bd3ccb32fbf68aa70d1a56d37b"
+    },
+    {
+      "gold_labels": [
+        "desire"
+      ],
+      "id": "edf3twh",
+      "text_sha256": "6c11e053a035dbfc079599371650072f28166cd93747c9f2a37d340ec215b7d3"
+    },
+    {
+      "gold_labels": [
+        "embarrassment"
+      ],
+      "id": "edfozau",
+      "text_sha256": "b4f369e942a74d2ed4acf95e3b24e5b95eef39e6f01aaf139a9f167fb4e32aa2"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edfp5mz",
+      "text_sha256": "89f82d9698b1bf0ab3da95c85232518cbd70f86d0665b9b83d1d90d836e86a57"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edfq79n",
+      "text_sha256": "ded3e8810422a925e43d16c16e21a30d3e4cb80274b29e80879f9ddb3937c8ca"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "annoyance"
+      ],
+      "id": "edfu4fx",
+      "text_sha256": "61c5fab9a675136447782a261d59adcd76b3a835b19750b744176c0d45b691ec"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edfv0s8",
+      "text_sha256": "0eb41575bef5c50c4e089aa0229ab0e52b10df3c32d4a2faa541fc0427075c34"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "edg0er1",
+      "text_sha256": "477c92b9345beafc29968709f5d65fffe5cb3ce824d2411710fe135f64d9ca1a"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edg1qui",
+      "text_sha256": "09533b1d564ca81a60f3076b44a173fbd6a195890a9bdd9e61f3a3b1f42b2427"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "edgeht1",
+      "text_sha256": "355d792ef1f96506a304f025ae685d12f10ebb3aeb98e76e71ccbddc992469b2"
+    },
+    {
+      "gold_labels": [
+        "disappointment",
+        "neutral"
+      ],
+      "id": "edghrs5",
+      "text_sha256": "fba7e6475516e10b4db3f7f0353736946683a3d46abfac405a517460f79953f5"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edhe7pc",
+      "text_sha256": "3fdc624a6d9445ec0daf11ab0958a501e920f9a0a55b58ad3953bef2de409017"
+    },
+    {
+      "gold_labels": [
+        "desire"
+      ],
+      "id": "edhn3of",
+      "text_sha256": "ec920ac1d2803fa66621c422562ed025008f269a8af70d86b080256540f0e24e"
+    },
+    {
+      "gold_labels": [
+        "fear"
+      ],
+      "id": "edhn69b",
+      "text_sha256": "a968b868a6e54ed41f944d0b302a596ec20339031ee727941c01b76dd7403d5c"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "gratitude"
+      ],
+      "id": "edhpdp0",
+      "text_sha256": "0673aa97491f9549a87b88e45ba5882ec812ccbd266564369e6f66cc23d47abc"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "edhzmix",
+      "text_sha256": "8b85e5effb69a6c2058afe13167843c0ea4a91c1b6bac13bceea1efc42eaf392"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edi4zqb",
+      "text_sha256": "ae462d38f0218f3076216c9a47be619f33b05d0889d7d3475753afaf3e7564a3"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edi6n9b",
+      "text_sha256": "7e59a3e9b2985d426cd31f5111847fb27fb24b284ca98c025630983655551283"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edibv6a",
+      "text_sha256": "dab02dced3399a2e390ae14ed86f03a416eb7a0b942a6cc8b6e20d163bd89a37"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edidk1r",
+      "text_sha256": "2e54da9fd7bed9bef0045e5e625499bf829c6a77739f69683207fea305525ef1"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ediiavm",
+      "text_sha256": "6531fbd3b7f9dbf2b2e1c37fbacbcbcf8b77a03bded82a4f90e9563fc75ca043"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "editvs0",
+      "text_sha256": "b0dd79222fa80ee83c4743e416d8226c94d25f00ac6c42957358558e3949905c"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edixl9l",
+      "text_sha256": "95ef4440f743cd2f986232e6545f59690d764283f755b17e52ef3c32b2d46458"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edj05dy",
+      "text_sha256": "164a242be3cde88f2abe9d1dfef582283c7a7889974486445a5d01c342d2b514"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edj6ppe",
+      "text_sha256": "94f8faac42c039fc8d9bdf9b8a9438b3043a235cba94b762c9cea17c71b612eb"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "edjavbb",
+      "text_sha256": "4e99f307434aa0fa0a27cadbdcc563fb45e5fab3c34869db1e160d168625ea03"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edjcvbi",
+      "text_sha256": "960377d1d532f507e5ffb3645b7691edec9e3091c8e936bce8124d352595acdb"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "edje3s2",
+      "text_sha256": "a5f713957a3b99aafa3bc3f9d00faed112d4e44947399ac44efaafcb240f273e"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edjolab",
+      "text_sha256": "bab17e0d5ed5832925ade682bba30ec76dd742f7381a941d1b39b65d77047c62"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "edjomvc",
+      "text_sha256": "516b912c9e2323ee48b7c13c6ab6091a2af2463da47c04784b5e01292a4d0f03"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edjrp8v",
+      "text_sha256": "fd442be5b40fe59f8ee85901b27b04dd2c20e870a77f8fcfdbee156e3b1ab912"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edjsowf",
+      "text_sha256": "d65cc7fbff00279b58b1c4d92f644155f75a5326afb7936b8a3883ca9eee97cf"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edjw0pb",
+      "text_sha256": "3be4fc08f68476b9dac1d587837e4a793f65c9cc670c0737cfb96f4dc775ee37"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edk5r7o",
+      "text_sha256": "1c96145ccb973a62367bcd22b1cdc9cb8063c8d552100f53ed5286808edc2f85"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edk79k6",
+      "text_sha256": "9ebb32d6912912e41659fcd9f0e28db4279a17c3b2f676919e1610ada63a7686"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edkg42y",
+      "text_sha256": "2485abf1598a794ff3fc59aa6c31997ae2a54e3fae38367b01abc91ea8ff3fcb"
+    },
+    {
+      "gold_labels": [
+        "fear"
+      ],
+      "id": "edkguai",
+      "text_sha256": "6938ef7cd8e59004832d5f09bfb1e4a73ea5301845aef53f123aecbb3dd68f8c"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "edktxux",
+      "text_sha256": "62fb854c7b8d6278b2fc0428a1f25ed23b6fbf00f1040da24eb6b30d5fcf52ae"
+    },
+    {
+      "gold_labels": [
+        "curiosity",
+        "surprise"
+      ],
+      "id": "edkwym4",
+      "text_sha256": "93dcf84b9e3bd6a6a65f0a71c5b628853d7923bd3fcf675cd2ea687120dee613"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edl3yjh",
+      "text_sha256": "c52d2bb5bb7820d139360e07dc4c7011943d802093b96638e46c0ff01e659086"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edl501s",
+      "text_sha256": "deb1d42a7f8f2b1651fdb150e7c90313e1c94c458f5f2e6b45554490b5179661"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edl53v2",
+      "text_sha256": "1d0ae59c049933788af4ef053e763fae318388a953ad1aebe581fef20c864ee3"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edlbpr8",
+      "text_sha256": "87b1d37cb1ee60a72c5d6928d4062919b64fc13052173be51f8b98e3c178e2c5"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "edlse69",
+      "text_sha256": "c9675346b0ba72d4ae7f3731b845d8f92b7458690089a4ea0a7cbfa47e73bdde"
+    },
+    {
+      "gold_labels": [
+        "fear",
+        "neutral"
+      ],
+      "id": "edmcjnx",
+      "text_sha256": "02650cf541b1ff1902e3299d5b6aebecb670211f7a1f803bf0da890d7d8d78b0"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edmhnga",
+      "text_sha256": "69d59dac4055ee444bf853e925c90c6264b29ddbe02c470e4bf7fb72e8547274"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edmqqoo",
+      "text_sha256": "efd4a90b9140a5dc66d9f8c0c300a81f87302bbb6e5fdc53a834fe8cf8fbf10f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edn07c8",
+      "text_sha256": "9350b8d2dbf7b25a4761837d695852e862493eb5336fe41684aed2535a8658b0"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "edn2f47",
+      "text_sha256": "c04a572d072bb0ccb7d13a8b383a39547001eab0b723effb5db74362bdab6487"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edn8jgn",
+      "text_sha256": "d7b91241b4951213e62cf91047e4b00dadf890945acf8e36a7170ffb3a3363fe"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "ednb2pc",
+      "text_sha256": "66149f83d040299a7b1cafe184c29131a7ff895a3c3f02fadfec64dc337d301b"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ednbe0z",
+      "text_sha256": "d91581908debb84848617b9398018fa0a3c63c6d6be10ae2895bdc4d2c3ce240"
+    },
+    {
+      "gold_labels": [
+        "fear",
+        "nervousness"
+      ],
+      "id": "ednhgfw",
+      "text_sha256": "d61769b2cd908efffee15e8d55dd1603ee1667e834e7734458e0b0bdae8cc97f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ednhh45",
+      "text_sha256": "7bc0da72f5c00ff6d4041c56a0f9db6fa320767760fbb6050d66ff81121fc9c9"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edno8iy",
+      "text_sha256": "59057521737f52453ac1e3c78e11994e6d18317984a868691389d19504c3b81d"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ednojxz",
+      "text_sha256": "5817cab2f7fc3111b12112b392bb15eb7f8a38478cff3ed841132e9711d29e6d"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ednw7vz",
+      "text_sha256": "1e966304ea2906983808cb2733e3e582396dc9c902485c289617d15c0848c56b"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ednwn8c",
+      "text_sha256": "8831c77b58135cd88688337160cd5d2bd55cf68827e2e39a964bde8a8b4eb4b0"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "realization"
+      ],
+      "id": "ednz1i8",
+      "text_sha256": "85958e1672164e01e453eadaa4b176ff664d2d4587fb34b9087ce389192f5e98"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edo596m",
+      "text_sha256": "b5df13dd74331599cc9916e55c03876bc27e715d66776f579a310a99f956d131"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edoh87r",
+      "text_sha256": "d07d8c17399d106a74239cc2ba39bcf83c30b2b24f5f94fc41731d83e766bb3c"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "edolgbp",
+      "text_sha256": "663c7316360d02bf520b7bb3d226cc94c71505c07861a6f8f5898f005c738e64"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edotloz",
+      "text_sha256": "cc49579c9c3e7764878f9f61c9139c99167255284adc153f8c8e9478aa1a7068"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "edottot",
+      "text_sha256": "ebd222141a483e6c03d97b2f3221bf5414de3b6002ec8021b01229b68e644115"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "edov7s2",
+      "text_sha256": "e6e1d1a89c9d8f5021abd154848b0b05e082303199e6c5ff52cdd20d54db150f"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "edowvm4",
+      "text_sha256": "2a5cf807eb91110120706d1ec7193066b4299dd6bbab089d5afc1f2e779fb508"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "edp3os0",
+      "text_sha256": "8f874b8255f3815e8ed9e9e5aaf21e66a8450cbcfc36ba0a304c0f0f1397f85d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edp9127",
+      "text_sha256": "384a0080b367788e8666b50c4a4cf9b1d9f20444c853b7ba2ba95eb9ed7c5cc1"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edpn76v",
+      "text_sha256": "f11ec14b60b4baee37914f5caa132dce8ad7b39d01e40b14d4fc3c8ab0620675"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "edpoy77",
+      "text_sha256": "ed095fa471a63635b5f2eb3aa4d180a6f1992fb510849f365aef3ee9a75469cc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edq09e1",
+      "text_sha256": "fc331c6cca7d785354db7ae0fb2f1c7ed4a8463311f0d3e72db024437cd4e45f"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edq444d",
+      "text_sha256": "993ab2dec9173a82aa84bd235ed8c3bdaa2057c45de3f480f1483fc8fcc5a707"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "excitement"
+      ],
+      "id": "edqb4r6",
+      "text_sha256": "ae45bb3d3401dee58c0a6b71adf5229bdb8912a83a967e80a21708a34eb8616d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edqdaj9",
+      "text_sha256": "8bed6c4a1d6e7d53df8c305e5dd4b4e3577f9a79c1afd4c47898f2a5c8a99e6c"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "edqdbf4",
+      "text_sha256": "cd0064766eba4df5daff4e1a3cdc1116b59769d0b7aad795ea3ca9f671991cfa"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edqh8dk",
+      "text_sha256": "db22c2987d43eb08901e1ed68d84c60f50f13918af6dbd3109d01df102ca5a9d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edqqmuw",
+      "text_sha256": "47f79392eff4f47d2ba148e22aed7b27eaf8cf2ee625d917e19e55a8a9b908c2"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edqt3va",
+      "text_sha256": "92457ad94b940f7a00d699ae445042833c2ea62d0a5ffa84fdff10135e26e002"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "disappointment"
+      ],
+      "id": "edqw5bd",
+      "text_sha256": "119bed122dc4ea3672c411ed674a79fb97c9cdba556961970e57eab7a03a744e"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edqz53f",
+      "text_sha256": "20ea59366050f27cf23075ffd49e4910ca9909cef61b4ff6ff5492e67724da56"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "edqza66",
+      "text_sha256": "9bf3d4a3d4d7195b3afd6c310e7c696b2f5d308fd6e5622387a7312ce1d13dc6"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "edr9t2i",
+      "text_sha256": "c3f33f74cf348018b607d4dfae1dcc20a32fd375ba7f1f7428dabf80570dce1a"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "remorse"
+      ],
+      "id": "edrjfw8",
+      "text_sha256": "8b7da0f12b4e5411bb2e75aa8facfd657cc0927c4581452969fc04f573375652"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edrjkm1",
+      "text_sha256": "977ded4d6b7b416ac423fb03951cf1a6a99cad32b5ef079167569ddc1b24a107"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edrkw0s",
+      "text_sha256": "8df0fa5f820769016858b32895a04c2a76e85bce3944b7d173dd876cc9a1a1bc"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edrl3n7",
+      "text_sha256": "c20e5793ca199708a6c8fbf8bc0d82ede9238b48c210e9e0d09441726c5446fc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edrl5bt",
+      "text_sha256": "efa5c02961888a75c09e88e2a7baf25655d6902cedc74e87f903d8d140952333"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edrugc2",
+      "text_sha256": "5ec8117984595ab7345bc76115119674d98c0f218608bd9328e083d7a0f990c0"
+    },
+    {
+      "gold_labels": [
+        "annoyance",
+        "love"
+      ],
+      "id": "edrux4m",
+      "text_sha256": "71d16ddadceb96833a58814b68646c878d715921b95dab27826cde2f68b29cf7"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "annoyance"
+      ],
+      "id": "edry2q1",
+      "text_sha256": "4eec52281ce28ade9ba30a99494a296142fbd675adf25dbd61e0eee7906896ca"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "eds10sl",
+      "text_sha256": "647362d4225467c35623293baf67bc4f7c64f466a1755ef1a64cffb3849e3156"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edsljig",
+      "text_sha256": "2b8d11c43b152effc6372f728b9f68ea083edafa134c37b20086bd893042d1b8"
+    },
+    {
+      "gold_labels": [
+        "excitement"
+      ],
+      "id": "edsltsg",
+      "text_sha256": "49f962e599828bb5bb7891380f36ad7613dc0bbd74667ff228e58052f7acf4ee"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edt1ukl",
+      "text_sha256": "be28c45ef5c82fab578c7b25a629ad060f61a6d449e62a9e30322fe03ddb32d9"
+    },
+    {
+      "gold_labels": [
+        "fear"
+      ],
+      "id": "edt81gk",
+      "text_sha256": "a8053a800593e881d39b301dbf8e39575801e645ff4a15c9ba01e822b6c69360"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "approval"
+      ],
+      "id": "edtbmhw",
+      "text_sha256": "11e599518ca27691c34ac1fc8405d9efeff00a8802292c1d86e77a7242f3a32f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edufwaw",
+      "text_sha256": "7751b2f50d3a916fb6f8408899575ab33d92c5805212d8e16bbe9443d6feca00"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eduu687",
+      "text_sha256": "71ece798dab339bee49fabaa3eaca7ea8b5d21e7caf8ed1b5d0daa945ee9f2bb"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edv1eu6",
+      "text_sha256": "e95f63601744e3575394af81414e90d804ac3ff4c687b43da6a159b84033b990"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edv3j6s",
+      "text_sha256": "768861c9b586aa92070e4e6f754dfab3746086f5487690fa9f07950b20491e54"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "edv7pxb",
+      "text_sha256": "9a6ac61d8d008929ab9c310fc0f907cb81fec5d0a58f41ccdad22aa69e899279"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "edv88xq",
+      "text_sha256": "37338ea60a88f34f07d229095c9f82bd795d4ecc8e1f5e83e1a5d5bf51d7858f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edvfrzj",
+      "text_sha256": "abef3d184a2b160831f6b3e31e0c68f6c7319ff39b0dd85cbfacee5dbe1fafee"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edw5ip5",
+      "text_sha256": "ba344f0709107644943588f610a4de5a4e7a54bd104050ae91904ff9da3d2f7b"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "confusion",
+        "curiosity"
+      ],
+      "id": "edwgmnm",
+      "text_sha256": "73ea3c268bfcb165969dd2d6bd534dcd5b0e9d8d1baa585fb675870f2deae6f7"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edwpejp",
+      "text_sha256": "855ec6d2785be37de5c3a27372f80377e57ca67f1781772c525ea465f48a993d"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edwwt14",
+      "text_sha256": "745a10604e66fc940245c36160f1097f6533f1699a8313e3bd3ae55d064389f0"
+    },
+    {
+      "gold_labels": [
+        "remorse"
+      ],
+      "id": "edwyk22",
+      "text_sha256": "be44d13801e2e99fb6e20ff01530c5a2b624e020980b325f0b3dbbff4b46fd79"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edwz4ms",
+      "text_sha256": "0761408bbee9746ed5cda09f1aa8181c56000ef38966ced0237668942a862f50"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edx5xru",
+      "text_sha256": "604b50161e469dadcd2abe250362161f8de32b771b2d36d4171702e0c0dbc89f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edx95ly",
+      "text_sha256": "73ccdd10a79228ce99bd4d1707e311ae09475a8f5218d838eaab7500260b8d06"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "edxg5pu",
+      "text_sha256": "aadcf2d7da9790737ca517ec4cd1022f2d011d333b12928c23964d6d6192982e"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "edxgxve",
+      "text_sha256": "f01456ee33283b235c5dd6e7d859ccb554715553e3718a89a192bf5845bf437e"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edxl7a7",
+      "text_sha256": "b042182fcba637069f4c247f027d4485943ee635034956b996932cd1fe16625f"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "edxtjq0",
+      "text_sha256": "e11915125f1457a3f4203371336d075f3401a0314003183b80734ae17e933ef3"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "edy27eb",
+      "text_sha256": "a41425c62cc33584d3ef67a6d0b8eb0686309e0cc0e08f4e1cdd50a9f4451af4"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "edy2rzh",
+      "text_sha256": "be91e64ef509614e0e685bdfa9eab4c4b941aec8f214a28aaccbe134f57ba57f"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "edya76e",
+      "text_sha256": "7f3367a6a700b6d3b4e67cb45973f6b0a4995409d668406a2eb77d1597edf864"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edyc6y2",
+      "text_sha256": "4877a5d13115d4c9fb54c583941613fb30f94786b9de7f825d3a60f0020bb8f8"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edyoh9s",
+      "text_sha256": "b1cb1fb5af79f20985298aecc1382ccfbcae366dee75b9d4e7d75df380836136"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "edypzin",
+      "text_sha256": "6e9fe7b5b8f613f5740273874ab1493c597ada4c5110c62414b6b07019a20d2c"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "edyygdx",
+      "text_sha256": "18c882a912d2dd59ffbde186064fa18bc8069d22cc0e0e088531fb7103bab904"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "edz3gqd",
+      "text_sha256": "19d7458cbc8095384419f283b6919b39ae940dfac8038d22557b83d0ff7d67ef"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "edz501j",
+      "text_sha256": "625a33a40dd71594226b1dc3dc3a596d635e778c2bb7bc592a8087acbb4754ab"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "edz50y2",
+      "text_sha256": "e7e835bad362cce1aafd62f34e434797f62b8a6a9651e0e6dd91f3d6204f9fac"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "edz5f0k",
+      "text_sha256": "c0802de55370990e33a9209d19a39e17e682356705b9d5ba17aee879e4493ff8"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ee0p7o9",
+      "text_sha256": "f446d170b3d4467153c9403b4fe66262027ca7f9ee6fc6958f5c93f5e1feac69"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ee0tttf",
+      "text_sha256": "b3828ab5d3a21a6d8bf1988b216a12144aa5429d40da133009e52bfe03ba65ea"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "ee0w87f",
+      "text_sha256": "1f54c3fda76781647cbc619fccd6052b3667231b5d5317b935e64ec3480a9195"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee0wn5o",
+      "text_sha256": "3d00616bce11ea6e423c439bac93c9336f9ae5aa17007e453a1fcbf1eafcfe4c"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ee0wqbd",
+      "text_sha256": "18f1931a076f2c70b746c2daa6820cefb9ef665ff930eed2dca9103e6c0295db"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ee0xmh0",
+      "text_sha256": "8d8e10ee6b64b47834dc4635b9f02f2ea439a16e96a94b97909fbd2b7e07be8d"
+    },
+    {
+      "gold_labels": [
+        "embarrassment",
+        "realization"
+      ],
+      "id": "ee17j2h",
+      "text_sha256": "1bbd59f58349770a805ffd1ce042e71d515d341263d8f84e4ba960b4511f0ce6"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "ee1dq73",
+      "text_sha256": "5d208a4a60c360cf5e2c896312adbb67280de5479548648d86b7fa8e481a5617"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ee1jc10",
+      "text_sha256": "be6ef4b57177ba1b80f80f16b0e58a9b3e281fcdf0ad966b71d4c718020010d9"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "love"
+      ],
+      "id": "ee1jqbs",
+      "text_sha256": "39afcf562b3fb5b552585959982d5f7013aae26936f09f093d4b61243233a630"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "neutral"
+      ],
+      "id": "ee1kiw6",
+      "text_sha256": "fd22caafeb02f8619cb788f32f10298a66165951e4f2e0b11948974596ae7087"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "ee1uv64",
+      "text_sha256": "da227132bc913261d5a3ba976af13291f5ce4c7446f375607c258753b4923f56"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee26p7d",
+      "text_sha256": "8ea6e581178c7914518914230aebc31c93e01efeca7f3dccc2822376c59efcfe"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ee2csg8",
+      "text_sha256": "e6786cf11437419779b6f0fa2b1d3ce027daaadcd983b2a5e5bdfa2c9586cbb5"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee2ncym",
+      "text_sha256": "4dc2b3ac2cbd38c49b0bc94810ee823c9f1a7d37a9c3926a5f6381da4a985b43"
+    },
+    {
+      "gold_labels": [
+        "optimism",
+        "sadness"
+      ],
+      "id": "ee2ojgg",
+      "text_sha256": "3fa8f0fdb7397c0f313d211ebc7869df2568d5adf1eb6433d1b69f0325e0d7e1"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee2pfs2",
+      "text_sha256": "ce527e6ce8501638c41da0c5c4785dcb7d2537f9f5b01f66da000d27b14687eb"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ee3ikas",
+      "text_sha256": "aa5ad58f08f260c42b4eecb306e184a235b9dcd4fa44dd1a776ea96075763762"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee3j1ri",
+      "text_sha256": "57bf860c5265e01740cf5922f3fdf50c371014ea3f40f2adfaa74a07ef4ca90b"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee3l0bw",
+      "text_sha256": "4e4691d71249b5e086ee5ef552275d71e460b6aabab0852f022776de4bdc0755"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "ee3l8ve",
+      "text_sha256": "5d3b5e19313f19f80ca281b759f18645c2679f94f231d6408fb2ebe8caca8d19"
+    },
+    {
+      "gold_labels": [
+        "annoyance",
+        "neutral"
+      ],
+      "id": "ee3oyyx",
+      "text_sha256": "37c6a4576a68cd91a7dd53c9caba55a13a91a2e282dafef7b735c364a44bd1ea"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "ee3zc4r",
+      "text_sha256": "8db0da28d270fa3d6eab2998b6ef6c408fc4b792df0f1d9a3e081a8ec12442c5"
+    },
+    {
+      "gold_labels": [
+        "embarrassment"
+      ],
+      "id": "ee3ztta",
+      "text_sha256": "d8267b3ac317e1a995f0accd54b875b671ac4ec51332dc5b632bbfcc2f545ce9"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ee455vq",
+      "text_sha256": "becb31be3a4bbde7f6f619ee8e2a387ed0f7133e8b0c8d2c885099dfd64c6d08"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "ee4furk",
+      "text_sha256": "7ac16b7137a4fc97df5d099f89c01803d6f03389e4427b482ad4169f21621bb0"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "pride"
+      ],
+      "id": "ee4h0uj",
+      "text_sha256": "4c082710e159131b70ed9fd36cf4a4c0f64ca3589d611e8484981664a761f07c"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ee4irq0",
+      "text_sha256": "b4e5225e4e8bdb325136eb15734191127bcae271f40fa7f3abe0dd4bdfc2c10c"
+    },
+    {
+      "gold_labels": [
+        "disapproval",
+        "optimism"
+      ],
+      "id": "ee4lh8p",
+      "text_sha256": "c42b47bf1bca0ed32e42a8b1cefabb8b16cea2d395e5a91ab3e2719c1f778752"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee4mc5f",
+      "text_sha256": "f4c1820c50234e2676893d509b35b77440612f7ca5f7d32c8368a84f051740ce"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee4x5vg",
+      "text_sha256": "20e17c613f6e42df00ec337814d2fbe5de5383a8468b2aabef4336159fe2edc7"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee58m2y",
+      "text_sha256": "15b7a0e39a9421e2e19e29d38b0c556b753749b34b2d3fed1533eeb374c7bdea"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ee5aye9",
+      "text_sha256": "518f57b3c5932274b09718a60bbb55907f56925a51a64265848b4395bdebd44a"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee5ds1e",
+      "text_sha256": "3ba5791ac5438109c8c3bb00419e790f44b544b7ac2b4bfe88527a2dc7420d45"
+    },
+    {
+      "gold_labels": [
+        "desire"
+      ],
+      "id": "ee5fqe7",
+      "text_sha256": "3a4f8581146c206329238ba3e030ac4ac6728ff69755f9454079dc2ee1a75d00"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee5k01s",
+      "text_sha256": "006fddacc43faca0fcfd77a2c3e652a716e6a429a557b1b5b3e2cbcb775f4b87"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "curiosity"
+      ],
+      "id": "ee5kjzk",
+      "text_sha256": "9c905998b80173ff32eea4664761622559681898126ca001c1da34effe7a5b51"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee5kunq",
+      "text_sha256": "2cba76c6062a77fa0908bf9e2465bf96cd2b62e195474301d7f97317eee41468"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee5u2v9",
+      "text_sha256": "7ee82c70f768d17d2a8990096b915fec79fc205673b0d4b34c77c2b40441bfde"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee5yybc",
+      "text_sha256": "441f88bf7360547a953c9be6a7a47939986a75dc3f129f9eabb8a6f3691c9883"
+    },
+    {
+      "gold_labels": [
+        "disapproval",
+        "disgust"
+      ],
+      "id": "ee62cyq",
+      "text_sha256": "9ff40b76ddda6b406d699a6da06a6d04fdd203f29a6f8683e5679ab69dd2d62e"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "ee64ows",
+      "text_sha256": "503df58ac4560c0aee0542ed135de04ef94b876d2431f61edaa637761652f983"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "curiosity"
+      ],
+      "id": "ee66boo",
+      "text_sha256": "9ec024a6c8c4de1cfd273075b50e8308df22aa79ad2db65ff53f51e0ce78fff0"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ee66s62",
+      "text_sha256": "e3edca87b3b278eb125302975be14330d9c693cfbc365a198ca48bdcb98e3e3e"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "ee6kkyc",
+      "text_sha256": "819db6211d5611aadef0835ea7773a0f3bf4576d1fdb1f2faee9a7be1ab0cc78"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ee6o9en",
+      "text_sha256": "1405c366739c55be54fd9804a6ec9459c40dfb4a78cbfe60700b094ae9a02403"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ee6q36p",
+      "text_sha256": "1d3b108520e6736acda9f42e29de65f8202d841c9f2aa4d2e99a654213cad2f4"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee6zqu7",
+      "text_sha256": "407f1a59aeca74c3010242a60d8a1b97d38da5bd44ef99471d08e672bd33c7dd"
+    },
+    {
+      "gold_labels": [
+        "annoyance",
+        "neutral"
+      ],
+      "id": "ee75eyj",
+      "text_sha256": "63a3461a6159567633d1d1eeee175f94627237e1361da1cde393f68a86948aba"
+    },
+    {
+      "gold_labels": [
+        "realization",
+        "surprise"
+      ],
+      "id": "ee85poi",
+      "text_sha256": "58725e34d4601c1ece7f26a98a0f353899fb85380e0e783fe2afb74385f1fc61"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ee8gxoj",
+      "text_sha256": "290385f4bd128af9b045aba0486dc0f217ef1de83cce7522f7d5e006a923c907"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee8l22v",
+      "text_sha256": "909c8c2f40b62489cd5e918ca8232a757fc97cc97fbae31c4d0077015862ca2c"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee8sroz",
+      "text_sha256": "fd5d4405f77178f6995f10c042a87eb63bb2b511d470efeae24bde9202cb6812"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ee8us49",
+      "text_sha256": "14a9ec94be195dd8b5d61ef54b54c18f2892135dae35c9bc9fb04122ef45158b"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ee8wtoo",
+      "text_sha256": "945a7b185fe82151c804cac6c8e0061dc0e863c9deedcf444ee130b214d9494d"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ee8z9ge",
+      "text_sha256": "f50c55548f131e594c79e5bfe48952deb0b60e8071bd3ecb7fbbbefbae325948"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "excitement"
+      ],
+      "id": "ee99pw8",
+      "text_sha256": "d528a1af7d83b89de4027ba4278febd52c5e35b44ab7a26de097234ba2801b57"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "relief"
+      ],
+      "id": "ee9jcre",
+      "text_sha256": "e43b0c6e89a30b43f24a7a48e9721aeee850776850baeb53eb30896c7235fcf0"
+    },
+    {
+      "gold_labels": [
+        "confusion",
+        "neutral"
+      ],
+      "id": "ee9l3bb",
+      "text_sha256": "28c9b5e1a5b5ede69299186f9c83980718c6268ff724aeb67952da09a721d2a7"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ee9n43j",
+      "text_sha256": "7c93f36f26d5d1e2c7c559b22f79f9f8cefc5ab02ad2f52050887955589bbe10"
+    },
+    {
+      "gold_labels": [
+        "remorse",
+        "sadness"
+      ],
+      "id": "ee9pka6",
+      "text_sha256": "07407fdfba4a6e9659183499d29853c17842401768e232e4e3300c9193d1372c"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ee9rsd8",
+      "text_sha256": "bf9f9f906676d33fe46191e0d6ea6d8bd2fcca3c39afc74e95df9bd99a47760a"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ee9xgzw",
+      "text_sha256": "831b5c60230a5e16f014b0f1ed94ade10c60a803582bfa43bdc982338575eef9"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eea54g6",
+      "text_sha256": "7700e5d442546297dedab2abe17e9f50fc4e4b97b3cc7c499bbeb2aac3b6fb49"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeabi3r",
+      "text_sha256": "9f328d38f36c70ea4acaf9f76de46a29780222428ced687989c98c918e46a924"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeaf14r",
+      "text_sha256": "0523bcb13548b136a1a6baf022c64c6f51438a834e96d8eee1978564919ec563"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eeajc5n",
+      "text_sha256": "db5260e38346d760752fc2140c019a257d3259d9e255521f3a02bf444fe12c52"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "caring"
+      ],
+      "id": "eeams2a",
+      "text_sha256": "d870b568ad22f982534c3ee74a70c93f1aa5ac327360f3ae3c56e70053000a7c"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "eeankkh",
+      "text_sha256": "f7053a1e9197bfbd4d3982e5fd80ab335967788d5ebc98896326f8985e7750c9"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "eeaqtts",
+      "text_sha256": "0166aed09f338c7efd671e0bc7f2086b9bf1a1ad350c4f61996f9d5a3cfbfa4e"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "eeaxxk6",
+      "text_sha256": "65666cdeac494a18a490c05f047a7ceb23cafbcf87806703632cf864dc805a16"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeb7nrp",
+      "text_sha256": "454e6602713ac8df7fd9699b66901fe3ab31bc2b918df0af62cbf7e3ed0acd38"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eebiexj",
+      "text_sha256": "0b6d713216d38b499a94488387fde7a62bd4b94f2c504080acd8b141a3a02104"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eebo8e2",
+      "text_sha256": "71924f243f3e631695f143582f668f8adec149676508dcf94ce5d6359bacc6e8"
+    },
+    {
+      "gold_labels": [
+        "confusion",
+        "fear",
+        "surprise"
+      ],
+      "id": "eebu17v",
+      "text_sha256": "2be62fc88f2b49939e225051710a10f4f6a9eccb20f8fd0da441df4d77ad73ca"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "disappointment"
+      ],
+      "id": "eebuqgf",
+      "text_sha256": "b1b5e376f2d7a94ebf5435c4da3d82fe9ef8827ad9d6432f75c2e3a8183ea7c0"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eeby8eg",
+      "text_sha256": "9c5fdbfdcca4a080beb1bcca16a04600c274a392f37ed2574f0c02f94ca5a742"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "excitement"
+      ],
+      "id": "eebyxed",
+      "text_sha256": "74fd3fb436f5b677418fd4d04bc767071d1776f8798e9117529be18adb0b57c8"
+    },
+    {
+      "gold_labels": [
+        "fear"
+      ],
+      "id": "eebz2uw",
+      "text_sha256": "e9fdb41c07c92a319881c99e6ee81e58f6fba3465182af34771eaefd33d63842"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eec72hd",
+      "text_sha256": "f5830208a43c4c67818e5addfb6d1f370c9b627fd5c5b3279fe0667eb2e6018e"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eec7780",
+      "text_sha256": "b31e90c84e05e022ed5ace26cff1aea2e7ed482f8f6c2f708b62f3e6cfc0e6e2"
+    },
+    {
+      "gold_labels": [
+        "confusion",
+        "curiosity"
+      ],
+      "id": "eeceu5l",
+      "text_sha256": "8dcf3b54fa8a1b517be44829b4aeecd1d6d598aca584421d3d9e45720cea093d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eecn0nk",
+      "text_sha256": "224740b4395c33bf4eec4807501fda296e04060e191599ec198ed26c9bc3aa81"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eecodl3",
+      "text_sha256": "b0b03e7be64ffe072ef7577d92e19e37845a3be59c47bc0f4c9b8df2fedee633"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "joy"
+      ],
+      "id": "eed22vi",
+      "text_sha256": "f4561665f0ad714fdb7fbb30674943fce4a96c8ff0756ce345f746cb594afe22"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "eed885w",
+      "text_sha256": "4d3bac314995f217abeebd806ca5156b37ca57d2f8f0f85908ae8adc1e60e81d"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eed8mpu",
+      "text_sha256": "32a81fbc90e846ba615f63631507fe2d1114dc091dade3f54159db2e51c2cd0c"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eedaw1d",
+      "text_sha256": "39fc933f957f82d7225bad82b66ddbedf3fbcac9988fc3ec9e9cf17d1905cf63"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eedm88w",
+      "text_sha256": "50b0a4c2fab42543a4cd90747219253635459e5358eb4c501a72c60597b1ce8a"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eedn7il",
+      "text_sha256": "46801a212f419b21915579977cd2b03a675ca8448f87e15b13e7f05c43913254"
+    },
+    {
+      "gold_labels": [
+        "disappointment",
+        "surprise"
+      ],
+      "id": "eeeas90",
+      "text_sha256": "850f9a032396faf6f867bc7d3c1ff14c589f6a196004bbb602779a33f258f6c8"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeegcl7",
+      "text_sha256": "0246bad2e50d0c0bc52d10146ad41f3edd871470c44358a897c9f5121d22b74f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeeyrof",
+      "text_sha256": "52148d4006d0d102af0b885970f7863c560fd098641a1a2441af5bbd511a3f99"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eef2zu5",
+      "text_sha256": "b6f49dc0636cc152266535cdc185bcd6d8d2a3acb11b9e1b2ee34a350c60b63f"
+    },
+    {
+      "gold_labels": [
+        "curiosity",
+        "optimism"
+      ],
+      "id": "eefb8qa",
+      "text_sha256": "b91585683beabf755c6a999dee79e97bef3e39bd87207e6da202fa1d6cad0932"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eefbhx0",
+      "text_sha256": "36b21e7958e1c77004c77df8520dcc8d47644ff8ecf86ca3be0fe1f7bca776e6"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eefew51",
+      "text_sha256": "40108525fd05cf02061717f8f231acde5368663a1f657c51cf83b908677238cc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eefj93d",
+      "text_sha256": "89684e1986f5164dfd10949bfd3767603913fc3f6e36b51757502899bd3564c6"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "eefo55l",
+      "text_sha256": "f0cd9915e6ef76fe8e64b3d755bbbcfe48a140957e057ce9632eea88512340ba"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eefozk4",
+      "text_sha256": "d17f2809f305573776f01d64394565b1615451f81a8227a9139299d180a7b481"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eeftq0a",
+      "text_sha256": "291b8034a576c1c5f0f9a8cb943680b2fb0b35c5efa70a4b75dc612a781842b7"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "neutral"
+      ],
+      "id": "eefud6i",
+      "text_sha256": "450d1657a77428f21fb08af8ebdcbfba1741390d5f765acbeaa7b338fb8dd844"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eefvtb9",
+      "text_sha256": "d21fe769b5b0c6381539894a6a30b8893fdbc960e4c17e9933e255fefc7e31b7"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eefydrt",
+      "text_sha256": "f346ac744a48a3282d5535ed878cbd19120fa7d6b21868b12e424e15a3ecd9ad"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eefzh42",
+      "text_sha256": "39604a91fa5f8fe0f3529b339f48dde54cfcd7a742201dfa4095adbba8b87bef"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eegjf0u",
+      "text_sha256": "7c1f1cc3b1a172d225dc55eeffb0bd8705c2b2e328686ad090c1fb8125185658"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eegnb46",
+      "text_sha256": "83c8ff0fc18fa41654ff2718ebfbc4a95ad62399e72fba5b1a198a31bb02cdbb"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eegnshm",
+      "text_sha256": "c6a2a6b3dcb49cbc40405579896a21a88e99b8cff282bff548365d3da63971ef"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeh94sk",
+      "text_sha256": "408da1f5ff0c7697e17db87b4bfb7fb608966d139c96ccead50f9adc2359d9ce"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eehla6e",
+      "text_sha256": "87a4a0f0fd0cd70a537a93114b966cd5fac2a33f67f58958e2e7d7b8cb7c12ca"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eehnqko",
+      "text_sha256": "6f460f115c417fef50e7138be8df645b97b4ed582005a1f5e71f72d8737ba2e8"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eehpq6s",
+      "text_sha256": "7a4be06b931a0f6bab097c7b87e182f69d50b923f92a92135c3fd1029f417a8e"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "eehs8f1",
+      "text_sha256": "6394640d981387cb6f969e2516d0d5a5cb20c3f11d6efa54f45d7cd20a34e47f"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eehwiip",
+      "text_sha256": "76e4eb831caa56afe061bf198288bde16f56457612c4923728188c3da9ad9548"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eehxprf",
+      "text_sha256": "89f72ac43b8225e6f99aa20b734261f3197142dd761cde926ae9c018e1fba8b4"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eei82lj",
+      "text_sha256": "a71494470fe14548ef973b2ca30a739d8877e0a3eb7eb123317c2bdb7287168e"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eei94jc",
+      "text_sha256": "2ad4a0726db1362188c16209732aeed5515c2d891754ed5264a7363dae4711e8"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "eeiw8kf",
+      "text_sha256": "7da4765540b054ae27435d50b9334b4c75cf4ffebaf0aaa42c75697f2841ae9a"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eej1fnr",
+      "text_sha256": "20653181b5cacb2c2d5735c930f59562434d89096ab56f964cc819c9af8f6cca"
+    },
+    {
+      "gold_labels": [
+        "joy",
+        "love"
+      ],
+      "id": "eej7cn2",
+      "text_sha256": "b472f51df606a47077a687004bcdf26beeb2225b775d57b869b5b6c17a6a3c91"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eejdc1n",
+      "text_sha256": "5f371be224ae7f52a2fdfd9e1ac163afbe00de10034163debc6a134f1acd1ac1"
+    },
+    {
+      "gold_labels": [
+        "excitement"
+      ],
+      "id": "eejhcrm",
+      "text_sha256": "c82c109761d0fa57750ee6a0ba31127592d772367e4236cdad76da76d950a528"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eejmq4c",
+      "text_sha256": "e7e0c67f91d0b9fab9b19cbc31606e470baa669a85a4efb953162976c105df9a"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "curiosity"
+      ],
+      "id": "eejn19n",
+      "text_sha256": "62dc55cfce9d5ab250f9a0a10bbbae54c3823a64c9413b37cafdad7fa87c5c2a"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eejq68m",
+      "text_sha256": "863a2871fb1c182f035213ffc48539e78f299abe7eaf87925f89581249a101cd"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eejsrc4",
+      "text_sha256": "c162784ef59f24518010d18488dcc206764eab3922469624a290787217fd8a22"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "desire"
+      ],
+      "id": "eejvjpm",
+      "text_sha256": "adaa4013f3e1889859cdaed4d10bf102926d51a312a089944fbb0653c762f020"
+    },
+    {
+      "gold_labels": [
+        "fear"
+      ],
+      "id": "eejxmnj",
+      "text_sha256": "a71180567d5f00a57834569c2409cc238c134ad99f51c3a9f88e1a10cc267453"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eekm522",
+      "text_sha256": "96cffee03d8a6d13fac2f63433fc2043851d3d01000083372ecc52fad7611c9f"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "eekpx1q",
+      "text_sha256": "46642a5cf6c077455ee52b1da9262c9879f3b83941928280f45caf0316b783c5"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "eekyihh",
+      "text_sha256": "b3ff808f3729b11113e0aa43dab37ab27cdb11e7ba5f0398476a09d5621b5420"
+    },
+    {
+      "gold_labels": [
+        "desire",
+        "love",
+        "sadness"
+      ],
+      "id": "eelgo1w",
+      "text_sha256": "7755650d3e4aaa441b80459043b460d58cdc87fd50a0f8ab8d8faf82c7519d30"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "eelpq2s",
+      "text_sha256": "d77c65dd93bfd6e64b32d7c839a787807144e477c51201a4da0a4d05d415ff8b"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "eelscqt",
+      "text_sha256": "4404a91370c40f8d5c0bedb3f89a1c785573bf8ebe1a7f6e45be1ff634591966"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eelwj8x",
+      "text_sha256": "8c7aeaccdd33b270f4e2f02f35cda5637bf4104ce9e0d2cec61f5c18fdc81ea5"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "eelwscx",
+      "text_sha256": "917ce690a45fec9cbaa5246e06901e904f7df100c17a10716f0085376d2e7b30"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eem5vrq",
+      "text_sha256": "cc47cbcb3b5d1b9e926e81e7fb97c3a75ff877349317f4a5dac19ae5d18a7963"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eemcyc6",
+      "text_sha256": "e52cfc02ac6edcf4c6e0f2f9dfd00245a92d7ffd1b24aae98b73fddec212d1a3"
+    },
+    {
+      "gold_labels": [
+        "amusement",
+        "optimism"
+      ],
+      "id": "eemf54e",
+      "text_sha256": "ec5372cc7734952b3142ac40f9ac3e460deabea59b553c8413ee2540ca909cef"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eemkx7a",
+      "text_sha256": "4cf38fd03a6d54b61fdfa05608c34e614599609c5e6170103dc0c99585af7afe"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "een0g88",
+      "text_sha256": "b0c485824e12175f896c39ab00924f948532b7e803f918e7a7a16ffc85822e1d"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "een1rib",
+      "text_sha256": "220e711725bd03cc657cfefb5ee5129de7228eb31663c7dc739b1f4b7b29a978"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "een43lb",
+      "text_sha256": "e81104855f0617a1eee5dd018cb50f9fa9b926a75e0e4990ffa9c772f6006369"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "eenb7zk",
+      "text_sha256": "3cdee16fb71a09ab96a87620d7332936073953524fb8edeb498a7816808990e5"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eenf87g",
+      "text_sha256": "e69223c15f0d0c781e76269bbf29b0f724a41dced782685a6a29b991a94d4043"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "eengaqh",
+      "text_sha256": "ae1d791637bac478b28a2cf869b2386ab196fb06a33893be7e467bbd56904f7c"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eenmetd",
+      "text_sha256": "81ec9034827c97b88cce71ce9bb1a6ec1136502d49e029573f4740d954280a3d"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eentsks",
+      "text_sha256": "3b6ee2b4a14e30b40437b349dde8be6deeaa189a98a04df5d5c8bbf37387fa63"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "eenvu2f",
+      "text_sha256": "967159ba57ad5f1e1a6789754697389da4e501f54ead57c45fca32b0cb76f11e"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eenwb0b",
+      "text_sha256": "27bec12654cfc3ee1ce6ad7a9be4d3dbe8ec652514877cbb6f9cc8505a469a1d"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eenx5c7",
+      "text_sha256": "76f737d9dbc0cf6956f27ec7e4bd47000ce8c7ff6fdb81dfbf8e97d3e831408e"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eeojt1q",
+      "text_sha256": "a9d5cdcce4797dd4f5e336569d9ef7959b48c5e3fb420b312f1806ca305ed9f0"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "eeot88f",
+      "text_sha256": "d9820347e181f5b1281477ed1724a0d309009f291a4a57528fa937a40736cc6e"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eep2mz3",
+      "text_sha256": "41f28d4fdcfd46ca7d7e3de64698a2cee72148f37fb711fe0bff8216faa6e67f"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eepcbjy",
+      "text_sha256": "c2550c81f166a7632552292d077e480fd7f1bad6226e16d77d85276f767ddbb5"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eepebac",
+      "text_sha256": "7d1bae76a6960871ac432dcad599b14ea2b34414b4b0d2ce9fd367200e65b6fc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eepkdos",
+      "text_sha256": "f21c28f82c4999797f7fa30b6ffccfb82e13ef14f9399a8d3458742a0692d147"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eeplame",
+      "text_sha256": "25cc678babfe05d8587e6fc413d24b7c603c311210248af85c2f5f489816ebaf"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeplbdh",
+      "text_sha256": "a190b7d8fe71a3f3c01afa091cb65a66108117a4f170cd3bb9b7f757cb60d29e"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "eepte77",
+      "text_sha256": "b84f4de64c4b8de938cf128323158a8724cde0be8feddd145ea7c2da188bd534"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "eeq36jl",
+      "text_sha256": "83a474f5fdf2f033ba1207343870b1d46e8b839410b96aca38aa4a0ab8c846b7"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eeq92jw",
+      "text_sha256": "e2a581fe1291fbd547f4e5a808e7e7cfc3264f3e3fb31679bf386beac7f9fc6e"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "eeq9zem",
+      "text_sha256": "b969d34018a84dab6025e1f45e5e2f73ed55440ee753f4edff49f6a7401f5fe9"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeqaazw",
+      "text_sha256": "0202e06e104f268c4d2cbb0272cd2a18570ec2d9c92588d949f2ff4220ee7844"
+    },
+    {
+      "gold_labels": [
+        "disapproval",
+        "disgust"
+      ],
+      "id": "eeqcgus",
+      "text_sha256": "af3ae93dc2560b258f36c7ef00414a5cc28b5641fa8e2a7398179fa4efab210c"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eeqerzl",
+      "text_sha256": "9f7ef549693f312d1fa45effea0b5e86ed81d6749016a0fffc485924932acfb1"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eeqh3yz",
+      "text_sha256": "279730d65cae5535fbe403fd21332327d8087783464cc704ac335b1870a393ca"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeqikij",
+      "text_sha256": "c3f170c9e7b49c223ed55dac09e6199bbf60b3c4ef5b3ccd015a1f681534b79a"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eeqng0m",
+      "text_sha256": "89fdc9f9bf87279b5c38b60802d1758af8b66d96bbb7e0d3cc65ef49b0db146e"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeqs3wt",
+      "text_sha256": "ee230d32c01bcb73b2ce50cbffdebd60a764cfdc6d6a77497849aaa23ed9407e"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eeqz4se",
+      "text_sha256": "378cc4405f7bba77a94986dc04c3deca4bfb28df1e3074826734d35f0200f4c7"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eer6s0j",
+      "text_sha256": "4768b4385c724ecd06e6698dc4c59de67a43d854c5c444f2f0475072c1c079bd"
+    },
+    {
+      "gold_labels": [
+        "disappointment",
+        "sadness"
+      ],
+      "id": "eeraamn",
+      "text_sha256": "838be176b567838bfd964c247382ad921a2a853515d72fbd8fb7bc919ceb7734"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eerbo7f",
+      "text_sha256": "45de2f196dce29ca3ec5c56f83bc74ca22ad0a2efc1ff8f4a7e419dfa18e74b2"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "eerndsr",
+      "text_sha256": "184397a0b96aa15850dc3d672f8080d0c0afc7dddc36a3185f85006b8a5488f6"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eerpxg7",
+      "text_sha256": "f52ef1d8f1fe553b2c6343dc2ec9cfb889bb8a4df850a9360abcb2cc12cb63ad"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeru3rp",
+      "text_sha256": "ed2bac46b6b5f5899b58ea6a5117c98536832780688bced70342742d22497722"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eervdi9",
+      "text_sha256": "2276308a8b7e03680287e94776e39742f08b143ebbb6b0bace2521d6c6288faa"
+    },
+    {
+      "gold_labels": [
+        "remorse"
+      ],
+      "id": "eeser0o",
+      "text_sha256": "98938d4491570fa01475de9420afadcaf060b504a948d13aa7225a5990c0e271"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eesh7lb",
+      "text_sha256": "e8eea1564190c033564cba5289bfa5dedaeaa3a976fd5fdf8ab03981dcb6f120"
+    },
+    {
+      "gold_labels": [
+        "disappointment",
+        "sadness"
+      ],
+      "id": "eesqlxb",
+      "text_sha256": "2bbadf3b751f1da299ede213d075e1d8044a0397c0e75323e81c05f3134f7067"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eesypcd",
+      "text_sha256": "2c3c24d1c201adf61bc2f5f5465c79dedd49af3c4b98333eee26a20b1cf36fd3"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eet05xb",
+      "text_sha256": "3e39c5e6558f58438c79706ff06ab4ac53028da1b2c09bd698107cdd368a5d11"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eetf51v",
+      "text_sha256": "c876e4ccf50c658dfc4114f887975dea7c51446f49431e79bd4431b8e1488362"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "approval"
+      ],
+      "id": "eetgy2z",
+      "text_sha256": "0038566ba3a113bdf23410396b08af8f7f696033e1e1701b8fbd52416f0dd2a8"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeto45b",
+      "text_sha256": "4a52076d1949ef66db6e57ec9ad6f73e0da0e43d6f0d34c6fe44092a3e1aeb6e"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "eeu6rax",
+      "text_sha256": "8bbf48c231aff5cac4d5b0ec43e45ccb8da4806fb8cd5b9ea7d579c07f575381"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eeu8jww",
+      "text_sha256": "316539849254f5158fcd4c66cd5d80413c5fa3acf6b53993ef630364900aa783"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "love"
+      ],
+      "id": "eeuaik7",
+      "text_sha256": "d0c90b3e0b738166da5c36f792c8acf0325c06399fb4442f03de6d33182d6a2b"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "eeug6do",
+      "text_sha256": "8bf5fe2ba77025052a04665d16ebd4992260b5980fd650240170c0034564491b"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "eeum4kw",
+      "text_sha256": "a2eb8bd3a111663b14e8512b2cd72c1dbe6ef825698e0ad26d63994517cb8854"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eeunmyg",
+      "text_sha256": "5d10f1335e4a4fc8f00e7e6c4e4307e86b0141c372a23d9e3744723daba53bd1"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "eeuwcao",
+      "text_sha256": "b74d486f65548f56c2a2b2d83c3928ed2b028441d794ed577adee995c3dbdfeb"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eeuwiz4",
+      "text_sha256": "1ef4da6e6d0f1d57cca1ca673935cf4ac0f90530182648d2d5f6822be7479f54"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeux7i1",
+      "text_sha256": "970fdf63b54e53c31a591475d993c7440444da54ae9af0b85e20544989f3ec37"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "eev1mre",
+      "text_sha256": "93dcd8bbd847e6a2b7212a8bdcc3f30234417c93b8fc69dea136f2299db2f128"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "eevg9qk",
+      "text_sha256": "4abb1d18acdf93fea152c38ef9c62076fa7e8b1d006164845a566f90aea8c0c7"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eevgk7f",
+      "text_sha256": "3aa73f2353d2dca6721911bd541257a6ec8ff5fdcdcaa174d7a8efa0243de1d1"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eevnecj",
+      "text_sha256": "27fe5ba894057ed404f3b3c8b0f8ee5589a9e00a81a9d4bb19ad5802531f9dbd"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eevz90x",
+      "text_sha256": "3573e9dc9079140b62892a89c47dc84a6019c9cbbaa5b52376bcc9764fc9445d"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "eew4gxp",
+      "text_sha256": "7834bf99ade2ffbfaca5caf84554f1837ba4aa3f645c5a1c8842c236b9e97c83"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "gratitude"
+      ],
+      "id": "eew51qn",
+      "text_sha256": "c2b877ae813adc01eb4f4c3b4c280a842b66e1ef2e15505b3cf760f17ee7d890"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "eewbfj5",
+      "text_sha256": "ed7cff5bcd6dd8a9b4a0c432401ebde57111661bcfc3388540171618786c0c50"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "eewppx3",
+      "text_sha256": "3aa1a9984c9ce9866552cab3bf83e6600f55322bf0071c41b4553caabcaa1dee"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "eewrafg",
+      "text_sha256": "95b2cd3bc4b35b281b9a1b8273470310e349406d5dde94c8e54d9af4d3eb5786"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "eewz3d0",
+      "text_sha256": "56b46b1bd967ab9331f7eb4435a8d7d5f24e83b87d69d7fe71efc34f9a8acd28"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "sadness"
+      ],
+      "id": "eewzjgq",
+      "text_sha256": "75af65ee9b22be67420859d17c97afa8f9cf8abd9122e3f334807ace08eb50c7"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eexkl7c",
+      "text_sha256": "663a1a034cdb0b728688bb6128b14ba26e4fc0bf7d2ad24a91449f4a0617e8c6"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eey0p8d",
+      "text_sha256": "c201419469f85ecf2a7992156d43cbbef4e550bf2a739371de223998d078fdd5"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eey8urd",
+      "text_sha256": "8dc05ab70019169225fe786815610bd2a26c377086874e9e91518a57882d810c"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "eeyaoze",
+      "text_sha256": "5c9076261e159272ab1e25e0387525102e1c88fecb55f211d9dab25c853fc365"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "confusion"
+      ],
+      "id": "eeyaru9",
+      "text_sha256": "a154f671632c90979dab90f0e4b35786a52c51a559c7e1741cc0b9653d810400"
+    },
+    {
+      "gold_labels": [
+        "annoyance",
+        "curiosity"
+      ],
+      "id": "eeyjuwk",
+      "text_sha256": "7a69923fe72fb7a8082047789d5466cccad45b0aa9633db1edd250a26584cb0b"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "eeyp552",
+      "text_sha256": "914993fdad459500f5cdaedff0486cee7be39f92abea788efa84974718621f91"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "eeyqxkt",
+      "text_sha256": "4573d34722e966a7f7139c79d050b09cf3129c28fce7952c21ae0ae2cfec23c2"
+    },
+    {
+      "gold_labels": [
+        "realization"
+      ],
+      "id": "eez9zmx",
+      "text_sha256": "c4ac6292eb9a945322737bab1e808acbe209a760400885f578c49c186b2a8e80"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "eezd4nf",
+      "text_sha256": "bb1811c321ee6c550b6f43c593c979aefeec810ee423b2305c9077adc60bc667"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "eezdgug",
+      "text_sha256": "a30d621637d347734b148966a61d587c00a5f662b83986adf86b09e848f9df6e"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "eezireo",
+      "text_sha256": "968c8a14a3392aa49a2797b23c2fb1f97223cf9bc59ff5ab845b9febc4513b1d"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "eezl0xt",
+      "text_sha256": "57423b4b757b00bc049d1d1c2b4c33c1bf9ce5181828a773043a6fbaaa12bd69"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ef11o81",
+      "text_sha256": "e5b9b2c833b0d16ba81bded89a2617a72056e88ff300ceec2f33e981ce59f53f"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "ef147n1",
+      "text_sha256": "190cb1698972ba312bf8126ab2061c44c18eefdf79723d54294c42002f7b1790"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ef169ls",
+      "text_sha256": "5f0e484f60cd663da400a7ffa41cde87ce46d6215edc7790a916e473edafcfac"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ef1jbz8",
+      "text_sha256": "13c8560a5843d6e87c51aac02fd344c6387ad6f80d7dc7faecfbf6c21ac65730"
+    },
+    {
+      "gold_labels": [
+        "disappointment"
+      ],
+      "id": "ef1lw6h",
+      "text_sha256": "53d7d0316960793ad6cb1497b64e166b681a44f07319614343f48c280d02d3c9"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "ef1mvt7",
+      "text_sha256": "c3a70cf51049ec39816aecaf2d87dcd6a7d7544e3a247d6ebbb2a09bab2d41ba"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef2b70x",
+      "text_sha256": "2f8873f6100b856cd64398f2f29d978a6402e6778a947b66a1dc1c896fb86d08"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ef2hbyw",
+      "text_sha256": "a6e12608de3bf328ee184007c205e483ebd422418101c0266b15114af6a6b277"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef2vf27",
+      "text_sha256": "670c36a3bcb075d1202a483a430fe7782b11f73c2ad3c934a39fd1f5b6d52fc6"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "ef3lmqh",
+      "text_sha256": "ae540605c3f93f1e0b2f4f69d6fa2da931bd1a7aad8d1119d1ef5a1b315e72f8"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "ef40uup",
+      "text_sha256": "3ab6b419edc9858e914d178a10a8572ef2b13ddf6e215e9114717fc533d87bb7"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ef4jshg",
+      "text_sha256": "b626c246c1f35b7307ef41fcf2ff2ac174f171549bec83ce178572031be839c9"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "ef4k1i7",
+      "text_sha256": "6a4d8691bf1121faa44b86790d4b887c0678767c6ec0b68695423204fb4d4e07"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "ef4oweb",
+      "text_sha256": "fcde6471466e43aa24c6ef4906b15dc9bda296c70ad284d7a79420886e959fbc"
+    },
+    {
+      "gold_labels": [
+        "admiration",
+        "grief",
+        "sadness"
+      ],
+      "id": "ef54wy8",
+      "text_sha256": "8d37f34e9de0f1e79db2c2f97be57fe86733cb8e4aa5093297190bc28a4f94d7"
+    },
+    {
+      "gold_labels": [
+        "approval",
+        "disappointment",
+        "optimism"
+      ],
+      "id": "ef5n4m2",
+      "text_sha256": "349136ea762dec9378b3acac98d7f21c58b88ba95d3e8ff2c75adf9303fc51ec"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef6jmgz",
+      "text_sha256": "9ec453f9c1f9ae98b0694a073ee839b60b4bf8b00cc90ee37ef7eaf98fd75681"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ef6ltfx",
+      "text_sha256": "bd285f34b81481f2d11913886ffa4004b48ef544b557bb98b605f700f8d15315"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "ef6oa94",
+      "text_sha256": "d38015a81285c6ab46ddab2446ea0c24c87954183a0e1b35c38da831b0adfdcd"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef6xolo",
+      "text_sha256": "bcabf5e7a48979ca565f0c0a2518b9ef092cafeec8c4f08e8853b65aab71bb37"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ef71pfk",
+      "text_sha256": "966ed3ad649ae503d454a1de5db074c4c90ef04febf7e2cb0c78fc2726fbe66b"
+    },
+    {
+      "gold_labels": [
+        "caring",
+        "neutral"
+      ],
+      "id": "ef75kh0",
+      "text_sha256": "86f76b26872b5e6351d581645cc86ddaae1c96971e3164e2745418f4e72ef73f"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ef7715h",
+      "text_sha256": "80d430be7cb3e38d1791f5fc8b855c0fcab20f9a7a148a6e1f68eceea9ce04c1"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "ef77erd",
+      "text_sha256": "b2b43cc709daf89c3d53bcf429bb314b20a528a5f27a6c98c696c836fe0b0396"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "ef77ziw",
+      "text_sha256": "6eaafb673313df07133409511d05c80d9f936b059bbe45973bad3b063238f021"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "ef7jlf9",
+      "text_sha256": "975b1ccc293d23d1bb8e2da5b3d8ddd5291e3a0a64856c4847a6758ff9ab90ff"
+    },
+    {
+      "gold_labels": [
+        "disgust"
+      ],
+      "id": "ef7kpaw",
+      "text_sha256": "4529ccda3af7e85e14c9e70e188fe330cc641c36fed56b176bcf0b95f79c4821"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef7tgnj",
+      "text_sha256": "776f2bc065daf3a44adedad65a8476f795d65f5715ee0dca1d570db91ccdd920"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef7yz0f",
+      "text_sha256": "2c5374a7b0e482695098f478a6d2b738ddb52f6166016369364d72b029d14a74"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "ef8754u",
+      "text_sha256": "0927e848f132e0f6b8509d0a7e2518520e914a55aad28e8759a17fd07b237b8f"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "ef8gm3c",
+      "text_sha256": "5728dd9385bc92c3e186a2b6fed0ba24e2933a60e4ab6c7d59f38f216e631992"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "ef8i6fy",
+      "text_sha256": "69ef08d69f65b6571f6870b61f096c8f4cca63abe575cc38e8fc164adada298b"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef8s17g",
+      "text_sha256": "fb7c0e3292f4df8221e02c4e6de0466a0842e0fa85a74062857dfc89c3b6aa46"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "ef8tw64",
+      "text_sha256": "780e6730302ecca12abbc96ada804730ae0553f808614124d672325f6552c253"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "ef9r278",
+      "text_sha256": "0dbb3955b775a700b0567278e93c6b0d0ec9958606220fa25869a2b8df43346f"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "ef9vqcg",
+      "text_sha256": "064191859d02a629569547fa05f115d8137582de80085658e64e20ba398abb94"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efa9ym5",
+      "text_sha256": "225b54c35eed6cf4c2185b79840ba9c092477db0beda383a3cc9cebdbab7ad73"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "efab1ai",
+      "text_sha256": "3e202f5fed65ebe817485ed2bd8a7cfeaf3d5e3bd2ae58aa167c41054dc6620a"
+    },
+    {
+      "gold_labels": [
+        "love"
+      ],
+      "id": "efacy5s",
+      "text_sha256": "e0a2268d55ba9e8c9cb743e18059d0d43f9cac7fd73bab9753a4ab5d441d7a38"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efak617",
+      "text_sha256": "90cf1cd0812c0bab9a349e0841cd61c643ee50ff343e4463cad83985bad1b428"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efang0u",
+      "text_sha256": "7c3f889e9df743596b11c4cd49f799ba17dd6e669fdd6c1ad0e46ceab45d319c"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "efatcsc",
+      "text_sha256": "180b0af68a6167d3ade3430d1acc83227c47da557e093af6e4ab7b52c7848357"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efatg7f",
+      "text_sha256": "64a978dae64661e5e1d3fddd796134174460220d5c31c118678ef57da97f318d"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "efb2dh5",
+      "text_sha256": "194d34325aa1a6091cd5bee8f36f2a1b4974471af1a5b0ac45f78f0cb879d3cd"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efbkbcg",
+      "text_sha256": "b985f558ec4aba61f0c255e7be892e74c7f8e4d267dc0ba2a57c14a68f738396"
+    },
+    {
+      "gold_labels": [
+        "annoyance"
+      ],
+      "id": "efbnn3t",
+      "text_sha256": "6ee07f1a1f2358118648b83459a5552851be366eea0034ddffd1f8b4e1fa0523"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efbxj2a",
+      "text_sha256": "3d2dc06e03d0a82b33389372cbbb4e568028502c14b7e4efbe0e67b87b39a1d6"
+    },
+    {
+      "gold_labels": [
+        "anger"
+      ],
+      "id": "efc2t5t",
+      "text_sha256": "f33ca18d675406e87571e26b7fab5aaf613ff81aa714a1379bc4a9b82db8ab4c"
+    },
+    {
+      "gold_labels": [
+        "caring"
+      ],
+      "id": "efcmt0h",
+      "text_sha256": "e6bdf976c996334c347778a2a338d1096fd9924a4921b0bbde86be417cb38376"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "efcplj3",
+      "text_sha256": "127604afa216faca04fb443e42b7ac82d025ae3ffb02f89b29c806dcbc891f13"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efcpmu0",
+      "text_sha256": "8f5fe373f557c2737d68e4f50babdd092c38764b41529209b9ab2861d84f5a4a"
+    },
+    {
+      "gold_labels": [
+        "optimism"
+      ],
+      "id": "efd3tlj",
+      "text_sha256": "ffc1378e95e81362f3c3d66ac9a319aac51e07e35a13c47a6a61a31db778d373"
+    },
+    {
+      "gold_labels": [
+        "curiosity"
+      ],
+      "id": "efdwgq8",
+      "text_sha256": "d6941454e6aeed08c74ed25870073e298d08042600cde785346a7e9227d5b9bc"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efdyxi0",
+      "text_sha256": "914e3639c213074a80fc5d93312773ba992e0571957cd5fbe48c2ff0d63d91eb"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efe0fbe",
+      "text_sha256": "e30eb6deae737a0095f3a806400cbdfee256a3351823161ee1168d2820a5e682"
+    },
+    {
+      "gold_labels": [
+        "anger",
+        "disappointment",
+        "realization"
+      ],
+      "id": "efe6psx",
+      "text_sha256": "f1dc0f25119c3b08c1f5863663fcef53f8f38be6fe6083a7add731fa0570c6a3"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efeoo4g",
+      "text_sha256": "391416f718e9238dd41660fcc21cedd7f380fd0f6c84cf6f83df7b18f9214de2"
+    },
+    {
+      "gold_labels": [
+        "admiration"
+      ],
+      "id": "efewsy0",
+      "text_sha256": "1e27d5e24dc35dc3abd19b4be75969698336eed0545c7c236aa32707ae306f71"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "effia0u",
+      "text_sha256": "4a5cfc670ab071566f3d029de187758a0a7b7386e5caba8f816766fcb9a70b95"
+    },
+    {
+      "gold_labels": [
+        "sadness"
+      ],
+      "id": "effntwc",
+      "text_sha256": "863b2ab4b6849b6c3d0544d4b954296e373a675e3acb967886693756b86b68ec"
+    },
+    {
+      "gold_labels": [
+        "approval"
+      ],
+      "id": "effukkt",
+      "text_sha256": "c38a2da04cea2edbf0717bdd392243d55294f0396891237f6efea0fa785056f2"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "effxdsk",
+      "text_sha256": "dfbeeddbf786f510e5c38c825e5061570d74cc06ed19dc77062755daf4d7f7dd"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "efg239h",
+      "text_sha256": "b95a2dfb5b5a02bc8529c7320480393226ea3b1b6217a2aef283e07eb53344b8"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efg39xf",
+      "text_sha256": "9da7c851f2f743b00d5a30a942a9d57411e959e845cf5fbe1455f7273ed3e65f"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efgb0j7",
+      "text_sha256": "be084c3cd91c1600b0751b72375527196e16bcbdc9dca468764eb07c4c029081"
+    },
+    {
+      "gold_labels": [
+        "disapproval"
+      ],
+      "id": "efgh3am",
+      "text_sha256": "8bb04b60adbf61eb3f167156ed9bee3ec7428aa5a8ca52131ea4795ad56dcfc6"
+    },
+    {
+      "gold_labels": [
+        "amusement"
+      ],
+      "id": "efghk7t",
+      "text_sha256": "f0be0bc86a506ba07e08d27b36365047eb9a1f07868653376a4c0f9a34a88dac"
+    },
+    {
+      "gold_labels": [
+        "neutral"
+      ],
+      "id": "efgth8e",
+      "text_sha256": "9cfdfe91ebf740d268c41c80339ffdf211d500e485fc7e4439d7146edfd00880"
+    },
+    {
+      "gold_labels": [
+        "gratitude"
+      ],
+      "id": "efgum0f",
+      "text_sha256": "e3b2dd0a3f09ab6f2b029b303bb6248a6d2320881b47734a16d988c8d6be4f07"
+    },
+    {
+      "gold_labels": [
+        "surprise"
+      ],
+      "id": "efgyfeh",
+      "text_sha256": "1a7ae152755118ff9ec110bd66a0612b38632b37ddad91a417a0f4f849a3377c"
+    },
+    {
+      "gold_labels": [
+        "remorse"
+      ],
+      "id": "efh0c26",
+      "text_sha256": "f5e228921150637e48fdbfc29ded0f04d747e177757e8ba2982725123a825c51"
+    },
+    {
+      "gold_labels": [
+        "joy"
+      ],
+      "id": "efhau83",
+      "text_sha256": "6216406970d1593b7589ab42f4730b9f2dc4eb0e3357a4f4a88522f34dba337d"
+    },
+    {
+      "gold_labels": [
+        "confusion"
+      ],
+      "id": "efhclgb",
+      "text_sha256": "aedc788f93f4cc3f2c7fb8e5899ff5e8f7331708d2b1eab166044bccb164fc48"
+    }
+  ],
+  "seed": 13,
+  "split": "dev",
+  "version": 1
+}

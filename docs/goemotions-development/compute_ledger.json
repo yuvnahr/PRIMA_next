@@ -1,0 +1,69 @@
+{
+  "experiments": [
+    {
+      "experiment": "word_unbalanced_tfidf_seed13",
+      "fit_and_dev_seconds": 93.406,
+      "fit_peak_process_rss": "unavailable_interrupted_monitor",
+      "gpu": false,
+      "projection_session_including_reserve": "not_applicable_local_CPU_only",
+      "quota": "not_applicable",
+      "result": "frozen; dev threshold-fit metric gate passed; exact-set loss; unpromoted",
+      "split": "train43410/dev5426"
+    },
+    {
+      "experiment": "first_full_dev_reload_and_concurrent_broader_checks",
+      "reason": "live processes had flat CPU, no artifact progress and waiting loopback sockets; no timing/success claim",
+      "recovery": "one asyncio loop per CPU batch; reuse exact completed fit and verify all dev predictions",
+      "result": "interrupted_incomplete"
+    },
+    {
+      "experiment": "repaired_frozen_full_dev_reload",
+      "gpu": false,
+      "measured_seconds": 34.04587190004531,
+      "peak_process_rss_bytes": 405929984,
+      "quota": "not_applicable",
+      "result": "all dev metrics exactly reproduced",
+      "split": "dev5426"
+    },
+    {
+      "experiment": "three_Qwen_prompts_dev512",
+      "pilot": null,
+      "projection_session_including_reserve": null,
+      "quota": "unavailable; must check live before admission",
+      "result": "pending_not_run"
+    },
+    {
+      "experiment": "optional_deberta_v3_small",
+      "pilot": null,
+      "projection_session_including_reserve": null,
+      "quota": "unavailable",
+      "reason": "local RTX 3050 has 4096 MiB; no matching live T4 allocation, account quota, sequence smoke or validation/export pilot",
+      "result": "not_admitted"
+    },
+    {
+      "experiment": "replacement_correction",
+      "reason": "no real calibrated per-label policy, predeclared margins, measured per-label harm or integrated cost",
+      "result": "not_admitted"
+    },
+    {
+      "experiment": "final_test5427",
+      "pilot": null,
+      "projection_session_including_reserve": null,
+      "quota": "unavailable",
+      "result": "not_run_deferred_after_reviewed_integration"
+    }
+  ],
+  "fingerprint": "ab50af1ef3b4bb18e349d274f7c7d6262398447b237f88e155d0f79c17118d28",
+  "gpu_campaign_contract": {
+    "campaign_hours_max": 10.5,
+    "finalization_reserve_seconds_min": 900,
+    "production_admitted": false,
+    "safety_margin_min": 0.2,
+    "session_hours_max": 12
+  },
+  "preregistration": {
+    "cpu_driver_started_utc": "2026-10-21T15:49:37.414201+00:00",
+    "selection_fingerprint": "e650c545e01e57cdf452ed55ec342c41b356b3bd9058aa9624326592598cacf2"
+  },
+  "version": 1
+}
