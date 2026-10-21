@@ -164,7 +164,7 @@ def test_old_record_without_policy_fields_remains_readable() -> None:
         "prima_decision": {"reason": "add_prima_lexical_emotion"}, "raw_response": '{"labels":["anger","neutral"]}',
     }
     metrics = experiment._metrics([record], list(LABELS), 13, 2)
-    assert metrics["headline_affect_comparison"]["sample_count"] == 1
+    assert metrics["headline_affect_comparison"]["sample_count"] == 0
     assert record["prima_decision"]["reason"] == "add_prima_lexical_emotion"
     assert "label_policy_version" not in record
 

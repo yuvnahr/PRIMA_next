@@ -4,8 +4,8 @@
 
 Delivery branch: `dev-p2`. Actual implementation base/predecessor:
 `c25a178d6308bc48b3a5e44d9519316a5179c499`, matching the planning snapshot.
-Status: **Goal 1 implementation acceptance complete**; Goals 2–4 and measured
-benchmark/release acceptance remain pending.
+Status: **Goal 1 implementation acceptance complete**. Later checkpoint status
+is recorded in the corresponding sections below; measured release acceptance is separate.
 Goal 1 is the first checkpoint; its own commit SHA belongs in the completion
 message. Work was isolated in the attached `goemotions-b1` worktree because
 the user's checkout contained unrelated untracked documents/directories.
@@ -13,8 +13,8 @@ No Person 1 files, external submodules, notebook, dependencies or CI were edited
 No push, PR, merge to `dev`, training or production campaign is authorized by this checkpoint.
 
 The four-goal workflow supersedes the source plan's intermediate PR/merge order.
-Only B1 is implemented here. Goals 2–4 remain pending, including final integration
-against Person 1's completed pinned checkpoint. Person 1 completion is supplied
+This section records the B1 checkpoint. Later work includes final integration
+against Person 1's completed pinned checkpoint. Person 1 completion was supplied
 by the user; this checkpoint does not independently certify it.
 
 ## Requirements, implementation and evidence
@@ -207,3 +207,221 @@ acceptance is inferred from these offline checks.
 Rollback: revert this one scoped checkpoint or select a previously reviewed
 explicit configuration using a new campaign identity. Never reset `dev`, rewrite
 the historical archive, or resume across incompatible policy fingerprints.
+
+## Goal 2: metrics, confidence and report semantics
+
+Predecessor and actual base: `e0dd105484a2f78fc7a13811c83ef4e04aaad440` (Goal 1),
+verified as `dev-p2` HEAD before work. The separate `goemotions-b2` worktree
+preserves the original checkout's unrelated files. Status: **Goal 2 implementation
+acceptance complete**; the successful checkpoint's own SHA belongs in
+the completion response. Only B2 is in scope, with final notebook presentation
+and actual combined producer/consumer integration reserved for Goal 4.
+
+### Requirement and caller coverage
+
+| B2 requirement | Producer/consumer | Evidence |
+|---|---|---|
+| Same paired sample-F1 statistic and sampling | `benchmarks/goemotions/metrics.py` precomputes per-case differences; identical seeded `randrange` calls and percentile indices | Frozen old-reference tests, empty/zero/negative/single/wrong/mixed/swapped cases; full historical profiling below |
+| Confidence requires eligible scores | `systems.py`, `experiment.py`, `metrics.py`; benchmark dictionaries suppress label-indicator confidence | Tests for label-only, uncalibrated, partial/nonfinite/out-of-range/bool scores and identity mismatch |
+| Actual calibration identities | Encoder receives generation revision; calibration writer/fitter/CLI retain model revision and dev hash | Synthetic artifact/hash/model/temperature checks; missing old revision remains unavailable |
+| Complete selected probability population | Metric eligibility checks every selected case, including failed checkpoints, one calibration identity and full official 28-label vector | Positive calibrated fixture, missing/failed/mixed-identity and empty populations |
+| Multilabel metrics and counts | Existing evaluator plus prediction counts; native report adds weighted/precision/recall/Jaccard/Hamming/cardinality and per-label table | Metric/reference and report assertions; low-support context retained |
+| Partial correction gains/harms | Valid same-response populations only; original hashes/parses rechecked | Partial-F1 gain without exact gain, regression and added-label precision fixtures |
+| Correct provider/cache/token accounting | Existing bounded provider adds thread-local request measurements; default standalone systems reuse it | Actual fake-provider cache/retry tests and a tiny native campaign; failures have unavailable billed tokens |
+| Monotonic active time and resume | Shared `AttemptTimer`, native experiment and campaign orchestrator | Checkpointed active attempts, interrupted/open-tail handling and synthetic calendar downtime |
+| Old/new report consumers | `benchmarks/common/reporting.py`, campaign aggregation | Exact committed Person 1 old/new fixtures; missing fields stay unavailable; legacy reflection/throughput aliases documented |
+
+Caller searches included bootstrap/evaluation functions, `_metrics`, native
+serialization/reporting, all system constructors and source conversions, shared
+provider cache/retry paths, campaign aggregation and calibration CLI/helper calls.
+No Person 1 source/config/runtime files, notebook cells, dependency manifests,
+external data or submodules were changed. Existing classification labels and B1
+correction safety remain unchanged.
+
+### Frozen report contract for Goal 3 and Goal 4
+
+`report_schema_version="2.0"` is additive in metrics/manifests and changes exact
+resume identity. It does not reinterpret historical stored predictions. A B1
+campaign needs an explicitly new identity for B2 execution; old archives remain
+readable for offline evaluation with unavailable observations.
+
+- Label-only output exposes `confidence_available=false`, `confidence=null` and
+  a reason, including the serialized benchmark `prediction` dictionary. The
+  generic runtime `EmotionPrediction` stays unchanged; its internal indicator
+  vector cannot become probabilistic confidence through report conversion.
+- `probability_provenance` requires trained scores, matched actual model/revision,
+  `scalar_temperature`, dev split/hash and calibration artifact SHA-256. Encoder
+  temperature must match the loaded calibration. The fitter/CLI forwards the
+  existing `--revision`. Old artifacts with no revision can still load, but do
+  not authorize confidence or calibrated metrics. No new calibration fit or
+  training was performed in B2.
+- Aggregate probability metrics require one verified identity and a valid full
+  28-label vector for every selected case. Missing scores, parse/execution
+  failures, mismatched calibration or a partial population yields unavailable
+  metrics and confidence, with eligible/selected counts. Raw sigmoid scores are
+  insufficient. Calibration identity is checked against the selected dataset's
+  actual development/validation split hash.
+  Eligible confidence is the maximum calibrated label score (aggregate: its
+  mean), not a calibrated probability that the whole predicted set is correct.
+- `populations` and `primary_outcome_counts` disclose the legacy metric
+  denominator (execution-success records, with parse failures scored as their
+  observed prediction), execution errors, original parse failures, valid label
+  errors and exact successes. Primary counts reconcile to all selected cases.
+  An old neutral fallback never conceals an original baseline parse failure;
+  its historical prediction is retained rather than rewritten.
+- `label_correction` adds partial-F1 gain/harm/unchanged counts, mean change,
+  correct/total added labels and added-label precision (null for no additions).
+  Only verified valid same-response pairs enter it; exclusions are counted.
+  An empty eligible population is unavailable, with null mean change, rather
+  than evidence of zero correction gain.
+  `improved_after_label_correction` / `regressed_after_label_correction` are
+  canonical. Old reflection-named aliases are explicitly deprecated label
+  outcomes. Runtime reflection is separately not applicable / zero executed in
+  affect-only classification. No inference about reflection benefit is made.
+- `classification_provider` is request-scoped and includes actual send attempts,
+  successes, retries, cache hits, known uncached tokens and inference-window
+  endpoints. Logical classification calls count even when generic runtime
+  `MODEL_EXECUTOR` is not applicable. Cached usage is logical; it is not charged
+  again as actual inference. Failed provider requests can consume unknown tokens,
+  so total actual tokens are unavailable when such usage cannot be observed.
+  Uninstrumented old/external clients also report actual counts unavailable.
+- `performance.wall_throughput_examples_per_second` uses completed checkpoints
+  (including recorded execution failures) / measured active wall seconds.
+  `examples_per_summed_latency_second` is a distinct diagnostic. Provider rate
+  is successful uncached sends / observed inference-window duration, grouped by
+  active attempt; overlapping latencies are never summed as wall time. Logical
+  and actual token totals/rates are separate, with unknown usage unavailable.
+  Deprecated `throughput_examples_per_second`, `total_tokens` and
+  `tokens_per_second` retain their old summed-latency/logical meanings, with an
+  explicit alias map and observed partial sums where old usage was incomplete.
+  Canonical full totals/rates remain unavailable when their coverage is missing.
+  Notebook readers must use the new canonical fields.
+- `attempt_timings.jsonl` records cumulative monotonic elapsed time durably on
+  checkpoint and phase boundaries. Summaries add active attempts, never calendar
+  downtime. An unclosed hard-killed attempt is a measured lower bound and makes
+  wall throughput unavailable. A reporting snapshot explicitly excludes its
+  final statistics/summary refresh; it is not claimed as an all-inclusive
+  session or model timing. Calendar seconds are reported separately.
+- Campaign aggregates expose `report_semantics`. QA component coverage and
+  conversation replay/admission/maintenance coverage have separate populations;
+  missing replay records are unavailable. Old last-hop recall never becomes
+  all-hop recall. Candidate/accumulated/supplied/cited stages stay distinct;
+  evidence flags are non-additive and new primary failures remain disjoint.
+  Official/legacy `answer_scores` and authoritative reflection audits are
+  preserved from producers rather than reconstructed.
+
+Person 1 fixture source: `dev-p1` pinned at
+`4d4b76b1462f18d70450d51a4ee1c2714d558dd9`. Exact committed bytes of
+`report_contract.json` and `goal4_producer_contract.json` were copied into the
+owned `tests/fixtures/campaign/person1_*.json` paths; producer files were not
+modified or merged. Their old/new expectations are exercised now. Actual
+producer execution against final Person 2 notebook/consumers remains the
+explicit Goal 4 combined-checkout acceptance gate, not a substitute handwritten
+schema or an unimplemented GoEmotions B2 dependency.
+
+### Measurement and validation ledger
+
+The historical archive and expected SHA-256 are the same verified input as B1.
+The full old/new 1,000-resample CPU comparison is run serially using the exact
+pre-B2 metric source from predecessor `e0dd105`, identical 5,427 saved cases,
+seed 13, and the existing Python 3.14.8 environment. An initial profiling probe
+was deliberately stopped when a competing test process was noticed; it is not
+used as performance evidence. No test jobs overlap the retained comparison.
+Metrics, figures, report serialization and five-artifact ZIP packaging are
+measured separately. The retained serial comparison completed successfully:
+
+| Measured CPU phase | Seconds |
+|---|---:|
+| Original bootstrap, 1,000 resamples | 1367.622843 |
+| Optimized bootstrap, same resamples/seed/cases | 3.025457 |
+| One multilabel evaluation | 0.975321 |
+| Complete current metric producer, including bootstrap | 5.529434 |
+| Three figures, including matplotlib setup | 3.418314 |
+| Native report and metric JSON serialization | 0.012327 |
+| Five-artifact ZIP write and CRC validation | 0.143370 |
+
+This is an observed 452.04x bootstrap speedup for this one local calculation,
+not an end-to-end campaign speedup. Packaging covers only three figures, the
+native report and metrics JSON, not a complete campaign bundle. Reference
+source SHA-256: `319ce5887533519e3f2cbf99d7a423c1233790a49ed9c1b73c7b060550c1aee0`.
+Environment: Python 3.14.8, Windows 11 build 26300, unchanged project dependencies.
+
+The old result was delta `-0.02305140961857377`, interval
+`[-0.025403844972667566, -0.020748111295375016]`; new result was delta
+`-0.023051409618573798`, interval
+`[-0.025403844972667528, -0.020748111295374978]`. All differences passed 1e-12
+absolute-tolerance checks (small fixtures use 1e-14). This reproduces the
+historical negative correction result on saved responses; it does not measure a
+new policy or infer the cause of all 840 historical postprocessing seconds.
+The serial final-code recheck (after metadata/report compatibility hardening)
+matched the same complete historical statistic again. Its bootstrap was
+1.319162 s, one evaluation 0.589854 s, complete producer metrics 5.503815 s,
+figures 2.781660 s, report serialization 0.004723 s and packaging 0.092156 s.
+These repeat timings vary; the 452.04x figure above belongs to the first paired
+observation, not a universal latency claim or a cherry-picked comparison using
+the faster repeat. All ten modified production Python files matched the
+normalized source hashes recorded by this final recheck.
+
+The archive's original corrected predictions independently yielded 9 partial-F1
+gains, 403 partial-F1 harms, 5,015 unchanged sample-F1 scores, 669 added labels
+with 9 correct additions (precision 0.013452914798), 2 exact-set improvements and
+379 exact-set regressions. Counts reconcile over 5,427 valid pairs. There were
+811 exact matches and 4,616 valid label errors, with zero execution/parse errors.
+This is historical correction analysis; the safe new preserve-label policy has
+no semantic edits and is not being credited with a trained-model improvement.
+
+Local evidence is preserved under
+`C:\Users\galad\OneDrive\Desktop\Capstone\code\PRIMA_next\evaluation\goemotions\smoke\b2_profile`
+(ignored output, excluded from the commit): drivers, summaries, native reports,
+metrics, figures and both CRC-validated five-artifact ZIP probes.
+`summary.json` SHA-256 is
+`a517da996faca17eccf88d36faa81f32a4d84131543e213dd58f762852589d21`;
+`final_recheck.json` SHA-256 is
+`925b41d7731f9a107bdde33f9c62370171ec9d4d71535787e7653d80d34aac8a`.
+The committed results above remain the durable evidence even without those
+ignored outputs. The two exact pinned Person 1 fixture copies were byte-checked
+against their Git blobs before staging.
+
+Final validation, existing Python 3.14.8 environment without dependency changes:
+
+- Focused safety/affect/metrics/report suite: **120 passed in 5.83 s**. The frozen
+  scalar reference is independent of current scoring helpers; absolute tolerance
+  is 1e-14 with relative tolerance disabled.
+- Full affected GoEmotions/affect/campaign/common/integration run: **276 passed,
+  1 failed in 72.22 s**. The sole failure is the unchanged worktree notebook
+  child-identity issue already reproduced on the clean base in B1.
+- Final broader recheck: **276 passed, 1 explicitly deselected in 66.66 s**;
+  only that already-confirmed notebook test was excluded. Its failure remains
+  recorded rather than presented as a passing check.
+- Scoped Ruff over affect, GoEmotions, common, campaign and affected tests: **all
+  checks passed**. `git diff --check --ignore-submodules=all`: **passed**.
+- Scoped strict-package mypy: **success, no issues in 5 entry files**. Its initial
+  split-validation `object.get` finding was fixed with an explicit dictionary/
+  string boundary; no task-caused check failure remains.
+- Notebook and Person 1 producer/config paths have no diff. The B1 checkpoint
+  remains the predecessor; no unrelated tracked changes were included.
+
+Commands actually executed (use the same `$py` interpreter defined above):
+
+```powershell
+& $py -m evaluation.goemotions.smoke.b2_profile.profile
+& $py -m evaluation.goemotions.smoke.b2_profile.final_recheck
+& $py -m pytest -q tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks/test_goemotions_metrics_reporting.py --tb=short
+& $py -m pytest -q tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks tests/integration --tb=short
+& $py -m pytest -q tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks tests/integration --deselect 'tests/benchmarks/test_kaggle_smoke.py::test_notebook_smoke_stages_native_artifacts_and_partial_packages[goemotions]' --tb=short
+& $py -m ruff check affect benchmarks/goemotions benchmarks/common benchmarks/campaign tests/test_goemotions_benchmark.py tests/test_goemotions_upgrade.py tests/test_goemotions_review_regressions.py tests/affect tests/benchmarks/test_goemotions_metrics_reporting.py tests/fixtures/goemotions_review/bootstrap_reference.py
+& $py -m mypy benchmarks/common/reporting.py benchmarks/common/timing.py benchmarks/campaign/provider_session.py benchmarks/campaign/orchestrator.py benchmarks/campaign/aggregation.py
+git diff --check --ignore-submodules=all
+```
+
+Goal 3's prerequisite is this successful checkpoint with the frozen statistic,
+eligible-population rules, raw metric precision and policy/report identities.
+No prompt, threshold or correction-policy selection was performed here. Final
+notebook consumers and actual combined execution with Person 1's pinned final
+head remain Goal 4 acceptance work; the available B2 fixture consumers are done.
+
+The known worktree-only notebook child-identity issue from B1 remains assigned
+to Goal 4. Full CI/Kaggle Python, GPU resource/time gates, account quota, fresh
+inference, trained-model quality and final notebook migration are not inferred
+from local fake-provider tests or offline metric profiling. No push, PR, merge
+to `dev`, Goal 3 tuning or full production run is part of B2.

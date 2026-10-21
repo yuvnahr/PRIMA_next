@@ -6,6 +6,10 @@ The default is `affect_telemetry_preserve_labels`: the existing schema-constrain
 
 Each response retains its original text/hash, baseline/final labels, parse error, correction decision and evidence source. `label_correction` is the canonical audit; `affect_decision` and `prima_decision` remain compatibility views, not runtime reflection. A neutral fallback may keep runtime telemetry operating after malformed output, but it is explicitly `runtime_only_not_scored`: parsing still fails, scored labels remain empty and the record is excluded from the valid same-response headline. QA, retrieval, planning, tools and runtime reflection are outside this route.
 
+Reports use schema 2.0. Label-only confidence is unavailable (`confidence_available=false`, `confidence=null`); raw sigmoid scores also require verified dev calibration, model/revision and artifact identities before probability metrics are eligible. Every selected case must have a valid full 28-label vector. The generic runtime prediction type is unchanged.
+
+Use `performance.wall_throughput_examples_per_second` for measured active wall throughput. Summed-latency diagnostics, provider inference-window rates, cache hits, logical tokens and observed uncached tokens are separate. Deprecated keys retain their explicitly documented historical meanings. `attempt_timings.jsonl` separates resumed active work from calendar downtime; an unclosed attempt makes wall throughput unavailable. Native reports include per-label support/prediction counts, distinct execution/parse/label failures and partial-F1 correction gains/harms. Campaign `report_semantics` consumes these values and keeps LoCoMo replay coverage separate from QA coverage. See the handoff for exact scopes, aliases and the measured bootstrap comparison.
+
 Learned backends are opt-in via `PRIMA_AFFECT_BACKEND=goemotions_pretrained` or `goemotions_deberta`; otherwise PRIMA keeps `LegacyAffectClassifier`.
 
 The learned inference/training dependencies are included in the repository's `requirements.txt`.

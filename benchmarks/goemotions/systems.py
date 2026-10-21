@@ -71,6 +71,8 @@ class _LLMPredictionSource:
         prompt = build_prompt(
             text, list(LABELS), include_definitions=self.include_definitions, structured=self.schema_constrained
         )
+        if hasattr(self.client.provider, "reset_request_metrics"):
+            self.client.provider.reset_request_metrics()
         response = self.client.chat(
             prompt,
             generation_config=self.generation,
@@ -83,6 +85,14 @@ class _LLMPredictionSource:
             "provider_response": response.raw,
             "provider_usage": dict(response.usage or {}),
             "probabilities_available": False,
+            "confidence_available": False,
+            "confidence": None,
+            "confidence_reason": "label_only_or_unavailable_scores",
+            "logical_classification_provider_calls": 1,
+            "classification_provider": (
+                self.client.provider.request_metrics() if hasattr(self.client.provider, "request_metrics")
+                else {"available": False, "reason": "provider_request_instrumentation_unavailable"}
+            ),
             "baseline_labels": sorted(selected),
             "baseline_parse_error": parse_error,
             "baseline_empty_output": not response.text.strip(),
@@ -169,8 +179,15 @@ class _RuntimeClassificationSystem:
 
     def _client(self) -> LLMClient:
         if self._client_instance is None:
+            from benchmarks.campaign.provider_session import _BoundedProvider
+
             self._client_instance = LLMClient(provider_name=self.generation.provider)
+            self._client_instance.provider = _BoundedProvider(self._client_instance.provider, 1)
         return self._client_instance
+
+    def provider_request_metrics(self) -> dict[str, Any]:
+        provider = self._client().provider
+        return provider.request_metrics() if hasattr(provider, "request_metrics") else {"available": False}
 
     def _execute(self, text: str, source: _PredictionSource) -> tuple[str, dict[str, Any]]:
         adapter = getattr(self._runtime_local, "adapter", None)
@@ -220,8 +237,11 @@ class _RuntimeClassificationSystem:
         if forbidden & set(response.diagnostics.executed_components):
             raise RuntimeError("GoEmotions activated a component outside the bounded affect route.")
         return source.last_raw, {
+            "confidence_available": False,
+            "confidence": None,
+            "confidence_reason": "probability_eligibility_requires_benchmark_split_identity",
             **source.last_metadata,
-            "prediction": prediction.to_dict(),
+            "prediction": {**prediction.to_dict(), "confidence": None, "confidence_available": False},
             "final_scored_labels": source.last_metadata.get("final_scored_labels", list(prediction.selected_labels)),
             "system_name": self.name,
             "system_family": self.system_family,
@@ -307,6 +327,7 @@ class EncoderSystem(_RuntimeClassificationSystem):
 
         self._encoder = GoEmotionsEncoder(
             self.generation.model,
+            revision=self.generation.revision,
             requested_device=self.classifier.device,
             batch_size=self.classifier.batch_size,
             thresholds_path=self.classifier.thresholds_path,
@@ -332,11 +353,36 @@ class EncoderSystem(_RuntimeClassificationSystem):
                             "wrapper_attribution": False,
                             "probabilities_available": True,
                             "evidence_source": "trained_probability",
+                            "probability_provenance": self._calibration_provenance(prediction),
+                            "logical_classification_provider_calls": 0,
+                            "classification_provider": {
+                                "available": True, "attempts": 0, "successes": 0, "retries": 0,
+                                "cache_hits": 0, "actual_tokens": 0, "actual_tokens_available": True,
+                                "inference_started": None, "inference_finished": None,
+                            },
                         },
                     ),
                 )
             )
         return results
+
+    def _calibration_provenance(self, prediction: EmotionPrediction) -> dict[str, Any]:
+        path = self.classifier.calibration_path
+        if path is None:
+            return {"source": "trained_probability", "calibrated": False}
+        content = path.read_bytes()
+        calibration = json.loads(content)
+        return {
+            "source": "trained_probability",
+            "calibrated": (calibration.get("model_id") == prediction.model_id
+                           and calibration.get("model_revision") == prediction.model_revision
+                           and prediction.model_revision is not None
+                           and calibration.get("temperature") == (prediction.metadata or {}).get("calibration_temperature")),
+            "model_id": calibration.get("model_id"), "model_revision": calibration.get("model_revision"),
+            "method": calibration.get("method"), "split": "dev",
+            "dev_dataset_sha256": calibration.get("dev_dataset_sha256"),
+            "artifact_sha256": hashlib.sha256(content).hexdigest(),
+        }
 
 
 def _legacy_generation(provider: str, model: str, *, schema: bool) -> GenerationConfig:

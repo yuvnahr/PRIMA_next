@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any, Literal
 
@@ -15,9 +16,11 @@ from benchmarks.campaign.registry import child_manifest_path, execute_mode
 from benchmarks.campaign.scheduler import schedule_modes
 from benchmarks.campaign.telemetry import collect_host_telemetry
 from benchmarks.common.contracts import BenchmarkManifest, RunStatus
+from benchmarks.common.timing import AttemptTimer
 
 
 def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, Any]:
+    attempt_started = time.perf_counter()
     if config.run_kind == "smoke" and resume:
         raise ValueError("Smoke campaigns must be fresh; resume is disabled")
     session = SharedProviderSession(
@@ -26,6 +29,8 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
     preflight = run_preflight(config, session)
     store = CampaignManifestStore(config.output_root)
     manifest = store.initialize(config, preflight, resume=resume)
+    timer = AttemptTimer(config.output_root / "attempt_timings.jsonl", started=attempt_started)
+    timer.record("setup")
     host_before = collect_host_telemetry(config.telemetry.gpu) if config.telemetry.enabled else {}
     results: dict[str, dict[str, Any]] = {}
     pending = [mode for mode in config.benchmarks if manifest.modes[mode.id].status != "complete"]
@@ -76,7 +81,12 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
                 raise
             return {"error": str(exc)}
 
-    schedule_modes(pending, config.scheduler, run_one)
+    try:
+        schedule_modes(pending, config.scheduler, run_one)
+    except BaseException:
+        timer.record("interrupted", finished=True)
+        raise
+    timer.record("execution")
     current = store.read()
     for mode in config.benchmarks:
         if mode.id not in results and current.modes[mode.id].status == "complete":
@@ -112,6 +122,9 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
         "after": _gpu_memory(telemetry["host_after"]),
         "measurement": "campaign-boundary snapshots; not peak usage",
     }
+    timer.record("reporting_snapshot", finished=True)
+    telemetry["campaign_timing"] = timer.summary()
+    telemetry["campaign_timing"]["scope"] = "through mode execution, comparisons and telemetry; aggregate/manifest refresh excluded"
     current = store.read()
     write_aggregate(config.output_root, current.campaign_id, current.modes, comparisons, telemetry,
                     run_kind=config.run_kind)
