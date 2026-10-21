@@ -6,6 +6,7 @@ import builtins
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
+from memory.evolution.semantic_abstraction_engine import factual_evidence_eligible
 from memory.graph.graph_builder import GraphBuilder
 from memory.graph.graph_repository import ChromaGraphRepository, GraphRepository
 from memory.memory_note import MemoryNote
@@ -24,6 +25,12 @@ class MemoryIndex(MemoryRepository):
     repository: MemoryRepository
     graph_repository: GraphRepository | None = field(default_factory=GraphRepository)
     _graph_initialized: bool = field(default=False, init=False, repr=False)
+    factual_only: bool = False
+    source_conversation_id: str | None = None
+
+    def _visible(self, note: MemoryNote) -> bool:
+        return ((not self.factual_only or factual_evidence_eligible(note)) and (not self.source_conversation_id
+            or note.context.get("source_conversation_id", self.source_conversation_id) == self.source_conversation_id))
 
     def __post_init__(self) -> None:
         if self.graph_repository is None:
@@ -62,10 +69,11 @@ class MemoryIndex(MemoryRepository):
         return saved
 
     def get(self, note_id: str, memory_type: MemoryType | None = None) -> MemoryNote | None:
-        return self.repository.get(note_id, memory_type)
+        note = self.repository.get(note_id, memory_type)
+        return note if note is None or self._visible(note) else None
 
     def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
-        return self.repository.list(memory_type)
+        return [note for note in self.repository.list(memory_type) if self._visible(note)]
 
     def query(
         self,
@@ -73,7 +81,9 @@ class MemoryIndex(MemoryRepository):
         memory_type: MemoryType | None = None,
         limit: int = 10,
     ) -> builtins.list[tuple[MemoryNote, float]]:
-        return self.repository.query(embedding, memory_type, limit)
+        excluded = sum(not self._visible(note) for note in self.repository.list(memory_type)) if self.factual_only or self.source_conversation_id else 0
+        rows = self.repository.query(embedding, memory_type, limit + excluded)
+        return [(note, score) for note, score in rows if self._visible(note)][:limit]
 
     def _sync_graph(self) -> None:
         notes = self.repository.list()

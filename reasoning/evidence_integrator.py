@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from memory.evolution.semantic_abstraction_engine import factual_evidence_eligible
 from memory.retrieval.retrieval_controller import RetrievalResponse
 from reasoning.models import EvidenceItem, EvidenceState
 
@@ -27,7 +28,7 @@ class EvidenceIntegrator:
         added = duplicates = excluded = 0
         for result in response.results:
             source_id = result.note.id
-            if not result.note.content.strip() or not result.note.context.get("evidence_eligible", True):
+            if not result.note.content.strip() or not factual_evidence_eligible(result.note):
                 excluded += 1
                 continue
             normalised = _normalise(result.note.content)

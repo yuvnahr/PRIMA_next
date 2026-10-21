@@ -58,15 +58,26 @@ class CorrectionAttempt:
     after_confidence: float
     confidence_delta: float = 0.0
     utility: float = 0.0
+    proposal_accepted: bool = False
+    executed: bool = False
+    validated: bool | None = None
+    rejected_output: dict[str, Any] | None = None
+    before_generation: Any = field(default=None, repr=False)
+    before_generation_count: int = 0
+    before_retrieval_count: int = 0
+    before_prompt_evidence: list[dict[str, Any]] = field(default_factory=list, repr=False)
+    before_reasoning: Any = field(default=None, repr=False)
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize one schema-versioned correction record."""
         return {
-            "schema_version": "1.0",
+            "schema_version": "2.0",
             "attempt_index": self.attempt_index,
             "stage": self.stage,
             "advice": self.advice.to_dict(),
             "accepted": self.accepted,
+            "proposal_accepted": self.proposal_accepted, "executed": self.executed, "validated": self.validated,
+            "rejected_output": self.rejected_output, "utility_interpretation": "heuristic_change_score",
             "decision_reason": self.decision_reason,
             "before_query": self.before_query,
             "after_query": self.after_query,
@@ -105,7 +116,12 @@ class CorrectionLoop:
             attempt_index=len(context.correction_attempts) + 1,
             stage=stage,
             advice=advice,
-            accepted=accepted,
+            accepted=False,
+            proposal_accepted=accepted,
+            before_generation=context.generation_result,
+            before_generation_count=int(context.metadata.get("generation_count", 0)),
+            before_retrieval_count=int(context.metadata.get("evidence_acquisition_attempts", 0)),
+            before_prompt_evidence=list(context.prompt_evidence), before_reasoning=context.reasoning_result,
             decision_reason=reason,
             before_query=query,
             after_query=candidate if accepted and candidate else query,
@@ -126,8 +142,40 @@ class CorrectionLoop:
         answer = _answer_snapshot(context.generation_result)
         confidence = _confidence_snapshot(context)
         for attempt in context.correction_attempts:
-            if not attempt.accepted:
+            if not attempt.proposal_accepted or attempt.validated is not None:
                 continue
+            attempt.executed = (int(context.metadata.get("generation_count", 0)) > attempt.before_generation_count
+                or int(context.metadata.get("evidence_acquisition_attempts", 0)) > attempt.before_retrieval_count
+                or _plan_snapshot(context.plan) != attempt.before_plan)
+            if not attempt.executed and getattr(getattr(context.workflow_state, "current_phase", None), "value", "") != "output":
+                continue
+            valid = bool(getattr(context.output_validation, "valid", False))
+            candidate_generation = context.generation_result
+            valid = valid and not (getattr(candidate_generation, "errors", ())
+                                  or getattr(candidate_generation, "validation_errors", ())
+                                  or getattr(candidate_generation, "failure_kind", None))
+            if str(context.metadata.get("task_kind")) == "factual_qa":
+                generation = context.generation_result
+                selected = set(getattr(generation, "selected_source_ids", ()))
+                supplied = {row["memory_id"] for row in context.prompt_evidence}
+                outcome = getattr(getattr(generation, "outcome", None), "value", "")
+                valid = valid and (outcome == "abstained" or (
+                    outcome == "answered" and bool(selected) and selected <= supplied
+                    and bool(getattr(context.reasoning_result, "evidence_references", ()))))
+            attempt.validated = valid
+            attempt.accepted = bool(attempt.executed and valid)
+            if not attempt.accepted:
+                candidate = context.generation_result
+                attempt.rejected_output = candidate.to_dict() if hasattr(candidate, "to_dict") else {"text": answer}
+                attempt.rejected_output["prompt_evidence"] = list(context.prompt_evidence)
+                attempt.decision_reason = "invalid_corrected_output" if attempt.executed else "correction_not_executed"
+                if attempt.before_generation is not None:
+                    context.generation_result = attempt.before_generation
+                    context.prompt_evidence = list(attempt.before_prompt_evidence)
+                    context.reasoning_result = attempt.before_reasoning
+                    answer = _answer_snapshot(context.generation_result)
+            else:
+                attempt.decision_reason = "validated_evidence_and_output"
             attempt.after_query = query
             attempt.after_plan = plan
             attempt.after_answer = answer
@@ -148,6 +196,11 @@ class CorrectionLoop:
         candidate: str,
     ) -> str:
         budget: RequestBudget | None = getattr(context, "request_budget", None)
+        if not context.metadata.get("reflection_enabled", True):
+            return "reflection_off"
+        gate_decision = getattr(getattr(context, "execution_decision", None), "decision", None)
+        if str(gate_decision) in {"abstain", "ask_for_clarification"}:
+            return "gate_terminal_decision"
         if budget is not None:
             if budget.remaining_seconds <= 0:
                 return "time_budget"

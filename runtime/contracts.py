@@ -206,6 +206,7 @@ _INTERNAL_CONTROL_KEYS = {
     "retrieval_query_override",
     "correction_budget",
     "tool_results",
+    "reflection_enabled",
 }
 
 

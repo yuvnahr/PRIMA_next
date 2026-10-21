@@ -24,6 +24,7 @@ class ReflectionContext:
     failure_type: FailureType | None = None
     failure_metadata: dict[str, Any] = field(default_factory=dict)
     affect_signals: tuple[Any, ...] = ()
+    read_only: bool = False
 
     def state_snapshot(self) -> dict[str, Any]:
         if self.cognitive_state is None:

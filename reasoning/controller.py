@@ -117,15 +117,22 @@ class ReasoningController:
             query = need.query
             hop += 1
     def _advised_query(self, state: EvidenceState, query: str, hop: int, stop_reason: str, decision: SufficiencyDecision) -> str | None:
+        from uncertainty.execution_gate import UncertaintyGate
+
         event = {"no_new_evidence": ReflectionEvent.NO_NEW_EVIDENCE, "duplicate_query": ReflectionEvent.DUPLICATE_QUERY, "contradictory": ReflectionEvent.CONTRADICTORY_EVIDENCE}.get(stop_reason)
         budget = state.request.budget
-        if (event is None or self.reflection_advisor is None or state.reflection_interventions >= budget.max_reflection_interventions
-                or state.shared_budget.retrieval_time_exhausted):
+        suppression = UncertaintyGate.reflection_suppression(enabled=self.reflection_advisor is not None,
+            remaining_seconds=state.shared_budget.remaining_seconds,
+            remaining_calls=state.shared_budget.max_llm_calls - state.shared_budget.llm_calls,
+            interventions=state.reflection_interventions, max_interventions=budget.max_reflection_interventions,
+            work_available=(not state.shared_budget.retrieval_time_exhausted
+                and state.shared_budget.retrieval_calls < budget.max_retrieval_calls and len(state.attempted_queries) < budget.max_hops))
+        if event is None or suppression or self.reflection_advisor is None:
             if event is not None:
                 state.add_trace(
                     "ReflectionSuppressed",
                     hop,
-                    reason_code="disabled_or_budget",
+                    reason_code=suppression or "not_eligible",
                     before_query=query,
                     after_query=query,
                     before_plan=None,

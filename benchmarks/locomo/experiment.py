@@ -222,11 +222,13 @@ async def _run_conversation(
     checkpoint: Callable[[dict[str, Any]], None], context_budget: int = 1600,
     timing: Callable[[dict[str, Any]], None] | None = None,
     include_captions: bool = False,
+    admission_checkpoint: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
     ingestion_failure: PrimaResponse | None = None
     historical_replay_ms = 0.0
+    admissions = []
     history_started = time.perf_counter()
     if hasattr(runtime, "start_maintenance"):
         await runtime.start_maintenance()
@@ -234,6 +236,11 @@ async def _run_conversation(
         for turn in conversation.turns:
             replay_started = time.perf_counter()
             response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation, include_captions))
+            admissions.append({"conversation_id": conversation.id, "turn_id": str(turn.turn_id),
+                "source_session_id": turn.session_id, "speaker": turn.speaker, "source_timestamp": turn.timestamp,
+                "input_sha256": hashlib.sha256(_turn_text(turn, include_captions).encode()).hexdigest(),
+                "execution_status": response.status.value, "admission": response.output_data.get("memory_admission"),
+                "created_memory_ids": list(response.output_data.get("memory_ids_created", ())), "errors": list(response.errors)})
             historical_replay_ms += (time.perf_counter() - replay_started) * 1000
             if response.status is not ExecutionStatus.COMPLETED:
                 ingestion_failure = response
@@ -245,6 +252,14 @@ async def _run_conversation(
             admission = response.output_data.get("memory_admission", {})
             if memory_id or (isinstance(admission, dict) and admission.get("stored")):
                 admitted_turn_ids.add(str(turn.turn_id))
+        for turn in conversation.turns[len(admissions):]:
+            admissions.append({"conversation_id": conversation.id, "turn_id": str(turn.turn_id),
+                "execution_status": "not_executed", "admission": None, "created_memory_ids": [],
+                "reason": "prior_ingestion_failure"})
+        if admission_checkpoint:
+            admission_checkpoint({"schema_version": "1.0", "conversation_id": conversation.id,
+                "ingestion_policy": policy.value, "turn_count": len(conversation.turns), "turns": admissions,
+                "complete": ingestion_failure is None})
         await _barrier(runtime, maintenance, MaintenanceBarrier.AFTER_CONVERSATION)
         history_seconds = time.perf_counter() - history_started
         if timing:
@@ -394,6 +409,12 @@ def _question_record(
         "answer_attempt_permitted": response.output_data.get("answer_attempt_permitted") if response else None,
         "answer_attempt": response.output_data.get("answer_attempt") if response else None,
         "request_budget": response.output_data.get("request_budget") if response else None,
+        "reflection_audit": response.output_data.get("reflection_audit") if response else None,
+        "prediction_before_reflection": (response.output_data.get("reflection_audit") or {}).get("original_output") if response else None,
+        "prediction_after_reflection": prediction,
+        "qa_memory_write_count": len(response.output_data["memory_ids_created"]) if response and isinstance(response.output_data.get("memory_ids_created"), list) else None,
+        "invalid_citations": (bool(generation.get("validation_errors")) or any("citat" in str(error).lower() or "unknown evidence" in str(error).lower()
+            for error in generation.get("errors", ()))) if response and "validation_errors" in generation else None,
         "candidate_source_turn_ids": candidate_ids,
         "accumulated_source_turn_ids": audit.get("accumulated_source_turn_ids"),
         "supplied_source_turn_ids": audit.get("supplied_source_turn_ids"),
@@ -603,6 +624,8 @@ def run_locomo_experiment(
         raise ValueError("question/conversation limits cannot be negative")
     dataset = LoCoMoDataset(Path(dataset_path)) if dataset_path else LoCoMoDataset()
     runtime_config = runtime_config or RuntimeConfig.from_environment()
+    if runtime_config.reflection_enabled is None:
+        runtime_config = runtime_config.model_copy(update={"reflection_enabled": False})
     with use_embedding_backend_config(EmbeddingBackendConfig.from_runtime_config(runtime_config)):
         embedding_identity = get_embedding_backend().info()
     reranker_identity = (model_snapshot(runtime_config.reranker_model, runtime_config.reranker_revision,
@@ -637,6 +660,7 @@ def run_locomo_experiment(
         "input_representation": representation_identity(conversations, include_captions),
         "retrieval_contract_version": "2.0",
         "answer_contract_version": "1.0",
+        "memory_policy_contract_version": "1.0",
         "embedding_identity": embedding_identity, "reranker_identity": reranker_identity,
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)
@@ -668,6 +692,7 @@ def run_locomo_experiment(
             conversation, runtime, profile, policy, generation, top_k,
             bounded_context_turns, maintenance, pending_ids,
             lambda record: _checkpoint(store, record), context_budget, timing, include_captions,
+            lambda record: atomic_write_json(store.layout.root / "admission" / (hashlib.sha256(conversation.id.encode()).hexdigest()[:20] + ".json"), record),
         ))
         timing({"phase": "conversation", **diagnostics,
                 "worker_seconds": time.perf_counter() - worker_started})

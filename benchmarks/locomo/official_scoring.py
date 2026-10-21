@@ -13,7 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import regex
+import regex  # type: ignore[import-untyped]
 from nltk.stem import PorterStemmer
 
 UPSTREAM_COMMIT = "3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376"

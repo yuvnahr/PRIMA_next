@@ -7,6 +7,7 @@ from dataclasses import dataclass, field, replace
 from time import perf_counter
 from typing import Any
 
+from memory.evolution.semantic_abstraction_engine import factual_evidence_eligible
 from memory.memory_index import MemoryIndex
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
@@ -76,14 +77,20 @@ class RetrievalController:
             candidate_request = replace(candidate_request, query_embedding=request.embedding())
             timings["embedding"] = (perf_counter() - started) * 1000
         by_strategy = {}
+        scoped_index = (MemoryIndex(self.memory_index.repository, self.memory_index.graph_repository,
+                                    factual_only=True, source_conversation_id=request.session_id or None)
+                        if request.task_kind == "factual_qa" else self.repository)
         for strategy in active_strategies:
             started = perf_counter()
-            candidates = strategy.retrieve(candidate_request, self.repository)
-            by_strategy[strategy.name] = [result for result in candidates if not request.session_id
-                or result.note.context.get("source_conversation_id", request.session_id) == request.session_id]
+            candidates = strategy.retrieve(candidate_request, scoped_index)
+            by_strategy[strategy.name] = [result for result in candidates
+                if (request.task_kind != "factual_qa" or factual_evidence_eligible(result.note))
+                and (not request.session_id or result.note.context.get("source_conversation_id", request.session_id) == request.session_id)]
             timings[strategy.name] = (perf_counter() - started) * 1000
         started = perf_counter()
         fused = self.fusion.fuse(by_strategy, top_k=candidate_request.top_k)
+        if request.task_kind == "factual_qa":
+            fused = [result for result in fused if factual_evidence_eligible(result.note)]
         fused = self._apply_state_filter(fused, request)
         fused = self._apply_semantic_boost(fused, request)
         timings["fusion"] = (perf_counter() - started) * 1000

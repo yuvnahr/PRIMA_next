@@ -6,7 +6,7 @@ import asyncio
 import json
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any
 
@@ -73,6 +73,9 @@ class GenerationResult:
     provider_capabilities: dict[str, Any] | None = None
     failure_kind: str | None = None
     blocked_reason: str | None = None
+    validation_errors: tuple[str, ...] = ()
+    rejected_output: str | None = None
+    raw_output: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible generation record."""
@@ -93,6 +96,9 @@ class GenerationResult:
             "provider_capabilities": dict(self.provider_capabilities or {}),
             "failure_kind": self.failure_kind,
             "blocked_reason": self.blocked_reason,
+            "validation_errors": list(self.validation_errors),
+            "rejected_output": self.rejected_output,
+            "raw_output": self.raw_output,
         }
 
 
@@ -180,6 +186,7 @@ class AnswerGenerationController:
         prompt, label_map = self._prompt(context, reasoning, factual)
         started = time.perf_counter()
         failure_kind = "provider"
+        raw: str | None = None
         try:
             budget.reserve_call()
             if bounded:
@@ -203,7 +210,7 @@ class AnswerGenerationController:
                 aggregate_usage[str(key)] = int(aggregate_usage.get(str(key), 0)) + int(value)
             context.metadata["model_usage"] = aggregate_usage
             failure_kind = "parse"
-            return self._parse(
+            parsed = self._parse(
                 raw,
                 context.user_input,
                 label_map,
@@ -214,18 +221,20 @@ class AnswerGenerationController:
                 round((time.perf_counter() - started) * 1000, 3),
                 response.usage,
             )
+            return replace(parsed, raw_output=raw)
         except TimeoutError:
             return blocked("time_budget", called=True)
         except RequestBudgetExceeded as exc:
             return blocked(str(exc), called=budget.llm_calls > 0)
         except (ProviderError, RuntimeError, TypeError, ValueError) as exc:
-            return self._fallback(
+            fallback = self._fallback(
                 reasoning,
                 config,
                 str(exc),
                 round((time.perf_counter() - started) * 1000, 3),
                 failure_kind=failure_kind,
             )
+            return replace(fallback, raw_output=raw)
         finally:
             context.metadata["model_call_count"] = budget.llm_calls
 
@@ -306,7 +315,11 @@ class AnswerGenerationController:
             if unknown:
                 raise ValueError(f"LLM cited unknown evidence labels: {', '.join(unknown)}")
             if label_map and not labels:
-                raise ValueError("LLM factual answer must cite supplied evidence labels")
+                return GenerationResult(GenerationOutcome.ABSTAINED,
+                    text="I do not have sufficient evidence to answer this question.", provider=provider, model=model,
+                    llm_called=True, latency_ms=latency_ms, usage=usage, fallback_policy=config.fallback_policy.value,
+                    blocked_reason="missing_citations", validation_errors=("Factual answer must cite supplied evidence labels",),
+                    rejected_output=raw)
             answer = answer_value.strip()
             selected = tuple(dict.fromkeys(label_map[label] for label in labels))
         if answer.strip() == request_text.strip():

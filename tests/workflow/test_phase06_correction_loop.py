@@ -217,7 +217,7 @@ def test_invalid_duplicate_and_budgeted_advice_are_rejected() -> None:
     )
 
     assert loop.review(context, leaked, "pre_execution").decision_reason == "evaluation_leakage"
-    assert loop.review(context, valid, "pre_execution").accepted
+    assert loop.review(context, valid, "pre_execution").proposal_accepted
     assert loop.review(context, valid, "pre_execution").decision_reason == "duplicate_advice"
     assert loop.review(context, another, "pre_execution").decision_reason == "retrieval_budget_exhausted"
 
@@ -231,7 +231,7 @@ def test_invalid_duplicate_and_budgeted_advice_are_rejected() -> None:
         confidence=0.9,
         reason_code="constraint",
     )
-    assert replan_loop.review(replan_context, replan, "pre_execution").accepted
+    assert replan_loop.review(replan_context, replan, "pre_execution").proposal_accepted
     assert (
         replan_loop.review(replan_context, second_replan, "pre_execution").decision_reason
         == "replan_budget_exhausted"
@@ -273,7 +273,7 @@ def test_generation_budget_stops_repeated_schema_failures(tmp_path) -> None:
 
     assert client.calls == 2
     assert [item["decision_reason"] for item in response.output_data["correction_attempts"]] == [
-        "accepted",
+        "invalid_corrected_output",
         "duplicate_advice",
     ]
 

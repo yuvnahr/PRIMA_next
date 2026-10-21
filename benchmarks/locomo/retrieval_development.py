@@ -4,25 +4,28 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import random
 import time
 from collections import defaultdict
 from copy import deepcopy
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
 from benchmarks.common import atomic_write_json
 from benchmarks.common.artifacts import append_jsonl
-from benchmarks.locomo.experiment import IngestionPolicy, _turn_request, fingerprint, representation_identity
+from benchmarks.locomo.experiment import IngestionPolicy, _run_conversation, fingerprint, representation_identity
 from benchmarks.locomo.loader import LoCoMoDataset
 from config.runtime_config import RuntimeConfig
 from llm.generation_config import GenerationConfig
 from memory.embedding_backend import EmbeddingBackendConfig, model_snapshot
 from memory.embedding_pipeline import use_embedding_pipeline
+from memory.maintenance.background_supervisor import MaintenanceMode
 from memory.retrieval.retrieval_request import RetrievalRequest
 from reasoning.evidence_audit import retrieval_hop
+from runtime.contracts import ExecutionOptions, ExecutionProfile, PrimaRequest, TaskKind
 from runtime.prima_runtime import PrimaRuntime
 
 
@@ -58,15 +61,23 @@ class _NoGeneration:
         raise AssertionError("Retrieval-only development must never call a generation provider")
 
 
-async def _replay(runtime: PrimaRuntime, conversation: Any) -> None:
+async def _replay(runtime: PrimaRuntime, conversation: Any, policy: IngestionPolicy, captions: bool, target: Path) -> dict[str, Any]:
     generation = GenerationConfig(model="unused-retrieval-only", provider="test")
-    for turn in conversation.turns:
-        result = await runtime.execute(_turn_request(conversation.id, turn, IngestionPolicy.CONTROLLED_DOCUMENT, generation))
-        if result.status.value != "completed":
-            raise RuntimeError(f"Replay failed at {conversation.id}:{turn.turn_id}: {result.errors}")
+    logs: list[dict[str, Any]] = []
+    await _run_conversation(replace(conversation, questions=()), runtime, ExecutionProfile.PRIMA_FULL,
+        policy, generation, 5, 20, MaintenanceMode.DISABLED, set(), lambda record: None,
+        include_captions=captions, admission_checkpoint=logs.append)
+    audit = logs[0]
+    if not audit["complete"]:
+        raise RuntimeError(f"Replay failed for {conversation.id}")
+    atomic_write_json(target, audit)
+    return audit
 
 
-def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: dict[str, Any], output: Path) -> dict[str, Any]:
+def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: dict[str, Any], output: Path, *,
+                    ingestion_policy: IngestionPolicy = IngestionPolicy.CONTROLLED_DOCUMENT,
+                    include_captions: bool = False, gate_diagnostic: bool = False,
+                    _replay_cache: dict[tuple[Any, ...], Any] | None = None) -> dict[str, Any]:
     expected = development_manifest(dataset_path, seed=manifest["seed"], questions_per_category=manifest["questions_per_category_per_conversation"])
     if manifest != expected:
         raise ValueError("Development manifest identity/split/selected IDs do not match the frozen dataset")
@@ -76,7 +87,7 @@ def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: di
     conversations = [conversation for conversation in LoCoMoDataset(dataset_path).conversations()
                      if conversation.id in manifest["development_conversation_ids"]]
     selected = set(manifest["selected_question_ids"])
-    replay_cache: dict[tuple[Any, ...], tuple[Any, float, int, Any]] = {}
+    replay_cache = _replay_cache if _replay_cache is not None else {}
     ledger: dict[str, Any] = {}
     for name, candidate in candidates.items():
         config = RuntimeConfig.model_validate(candidate)
@@ -96,16 +107,22 @@ def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: di
         effective_replay_seconds = 0.0
         for conversation in conversations:
             backend = EmbeddingBackendConfig.from_runtime_config(config)
-            cache_key = (conversation.id, backend, config.representation_mode, config.identity_normalization)
+            admission_settings = tuple((key, value) for key, value in config.model_dump().items()
+                                       if key.startswith(("affect_", "admission_")))
+            cache_key = (conversation.id, backend, config.representation_mode, config.identity_normalization,
+                         ingestion_policy.value, include_captions, admission_settings)
             cached = replay_cache.get(cache_key)
             cache_hit = cached is not None
             runtime = PrimaRuntime(mode="benchmark", memory_backend="in_memory", memory_repository=cached[0] if cached else None,
                                    runtime_config=config, llm_client=_NoGeneration(), maintenance_enabled=False, log_path=output / "runtime.log")
             if cached is None:
                 replay_started = time.perf_counter()
-                asyncio.run(_replay(runtime, conversation))
+                admission_path = output / "admission" / (hashlib.sha256(repr(cache_key).encode()).hexdigest()[:20] + ".json")
+                admission = asyncio.run(_replay(runtime, conversation, ingestion_policy, include_captions, admission_path))
                 duration = time.perf_counter() - replay_started
-                cached = (runtime.memory_repository, duration, len(conversation.turns), deepcopy(runtime.embedding_pipeline))
+                admitted = {turn["turn_id"] for turn in admission["turns"] if (turn["admission"] or {}).get("stored")}
+                cached = (runtime.memory_repository, duration, len(conversation.turns), deepcopy(runtime.embedding_pipeline),
+                          len(runtime.memory_repository.list()), str(admission_path), admitted)
                 replay_cache[cache_key] = cached
                 replay_seconds += duration
             effective_replay_seconds += cached[1]
@@ -116,19 +133,33 @@ def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: di
                     if case_id not in selected:
                         continue
                     before = time.perf_counter()
-                    response = runtime.retrieval_controller.retrieve(RetrievalRequest(question.question, top_k=5, profile="simple_rag",
-                                                                                      session_id=conversation.id, historical=True))
-                    audit = retrieval_hop(response, conversation_id=conversation.id, query=question.question, hop=0,
-                                          elapsed_ms=(time.perf_counter() - before) * 1000)
+                    reflection_audit = None
+                    if gate_diagnostic:
+                        result = asyncio.run(runtime.execute(PrimaRequest(task_kind=TaskKind.FACTUAL_QA, profile=ExecutionProfile.PRIMA_FULL,
+                            input_text=question.question, session_id=conversation.id, options=ExecutionOptions(max_llm_calls=0),
+                            metadata={"historical_context": True})))
+                        hops = result.output_data["evidence_audit"]["hops"]
+                        audit = dict(hops[-1]) if hops else {"stage_source_ids": dict.fromkeys(("dense", "sparse", "fused", "reranked", "returned")), "timings_ms": {}}
+                        audit["elapsed_ms"] = (time.perf_counter() - before) * 1000
+                        reflection_audit = result.output_data["reflection_audit"]
+                        if result.diagnostics.model_call_count:
+                            raise RuntimeError("No-model gate diagnostics invoked a provider")
+                    else:
+                        response = runtime.retrieval_controller.retrieve(RetrievalRequest(question.question, top_k=5, profile="simple_rag",
+                                                                                          session_id=conversation.id, historical=True))
+                        audit = retrieval_hop(response, conversation_id=conversation.id, query=question.question, hop=0,
+                                              elapsed_ms=(time.perf_counter() - before) * 1000)
                     gold = {f"{conversation.id}:{turn}" for turn in question.evidence}
                     stage_recalls = {stage: len(gold & set(ids or ())) / len(gold) if gold and ids is not None else None
                                      for stage, ids in audit["stage_source_ids"].items()}
                     row = {"candidate": name, "case_id": case_id, "category": str(question.category),
                            "stage_recall": stage_recalls, "audit": audit, "replay_cache_hit": cache_hit,
                            "replayed_turns": cached[2]}
+                    row.update(admission_recall=len(set(question.evidence) & cached[6]) / len(question.evidence) if question.evidence else None,
+                               admission_log=cached[5], memory_count=cached[4], reflection_audit=reflection_audit)
                     rows.append(row)
                     append_jsonl(output / "traces.jsonl", row)
-            if len(runtime.memory_repository.list()) != cached[2]:
+            if len(runtime.memory_repository.list()) != cached[4]:
                 raise RuntimeError("Retrieval-only QA changed the replayed memory population")
         if len(rows) != len(selected) or {row["case_id"] for row in rows} != selected:
             raise RuntimeError("Development selected and observed question IDs do not reconcile")
@@ -144,9 +175,14 @@ def run_development(dataset_path: Path, manifest: dict[str, Any], candidates: di
                         "mean_stage_ms": {stage: sum(row["audit"]["timings_ms"].get(stage, 0) for row in rows) / len(rows)
                                           for stage in ("embedding", "dense", "sparse", "fusion", "reranking")},
                         "actual_runtime_manifest": runtime.runtime_manifest()}
+        ledger[name]["memory_count_by_conversation"] = {conversation.id: replay_cache[(conversation.id,
+            EmbeddingBackendConfig.from_runtime_config(config), config.representation_mode, config.identity_normalization,
+            ingestion_policy.value, include_captions, admission_settings)][4] for conversation in conversations}
         atomic_write_json(output / "development_report.json", {"manifest": manifest, "ledger": ledger, "production_promotion": False})
     report = {"manifest": manifest, "ledger": ledger, "production_promotion": False,
-              "ingestion_policy": "controlled_document_ingestion", "normal_admission_headline_measured": False,
+              "ingestion_policy": ingestion_policy.value, "normal_admission_headline_measured": False,
+              "include_captions": include_captions, "gate_diagnostic_without_model": gate_diagnostic,
+              "input_representation": representation_identity(list(LoCoMoDataset(dataset_path).conversations()), include_captions),
               "trace_sha256": fingerprint(output / "traces.jsonl") if (output / "traces.jsonl").exists() else None}
     atomic_write_json(output / "development_report.json", report)
     return report

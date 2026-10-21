@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from collections.abc import Mapping
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -49,6 +50,8 @@ class RuntimeConfig(BaseModel):
     reranker_device: str = "cpu"
     reranker_local_snapshot: str | None = None
     reranker_batch_size: int = Field(default=8, gt=0)
+    admission_policy: Literal["importance_threshold", "source_factual_candidate"] = "importance_threshold"
+    reflection_enabled: bool | None = None
 
     @field_validator("retrieval_strategies")
     @classmethod
@@ -97,6 +100,8 @@ class RuntimeConfig(BaseModel):
             reranker_device=values.get("PRIMA_RERANKER_DEVICE", "cpu"),
             reranker_local_snapshot=values.get("PRIMA_RERANKER_LOCAL_SNAPSHOT") or None,
             reranker_batch_size=int(values.get("PRIMA_RERANKER_BATCH_SIZE", "8")),
+            admission_policy=cast(Literal["importance_threshold", "source_factual_candidate"], values.get("PRIMA_ADMISSION_POLICY", "importance_threshold")),
+            reflection_enabled=_bool(values, "PRIMA_REFLECTION_ENABLED", False) if "PRIMA_REFLECTION_ENABLED" in values else None,
         )
 
     @property

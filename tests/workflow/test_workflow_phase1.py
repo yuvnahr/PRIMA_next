@@ -169,7 +169,8 @@ class WorkflowPhase1Test(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(context.plan, Plan)
         from typing import cast
 
-        self.assertIsNotNone(context.reflection_result)
+        self.assertIsNone(context.reflection_result)
+        self.assertEqual(context.metadata["reflection_suppressed_reason"], "gate_not_reflect")
         self.assertIsNotNone(context.action_result)
         self.assertIsNotNone(context.output)
         action_result = cast(dict[str, object], context.action_result)

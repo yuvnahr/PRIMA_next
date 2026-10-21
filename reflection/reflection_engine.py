@@ -100,7 +100,8 @@ class ReflectionEngine:
                 },
                 state_snapshot=context.state_snapshot(),
             )
-            self.reflection_repository.save_reflection(reflection_memory)
+            if not context.read_only:
+                self.reflection_repository.save_reflection(reflection_memory)
 
             if context.failure_metadata.get("successful_trace"):
                 rule = self.rule_extractor.extract_rule(
@@ -109,7 +110,8 @@ class ReflectionEngine:
                     source_failures=lineage.source_failure_ids,
                     lineage=lineage,
                 )
-                self.reflection_repository.save_rule(rule)
+                if not context.read_only:
+                    self.reflection_repository.save_rule(rule)
                 rules.append(rule)
         else:
             confidence = self.confidence_estimator.estimate(

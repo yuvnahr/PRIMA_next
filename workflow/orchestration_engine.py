@@ -242,7 +242,7 @@ class OrchestrationEngine:
     ) -> list[WorkflowPhase]:
         stage = "post_execution" if source_phase is WorkflowPhase.OUTPUT_VALIDATION else "pre_execution"
         attempt = self.correction_loop.review(context, advice, stage)
-        if not attempt.accepted:
+        if not attempt.proposal_accepted:
             return []
         action = advice.action
         if action in {
