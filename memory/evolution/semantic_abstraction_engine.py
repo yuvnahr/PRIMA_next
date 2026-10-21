@@ -2,9 +2,18 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 
 from memory.memory_note import MemoryNote, extract_dominant_context_chain
+
+
+def factual_evidence_eligible(note: MemoryNote) -> bool:
+    if note.context.get("evidence_eligible") is False:
+        return False
+    return not (note.context.get("source") == "memory_evolution"
+                and note.context.get("type") == "semantic_abstraction"
+                and re.fullmatch(r"I have \d+ related memories about [a-z0-9', -]+\.", note.content))
 
 
 class SemanticAbstractionEngine:

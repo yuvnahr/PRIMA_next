@@ -1,70 +1,45 @@
+# One matched GoEmotions session; this configuration is not a budget/resource admission.
+# Use the pinned-source canonical notebook's fresh gate/monitor for production.
+# Run LoCoMo or extra baselines in separate independently admitted sessions.
 schema_version: "1.0"
 output_root: ${PRIMA_CAMPAIGN_OUTPUT}
+repository:
+  url: https://github.com/yuvnahr/PRIMA_next.git
+  requested_ref: dev
+  commit_sha: ${PRIMA_REVIEWED_DEV_SHA}
+  require_clean_pinned_source: true
 provider:
   kind: ollama
-  model: ${PRIMA_CAMPAIGN_MODEL}
-  revision: ${PRIMA_CAMPAIGN_MODEL_REVISION}
+  model: qwen3.8:27b
+  revision: aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813
   endpoint: ${PRIMA_CAMPAIGN_ENDPOINT}
   health_path: /api/tags
-  context_window: 32768
+  context_window: 8192
+  max_output_tokens: 512
+  safety_overhead_tokens: 512
   structured_output: true
-  timeout_seconds: 120
-  retries: 2
+  timeout_seconds: 180
+  retries: 1
 scheduler:
-  mode: interleaved
+  mode: sequential
   max_gpu_requests: 1
-  cpu_workers: 3
-  gpu_devices: ["0"]
+  cpu_workers: 1
+  ollama_parallel_slots: 1
+  gpu_devices: ["0", "1"]
+  min_free_disk_gb: 5
+runtime:
+  affect_backend: legacy
+  embedding_backend: stable
+  embedding_dimensions: 64
+  embedding_device: cpu
+  reranker_device: cpu
+  reflection_enabled: false
 benchmarks:
-  - id: goemotions-schema
+  - id: goemotions-preserve-labels
     benchmark: goemotions
     dataset_path: ${GOEMOTIONS_TEST_FILE}
     profile: affect_only
-    variant: schema_constrained_model_only
-    context_budget: 2048
-    options: {split: test, batch_size: 8}
-  - id: hotpotqa-model-only
-    benchmark: hotpotqa
-    dataset_path: ${HOTPOTQA_FILE}
-    profile: model_only
-    variant: distractor
-    context_budget: 16384
-  - id: hotpotqa-simple-rag
-    benchmark: hotpotqa
-    dataset_path: ${HOTPOTQA_FILE}
-    profile: simple_rag
-    variant: distractor
-    context_budget: 16384
-  - id: hotpotqa-prima-full
-    benchmark: hotpotqa
-    dataset_path: ${HOTPOTQA_FILE}
-    profile: prima_full
-    variant: distractor
-    context_budget: 16384
-  - id: locomo-model-only
-    benchmark: locomo
-    dataset_path: ${LOCOMO_FILE}
-    profile: model_only
-    variant: controlled_document_ingestion
-    context_budget: 16384
-    options: {full_dataset: true}
-  - id: locomo-simple-rag
-    benchmark: locomo
-    dataset_path: ${LOCOMO_FILE}
-    profile: simple_rag
-    variant: controlled_document_ingestion
-    context_budget: 16384
-    options: {full_dataset: true}
-  - id: locomo-prima-full
-    benchmark: locomo
-    dataset_path: ${LOCOMO_FILE}
-    profile: prima_full
-    variant: controlled_document_ingestion
-    context_budget: 16384
-    optional_metrics: [rouge_l]
-    options: {full_dataset: true}
-comparisons:
-  - {id: hotpot-model-vs-full, left: hotpotqa-model-only, right: hotpotqa-prima-full, metric: metrics.joint_f1}
-  - {id: hotpot-rag-vs-full, left: hotpotqa-simple-rag, right: hotpotqa-prima-full, metric: metrics.joint_f1}
-  - {id: locomo-model-vs-full, left: locomo-model-only, right: locomo-prima-full, metric: metrics.f1}
-  - {id: locomo-rag-vs-full, left: locomo-simple-rag, right: locomo-prima-full, metric: metrics.f1}
+    variant: affect_telemetry_preserve_labels
+    context_budget: 6144
+    max_items: 0
+    options: {split: test, batch_size: 1, device: cpu, prompt_variant: definitions_schema, comparison_mode: same_response}

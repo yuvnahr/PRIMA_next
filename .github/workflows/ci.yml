@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Frozen development evidence checks historical checkpoint blobs.
 
       - name: Setup Python
         uses: actions/setup-python@v5

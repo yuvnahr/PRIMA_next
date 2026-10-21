@@ -22,6 +22,9 @@ from llm.llm_client import LLMClient
 from runtime.contracts import ExecutionOutcome, ExecutionProfile, PrimaRequest, RuntimeComponent, TaskKind
 from runtime.prima_runtime import PrimaRuntime
 
+LABEL_POLICY_VERSION = "preserve_labels_v1"
+LABEL_AUDIT_SCHEMA_VERSION = "1.0"
+
 
 @dataclass(frozen=True, slots=True)
 class ClassifierSettings:
@@ -39,6 +42,7 @@ class ClassifierSettings:
 
 class GoEmotionsSystem(Protocol):
     name: str
+    prompt_variant: str
     system_family: str
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
@@ -61,13 +65,17 @@ class _LLMPredictionSource:
     include_definitions: bool
     schema_constrained: bool
     client: LLMClient = field(repr=False)
+    prompt_variant: str = field(default="definitions_schema", kw_only=True)
     last_raw: str = field(default="", init=False)
     last_metadata: dict[str, Any] = field(default_factory=dict, init=False)
 
     def predict(self, text: str) -> EmotionPrediction:
         prompt = build_prompt(
-            text, list(LABELS), include_definitions=self.include_definitions, structured=self.schema_constrained
+            text, list(LABELS), include_definitions=self.include_definitions, structured=self.schema_constrained,
+            variant=self.prompt_variant,
         )
+        if hasattr(self.client.provider, "reset_request_metrics"):
+            self.client.provider.reset_request_metrics()
         response = self.client.chat(
             prompt,
             generation_config=self.generation,
@@ -77,12 +85,39 @@ class _LLMPredictionSource:
         self.last_raw = response.text
         self.last_metadata = {
             "benchmark_prompt": prompt,
+            "prompt_variant": self.prompt_variant,
             "provider_response": response.raw,
             "provider_usage": dict(response.usage or {}),
             "probabilities_available": False,
+            "confidence_available": False,
+            "confidence": None,
+            "confidence_reason": "label_only_or_unavailable_scores",
+            "logical_classification_provider_calls": 1,
+            "classification_provider": (
+                self.client.provider.request_metrics() if hasattr(self.client.provider, "request_metrics")
+                else {"available": False, "reason": "provider_request_instrumentation_unavailable"}
+            ),
             "baseline_labels": sorted(selected),
             "baseline_parse_error": parse_error,
             "baseline_empty_output": not response.text.strip(),
+            "raw_model_response": response.text,
+            "final_scored_labels": sorted(selected),
+            "label_audit_schema_version": LABEL_AUDIT_SCHEMA_VERSION,
+            "label_policy_version": LABEL_POLICY_VERSION,
+            "parse_recovery": {
+                "applied": parse_error is not None,
+                "labels": ["neutral"] if parse_error else [],
+                "scope": "runtime_only_not_scored",
+            },
+            "label_correction": {
+                "policy_version": LABEL_POLICY_VERSION,
+                "evidence_source": "unavailable",
+                "accepted": False,
+                "added_labels": [],
+                "removed_labels": [],
+                "reason": "baseline_parse_failure" if parse_error else "no_validated_correction_policy",
+                "preserved_baseline": True,
+            },
         }
         return _prediction_from_labels(selected or frozenset({"neutral"}), self.generation.model)
 
@@ -103,12 +138,10 @@ class _StaticPredictionSource:
 
 @dataclass(slots=True)
 class _BoundedLLMPredictionSource(_LLMPredictionSource):
-    """Transform one model response before it reaches the runtime affect engine."""
+    """Audit the disabled legacy heuristic without changing the model label set."""
 
     def predict(self, text: str) -> EmotionPrediction:
         baseline_prediction = _LLMPredictionSource.predict(self, text)
-        raw_model_response = self.last_raw
-        baseline = set(self.last_metadata.get("baseline_labels", []))
         profile = LegacyAffectClassifier().classify(text)
         candidate = profile.dominant_emotion
         derived = (
@@ -116,38 +149,22 @@ class _BoundedLLMPredictionSource(_LLMPredictionSource):
             if profile.emotional_keywords and candidate in {"anger", "disgust", "fear", "joy", "sadness", "surprise"}
             else set()
         )
-        final = set(baseline)
-        reason = "preserve_model_labels"
-        if (not baseline or baseline == {"neutral"}) and derived:
-            final.update(derived)
-            reason = "add_bounded_lexical_emotion"
-        elif not baseline:
-            final.add("neutral")
-            reason = "recover_parse_failure_as_neutral"
-        self.last_raw = json.dumps({"labels": sorted(final)})
+        decision = {
+            **self.last_metadata["label_correction"],
+            "evidence_source": profile.evidence_source,
+            "reason": "unvalidated_legacy_correction_suppressed",
+        }
         self.last_metadata.update(
             {
-                "raw_model_response": raw_model_response,
                 "affect_derived_labels": sorted(derived),
-                "final_scored_labels": sorted(final),
-                "affect_decision": {
-                    "added_labels": sorted(final - baseline),
-                    "removed_labels": sorted(baseline - final),
-                    "reason": reason,
-                    "preserved_baseline": final == baseline,
-                },
-                "prima_decision": {
-                    "added_labels": sorted(final - baseline),
-                    "removed_labels": sorted(baseline - final),
-                    "reason": {
-                        "add_bounded_lexical_emotion": "add_prima_lexical_emotion",
-                        "preserve_model_labels": "preserve_qwen_labels",
-                    }.get(reason, reason),
-                    "preserved_baseline": final == baseline,
-                },
+                "legacy_policy_version": "bounded_lexical_v0",
+                "legacy_policy_enabled": False,
+                "label_correction": decision,
+                "affect_decision": dict(decision),
+                "prima_decision": dict(decision),
             }
         )
-        return _prediction_from_labels(frozenset(final), baseline_prediction.model_id)
+        return baseline_prediction
 
 
 @dataclass(slots=True)
@@ -155,6 +172,7 @@ class _RuntimeClassificationSystem:
     generation: GenerationConfig
     name: str
     system_family: str
+    prompt_variant: str = field(default="definitions_schema", kw_only=True)
     _client_instance: LLMClient | None = field(default=None, init=False, repr=False)
     _runtime_local: threading.local = field(default_factory=threading.local, init=False, repr=False)
 
@@ -166,8 +184,15 @@ class _RuntimeClassificationSystem:
 
     def _client(self) -> LLMClient:
         if self._client_instance is None:
+            from benchmarks.campaign.provider_session import _BoundedProvider
+
             self._client_instance = LLMClient(provider_name=self.generation.provider)
+            self._client_instance.provider = _BoundedProvider(self._client_instance.provider, 1)
         return self._client_instance
+
+    def provider_request_metrics(self) -> dict[str, Any]:
+        provider = self._client().provider
+        return provider.request_metrics() if hasattr(provider, "request_metrics") else {"available": False}
 
     def _execute(self, text: str, source: _PredictionSource) -> tuple[str, dict[str, Any]]:
         adapter = getattr(self._runtime_local, "adapter", None)
@@ -200,20 +225,29 @@ class _RuntimeClassificationSystem:
         if response.outcome is not ExecutionOutcome.CLASSIFIED or prediction is None:
             raise RuntimeError(f"Canonical emotion-classification route failed: {response.errors}")
         forbidden = {
+            RuntimeComponent.QUERY_REWRITER,
             RuntimeComponent.DENSE_RETRIEVAL,
             RuntimeComponent.SPARSE_RETRIEVAL,
+            RuntimeComponent.TEMPORAL_RETRIEVAL,
+            RuntimeComponent.GRAPH_TRAVERSAL,
             RuntimeComponent.GRAPH_REASONING,
+            RuntimeComponent.FUSION,
+            RuntimeComponent.RERANKER,
             RuntimeComponent.PLANNER,
             RuntimeComponent.WORLD_MODEL,
             RuntimeComponent.TOOL_EXECUTOR,
             RuntimeComponent.MODEL_EXECUTOR,
+            RuntimeComponent.REFLECTION,
         }
         if forbidden & set(response.diagnostics.executed_components):
             raise RuntimeError("GoEmotions activated a component outside the bounded affect route.")
         return source.last_raw, {
+            "confidence_available": False,
+            "confidence": None,
+            "confidence_reason": "probability_eligibility_requires_benchmark_split_identity",
             **source.last_metadata,
-            "prediction": prediction.to_dict(),
-            "final_scored_labels": list(prediction.selected_labels),
+            "prediction": {**prediction.to_dict(), "confidence": None, "confidence_available": False},
+            "final_scored_labels": source.last_metadata.get("final_scored_labels", list(prediction.selected_labels)),
             "system_name": self.name,
             "system_family": self.system_family,
             "runtime": {
@@ -238,7 +272,7 @@ class ModelOnlyZeroShotSystem(_RuntimeClassificationSystem):
     system_family: str = "model_only"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, False, False, self._client()))
+        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, False, False, self._client(), prompt_variant=self.prompt_variant))
         metadata["final_scored_labels"] = list(metadata.get("baseline_labels", []))
         return raw, metadata
 
@@ -249,7 +283,7 @@ class SchemaConstrainedModelOnlySystem(_RuntimeClassificationSystem):
     system_family: str = "model_only"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, True, True, self._client()))
+        raw, metadata = self._execute(text, _LLMPredictionSource(self.generation, True, True, self._client(), prompt_variant=self.prompt_variant))
         metadata["final_scored_labels"] = list(metadata.get("baseline_labels", []))
         return raw, metadata
 
@@ -264,7 +298,7 @@ class AffectTelemetrySystem(SchemaConstrainedModelOnlySystem):
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
         raw, metadata = SchemaConstrainedModelOnlySystem.predict(self, text, labels)
         baseline = metadata.get("baseline_labels", [])
-        decision = {"added_labels": [], "removed_labels": [], "reason": "telemetry_only_preserve_model_labels"}
+        decision = {**metadata["label_correction"], "reason": "telemetry_only_preserve_model_labels"}
         metadata.update(
             {
                 "final_scored_labels": list(baseline),
@@ -272,18 +306,18 @@ class AffectTelemetrySystem(SchemaConstrainedModelOnlySystem):
                 "prima_decision": {**decision, "reason": "telemetry_only_preserve_qwen"},
             }
         )
-        return json.dumps({"labels": baseline}), metadata
+        return raw, metadata
 
 
 @dataclass(slots=True)
 class BoundedAffectDecisionSystem(SchemaConstrainedModelOnlySystem):
-    """Apply only a bounded lexical affect correction to the same model response."""
+    """Deprecated legacy entry point; v1 preserves labels and disables lexical edits."""
 
     name: str = "bounded_prima_affect_decision"
     system_family: str = "bounded_affect_decision"
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
-        return self._execute(text, _BoundedLLMPredictionSource(self.generation, True, True, self._client()))
+        return self._execute(text, _BoundedLLMPredictionSource(self.generation, True, True, self._client(), prompt_variant=self.prompt_variant))
 
 
 @dataclass(slots=True)
@@ -298,6 +332,7 @@ class EncoderSystem(_RuntimeClassificationSystem):
 
         self._encoder = GoEmotionsEncoder(
             self.generation.model,
+            revision=self.generation.revision,
             requested_device=self.classifier.device,
             batch_size=self.classifier.batch_size,
             thresholds_path=self.classifier.thresholds_path,
@@ -322,11 +357,37 @@ class EncoderSystem(_RuntimeClassificationSystem):
                             "system_family": "trained_baseline",
                             "wrapper_attribution": False,
                             "probabilities_available": True,
+                            "evidence_source": "trained_probability",
+                            "probability_provenance": self._calibration_provenance(prediction),
+                            "logical_classification_provider_calls": 0,
+                            "classification_provider": {
+                                "available": True, "attempts": 0, "successes": 0, "retries": 0,
+                                "cache_hits": 0, "actual_tokens": 0, "actual_tokens_available": True,
+                                "inference_started": None, "inference_finished": None,
+                            },
                         },
                     ),
                 )
             )
         return results
+
+    def _calibration_provenance(self, prediction: EmotionPrediction) -> dict[str, Any]:
+        path = self.classifier.calibration_path
+        if path is None:
+            return {"source": "trained_probability", "calibrated": False}
+        content = path.read_bytes()
+        calibration = json.loads(content)
+        return {
+            "source": "trained_probability",
+            "calibrated": (calibration.get("model_id") == prediction.model_id
+                           and calibration.get("model_revision") == prediction.model_revision
+                           and prediction.model_revision is not None
+                           and calibration.get("temperature") == (prediction.metadata or {}).get("calibration_temperature")),
+            "model_id": calibration.get("model_id"), "model_revision": calibration.get("model_revision"),
+            "method": calibration.get("method"), "split": "dev",
+            "dev_dataset_sha256": calibration.get("dev_dataset_sha256"),
+            "artifact_sha256": hashlib.sha256(content).hexdigest(),
+        }
 
 
 def _legacy_generation(provider: str, model: str, *, schema: bool) -> GenerationConfig:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
@@ -10,8 +11,29 @@ import pytest
 
 from config.settings import get_settings
 from llm.provider import OllamaProvider
+from memory.embedding_backend import (
+    EmbeddingBackendConfig,
+    get_embedding_backend,
+    use_embedding_backend_config,
+    validate_learned_backend,
+)
 from memory.memory_repository import ChromaMemoryRepository
 from runtime.prima_runtime import PrimaRuntime
+
+
+@pytest.mark.skipif(os.getenv("PRIMA_RUN_LEARNED_EMBEDDING_SMOKE") != "1", reason="Opt-in pinned-cache CPU model check")
+def test_pinned_cpu_embedding_semantics() -> None:
+    config = EmbeddingBackendConfig("minilm", "sentence-transformers/all-MiniLM-L6-v2", 384,
+                                    revision="c9745ed1d9f207416be6d2e6f8de32d1f16199bf", device="cpu")
+    with use_embedding_backend_config(config):
+        result = validate_learned_backend()
+        vector = get_embedding_backend().embed("A separate finite normalized vector check.")
+    assert result["passed"] and result["backend"]["device"] == "cpu"
+    assert result["backend"]["embedding_dimensions"] == 384
+    assert result["backend"]["revision"] == config.revision
+    assert result["backend"]["snapshot"]["artifact_sha256"] == "7550e754abbd9086d0f997f2fda4ff22744ac6815bea4550123b73e40b528a7e"
+    assert len(vector) == 384 and all(math.isfinite(value) for value in vector)
+    assert math.isclose(sum(value * value for value in vector), 1.0, abs_tol=1e-5)
 
 
 def _ollama_reachable() -> bool:

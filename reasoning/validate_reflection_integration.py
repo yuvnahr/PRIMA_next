@@ -25,7 +25,7 @@ class _Advisor:
         return ReflectionAdvice(
             trigger=True,
             action=ReflectionAction.BROADEN_QUERY,
-            suggested_query="Bridge details",
+            suggested_query="Cedar",
             confidence=0.9,
             event=event,
         )
@@ -33,9 +33,9 @@ class _Advisor:
 
 def main() -> int:
     responses = {
-        "What fact is linked to Alpha?": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge details": _response("bridge", "Bridge has the linked fact C."),
+        "What fact is linked to Alpha?": _response("alpha", "Alpha knows Cedar. Alpha identifies Bridge."),
+        "What fact is linked to Alpha? Source bridge: Bridge": _response("alpha", "Alpha knows Cedar. Alpha identifies Bridge."),
+        "What fact is linked to Alpha? Source bridge: Cedar": _response("bridge", "Cedar has the linked fact C."),
     }
     result = ReasoningController(reflection_advisor=_Advisor()).answer(
         ReasoningRequest("What fact is linked to Alpha?", mode=ReasoningMode.DIAGNOSTIC, budget=ReasoningBudget(max_hops=3)),

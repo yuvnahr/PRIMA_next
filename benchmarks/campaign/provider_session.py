@@ -12,7 +12,7 @@ from config.runtime_config import RuntimeConfig
 from llm.generation_config import ProviderCapabilities, StructuredOutputMode
 from llm.llm_client import LLMClient
 from llm.llm_types import LLMRequest, LLMResponse
-from llm.provider import Provider, ProviderError, ProviderFactory
+from llm.provider import Provider, ProviderFactory
 from runtime.prima_runtime import PrimaRuntime
 
 
@@ -154,6 +154,7 @@ class _BoundedProvider(Provider):
         self._request_local = threading.local()
         self._latencies: list[float] = []
         self._prompt_tokens = self._completion_tokens = 0
+        self._token_usage_complete = True
         self._backend_durations_ns: dict[str, int] = {}
         self._backend_duration_samples: dict[str, int] = {}
         self._cache: dict[str, LLMResponse] = {}
@@ -166,6 +167,12 @@ class _BoundedProvider(Provider):
 
     def send(self, request: LLMRequest) -> LLMResponse:
         started = time.perf_counter()
+        retry = getattr(self._request_local, "last", None) is request and getattr(self._request_local, "failed", False)
+        if not retry:
+            self.reset_request_metrics()
+        measured = self._request_local.metrics
+        self._request_local.last = request
+        self._request_local.failed = False
         cache_key = json.dumps(
             {
                 "prompt": request.prompt,
@@ -181,21 +188,35 @@ class _BoundedProvider(Provider):
                 cached = self._cache.get(cache_key)
                 if cached is not None:
                     self._cache_hits += 1
+                    measured["cache_hits"] += 1
                     return cached
                 if self._first_started is None:
-                    self._first_started = started
+                    self._first_started = time.perf_counter()
                 self._attempts += 1
-                if getattr(self._request_local, "last", None) is request:
+                measured["attempts"] += 1
+                if retry:
                     self._retries += 1
-                self._request_local.last = request
+                    measured["retries"] += 1
                 self._active += 1
                 self._max_active = max(self._max_active, self._active)
             try:
+                measured["inference_started"] = measured["inference_started"] or time.perf_counter()
                 response: LLMResponse = self.provider.send(request)
+                measured["successes"] += 1
+                usage = response.usage or {}
+                token_total = usage.get("total_tokens")
+                if token_total is None and usage.get("prompt_tokens") is not None and usage.get("completion_tokens") is not None:
+                    token_total = usage["prompt_tokens"] + usage["completion_tokens"]
+                if isinstance(token_total, int) and not isinstance(token_total, bool) and token_total >= 0:
+                    measured["actual_tokens"] += token_total
+                else:
+                    measured["actual_tokens_available"] = False
                 with self._lock:
                     self._successes += 1
                     self._cache[cache_key] = response
                     usage = response.usage or {}
+                    if usage.get("prompt_tokens") is None or usage.get("completion_tokens") is None:
+                        self._token_usage_complete = False
                     self._prompt_tokens += int(usage.get("prompt_tokens", 0) or 0)
                     self._completion_tokens += int(usage.get("completion_tokens", 0) or 0)
                     for field in ("model_load_duration_ns", "prompt_eval_duration_ns",
@@ -205,17 +226,33 @@ class _BoundedProvider(Provider):
                             self._backend_durations_ns[field] = self._backend_durations_ns.get(field, 0) + value
                             self._backend_duration_samples[field] = self._backend_duration_samples.get(field, 0) + 1
                 return response
-            except (ProviderError, TimeoutError) as exc:
+            except Exception as exc:
+                self._request_local.failed = True
+                measured["actual_tokens_available"] = False
                 with self._lock:
                     if "timeout" in str(exc).casefold() or "timed out" in str(exc).casefold():
                         self._timeouts += 1
                 raise
             finally:
+                measured["inference_finished"] = time.perf_counter()
                 elapsed = (time.perf_counter() - started) * 1000
                 with self._lock:
                     self._active -= 1
                     self._latencies.append(elapsed)
                     self._last_finished = time.perf_counter()
+
+    def request_metrics(self) -> dict[str, Any]:
+        """Current thread's logical call, including retries; cached usage is logical only."""
+        return dict(getattr(self._request_local, "metrics", {"available": False}))
+
+    def reset_request_metrics(self) -> None:
+        self._request_local.last = None
+        self._request_local.failed = False
+        self._request_local.metrics = {
+            "available": True, "attempts": 0, "successes": 0, "retries": 0, "cache_hits": 0,
+            "actual_tokens": 0, "actual_tokens_available": True,
+            "inference_started": None, "inference_finished": None,
+        }
 
     def telemetry(self) -> dict[str, Any]:
         with self._lock:
@@ -225,6 +262,7 @@ class _BoundedProvider(Provider):
             maximum = self._max_active
             retries, timeouts = self._retries, self._timeouts
             cache_hits = self._cache_hits
+            tokens_complete = self._token_usage_complete
             backend_seconds = {key.removesuffix("_ns"): value / 1e9
                                for key, value in self._backend_durations_ns.items()}
             backend_samples = dict(self._backend_duration_samples)
@@ -253,6 +291,12 @@ class _BoundedProvider(Provider):
             "prompt_tokens": prompt,
             "completion_tokens": completion,
             "total_tokens": prompt + completion,
+            "token_scope": "successful_uncached_provider_requests",  # nosec B105
+            "actual_uncached_tokens": prompt + completion if tokens_complete else None,
+            "observed_successful_uncached_tokens": prompt + completion,
+            "actual_token_usage_complete": tokens_complete,
+            "failed_request_tokens": None if attempts > successes else 0,
+            "deprecated_aliases": {"total_tokens": "observed_successful_uncached_tokens"},
             "inference_wall_time_seconds": wall_seconds,
             "throughput_requests_per_second": successes / wall_seconds if wall_seconds else 0.0,
         }

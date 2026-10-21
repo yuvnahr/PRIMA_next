@@ -1,0 +1,51 @@
+{
+  "dev_predictions_ids_sha256": "4210a544c9a4777d1ab1150d16aaa48391a47bef8786fe8e50372ea0715fa430",
+  "dev_predictions_sha256": "96c3ea5541e91a4775a123c1406e7e3401f68e5f41048d6bea2c6fb4ca417168",
+  "dev_thresholded_metrics": {
+    "exact_set_accuracy": 0.39034279395503135,
+    "macro_f1": 0.4193352865818717,
+    "micro_f1": 0.5486280706795001,
+    "micro_precision": 0.5063643595863166,
+    "micro_recall": 0.59858934169279,
+    "prediction_cardinality": 1.38997419830446,
+    "sample_f1": 0.5633299984203043
+  },
+  "fingerprint": "4c6f04459f475849f64874373cb75da7c81494ecee816dbb9ae515dacbcbb926",
+  "frozen_reload": {
+    "artifact_fingerprint": "99ab7a9a3afee350e3ef192a8be05b930605613c6b135da079db42688c8a8376",
+    "fit_runtime_seconds_before_loop_repair": 93.406,
+    "frozen_dev_reproduced": true,
+    "peak_process_rss_bytes": 405929984,
+    "reload_dev_wall_seconds": 34.04587190004531,
+    "resource_scope": "current Python process RSS sampled every 0.1 s; not a system/cgroup/GPU campaign gate",
+    "sample_count": 5426,
+    "test_inference": false
+  },
+  "full_dev_count": 5426,
+  "full_dev_dataset_sha256": "8f629aa53c1b1d6dd023b168e3762a09f4d1f4e575fcd9035c02bd74170ef56b",
+  "global_threshold_metrics": {
+    "exact_set_accuracy": 0.41227423516402506,
+    "macro_f1": 0.20620977719723604,
+    "micro_f1": 0.44382731633425904,
+    "micro_precision": 0.4791931673632564,
+    "micro_recall": 0.4133228840125392,
+    "prediction_cardinality": 1.014190932546996,
+    "sample_f1": 0.45707089323012656
+  },
+  "interpretation": "dev threshold-fit; not independent validation, Qwen gain or same-response correction",
+  "paired_dev_sample_f1": {
+    "delta": 0.10625910519017781,
+    "lower": 0.0951362926298422,
+    "samples": 1000,
+    "upper": 0.11789882927000508
+  },
+  "production_promoted": false,
+  "selected_dev512_gate_passed": true,
+  "test_inference": false,
+  "threshold_change_analysis": {
+    "beneficial": 527,
+    "changed": 2641,
+    "harmful": 646,
+    "unchanged": 2785
+  }
+}

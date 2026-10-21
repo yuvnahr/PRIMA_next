@@ -24,10 +24,12 @@ from benchmarks.locomo.experiment import (
     LOCOMO_PROFILES,
     IngestionPolicy,
     _classify_failure,
+    _records,
     run_locomo_experiment,
     run_paired_locomo_experiment,
     select_conversations,
 )
+from config.runtime_config import RuntimeConfig
 from runtime.contracts import (
     EvidenceReference,
     ExecutionOutcome,
@@ -88,6 +90,13 @@ def make_response(request: PrimaRequest, *, failed: bool = False) -> PrimaRespon
                 "fused_top30": ["D1:1", "D2:1"],
                 "reranked_top30": ["D1:1"], "final_candidates": ["D1:1"],
             }}}
+            output_data["evidence_audit"] = {
+                "schema_version": "1.0", "hops": [],
+                "candidate_source_turn_ids": [f"{request.session_id}:D1:1", f"{request.session_id}:D2:1"],
+                "accumulated_source_turn_ids": [f"{request.session_id}:D1:1"],
+                "supplied_source_turn_ids": [f"{request.session_id}:D1:1"],
+                "cited_source_turn_ids": [f"{request.session_id}:D1:1"],
+            }
     return PrimaResponse(
         request_id=request.request_id, task_kind=request.task_kind, profile=request.profile,
         status=ExecutionStatus.FAILED if failed else ExecutionStatus.COMPLETED,
@@ -293,8 +302,9 @@ def test_optional_metrics_are_opt_in_and_bertscore_uses_device_and_batch(monkeyp
         ({"ingestion_error": "bad"}, ExecutionProfile.PRIMA_FULL, "INGESTION_FAILURE"),
         ({"runtime_error": "bad"}, ExecutionProfile.PRIMA_FULL, "RUNTIME_FAILURE"),
         ({"prediction": ""}, ExecutionProfile.PRIMA_FULL, "ANSWER_PARSE_FAILURE"),
-        ({"candidate_evidence_recall": 0.0}, ExecutionProfile.PRIMA_FULL, "RETRIEVAL_MISS"),
-        ({"candidate_evidence_recall": 1.0, "final_evidence_recall": 0.5}, ExecutionProfile.PRIMA_FULL, "EVIDENCE_SELECTION_FAILURE"),
+        ({"prediction": "wrong", "memory_admission_recall": 0.0}, ExecutionProfile.PRIMA_FULL, "ADMISSION_COVERAGE_GAP"),
+        ({"prediction": "wrong", "candidate_evidence_recall": 0.0}, ExecutionProfile.PRIMA_FULL, "RETRIEVAL_MISS"),
+        ({"prediction": "wrong", "candidate_evidence_recall": 1.0, "supplied_evidence_recall": 0.0}, ExecutionProfile.PRIMA_FULL, "EVIDENCE_SELECTION_FAILURE"),
         ({"prediction": "wrong"}, ExecutionProfile.MODEL_ONLY, "ANSWER_SCORING_FAILURE"),
     ],
 )
@@ -303,6 +313,7 @@ def test_every_failure_category_has_a_reachable_branch(updates, profile, expecte
         "ingestion_error": None, "runtime_error": None, "prediction": "alpha",
         "expected_answer": "alpha", "expected_evidence": ["D1:1"],
         "candidate_evidence_recall": 1.0, "final_evidence_recall": 1.0,
+        "candidate_source_turn_ids": ["c:D1:1"], "memory_admission_recall": 1.0,
         "execution_failed": False,
     }
     record.update(updates)
@@ -349,28 +360,38 @@ def test_profiles_use_execute_and_explicit_ingestion_policies(tmp_path: Path, pr
         assert policy == DEFAULT_POLICIES[profile].value
 
 
-def test_question_checkpoint_resume_and_exact_duplicate_prevention(tmp_path: Path) -> None:
+@pytest.mark.parametrize("profile", ["model_only", "simple_rag"])
+def test_question_checkpoint_resume_and_exact_duplicate_prevention(tmp_path: Path, profile: str) -> None:
     dataset, output = write_fixture(tmp_path), tmp_path / "out"
     with pytest.raises(RuntimeError, match="interrupted"):
         run_locomo_experiment(
-            dataset_path=str(dataset), output_path=str(output), runtime_profile="model_only",
+            dataset_path=str(dataset), output_path=str(output), runtime_profile=profile,
             max_conversations=1, runtime_factory=ExplodingRuntime,
             provider="test", model="fixture-model",
         )
-    store = BenchmarkArtifactStore(output / "model_only")
+    store = BenchmarkArtifactStore(output / profile)
     assert [row.case_id for row in store.checkpoints()] == ["conversation-1:q1"]
+    original_audit = _records(store)[0]["evidence_audit"]
     resumed = run_locomo_experiment(
-        dataset_path=str(dataset), output_path=str(output), runtime_profile="model_only",
+        dataset_path=str(dataset), output_path=str(output), runtime_profile=profile,
         max_conversations=1, runtime_factory=FakeRuntime, resume=True,
         provider="test", model="fixture-model",
     )
     assert resumed["questions"] == 3 and len(store.checkpoints()) == 3
+    assert _records(store)[0]["evidence_audit"] == original_audit
+    if profile == "simple_rag":
+        assert original_audit["candidate_source_turn_ids"] == ["conversation-1:D1:1", "conversation-1:D2:1"]
     with pytest.raises(ValueError, match="model"):
         run_locomo_experiment(
-            dataset_path=str(dataset), output_path=str(output), runtime_profile="model_only",
+            dataset_path=str(dataset), output_path=str(output), runtime_profile=profile,
             max_conversations=1, runtime_factory=FakeRuntime, resume=True, model="changed",
             provider="test",
         )
+    for updates in ({"runtime_config": RuntimeConfig(embedding_dimensions=32)}, {"include_captions": True}):
+        with pytest.raises(ValueError):
+            run_locomo_experiment(dataset_path=str(dataset), output_path=str(output), runtime_profile=profile,
+                                  max_conversations=1, runtime_factory=FakeRuntime, resume=True,
+                                  provider="test", model="fixture-model", **updates)
 
 
 def test_paired_modes_reconcile_metrics_memory_maintenance_and_selection(tmp_path: Path) -> None:

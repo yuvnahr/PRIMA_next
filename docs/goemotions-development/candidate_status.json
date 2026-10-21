@@ -1,0 +1,86 @@
+{
+  "classical_candidate": {
+    "additional_feature_or_balance_trials": [],
+    "artifact_fingerprint": "99ab7a9a3afee350e3ef192a8be05b930605613c6b135da079db42688c8a8376",
+    "balanced": false,
+    "calibrated": false,
+    "correction_evidence_eligible": false,
+    "exact_set_accuracy_decreased": true,
+    "features": "word",
+    "seed": 13,
+    "status": "frozen_dev_threshold_fit_unpromoted"
+  },
+  "correction_policy": {
+    "admitted": false,
+    "allowed_edits": [],
+    "gain_scope": "tested invariant; no fresh Qwen inference",
+    "per_label_harm_tolerance": 0.0,
+    "positive_mean_and_95pct_lower_bound_required": true,
+    "preserve_labels_correction_gain": 0.0,
+    "reason": "no real calibrated per-label policy, predeclared margins, measured per-label harm or integrated cost",
+    "status": "not_admitted"
+  },
+  "dev_manifest_fingerprint": "a52f38cb539216e2e70f51c9a2b23ff7cac27ffd2a428af3ab555099af7be172",
+  "encoder": {
+    "admitted": false,
+    "epoch_ceiling": 3,
+    "load_integrity_validated": false,
+    "max_length": 128,
+    "model_id": "microsoft/deberta-v3-small",
+    "reason": "local RTX 3050 has 4096 MiB; no matching live T4 allocation, account quota, sequence smoke or validation/export pilot",
+    "revision": "a59be8aa63396e73dbb45a1487e4cde4be98bfa4",
+    "status": "not_admitted_pending_resources_and_need_review",
+    "temperature_and_threshold_fit": false,
+    "training": false
+  },
+  "fingerprint": "b1cedd430c8fd341208fefb1500d271ce95cb65c746856d0358828cb677f2013",
+  "implementation_predecessor": "def8f76dbe25699e63fd10cedcb9a6afe311ac93",
+  "pending": [
+    "three matched Qwen dev prompt runs on frozen IDs",
+    "full-dev selected Qwen comparison if affordable",
+    "live quota and matching T4 resources",
+    "fresh integrated cost and source identity gate",
+    "Person 1 pinned final producer + Person 2 proposed Goal 4 integration",
+    "reviewed merged dev source and separately admitted all-5427 test evaluation"
+  ],
+  "safe_candidate": {
+    "context_window": 8192,
+    "full_gpu_residency_required": true,
+    "full_test_count": 5427,
+    "generation_config": {
+      "fallback_policy": "fail",
+      "max_output_tokens": 512,
+      "model": "qwen3.8:27b",
+      "provider": "ollama",
+      "repeat_penalty": null,
+      "retries": 0,
+      "revision": null,
+      "seed": 13,
+      "structured_output": "json_schema",
+      "temperature": 0.0,
+      "timeout_seconds": 60.0,
+      "top_k": null,
+      "top_p": null
+    },
+    "label_policy_version": "preserve_labels_v1",
+    "model_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+    "production_promoted": false,
+    "prompt_variant": "definitions_schema",
+    "system": "affect_telemetry_preserve_labels",
+    "test_inference_enabled": false,
+    "workers": 1
+  },
+  "selection_fingerprint": "e650c545e01e57cdf452ed55ec342c41b356b3bd9058aa9624326592598cacf2",
+  "source_file_sha256": {
+    "benchmarks/goemotions/dataset.py": "8ea71bab48d68fc3e1988c4bf299d5bb0aa9b1d17126144158dfb100b16a0128",
+    "benchmarks/goemotions/development.py": "f3123ffe41406076dbc248adb33291107ba4d5a51fa9a1380c966f5d198a57d1",
+    "benchmarks/goemotions/experiment.py": "1e377396049fdabf4ff68b1a53b9179cd1c9d83d2c46aea295fc58874c2ee7f4",
+    "benchmarks/goemotions/prompts.py": "e6ed2325839ce7568f04cef0ae5f86fde8989d9db1e306cf4e3ede89127b03b6",
+    "benchmarks/goemotions/schemas.py": "db34f0993d0f951c09ed45e6b80a96e5ce6e9f0f79cc7b902fccebdc61d3ee66",
+    "benchmarks/goemotions/systems.py": "0325fe26d7bbd84e7f3a2a58a68f98326ca52da99091dab203526b7fb26e4a92",
+    "benchmarks/goemotions/training/classical.py": "8cdb04290c958a3acb9e042a9221b928323d8029000aaa9bc53a5b7cbabdff5b",
+    "benchmarks/goemotions/training/data.py": "4c6923dbf2c6cb1521c0f77eaa220f768cca42f7959d6b28702f1edd7dc45eef"
+  },
+  "source_hash_normalization": "utf8_lf_matches_git_text_blobs",
+  "version": 1
+}

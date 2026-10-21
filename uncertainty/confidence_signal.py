@@ -142,5 +142,6 @@ class OverallConfidence:
             "recommended_decision": self.recommended_decision.value,
             "signals": [signal.to_dict() for signal in self.signals],
             "calibration": dict(self.calibration),
+            "confidence_interpretation": "empirically_calibrated" if self.calibration.get("fitted_on_development") else "heuristic_uncalibrated",
             "metadata": dict(self.metadata),
         }

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
+import math
 from collections import Counter
 from typing import Any
 
 from affect.taxonomies.goemotions import LABELS
+from benchmarks.goemotions.schemas import parse_label_response
 
 
 def evaluate(gold: list[frozenset[str]], predicted: list[frozenset[str]], labels: list[str]) -> dict[str, Any]:
@@ -27,6 +30,7 @@ def evaluate(gold: list[frozenset[str]], predicted: list[frozenset[str]], labels
             "f1": f1,
             "accuracy": _ratio(tp + tn, len(gold)),
             "support": tp + fn,
+            "prediction_count": tp + fp,
             "tp": tp,
             "fp": fp,
             "fn": fn,
@@ -93,6 +97,11 @@ def probability_metrics(
     """Probability-only diagnostics; callers must not use this for label-only systems."""
     if len(gold) != len(probabilities):
         raise ValueError("Gold and probability counts must match.")
+    if any(set(row) != set(labels) or any(
+        isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 1
+        for value in row.values()
+    ) for row in probabilities):
+        raise ValueError("Probability rows must contain finite [0, 1] scores for every label.")
     values = [
         (label in truth, float(row[label])) for truth, row in zip(gold, probabilities, strict=True) for label in labels
     ]
@@ -125,7 +134,7 @@ def render_figures(
     matrix = [[metrics["label_cooccurrence"][actual][guess] for guess in labels] for actual in labels]
     fig, axis = plt.subplots(figsize=(12, 10))
     image = axis.imshow(matrix, cmap="Blues")
-    axis.set(title="GoEmotions label co-occurrence", xlabel="Predicted label", ylabel="Gold label")
+    axis.set(title="GoEmotions gold/predicted label co-occurrence", xlabel="Predicted label", ylabel="Gold label")
     axis.set_xticks(range(len(labels)), labels, rotation=90, fontsize=6)
     axis.set_yticks(range(len(labels)), labels, fontsize=6)
     fig.colorbar(image, ax=axis)
@@ -278,15 +287,134 @@ def paired_bootstrap_sample_f1(
         raise ValueError("Paired bootstrap inputs must have equal lengths.")
     if not gold or samples < 1:
         return {"samples": samples, "delta": 0.0, "lower": 0.0, "upper": 0.0}
+    differences = [
+        _scores(len(truth & after), len(after - truth), len(truth - after))[2]
+        - _scores(len(truth & before), len(before - truth), len(truth - before))[2]
+        for truth, before, after in zip(gold, baseline, final, strict=True)
+    ]
     deltas = []
     generator = random.Random(seed)  # noqa: S311  # nosec B311
     for _ in range(samples):
-        indices = [generator.randrange(len(gold)) for _ in gold]
-        before = evaluate([gold[i] for i in indices], [baseline[i] for i in indices], list(LABELS))["sample_f1"]
-        after = evaluate([gold[i] for i in indices], [final[i] for i in indices], list(LABELS))["sample_f1"]
-        deltas.append(after - before)
+        deltas.append(sum(differences[generator.randrange(len(gold))] for _ in gold) / len(gold))
     deltas.sort()
     lower = deltas[int(0.025 * (samples - 1))]
     upper = deltas[int(0.975 * (samples - 1))]
-    observed = evaluate(gold, final, list(LABELS))["sample_f1"] - evaluate(gold, baseline, list(LABELS))["sample_f1"]
+    observed = sum(differences) / len(differences)
     return {"samples": samples, "delta": observed, "lower": lower, "upper": upper}
+
+
+def probability_eligibility(record: dict[str, Any], dev_hash: str | None = None) -> dict[str, Any]:
+    """Label indicators and uncalibrated sigmoid scores cannot establish confidence."""
+    unavailable = {"available": False, "confidence": None}
+    provenance = record.get("probability_provenance") or {}
+    if record.get("probabilities_available") is not True:
+        return {**unavailable, "reason": "label_only_or_unavailable_scores"}
+    if record.get("parse_error") is not None or record.get("baseline_parse_error") is not None or record.get("execution_failed"):
+        return {**unavailable, "reason": "invalid_classification"}
+    if not isinstance(provenance, dict) or provenance.get("source") != "trained_probability" or provenance.get("calibrated") is not True:
+        return {**unavailable, "reason": "uncalibrated_or_unverified_source"}
+    prediction = record.get("prediction") or {}
+    if not isinstance(prediction, dict):
+        return {**unavailable, "reason": "missing_prediction"}
+    for key in ("dev_dataset_sha256", "artifact_sha256"):
+        value = provenance.get(key)
+        if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+            return {**unavailable, "reason": "missing_calibration_identity"}
+    if (provenance.get("method") != "scalar_temperature" or provenance.get("split") != "dev"
+            or not provenance.get("model_id") or provenance.get("model_id") != prediction.get("model_id")
+            or not provenance.get("model_revision") or provenance.get("model_revision") != prediction.get("model_revision")
+            or dev_hash is None or provenance["dev_dataset_sha256"] != dev_hash):
+        return {**unavailable, "reason": "calibration_model_or_dev_identity_mismatch"}
+    row = prediction.get("probabilities")
+    if not isinstance(row, dict) or set(row) != set(LABELS) or any(
+        isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 1
+        for value in row.values()
+    ):
+        return {**unavailable, "reason": "incomplete_or_invalid_28_label_scores"}
+    return {"available": True, "confidence": max(row.values()), "reason": "dev_calibrated_full_label_scores", "provenance": provenance}
+
+
+def correction_metrics(gold: list[frozenset[str]], baseline: list[frozenset[str]], final: list[frozenset[str]]) -> dict[str, Any]:
+    if not len(gold) == len(baseline) == len(final):
+        raise ValueError("Correction inputs must have matching lengths.")
+    deltas, added, correct_added = [], 0, 0
+    for truth, before, after in zip(gold, baseline, final, strict=True):
+        deltas.append(_scores(len(truth & after), len(after - truth), len(truth - after))[2]
+                      - _scores(len(truth & before), len(before - truth), len(truth - before))[2])
+        added += len(after - before)
+        correct_added += len((after - before) & truth)
+    return {
+        "available": bool(gold), "sample_count": len(gold), "partial_f1_gains": sum(d > 0 for d in deltas),
+        "partial_f1_harms": sum(d < 0 for d in deltas), "partial_f1_unchanged": sum(d == 0 for d in deltas),
+        "mean_sample_f1_delta": _mean(deltas) if deltas else None, "added_labels": added, "correct_added_labels": correct_added,
+        "added_label_precision": correct_added / added if added else None,
+        "improved_after_label_correction": sum(b != g and a == g for g, b, a in zip(gold, baseline, final, strict=True)),
+        "regressed_after_label_correction": sum(b == g and a != g for g, b, a in zip(gold, baseline, final, strict=True)),
+        "scope": "valid_paired_same_response_labels_not_runtime_reflection",
+    }
+
+
+def same_response_eligible(record: dict[str, Any]) -> bool:
+    if "baseline_labels" not in record or record.get("baseline_parse_error") is not None or record.get("parse_error") is not None or record.get("execution_failed"):
+        return False
+    if record.get("same_response_comparison_eligible") is False:
+        return False
+    raw = record.get("raw_model_response", record.get("raw_response"))
+    if not isinstance(raw, str):
+        return False
+    baseline, error = parse_label_response(raw)
+    expected_hash = record.get("raw_model_response_hash", record.get("response_hash"))
+    return error is None and baseline == frozenset(record["baseline_labels"]) and (
+        expected_hash is None or hashlib.sha256(raw.encode()).hexdigest() == expected_hash
+    )
+
+
+def performance_metrics(records: list[dict[str, Any]], timing: dict[str, Any] | None = None) -> dict[str, Any]:
+    latencies = [float(row.get("latency_ms") or 0) for row in records]
+    if any(not math.isfinite(value) or value < 0 for value in latencies):
+        raise ValueError("Observed case latency must be finite and nonnegative")
+    latency_complete = bool(records) and all(row.get("latency_ms") is not None for row in records)
+    summed = sum(latencies) / 1000
+    logical_counts = []
+    for record in records:
+        usage = record.get("provider_usage") or {}
+        total = usage.get("total_tokens") if isinstance(usage, dict) else None
+        if total is None and isinstance(usage, dict) and isinstance(usage.get("prompt_tokens"), int) and isinstance(usage.get("completion_tokens"), int):
+            total = usage["prompt_tokens"] + usage["completion_tokens"]
+        logical_counts.append(total if isinstance(total, int) and not isinstance(total, bool) and total >= 0 else None)
+    logical_total = sum(value or 0 for value in logical_counts)
+    logical_complete = bool(records) and all(value is not None for value in logical_counts)
+    observed = [row.get("classification_provider") or {} for row in records]
+    available = bool(records) and all(row.get("available") is True for row in observed)
+    windows: dict[str, list[float]] = {}
+    for record, row in zip(records, observed, strict=True):
+        if row.get("inference_started") is not None and row.get("inference_finished") is not None:
+            windows.setdefault(str(record.get("attempt_id", "current")), []).extend([row["inference_started"], row["inference_finished"]])
+    inference_wall = sum(max(values) - min(values) for values in windows.values()) if windows else None
+    successes = sum(row.get("successes", 0) for row in observed) if available else None
+    actual_tokens = sum(row.get("actual_tokens", 0) for row in observed) if available and all(row.get("actual_tokens_available") for row in observed) else None
+    active = timing.get("active_wall_seconds") if timing and timing.get("complete") else None
+    return {
+        "total_latency_ms": sum(latencies), "mean_latency_ms": sum(latencies) / len(records) if records else 0.0,
+        "examples_per_summed_latency_second": len(records) / summed if summed and latency_complete else None,
+        "summed_latency_complete": latency_complete,
+        "wall_throughput_examples_per_second": len(records) / active if active else None,
+        "active_wall_seconds": active, "logical_tokens": logical_total if logical_complete else None,
+        "logical_tokens_available": logical_complete,
+        "logical_tokens_per_summed_latency_second": logical_total / summed if summed and logical_complete else None,
+        "provider_measurements_available": available,
+        "classification_provider_calls": sum(row.get("attempts", 0) for row in observed) if available else None,
+        "logical_classification_provider_calls": sum(row["logical_classification_provider_calls"] for row in records) if all("logical_classification_provider_calls" in row for row in records) else None,
+        "successful_uncached_requests": successes,
+        "response_cache_hits": sum(row.get("cache_hits", 0) for row in observed) if available else None,
+        "provider_retries": sum(row.get("retries", 0) for row in observed) if available else None,
+        "actual_uncached_tokens": actual_tokens, "inference_window_seconds": inference_wall,
+        "provider_requests_per_inference_second": successes / inference_wall if successes is not None and inference_wall else None,
+        "actual_tokens_per_inference_second": actual_tokens / inference_wall if actual_tokens is not None and inference_wall else None,
+        "measurement": "wall counts all completed checkpoints, including failures; logical tokens include cache hits; provider windows grouped by active attempt",
+        "throughput_examples_per_second": len(records) / summed if summed else 0.0,
+        "observed_logical_tokens_sum": logical_total,
+        "observed_logical_tokens_per_summed_latency_second": logical_total / summed if summed else 0.0,
+        "total_tokens": logical_total, "tokens_per_second": logical_total / summed if summed else 0.0,
+        "deprecated_aliases": {"throughput_examples_per_second": "legacy_examples_over_observed_summed_latency", "total_tokens": "observed_logical_tokens_sum", "tokens_per_second": "observed_logical_tokens_per_summed_latency_second"},
+    }

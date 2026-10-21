@@ -1,0 +1,84 @@
+{
+  "admission": {
+    "accepted_cpu_example": {
+      "component_names": [
+        "emotion",
+        "novelty",
+        "recurrence",
+        "reflection",
+        "relevance"
+      ],
+      "created_memory_count": 1,
+      "policy": "importance_threshold",
+      "reason": "importance_threshold_met",
+      "stored": true,
+      "threshold": 0.55
+    },
+    "complete": true,
+    "schema_version": "1.0",
+    "turn_count": 2,
+    "turns": [
+      {
+        "component_names": [
+          "emotion",
+          "novelty",
+          "recurrence",
+          "reflection",
+          "relevance"
+        ],
+        "created_memory_count": 0,
+        "reason": "importance_below_threshold",
+        "stored": false,
+        "threshold": 0.55
+      },
+      {
+        "component_names": [
+          "emotion",
+          "novelty",
+          "recurrence",
+          "reflection",
+          "relevance"
+        ],
+        "created_memory_count": 0,
+        "reason": "importance_below_threshold",
+        "stored": false,
+        "threshold": 0.55
+      }
+    ]
+  },
+  "old_record_missing_fields": {
+    "admission_log": null,
+    "invalid_citations": null,
+    "reflection_audit": null
+  },
+  "producer": "canonical_fake_runtime",
+  "qa": {
+    "memory_count_after": 1,
+    "memory_count_before": 1,
+    "outcome": "answered",
+    "reflection_audit": {
+      "confidence_interpretation": "heuristic_uncalibrated",
+      "corrections": {
+        "accepted": 0,
+        "attempted": 0,
+        "executed": 0,
+        "pending": 0,
+        "rejected": 0,
+        "suppressed": 0
+      },
+      "counterfactual_baseline": false,
+      "enabled": false,
+      "engine_executed": 0,
+      "final_output": "Her aunt",
+      "gate_authorized": 0,
+      "gate_decisions": [],
+      "gate_suppressed": 0,
+      "heuristic_recommended": 0,
+      "original_output": "Her aunt",
+      "original_output_observed": true,
+      "schema_version": "2.0"
+    },
+    "status": "completed"
+  },
+  "schema_version": "1.0"
+}

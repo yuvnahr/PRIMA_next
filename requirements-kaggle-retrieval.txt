@@ -1,0 +1,5 @@
+# Optional CPU learned retrieval, on top of the minimal benchmark runtime.
+# Reuse compatible installed versions; stage immutable model snapshots separately.
+-r requirements-kaggle.txt
+sentence-transformers>=2.7
+einops>=0.7

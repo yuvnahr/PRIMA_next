@@ -89,6 +89,8 @@ class OutputValidationController:
         signals: list[OutputValidationSignal] = []
         generation = context.generation_result
         if isinstance(generation, GenerationResult):
+            if generation.validation_errors:
+                signals.append(OutputValidationSignal.UNSUPPORTED_CLAIM)
             errors = " ".join(generation.errors).lower()
             if generation.outcome is GenerationOutcome.FAILED:
                 if any(token in errors for token in ("json", "schema", "invalid", "empty", "evidence")):

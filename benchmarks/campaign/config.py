@@ -58,6 +58,8 @@ class ProviderConfig(ConfigModel):
 
 
 class RepositoryConfig(ConfigModel):
+    require_clean_pinned_source: bool = False
+    source_fingerprint: str | None = None
     url: str | None = None
     requested_ref: str | None = None
     commit_sha: str | None = None

@@ -66,6 +66,7 @@ class ExecutionGateResult:
     rule: str
     rationale: str
     thresholds: dict[str, float | int]
+    suppression_reason: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the gate result for diagnostics and artifacts."""
@@ -74,6 +75,8 @@ class ExecutionGateResult:
             "rule": self.rule,
             "rationale": self.rationale,
             "thresholds": dict(self.thresholds),
+            "suppression_reason": self.suppression_reason,
+            "confidence_interpretation": "heuristic_uncalibrated",
         }
 
 
@@ -83,6 +86,21 @@ class UncertaintyGate:
 
     policy: UncertaintyGatePolicy = UncertaintyGatePolicy()
 
+    @staticmethod
+    def reflection_suppression(*, enabled: bool, remaining_seconds: float, remaining_calls: int,
+                               interventions: int, max_interventions: int, work_available: bool = True) -> str | None:
+        if not enabled:
+            return "reflection_off"
+        if remaining_seconds <= 0:
+            return "time_budget"
+        if remaining_calls <= 0:
+            return "max_llm_calls"
+        if interventions >= max_interventions:
+            return "reflection_intervention_budget"
+        if not work_available:
+            return "no_remaining_supported_work"
+        return None
+
     def evaluate(
         self,
         uncertainty: OverallConfidence,
@@ -90,6 +108,9 @@ class UncertaintyGate:
         *,
         retrieval_retry_count: int = 0,
         clarification_required: bool = False,
+        reflection_enabled: bool = True,
+        reflection_budget_available: bool = True,
+        reflection_event: str | None = None,
     ) -> ExecutionGateResult:
         """Choose one execution decision using explicit threshold precedence."""
         thresholds = self.policy.to_dict()
@@ -128,7 +149,12 @@ class UncertaintyGate:
                 "Retrieval uncertainty permits one bounded evidence retry.",
                 thresholds,
             )
-        if uncertainty.uncertainty >= self.policy.reflect_uncertainty:
+        if (uncertainty.uncertainty >= self.policy.reflect_uncertainty
+                or reflection_event in {"no_new_evidence", "duplicate_query", "no_supported_expansion"}):
+            if not reflection_enabled or not reflection_budget_available:
+                reason = "reflection_off" if not reflection_enabled else "reflection_budget_exhausted"
+                return ExecutionGateResult(ExecutionDecision.CONTINUE, reason,
+                    "Reflection is suppressed; answer/action gates still apply independently.", thresholds, reason)
             return ExecutionGateResult(
                 ExecutionDecision.REFLECT,
                 "reflection_threshold",

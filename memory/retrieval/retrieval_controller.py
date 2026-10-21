@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field, replace
+from time import perf_counter
 from typing import Any
 
+from memory.evolution.semantic_abstraction_engine import factual_evidence_eligible
 from memory.memory_index import MemoryIndex
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
@@ -44,12 +46,16 @@ class RetrievalController:
         memory_index: MemoryIndex | None = None,
         candidate_pool_multiplier: int = 6,
         candidate_pool_size: int = 30,
+        strategy_names: tuple[str, ...] | None = None,
     ) -> None:
         self.memory_index = memory_index or (
             repository if isinstance(repository, MemoryIndex) else MemoryIndex(repository)
         )
         self.repository = self.memory_index
         self.strategies = strategies
+        if strategy_names is not None and (not strategy_names or set(strategy_names) - {"dense", "sparse", "temporal", "graph"}):
+            raise ValueError("Unsupported retrieval strategy selection")
+        self.strategy_names = strategy_names
         self.fusion = fusion or HybridFusion(HybridFusionConfig.from_file())
         self.confidence_estimator = confidence_estimator or RetrievalConfidenceEstimator()
         self.reranker = reranker or Reranker()
@@ -65,14 +71,32 @@ class RetrievalController:
         candidate_top_k = max(request.top_k, self.candidate_pool_size, request.top_k * self.candidate_pool_multiplier)
         candidate_request = replace(request, top_k=candidate_top_k)
         active_strategies, skipped = self._strategies_for(request.profile)
-        by_strategy = {
-            strategy.name: strategy.retrieve(candidate_request, self.repository)
-            for strategy in active_strategies
-        }
+        timings = {"embedding": 0.0, "sparse": 0.0, "dense": 0.0, "fusion": 0.0, "reranking": 0.0}
+        if any(strategy.name == "dense" for strategy in active_strategies):
+            started = perf_counter()
+            candidate_request = replace(candidate_request, query_embedding=request.embedding())
+            timings["embedding"] = (perf_counter() - started) * 1000
+        by_strategy = {}
+        scoped_index = (MemoryIndex(self.memory_index.repository, self.memory_index.graph_repository,
+                                    factual_only=True, source_conversation_id=request.session_id or None)
+                        if request.task_kind == "factual_qa" else self.repository)
+        for strategy in active_strategies:
+            started = perf_counter()
+            candidates = strategy.retrieve(candidate_request, scoped_index)
+            by_strategy[strategy.name] = [result for result in candidates
+                if (request.task_kind != "factual_qa" or factual_evidence_eligible(result.note))
+                and (not request.session_id or result.note.context.get("source_conversation_id", request.session_id) == request.session_id)]
+            timings[strategy.name] = (perf_counter() - started) * 1000
+        started = perf_counter()
         fused = self.fusion.fuse(by_strategy, top_k=candidate_request.top_k)
+        if request.task_kind == "factual_qa":
+            fused = [result for result in fused if factual_evidence_eligible(result.note)]
         fused = self._apply_state_filter(fused, request)
         fused = self._apply_semantic_boost(fused, request)
+        timings["fusion"] = (perf_counter() - started) * 1000
+        started = perf_counter()
         reranked_pool = self.reranker.rerank(fused, request)
+        timings["reranking"] = (perf_counter() - started) * 1000
         reranked = reranked_pool[: request.top_k]
         confidence = self.confidence_estimator.estimate(reranked, request.top_k, request)
         diagnostics = self._diagnostics(
@@ -84,11 +108,14 @@ class RetrievalController:
             confidence=confidence,
             skipped_strategies=skipped,
         )
+        diagnostics["timings_ms"] = timings
+        diagnostics["fusion_weights"] = dict(self.fusion.config.weights)
         return RetrievalResponse(results=tuple(reranked), confidence=confidence, diagnostics=diagnostics)
 
     def _prepare_request(self, request: RetrievalRequest) -> RetrievalRequest:
         rewrite = request.query_rewrite or self.query_analyzer.rewrite(request.query, request.affective_context)
-        analysis = request.analyzed_query or rewrite.analysis
+        analysis = replace(request.analyzed_query or rewrite.analysis, reference_time=request.reference_time, historical=request.historical)
+        rewrite = replace(rewrite, analysis=analysis)
         expanded = request.expanded_query or ExpandedQuery(
             text=rewrite.rewritten_query,
             terms=tuple(rewrite.provenance.get("expansion_terms", ())),
@@ -125,6 +152,8 @@ class RetrievalController:
         }.get(profile)
         if selected is None:
             raise ValueError(f"Unsupported retrieval profile: {profile!r}.")
+        if self.strategy_names is not None:
+            selected = tuple(name for name in selected if name in self.strategy_names)
         active = tuple(available[name] for name in selected if name in available)
         skipped = {
             name: (
@@ -209,6 +238,7 @@ class RetrievalController:
         strategy_names = tuple(by_strategy)
         return {
             "question": request.query,
+            "stage_limits": {"candidate_pool": max(request.top_k, self.candidate_pool_size, request.top_k * self.candidate_pool_multiplier), "returned": request.top_k},
             "expanded_query": expanded.to_dict() if expanded is not None else {"text": request.query, "terms": [], "expansion_map": {}},
             "query_rewrite": request.query_rewrite.to_dict() if request.query_rewrite is not None else {},
             "query_analysis": analysis.to_dict() if analysis is not None else {},

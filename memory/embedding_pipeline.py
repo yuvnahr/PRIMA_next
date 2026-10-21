@@ -15,6 +15,7 @@ from memory.embedding_backend import (
     EmbeddingBackendConfig,
     embed_text,
     embedding_backend_config,
+    get_embedding_backend,
     use_embedding_backend_config,
 )
 from memory.experiment_config import EmbeddingExperimentConfig
@@ -46,6 +47,11 @@ def current_embedding_metadata(experiment: EmbeddingExperimentConfig | None = No
         "representation_version": f"{REPRESENTATION_VERSION}:{experiment.representation_mode}",
         "identity_version": f"{IDENTITY_VERSION}:{'on' if experiment.identity_enabled else 'off'}",
     }
+    if config.name != "stable":
+        info = get_embedding_backend().info()
+        payload.update(embedding_revision=config.revision, embedding_device=config.device,
+                       embedding_batch_size=config.batch_size, embedding_cpu_threads=config.cpu_threads,
+                       embedding_snapshot_sha256=(info["snapshot"] or {}).get("artifact_sha256"), normalization="l2-float32")
     fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return {**payload, "backend_fingerprint": fingerprint}
 

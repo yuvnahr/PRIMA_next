@@ -38,7 +38,7 @@ GENERIC_NOUNS = {
 }
 
 
-def stable_embedding(text: str, dimensions: int = 64) -> list[float]:
+def stable_embedding(text: str, dimensions: int | None = None) -> list[float]:
     """Return the configured embedding while preserving the existing interface."""
 
     from memory.embedding_backend import embed_text

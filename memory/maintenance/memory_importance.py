@@ -14,9 +14,11 @@ from memory.maintenance.importance_types import (
     MemoryAdmissionDecision,
     MemoryImportanceConfig,
 )
+from memory.memory_index import MemoryIndex
 from memory.memory_note import extract_dominant_context_chain
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryType
+from memory.retrieval.query_analysis import QueryAnalyzer
 
 DEFAULT_CONFIG_PATH = Path("config/memory_importance.yaml")
 
@@ -80,9 +82,13 @@ class MemoryImportanceEngine:
         repository: MemoryRepository,
         config: MemoryImportanceConfig | None = None,
         config_path: str | Path = DEFAULT_CONFIG_PATH,
+        *, policy: str = "importance_threshold",
     ) -> None:
         self.repository = repository
         self.config = config or load_memory_importance_config(config_path)
+        if policy not in {"importance_threshold", "source_factual_candidate"}:
+            raise ValueError("Unknown admission policy")
+        self.policy = policy
 
     def score(
         self,
@@ -119,10 +125,22 @@ class MemoryImportanceEngine:
         *,
         affect_update: Any | None = None,
         reflection_result: Any | None = None,
+        source_provenance: Mapping[str, Any] | None = None,
     ) -> MemoryAdmissionDecision:
-        score = self.score(query, affect_update=affect_update, reflection_result=reflection_result)
+        engine = self
+        if source_provenance and source_provenance.get("source_conversation_id"):
+            scoped = MemoryIndex(self.repository, graph_repository=None, source_conversation_id=str(source_provenance["source_conversation_id"]))
+            engine = MemoryImportanceEngine(scoped, self.config, policy=self.policy)
+        score = engine.score(query, affect_update=affect_update, reflection_result=reflection_result)
         stored = score.total_score >= self.config.threshold
         reason = "importance_threshold_met" if stored else "importance_below_threshold"
+        if not stored and self.policy == "source_factual_candidate" and source_provenance and score.novelty_score >= 0.5:
+            content = re.sub(r"^\[[^\]]+\]\s*[^:\n]+:\s*", "", query)
+            analysis = QueryAnalyzer().analyze(content)
+            dated = bool(re.search(r"\b(?:19|20)\d{2}\b|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b", content, re.IGNORECASE))
+            if (source_provenance.get("source_timestamp") and source_provenance.get("source_turn_id")
+                    and (analysis.events or analysis.relations or dated)):
+                stored, reason = True, "source_grounded_factual_retention_candidate"
         return MemoryAdmissionDecision(
             query=query,
             score=score,

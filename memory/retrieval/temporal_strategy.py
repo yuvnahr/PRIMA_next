@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 from memory.memory_repository import MemoryRepository
 from memory.memory_types import RetrievalWindow
+from memory.retrieval.query_analysis import temporal_agreement
 from memory.retrieval.retrieval_request import RetrievalRequest
 from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_strategy import RetrievalStrategy
@@ -24,25 +25,29 @@ class TemporalRetrievalStrategy(RetrievalStrategy):
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
         if not self._should_apply(request):
             return []
-        now = datetime.now(timezone.utc)
+        now = request.reference_time or (None if request.historical else datetime.now(timezone.utc))
+        if now is not None:
+            now = now.replace(tzinfo=now.tzinfo or timezone.utc)
         horizon = WINDOW_HOURS[request.temporal_window]
         results: list[RetrievalResult] = []
         for memory_type in request.memory_types:
             for note in repository.list(memory_type):
                 timestamp = note.timestamp.replace(tzinfo=timezone.utc) if note.timestamp.tzinfo is None else note.timestamp
-                age_hours = max(0.0, (now - timestamp).total_seconds() / 3600.0)
-                if age_hours > horizon:
+                age_hours = max(0.0, (now - timestamp).total_seconds() / 3600.0) if now else None
+                if age_hours is not None and age_hours > horizon:
                     continue
-                recency_score = max(0.0, 1.0 - (age_hours / horizon)) if horizon else 0.0
+                recency_score = max(0.0, 1.0 - (age_hours / horizon)) if horizon and age_hours is not None else 0.0
                 constraint_score = self._constraint_score(request, note.content.lower())
                 score = max(recency_score * 0.35, constraint_score)
+                if request.historical and request.analyzed_query is not None:
+                    score = max(score, temporal_agreement(request.analyzed_query, timestamp))
                 results.append(
                     RetrievalResult(
                         note=note,
                         score=score,
                         strategy_scores={self.name: score},
                         explanation={
-                            "age_hours": round(age_hours, 6),
+                            "age_hours": round(age_hours, 6) if age_hours is not None else None,
                             "window": request.temporal_window.value,
                             "constraint_score": round(constraint_score, 6),
                         },

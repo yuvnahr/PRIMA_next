@@ -28,12 +28,14 @@ def _nll(logits: Sequence[Sequence[float]], targets: Sequence[Sequence[float]], 
     return sum(terms) / len(terms)
 
 
-def write_calibration(path: Path, result: dict[str, Any], *, model_id: str, dev_hash: str) -> None:
+def write_calibration(path: Path, result: dict[str, Any], *, model_id: str, dev_hash: str, model_revision: str | None = None) -> None:
+    if model_revision is not None and (len(model_revision) < 7 or any(c not in "0123456789abcdefABCDEF" for c in model_revision)):
+        raise ValueError("Calibration model revision must be an immutable commit hash")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({**result, "model_id": model_id, "dev_dataset_sha256": dev_hash}, indent=2, sort_keys=True), encoding="utf-8")
+    path.write_text(json.dumps({**result, "model_id": model_id, "model_revision": model_revision, "dev_dataset_sha256": dev_hash}, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def fit_calibration_from_dev(data_dir: Path, logits_path: Path, output_path: Path, *, model_id: str) -> dict[str, Any]:
+def fit_calibration_from_dev(data_dir: Path, logits_path: Path, output_path: Path, *, model_id: str, model_revision: str | None = None) -> dict[str, Any]:
     """Fit scalar temperature from development logits in official development order."""
     labels = validate_splits(data_dir)["labels"]
     logits = json.loads(logits_path.read_text(encoding="utf-8"))
@@ -41,5 +43,5 @@ def fit_calibration_from_dev(data_dir: Path, logits_path: Path, output_path: Pat
     if not isinstance(logits, list) or len(logits) != len(dev):
         raise ValueError("Development logits must match the official dev split length.")
     result = fit_temperature(logits, [multi_hot(row, labels) for row in dev])
-    write_calibration(output_path, result, model_id=model_id, dev_hash=validate_splits(data_dir)["hashes"]["dev"])
+    write_calibration(output_path, result, model_id=model_id, dev_hash=validate_splits(data_dir)["hashes"]["dev"], model_revision=model_revision)
     return result

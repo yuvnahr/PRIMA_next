@@ -53,8 +53,8 @@ def test_first_hop_sufficient_never_requests_a_follow_up() -> None:
 def test_hop_and_retrieval_budgets_are_enforced() -> None:
     responses = {
         "What final trait has Alpha?": _response("a", "Alpha identifies Bridge."),
-        "Bridge": _response("b", "Bridge identifies Delta."),
-        "Delta": _response("c", "Delta identifies Echo."),
+        "What final trait has Alpha? Source bridge: Bridge": _response("b", "Bridge identifies Delta."),
+        "What final trait has Alpha? Source bridge: Delta": _response("c", "Delta identifies Echo."),
     }
     max_hops = ReasoningController().answer(
         ReasoningRequest("What final trait has Alpha?", budget=ReasoningBudget(max_hops=3, max_retrieval_calls=5, no_progress_limit=9)),

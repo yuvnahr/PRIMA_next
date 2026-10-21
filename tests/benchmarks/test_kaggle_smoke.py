@@ -41,8 +41,8 @@ def test_full_notebook_launch_requires_budget_resources_and_complete_source_sele
     ns = notebook_namespace()
     if benchmark == "goemotions":
         dataset = tmp_path / "goemotions_test.json"
-        dataset.write_text(json.dumps([{"id": f"test-{i}", "text": "happy", "labels": [17]} for i in range(5)]))
-        source_ids = [f"test-{i}" for i in range(5)]
+        dataset.write_text(json.dumps([{"id": f"test-{i}", "text": "happy", "labels": [17]} for i in range(5427)]))
+        source_ids = [f"test-{i}" for i in range(5427)]
     elif benchmark == "hotpotqa":
         dataset = FIXTURES / "campaign" / "hotpot.json"
         source_ids = [row["_id"] for row in json.loads(dataset.read_text())]
@@ -57,15 +57,31 @@ def test_full_notebook_launch_requires_budget_resources_and_complete_source_sele
     ns.update(json=json, re=__import__("re"), time=time, REPOSITORY_DIR=REPO, OUTPUT_ROOT=tmp_path,
               SELECTED_BENCHMARK=benchmark, SELECTED_DATASET=dataset, SESSION_STAMP="synthetic",
               OLLAMA_ENDPOINT="http://unused", STATE={
-                  "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": "a" * 40},
+                  "repository": {"url": "https://example.invalid", "requested_ref": "dev", "commit_sha": "a" * 40},
                   "model_identity": {"name": "synthetic", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "selected_workers": 1,
                   "expected_dataset_sha256": digest,
-              }, dataset_summary={"items": len(source_ids), "expected_full_run_count": len(source_ids)},
+              }, dataset_summary={"items": len(source_ids), "expected_full_run_count": len(source_ids), "sha256": digest},
               require_production_identity=require_production_identity, budget_gate=budget_gate)
     ns["CONFIG"].update(RUN_FULL_BENCHMARK=True, FULL_RUN_ID="synthetic-full", PINNED_COMMIT_SHA="a" * 40,
                         EXPECTED_MODEL_DIGEST="b" * 64)
     ns["CONFIG"]["EXPECTED_DATASET_SHA256"][benchmark] = digest
+    source_identity = {"git_commit": "a" * 40, "dirty": False, "source_fingerprint": "f" * 64,
+                       "executed_notebook_sha256": "e" * 64}
+    ns["STATE"].update(source_identity=source_identity, backend_restored=True)
+    ns["capture_source"] = lambda: copy.deepcopy(source_identity)
+    ns["live_quota"] = lambda: {"remaining_quota_seconds": 100000, "quota_age_seconds": 1}
+    if benchmark == "locomo":
+        from config.runtime_config import RuntimeConfig
+        promotion = {"reviewed_dev_sha": "a" * 40, "producer_checkpoint": ns["CONFIG"]["PERSON1_FINAL_CHECKPOINT"],
+            "runtime_config_fingerprint": RuntimeConfig.model_validate(ns["CONFIG"]["RUNTIME_CONFIG"]).fingerprint,
+            "model_digest": "b" * 64, "quality_gate_passed": True, "resource_time_gate_passed": True,
+            "answerable_official_f1_delta": .01, "paired_95pct_lower": .001, "adversarial_accuracy_delta": 0,
+            "execution_failure_increase": 0, "invalid_citation_increase": 0, "qa_memory_writes": 0}
+        promotion_path = tmp_path / "synthetic_promotion.json"
+        promotion_path.write_text(json.dumps(promotion))
+        ns["CONFIG"].update(LOCOMO_PROMOTION_MANIFEST=str(promotion_path),
+                            LOCOMO_PROMOTION_MANIFEST_SHA256=hashlib.sha256(promotion_path.read_bytes()).hexdigest())
     full, config_path, root, mode_id = ns["build_campaign_config"]("full", full=True)
     mode = full["benchmarks"][0]
     assert full["run_kind"] == "benchmark" and mode["max_items"] == 0
@@ -83,8 +99,9 @@ def test_full_notebook_launch_requires_budget_resources_and_complete_source_sele
     (measured_root / "run_identity.json").write_text(json.dumps({"effective_config": measured}))
     estimate = {"fresh": True, "resources_validated": True, "projected_campaign_seconds": 100,
                 "projected_remaining_seconds": 100, "projected_session_seconds": 100,
+                "safety_margin": .2, "final_artifact_reserve_seconds": 900, "measured_monotonic": time.monotonic(),
                 "identity": {"repository_sha": "a" * 40, "model_digest": "b" * 64,
-                             "dataset_sha256": digest, "session_stamp": "synthetic"}}
+                             "dataset_sha256": digest, "session_stamp": "synthetic", "source_fingerprint": "f" * 64}}
     ns["STATE"].update(timing_canary=estimate, pilot_results={"1": {"run_root": str(measured_root)}})
     ns["run_checked"] = lambda cmd, **kwargs: types.SimpleNamespace(stdout="" if "status" in cmd else "a" * 40)
     ns["inspect_model_identity"] = lambda: {"digest": "b" * 64}
@@ -202,7 +219,7 @@ def test_notebook_smoke_stages_native_artifacts_and_partial_packages(tmp_path, m
     ns.update(SELECTED_DATASET=dataset, sha256_file=lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest(),
               dataset_summary={"sha256": digest, "expected_digest_pinned": False,
                                "identity_policy": "selected_kaggle_input_snapshot"}, STATE={
-                  "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": git_commit()},
+                  "repository": {"url": "https://example.invalid", "requested_ref": "dev", "commit_sha": git_commit()},
                   "model_identity": {"name": "fake", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "mode_id": f"{benchmark}-prima",
                   "ollama_parallel_slots": 1, "model_load_seconds": 1, "smoke_setup_seconds": 2,
@@ -234,7 +251,8 @@ def test_notebook_smoke_stages_native_artifacts_and_partial_packages(tmp_path, m
 
     ns["subprocess"] = types.SimpleNamespace(Popen=FakeProcess, STDOUT=subprocess.STDOUT,
                                             TimeoutExpired=subprocess.TimeoutExpired)
-    ns["safety_sample"] = lambda *args: {**sample(), "timestamp": "synthetic", "elapsed_seconds": 1}
+    observed_times = iter(index / 10 for index in range(1, 1000))
+    ns["safety_sample"] = lambda *args: {**sample(), "timestamp": "synthetic", "elapsed_seconds": next(observed_times)}
     ns["check_safety"] = resource_guard
     ns["run_smoke"]()
     assert ns["STATE"]["budget_gate"]["allowed"] is False

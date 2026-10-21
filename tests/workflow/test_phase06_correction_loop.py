@@ -62,7 +62,7 @@ class _QueryRetrievalController(RetrievalController):
     def retrieve(self, request):
         query = str(request.query)
         self.queries.append(query)
-        if query == "corrected entity query":
+        if query == "What is the entity answer? Source bridge: Cedar":
             note = MemoryNote.create(
                 "The corrected entity answer is Right.",
                 MemoryType.SEMANTIC,
@@ -72,7 +72,7 @@ class _QueryRetrievalController(RetrievalController):
             confidence = RetrievalConfidence(0.9, 0.1, 1.0, 0.9)
         else:
             note = MemoryNote.create(
-                "A distractor mentions an unrelated Wrong answer.",
+                "The entity identifies Cedar.",
                 MemoryType.SEMANTIC,
                 note_id="distractor",
                 embedding=(0.0,),
@@ -86,7 +86,7 @@ class _QueryAdvisor:
         return ReflectionAdvice(
             trigger=True,
             action=ReflectionAction.REVISE_QUERY,
-            suggested_query="corrected entity query",
+            suggested_query="Cedar",
             correction_proposal="Retrieve independent evidence for the unresolved entity.",
             confidence=0.9,
             provenance={"component": "synthetic_reflection_advisor"},
@@ -149,13 +149,13 @@ def test_pre_execution_reflection_changes_query_evidence_and_answer() -> None:
 
     result = asyncio.run(workflow.run(context.user_input, context))
 
-    assert retrieval.queries == ["What is the entity answer?", "corrected entity query"]
+    assert retrieval.queries == ["What is the entity answer?", "What is the entity answer? Source bridge: Cedar"]
     assert result.output["text"] == "Right"
     assert result.reasoning_result.evidence_references[0].source_id == "correct"
     attempt = result.correction_attempts[0]
     assert attempt.accepted
     assert attempt.before_query == "What is the entity answer?"
-    assert attempt.after_query == "corrected entity query"
+    assert attempt.after_query == "What is the entity answer? Source bridge: Cedar"
     assert attempt.before_answer == ""
     assert attempt.after_answer == "Right"
     assert "gold" not in json.dumps(attempt.to_dict()).lower()
@@ -217,7 +217,7 @@ def test_invalid_duplicate_and_budgeted_advice_are_rejected() -> None:
     )
 
     assert loop.review(context, leaked, "pre_execution").decision_reason == "evaluation_leakage"
-    assert loop.review(context, valid, "pre_execution").accepted
+    assert loop.review(context, valid, "pre_execution").proposal_accepted
     assert loop.review(context, valid, "pre_execution").decision_reason == "duplicate_advice"
     assert loop.review(context, another, "pre_execution").decision_reason == "retrieval_budget_exhausted"
 
@@ -231,7 +231,7 @@ def test_invalid_duplicate_and_budgeted_advice_are_rejected() -> None:
         confidence=0.9,
         reason_code="constraint",
     )
-    assert replan_loop.review(replan_context, replan, "pre_execution").accepted
+    assert replan_loop.review(replan_context, replan, "pre_execution").proposal_accepted
     assert (
         replan_loop.review(replan_context, second_replan, "pre_execution").decision_reason
         == "replan_budget_exhausted"
@@ -273,7 +273,7 @@ def test_generation_budget_stops_repeated_schema_failures(tmp_path) -> None:
 
     assert client.calls == 2
     assert [item["decision_reason"] for item in response.output_data["correction_attempts"]] == [
-        "accepted",
+        "invalid_corrected_output",
         "duplicate_advice",
     ]
 

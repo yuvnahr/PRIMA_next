@@ -61,7 +61,9 @@ class MemoryEvolutionEngine:
                 memory_type=MemoryType.SEMANTIC,
                 memory_level=MemoryLevel.SEMANTIC_ABSTRACTION,
 
-                context={"type": "semantic_abstraction", "source": "memory_evolution", "references": list(lineage.parent_ids)},
+                context={"type": "semantic_abstraction", "source": "memory_evolution", "references": list(lineage.parent_ids),
+                         **({"summary_kind": "fact_free_cluster_description", "evidence_eligible": False}
+                            if summary == SemanticAbstractionEngine().summarize_cluster(parents, self.policy.max_summary_words) else {})},
                 salience_score=max(parent.salience_score for parent in parents),
                 retention_score=max(parent.retention_score for parent in parents),
             ).with_updates(

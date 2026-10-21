@@ -15,11 +15,17 @@ from benchmarks.campaign.config import CampaignConfig
 from benchmarks.campaign.kaggle import validate_replica_models
 from benchmarks.campaign.provider_session import SharedProviderSession
 from benchmarks.campaign.registry import effective_generation
+from benchmarks.common.source_identity import require_reviewed_source, source_identity
 from benchmarks.preflight import capability_report
 from llm.generation_config import StructuredOutputMode
 
 
 def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dict[str, Any]:
+    executed_source = source_identity(Path(__file__).resolve().parents[2])
+    if config.repository.require_clean_pinned_source:
+        if config.repository.requested_ref != "dev":
+            raise ValueError("Matched production source must name the reviewed dev ref")
+        require_reviewed_source(executed_source, config.repository.commit_sha or "", config.repository.source_fingerprint)
     datasets = {}
     for mode in config.benchmarks:
         if not mode.dataset_path.is_file():
@@ -109,6 +115,8 @@ def run_preflight(config: CampaignConfig, session: SharedProviderSession) -> dic
 
     return {
         "schema_version": "1.0",
+        "source_identity": executed_source,
+        "auxiliary_models": verify_auxiliary_models(config),
         "datasets": datasets,
         "endpoint": endpoint,
         "replica_placements": replica_placements,
@@ -135,3 +143,34 @@ def _hash(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_auxiliary_models(config: CampaignConfig) -> dict[str, Any]:
+    """Resolve only required pinned local artifacts; never download in campaign execution."""
+    settings = config.runtime.model_dump()
+    requested = []
+    if settings["affect_backend"] != "legacy":
+        if not settings["affect_local_files_only"] or settings["affect_allow_fallback"]:
+            raise ValueError("Learned affect must be staged local-only with fallback disabled")
+        requested.append(("affect", settings.get("affect_model_id"), settings.get("affect_model_revision"),
+                          None, settings.get("affect_device")))
+    if settings["embedding_backend"] not in {"stable", "hash", "current", "stable_hash", "stable_hash_embedding"}:
+        requested.append(("embedding", settings.get("embedding_model"), settings.get("embedding_revision"),
+                          settings.get("embedding_local_snapshot"), settings.get("embedding_device", "cpu")))
+    if settings["reranker_enabled"] and settings["reranker_backend"] == "cross_encoder":
+        requested.append(("reranker", settings.get("reranker_model"), settings.get("reranker_revision"),
+                          settings.get("reranker_local_snapshot"), settings.get("reranker_device", "cpu")))
+    if requested:
+        from memory.embedding_backend import model_snapshot
+
+        result = {}
+        for role, model, revision, snapshot, device in requested:
+            if device != "cpu":
+                raise ValueError("Matched Qwen campaign requires CPU auxiliary models")
+            if not model:
+                raise ValueError("Learned auxiliary model identity must be explicit")
+            _, identity = model_snapshot(model, revision, snapshot)
+            result[role] = {**identity, "device": device, "local_files_only": True,
+                            "execution_validated": False, "reason": "artifact staging; runner must report actual execution"}
+        return result
+    return {}

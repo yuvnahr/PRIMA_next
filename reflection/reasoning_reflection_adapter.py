@@ -32,6 +32,7 @@ class ReasoningReflectionAdapter:
                 retrieved_memories=tuple(getattr(state, "evidence_items", ())),
                 failure_type=failure_type,
                 failure_metadata={"reason": stop_reason, "severity": 1.0, "reasoning_event": True},
+                read_only=True,
             )
         )
         return self.advice_for_result(event, result, query=query, stop_reason=stop_reason)

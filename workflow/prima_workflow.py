@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from typing import Any
 
 from action import ActionContext, ActionExecutor, ExecutionPolicy
@@ -14,6 +16,7 @@ from events.event_types import EventType
 from events.maintenance_events import maintenance_event
 from llm.generation_config import GenerationConfig
 from llm.llm_client import LLMClient
+from llm.request_budget import RequestBudget
 from memory.maintenance.background_supervisor import BackgroundMaintenanceSupervisor
 from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 from memory.maintenance.memory_importance import MemoryImportanceEngine
@@ -27,8 +30,10 @@ from memory.retrieval.retrieval_request import RetrievalRequest
 from planning import PlanningContext, TaskPlanner
 from planning.plan import Plan
 from reasoning.controller import ReasoningController
-from reasoning.models import AnswerResult, ReasoningBudget, ReasoningMode, ReasoningRequest
+from reasoning.information_need_generator import InformationNeedGenerator
+from reasoning.models import AnswerResult, EvidenceState, ReasoningBudget, ReasoningMode, ReasoningRequest
 from reasoning.reflection_advisor import ReflectionAdvisor, ReflectionEvent
+from reasoning.sufficiency_verifier import SufficiencyVerifier
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_context import ReflectionContext
 from reflection.reflection_engine import ReflectionEngine
@@ -52,6 +57,46 @@ from workflow.task_router import TaskRouter
 from workflow.workflow_events import WorkflowEventBus
 from workflow.workflow_state import WorkflowPhase
 from world import PredictionResult, SimulationContext, StateSimulator
+
+
+def _set_source_provenance(context: ExecutionContext) -> None:
+    document = context.metadata.get("document_metadata", {})
+    historical = context.metadata.get("task_kind") == "historical_replay"
+    metadata = context.metadata if historical else document
+    if not historical and "source_timestamp" not in metadata:
+        return
+    raw = metadata.get("source_timestamp", metadata.get("timestamp"))
+    source = "metadata"
+    if raw is None and historical and "source_timestamp" not in metadata and "timestamp" not in metadata:
+        # Older replay callers used the explicit ISO transcript prefix instead of metadata.
+        match = re.match(r"^\[([^\]]+)\]", context.user_input)
+        raw = match.group(1) if match else None
+        source = "transcript_iso_prefix"
+    if not isinstance(raw, str) or not raw.strip():
+        raise ValueError("Historical replay requires a valid source timestamp")
+    try:
+        timestamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"Invalid historical source timestamp: {raw!r}") from exc
+    context.source_timestamp = timestamp.replace(tzinfo=timestamp.tzinfo or UTC).astimezone(UTC)
+    context.source_provenance = {
+        "source_timestamp": context.source_timestamp.isoformat(),
+        "source_timestamp_original": metadata.get("source_timestamp_original", raw),
+        "timestamp_precision": metadata.get("timestamp_precision", "date" if len(raw) == 10 else "datetime"),
+        "source_timestamp_source": source,
+        "source_conversation_id": str(context.metadata.get("session_id", "")),
+        "source_session_id": metadata.get("source_session_id"),
+        "source_turn_id": metadata.get("source_turn_id", metadata.get("turn_id", "")),
+        "speaker": metadata.get("speaker"),
+    }
+
+
+def _source_note_id(context: ExecutionContext) -> str | None:
+    if not context.source_provenance.get("source_turn_id") or not context.source_provenance.get("source_conversation_id"):
+        return None
+    identity = (context.source_provenance["source_conversation_id"], context.source_provenance["source_session_id"],
+                context.source_provenance["source_turn_id"], context.user_input)
+    return "mem_source_" + hashlib.sha256(repr(identity).encode()).hexdigest()
 
 
 @dataclass(slots=True)
@@ -165,6 +210,10 @@ class EvidenceAcquisitionController:
                     memory_types=tuple(item for item in MemoryType if item is not MemoryType.PROCEDURAL),
                     profile=str(context.metadata.get("profile", "prima_full")),
                     task_kind=str(context.metadata.get("task_kind", "factual_qa")),
+                    session_id=str(context.metadata.get("session_id", "")),
+                    historical=bool(context.metadata.get("historical_context", False)),
+                    reference_time=(datetime.fromisoformat(str(context.metadata["reference_time"]).replace("Z", "+00:00"))
+                                    if context.metadata.get("reference_time") else None),
                     required_reranker_backend=context.metadata.get("required_reranker_backend"),
                 )
             )
@@ -176,16 +225,26 @@ class EvidenceAcquisitionController:
             max_hops=int(context.metadata.get("max_hops", 3)),
             max_retrieval_calls=int(context.metadata.get("max_retrieval_calls", 3)),
             max_context_tokens=int(context.metadata.get("max_context_tokens", 1600)),
+            max_llm_calls=int(context.metadata.get("max_llm_calls", 4)),
+            time_budget_seconds=float(context.metadata.get("time_budget_seconds", 15.0)),
+            answer_reserve_seconds=float(context.metadata.get("answer_reserve_seconds", 3.0)),
         )
+        if context.request_budget is None:
+            context.request_budget = RequestBudget(budget.max_llm_calls, budget.time_budget_seconds, budget.answer_reserve_seconds)
+        attempt = int(context.metadata.get("evidence_acquisition_attempts", 0))
+        context.metadata["evidence_acquisition_attempts"] = attempt + 1
         result = self.reasoning_controller.answer(
             ReasoningRequest(
-                question=active_query,
+                question=context.user_input,
                 session_id=str(context.metadata.get("session_id", "")),
                 mode=mode,
                 budget=budget,
+                caller_metadata={"initial_query": active_query},
+                shared_budget=context.request_budget,
             ),
             retrieve=retrieve,
-            synthesize=lambda _question, _evidence: ("", False, (), {}),
+            retrieval_hops=context.retrieval_hops,
+            attempt_index=attempt,
         )
         compression_enabled = context.metadata.get("context_compression_enabled", True)
         if not isinstance(compression_enabled, bool):
@@ -193,10 +252,18 @@ class EvidenceAcquisitionController:
         compressor = replace(self.context_compressor, enabled=compression_enabled)
         compressed = compressor.compress(result.evidence_references, budget.max_context_tokens)
         context.compressed_context = compressed
+        permitted = bool(result.answer_attempt_permitted and compressed.evidence
+                         and compressed.compressed_tokens <= budget.max_context_tokens)
+        attempt_diagnostics = dict(result.answer_diagnostics.get("answer_attempt", {}))
+        attempt_diagnostics["permitted"] = permitted
+        if not permitted:
+            attempt_diagnostics["outcome"] = "blocked"
         result = replace(
             result,
             evidence_references=compressed.evidence,
-            answer_diagnostics={**result.answer_diagnostics, "context_compression": compressed.to_dict()},
+            answer_attempt_permitted=permitted,
+            answer_diagnostics={**result.answer_diagnostics, "context_compression": compressed.to_dict(),
+                                "answer_attempt": attempt_diagnostics},
         )
         return EvidenceAcquisitionResult(result, latest_retrieval)
 
@@ -303,6 +370,15 @@ class UncertaintyController:
         return tuple(signals)
 
 
+def _supported_reflection_query(context: ExecutionContext) -> str | None:
+    if not isinstance(context.reasoning_result, AnswerResult):
+        return None
+    state = EvidenceState(ReasoningRequest(context.user_input), evidence_items=list(context.reasoning_result.evidence_references))
+    state.attempted_queries = [str(row["query"]) for row in context.retrieval_hops]
+    need = InformationNeedGenerator().generate(state, SufficiencyVerifier().evaluate(state))
+    return need.query if need else None
+
+
 @dataclass(slots=True)
 class ExecutionDecisionController:
     """Apply the typed uncertainty gate before action or model execution."""
@@ -316,12 +392,42 @@ class ExecutionDecisionController:
             raise TypeError("Execution decision requires an OverallConfidence estimate.")
         if not isinstance(context.world_prediction, PredictionResult):
             raise TypeError("Execution decision requires a symbolic PredictionResult.")
+        shared = context.request_budget
+        work_available = bool(str(context.metadata.get("task_kind")) != "factual_qa"
+            or (context.reasoning_result is not None and context.reasoning_result.evidence_references))
+        stop = getattr(context.reasoning_result, "stop_reason", "")
+        if shared is not None and not shared.denial_reason():
+            if stop in {"max_retrieval_calls", "max_hops", "context_budget", "time_budget", "answer_time_reserve"}:
+                work_available = False
+            elif stop in {"no_new_evidence", "duplicate_query", "no_supported_expansion"}:
+                work_available = (not shared.retrieval_time_exhausted
+                    and shared.retrieval_calls < int(context.metadata.get("max_retrieval_calls", 3))
+                    and _supported_reflection_query(context) is not None)
+        suppression = self.gate.reflection_suppression(
+            enabled=bool(context.metadata.get("reflection_enabled", True)),
+            remaining_seconds=shared.remaining_seconds if shared else 15,
+            remaining_calls=shared.max_llm_calls - shared.llm_calls if shared else 4,
+            interventions=int(context.metadata.get("reflection_execution_count", 0)),
+            max_interventions=int(context.metadata.get("correction_budget", {}).get("max_reflection_interventions", 1)),
+            work_available=work_available)
         result = self.gate.evaluate(
             context.uncertainty,
             context.world_prediction,
-            retrieval_retry_count=int(context.metadata.get("retrieval_retry_count", 0)),
+            retrieval_retry_count=(self.gate.policy.max_retrieval_retries
+                if context.request_budget is not None and (context.request_budget.retrieval_time_exhausted
+                    or context.request_budget.retrieval_calls >= int(context.metadata.get("max_retrieval_calls", 3)))
+                else int(context.metadata.get("retrieval_retry_count", 0))),
             clarification_required=bool(context.metadata.get("clarification_required", False)),
+            reflection_enabled=bool(context.metadata.get("reflection_enabled", True)),
+            reflection_budget_available=suppression is None,
+            reflection_event=getattr(context.reasoning_result, "stop_reason", None),
         )
+        if result.suppression_reason:
+            context.metadata["reflection_suppressed_reason"] = suppression or result.suppression_reason
+        context.metadata.setdefault("reflection_gate_audit", []).append({
+            "recommendation": context.uncertainty.recommended_decision.value, "decision": result.decision.value,
+            "suppression_reason": (suppression or result.rule) if result.decision is not ExecutionDecision.REFLECT else None,
+            "confidence_interpretation": "heuristic_uncalibrated"})
         history = context.metadata.setdefault("execution_decision_history", [])
         if isinstance(history, list):
             history.append(result.to_dict())
@@ -338,6 +444,17 @@ class ReflectionController:
 
     async def execute(self, context: ExecutionContext) -> Any:
         """Run reflection using only workflow-routed subsystem outputs."""
+        if context.request_budget is not None and context.request_budget.remaining_seconds <= 0:
+            context.metadata["reflection_suppressed_reason"] = "time_budget"
+            return None
+        if (not context.metadata.get("reflection_enabled", True)
+                or getattr(context.execution_decision, "decision", None) is not ExecutionDecision.REFLECT):
+            context.metadata["reflection_suppressed_reason"] = "gate_not_reflect"
+            return None
+        if int(context.metadata.get("reflection_execution_count", 0)) >= int(context.metadata.get("correction_budget", {}).get("max_reflection_interventions", 1)):
+            context.metadata["reflection_suppressed_reason"] = "reflection_intervention_budget"
+            return None
+        context.metadata["reflection_execution_count"] = int(context.metadata.get("reflection_execution_count", 0)) + 1
         retrieval_confidence = getattr(context.retrieval_response, "confidence", None)
         retrieved_memories = tuple(getattr(context.retrieval_response, "results", ()))
         affect_signals = (
@@ -376,6 +493,7 @@ class ReflectionController:
             emotional_state=context.cognitive_state.emotional_state,
             reflection_history=reflection_history,
             failure_metadata=failure_metadata,
+            read_only=str(context.metadata.get("task_kind")) == "factual_qa",
             affect_signals=affect_signals,
         )
         result = self.reflection_engine.evaluate(reflection_context)
@@ -388,6 +506,11 @@ class ReflectionController:
             advice = adapter_method(event, result, query=query, stop_reason=event.value)
         else:
             advice = self.reflection_advisor.advise(event, context, query=query, stop_reason=event.value)
+        if advice.action.value in {"revise_query", "broaden_query", "pivot_entity"}:
+            supported = _supported_reflection_query(context)
+            advice = replace(advice, suggested_query=supported or "", trigger=bool(advice.trigger and supported),
+                reason_code=advice.reason_code if supported else "no_supported_expansion",
+                metadata={**advice.metadata, "original_suggested_query": advice.suggested_query})
         return replace(result, advice=advice)
 
     def _event(self, context: ExecutionContext) -> ReflectionEvent:
@@ -476,7 +599,11 @@ class DocumentIngestionController:
                 "source": "document_ingestion",
                 "explicit_import": memory_type is MemoryType.PROCEDURAL,
                 **document_metadata,
+                **context.source_provenance,
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
             },
+            timestamp=context.source_timestamp,
+            note_id=_source_note_id(context),
         )
         return IngestionResult(self.repository.add(note).id, memory_type)
 
@@ -499,10 +626,17 @@ class MemoryCommitController:
         if str(context.metadata.get("task_kind")) == "tool_request":
             return self._commit_procedure(context)
 
+        source_id = _source_note_id(context)
+        existing = self.repository.get(source_id) if source_id else None
+        if existing is not None and "admission_decision" in existing.context:
+            return {"notes": (), "admission": {**existing.context["admission_decision"], "policy": "source_replay_idempotent",
+                "existing_memory_ids": [existing.id], "record_count": 0}}
+
         decision = self.importance_engine.decide(
             context.user_input,
             affect_update=context.affect_update,
             reflection_result=context.reflection_result,
+            source_provenance=context.source_provenance,
         )
         if not decision.stored:
             return {"notes": (), "admission": {**decision.to_log_record(), "policy": "importance_threshold"}}
@@ -517,9 +651,14 @@ class MemoryCommitController:
                 "execution_id": context.execution_id,
                 "source_session_id": str(context.metadata.get("session_id", "")),
                 "source_turn_id": str(context.metadata.get("turn_id", "")),
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
+                **context.source_provenance,
+                **({"admission_decision": decision.to_log_record()} if context.source_provenance else {}),
             },
             state_snapshot=getattr(context.cognitive_state, "state_snapshot", None),
             salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
+            timestamp=context.source_timestamp,
+            note_id=_source_note_id(context),
         )
         if str(context.metadata.get("task_kind")) == "historical_replay":
             saved = self.repository.add(user_note)
@@ -540,6 +679,7 @@ class MemoryCommitController:
                 "execution_id": context.execution_id,
                 "source_session_id": str(context.metadata.get("session_id", "")),
                 "source_turn_id": str(context.metadata.get("turn_id", "")),
+                "source_conversation_id": str(context.metadata.get("session_id", "")),
             },
         )
         notes = (self.repository.add(user_note), self.repository.add(assistant_note))
@@ -755,6 +895,12 @@ class PrimaWorkflow:
         execution_context = context or ExecutionContext(user_input=user_input)
         if context is not None:
             execution_context.user_input = user_input
+        _set_source_provenance(execution_context)
+        if execution_context.request_budget is None:
+            execution_context.request_budget = RequestBudget(
+                int(execution_context.metadata.get("max_llm_calls", 4)),
+                float(execution_context.metadata.get("time_budget_seconds", 15.0)),
+                float(execution_context.metadata.get("answer_reserve_seconds", 3.0)))
         return await self.engine.execute(execution_context)
 
     async def cancel(self, context: ExecutionContext) -> None:
@@ -781,6 +927,7 @@ class PrimaWorkflow:
         maintenance_supervisor: BackgroundMaintenanceSupervisor | None = None,
         event_bus: WorkflowEventBus | None = None,
         retry_policy: RetryPolicy | None = None,
+        memory_importance_engine: MemoryImportanceEngine | None = None,
     ) -> PrimaWorkflow:
         """Create a workflow with default controller adapters."""
         repository = memory_repository or retrieval_controller.repository
@@ -831,7 +978,7 @@ class PrimaWorkflow:
                 WorkflowPhase.DOCUMENT_INGESTION: DocumentIngestionController(repository),
                 WorkflowPhase.OUTPUT: OutputController(),
                 WorkflowPhase.STATE_COMMIT: StateCommitController(state_manager),
-                WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(repository, MemoryImportanceEngine(repository)),
+                WorkflowPhase.MEMORY_COMMIT: MemoryCommitController(repository, memory_importance_engine or MemoryImportanceEngine(repository)),
                 WorkflowPhase.MAINTENANCE_ENQUEUE: MaintenanceEnqueueController(
                     repository, maintenance_supervisor
                 ),

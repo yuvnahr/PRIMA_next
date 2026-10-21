@@ -122,12 +122,15 @@ class OrchestrationEngine:
                 controller = self.registry.get(phase)
                 result = await controller.execute(context)
                 self._route_phase_output(context, phase, result)
+                if attempts:
+                    context.hard_error = None
                 context.touch()
                 return
             except asyncio.CancelledError as exc:
                 context.request_cancel()
                 raise WorkflowCancelledError("Workflow task was cancelled.") from exc
             except Exception as exc:
+                context.hard_error = str(exc)
                 attempts += 1
                 retry_count = context.workflow_state.increment_retry(phase)
                 context.workflow_state.errors.append(f"{phase.value}: {exc}")
@@ -208,6 +211,9 @@ class OrchestrationEngine:
         decision = getattr(context.execution_decision, "decision", None)
         terminal = str(context.metadata.get("correction_terminal_action", ""))
         if phase is WorkflowPhase.REFLECTION:
+            if context.request_budget is not None and context.request_budget.remaining_seconds <= 0:
+                context.metadata["reflection_suppressed_reason"] = "time_budget"
+                return True
             return context.execution_decision is not None and decision is not ExecutionDecision.REFLECT
         if phase in {WorkflowPhase.ACTION, WorkflowPhase.ANSWER_GENERATION}:
             return terminal in {ReflectionAction.ASK_USER.value, ReflectionAction.ABSTAIN.value} or decision in {
@@ -218,6 +224,8 @@ class OrchestrationEngine:
         return False
 
     def _phase_advice(self, context: ExecutionContext, phase: WorkflowPhase) -> ReflectionAdvice | None:
+        if context.request_budget is not None and context.request_budget.remaining_seconds <= 0:
+            return None
         if phase is WorkflowPhase.REFLECTION:
             advice = getattr(context.reflection_result, "advice", None)
         elif phase is WorkflowPhase.OUTPUT_VALIDATION:
@@ -234,7 +242,7 @@ class OrchestrationEngine:
     ) -> list[WorkflowPhase]:
         stage = "post_execution" if source_phase is WorkflowPhase.OUTPUT_VALIDATION else "pre_execution"
         attempt = self.correction_loop.review(context, advice, stage)
-        if not attempt.accepted:
+        if not attempt.proposal_accepted:
             return []
         action = advice.action
         if action in {

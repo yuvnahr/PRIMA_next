@@ -36,11 +36,11 @@ class _Advisor:
 
 
 def test_one_reflection_intervention_is_bounded_and_applied() -> None:
-    advisor = _Advisor("Bridge details")
+    advisor = _Advisor("Cedar")
     responses = {
-        "What fact is linked to Alpha?": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge": _response("alpha", "Alpha identifies Bridge."),
-        "Bridge details": _response("bridge", "Bridge has the linked fact C."),
+        "What fact is linked to Alpha?": _response("alpha", "Alpha knows Cedar. Alpha identifies Bridge."),
+        "What fact is linked to Alpha? Source bridge: Bridge": _response("alpha", "Alpha knows Cedar. Alpha identifies Bridge."),
+        "What fact is linked to Alpha? Source bridge: Cedar": _response("bridge", "Cedar has the linked fact C."),
     }
     result = ReasoningController(reflection_advisor=advisor).answer(
         ReasoningRequest("What fact is linked to Alpha?", mode=ReasoningMode.DIAGNOSTIC, budget=ReasoningBudget(max_hops=3)),

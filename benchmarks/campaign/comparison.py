@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import json
 import random
 from pathlib import Path
 from typing import Any
 
 from affect.taxonomies.goemotions import LABELS
 from benchmarks.campaign.config import ComparisonConfig
+from benchmarks.common.artifacts import read_json, read_jsonl
 from benchmarks.common.contracts import BenchmarkManifest
 from benchmarks.goemotions.metrics import evaluate
 from benchmarks.hotpotqa.evaluate import score_hotpot_record
@@ -26,8 +26,8 @@ def compare(
     right_context_budget: int,
 ) -> dict[str, Any]:
     del left_result, right_result
-    left = BenchmarkManifest.model_validate_json(left_manifest.read_text(encoding="utf-8"))
-    right = BenchmarkManifest.model_validate_json(right_manifest.read_text(encoding="utf-8"))
+    left = BenchmarkManifest.model_validate(read_json(left_manifest))
+    right = BenchmarkManifest.model_validate(read_json(right_manifest))
     checks = {
         "model": left.model == right.model,
         "revision": left.model_revision == right.model_revision or (
@@ -94,8 +94,7 @@ def _cases(manifest_path: Path) -> dict[str, dict[str, Any]]:
     cases: dict[str, dict[str, Any]] = {}
     if not checkpoint.is_file():
         return cases
-    for line in checkpoint.read_text(encoding="utf-8").splitlines():
-        row = json.loads(line)
+    for row in read_jsonl(checkpoint):
         case_id = str(row["case_id"])
         if case_id in cases:
             raise ValueError(f"Duplicate checkpoint case ID: {case_id}")

@@ -53,12 +53,23 @@ from benchmarks.locomo.config import (
 from benchmarks.locomo.evaluate import (
     LoCoMoEvaluator,
     answer_token_coverage,
+    bleu_score,
+    classify_failure,
     evidence_recall,
+    f1_score,
     normalized_exact_match,
 )
 from benchmarks.locomo.loader import LoCoMoDataset
+from benchmarks.locomo.official_scoring import official_locomo_score, scorer_identity
+from config.runtime_config import RuntimeConfig
 from config.runtime_mode import RuntimeMode
 from llm.generation_config import GenerationConfig
+from memory.embedding_backend import (
+    EmbeddingBackendConfig,
+    get_embedding_backend,
+    model_snapshot,
+    use_embedding_backend_config,
+)
 from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
 from runtime.contracts import (
     DiagnosticMode,
@@ -94,6 +105,7 @@ FAILURE_STAGES = {
     "INGESTION_FAILURE": "ingestion",
     "RUNTIME_FAILURE": "runtime",
     "ANSWER_PARSE_FAILURE": "answer",
+    "ADMISSION_COVERAGE_GAP": "ingestion",
     "RETRIEVAL_MISS": "retrieval",
     "EVIDENCE_SELECTION_FAILURE": "retrieval",
     "ANSWER_SCORING_FAILURE": "scoring",
@@ -161,20 +173,31 @@ def select_conversations(
     return selected
 
 
-def _bounded_question(conversation: Any, question: Any, turns: int) -> str:
+def _bounded_question(conversation: Any, question: Any, turns: int, include_captions: bool = False) -> str:
     context = conversation.turns[-turns:] if turns else ()
-    transcript = "\n".join(_turn_text(turn) for turn in context)
+    transcript = "\n".join(_turn_text(turn, include_captions) for turn in context)
     return f"Bounded conversation context:\n{transcript}\n\nQuestion: {question.question}"
 
 
-def _turn_text(turn: Any) -> str:
-    return f"[{turn.timestamp}] {turn.speaker}: {turn.text}"
+def _turn_text(turn: Any, include_captions: bool = False) -> str:
+    text = f"[{turn.timestamp}] {turn.speaker}: {turn.text}"
+    caption = turn.metadata.get("blip_caption") if include_captions else None
+    if caption is not None and not isinstance(caption, str):
+        raise ValueError("Supplied blip_caption must be a string")
+    return f"{text}\nImage caption: {caption.strip()}" if caption and caption.strip() else text
+
+
+def representation_identity(conversations: list[Any], include_captions: bool = False) -> dict[str, Any]:
+    payload = [(conversation.id, [(turn.turn_id, _turn_text(turn, include_captions)) for turn in conversation.turns]) for conversation in conversations]
+    return {"version": "locomo-replay-v2", "include_captions": include_captions,
+            "sha256": hashlib.sha256(json.dumps({"include_captions": include_captions, "turns": payload}, ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
 
 
 def _turn_request(
     conversation_id: str, turn: Any, policy: IngestionPolicy, generation: GenerationConfig,
+    include_captions: bool = False,
 ) -> PrimaRequest:
-    text = _turn_text(turn)
+    text = _turn_text(turn, include_captions)
     if policy is IngestionPolicy.NORMAL_PRIMA:
         return PrimaRequest(
             task_kind=TaskKind.HISTORICAL_REPLAY, profile=ExecutionProfile.PRIMA_FULL,
@@ -182,6 +205,7 @@ def _turn_request(
             metadata={
                 "turn_id": turn.turn_id, "source_session_id": turn.session_id,
                 "timestamp": turn.timestamp, "ingestion_policy": policy.value,
+                **{key: turn.metadata[key] for key in ("source_timestamp", "source_timestamp_original", "timestamp_precision", "speaker") if key in turn.metadata},
             },
         )
     return PrimaRequest(
@@ -197,18 +221,26 @@ async def _run_conversation(
     maintenance: MaintenanceMode, pending_ids: set[str],
     checkpoint: Callable[[dict[str, Any]], None], context_budget: int = 1600,
     timing: Callable[[dict[str, Any]], None] | None = None,
+    include_captions: bool = False,
+    admission_checkpoint: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     admitted_turn_ids: set[str] = set()
     created_memory_ids: set[str] = set()
     ingestion_failure: PrimaResponse | None = None
     historical_replay_ms = 0.0
+    admissions = []
     history_started = time.perf_counter()
     if hasattr(runtime, "start_maintenance"):
         await runtime.start_maintenance()
     try:
         for turn in conversation.turns:
             replay_started = time.perf_counter()
-            response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation))
+            response = await runtime.execute(_turn_request(conversation.id, turn, policy, generation, include_captions))
+            admissions.append({"conversation_id": conversation.id, "turn_id": str(turn.turn_id),
+                "source_session_id": turn.session_id, "speaker": turn.speaker, "source_timestamp": turn.timestamp,
+                "input_sha256": hashlib.sha256(_turn_text(turn, include_captions).encode()).hexdigest(),
+                "execution_status": response.status.value, "admission": response.output_data.get("memory_admission"),
+                "created_memory_ids": list(response.output_data.get("memory_ids_created", ())), "errors": list(response.errors)})
             historical_replay_ms += (time.perf_counter() - replay_started) * 1000
             if response.status is not ExecutionStatus.COMPLETED:
                 ingestion_failure = response
@@ -220,6 +252,14 @@ async def _run_conversation(
             admission = response.output_data.get("memory_admission", {})
             if memory_id or (isinstance(admission, dict) and admission.get("stored")):
                 admitted_turn_ids.add(str(turn.turn_id))
+        for turn in conversation.turns[len(admissions):]:
+            admissions.append({"conversation_id": conversation.id, "turn_id": str(turn.turn_id),
+                "execution_status": "not_executed", "admission": None, "created_memory_ids": [],
+                "reason": "prior_ingestion_failure"})
+        if admission_checkpoint:
+            admission_checkpoint({"schema_version": "1.0", "conversation_id": conversation.id,
+                "ingestion_policy": policy.value, "turn_count": len(conversation.turns), "turns": admissions,
+                "complete": ingestion_failure is None})
         await _barrier(runtime, maintenance, MaintenanceBarrier.AFTER_CONVERSATION)
         history_seconds = time.perf_counter() - history_started
         if timing:
@@ -249,13 +289,14 @@ async def _run_conversation(
                         timing({"phase": "initial_history_flush", "conversation_id": conversation.id,
                                 "seconds": initial_history_flush_seconds})
                 input_text = (
-                    _bounded_question(conversation, question, bounded_context_turns)
+                    _bounded_question(conversation, question, bounded_context_turns, include_captions)
                     if profile is ExecutionProfile.MODEL_ONLY else question.question
                 )
                 started = time.perf_counter()
                 response = await runtime.execute(PrimaRequest(
                     task_kind=TaskKind.FACTUAL_QA, profile=profile,
                     input_text=input_text, session_id=conversation.id,
+                    metadata={"historical_context": True, **({"reference_time": question.metadata["reference_time"]} if question.metadata.get("reference_time") else {})},
                     generation_config=generation, diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
                     options=ExecutionOptions(
                         top_k=top_k, reasoning_mode="adaptive", max_hops=3,
@@ -313,17 +354,15 @@ def _question_record(
 ) -> dict[str, Any]:
     expected_evidence = tuple(str(item) for item in question.evidence)
     response_dict = response.to_dict() if response is not None else {}
-    retrieval = response.output_data.get("retrieval", {}) if response is not None else {}
-    stages = retrieval.get("stage_source_ids", {}) if isinstance(retrieval, dict) else {}
-    candidate_ids = set(stages.get("fused_top30", ()))
-    if not candidate_ids:
-        candidate_ids = set(stages.get("dense_top30", ())) | set(stages.get("sparse_top30", ()))
+    audit = response.output_data.get("evidence_audit") if response is not None else None
+    audit = audit if isinstance(audit, dict) else {}
+    candidate_ids = audit.get("candidate_source_turn_ids")
     final_ids, final_texts = set(), []
     selected_source_ids = set()
     if response is not None:
         generation = response.output_data.get("generation", {})
         if isinstance(generation, dict):
-            selected_source_ids = {str(item) for item in generation.get("selected_source_ids", ())}
+            selected_source_ids = {str(item) for item in generation.get("selected_source_ids", ())} if not generation.get("fallback_used") else set()
         for evidence in response.evidence:
             if evidence.source_id not in selected_source_ids:
                 continue
@@ -337,21 +376,59 @@ def _question_record(
     runtime_error = None
     if ingestion_failure is None and (response is None or response.status is not ExecutionStatus.COMPLETED):
         runtime_error = "; ".join(response.errors if response else ()) or "runtime returned no response"
+    generation = response.output_data.get("generation", {}) if response else {}
+    parse_error = None
+    if generation.get("failure_kind") == "parse":
+        parse_error = "; ".join(generation.get("errors", ())) or "Invalid model response"
+        if response is not None and not (set(response.errors) - set(generation.get("errors", ()))):
+            runtime_error = None
+    elif generation.get("failure_kind") in {"provider", "generation"}:
+        runtime_error = "; ".join(generation.get("errors", ())) or "Generation failed"
     prediction = response.output_text if response and response.output_text else ""
+    qualified_gold = [f"{conversation.id}:{turn}" for turn in expected_evidence]
+
+    def recall(found: Any) -> float | None:
+        return evidence_recall(qualified_gold, found) if expected_evidence and found is not None else None
+
     record = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "case_id": question_case_id(conversation.id, question.question_id),
         "conversation_id": conversation.id, "question_id": question.question_id,
         "runtime_profile": profile.value, "ingestion_policy": policy.value,
         "question": question.question, "expected_answer": question.answer,
         "category": question.category, "expected_evidence": list(expected_evidence),
+        "reference_metadata": dict(question.metadata.get("reference_metadata", {})),
         "prediction": prediction, "outcome": response.outcome.value if response and response.outcome else None,
-        "candidate_evidence_ids": sorted(candidate_ids), "final_evidence_ids": sorted(final_ids),
+        "answer_scores": {
+            "legacy_normalized_exact_match": normalized_exact_match(prediction, question.answer),
+            "legacy_squad_f1": f1_score(prediction, question.answer),
+            "smoothed_sentence_bleu": bleu_score(prediction, question.answer),
+            "official_locomo_f1": official_locomo_score(prediction, question.metadata.get("reference_metadata", {}).get("answer", question.answer), question.category),
+        },
+        "evidence_audit": audit or None,
+        "answer_attempt_permitted": response.output_data.get("answer_attempt_permitted") if response else None,
+        "answer_attempt": response.output_data.get("answer_attempt") if response else None,
+        "request_budget": response.output_data.get("request_budget") if response else None,
+        "reflection_audit": response.output_data.get("reflection_audit") if response else None,
+        "prediction_before_reflection": (response.output_data.get("reflection_audit") or {}).get("original_output") if response else None,
+        "prediction_after_reflection": prediction,
+        "qa_memory_write_count": len(response.output_data["memory_ids_created"]) if response and isinstance(response.output_data.get("memory_ids_created"), list) else None,
+        "invalid_citations": (bool(generation.get("validation_errors")) or any("citat" in str(error).lower() or "unknown evidence" in str(error).lower()
+            for error in generation.get("errors", ()))) if response and "validation_errors" in generation else None,
+        "candidate_source_turn_ids": candidate_ids,
+        "accumulated_source_turn_ids": audit.get("accumulated_source_turn_ids"),
+        "supplied_source_turn_ids": audit.get("supplied_source_turn_ids"),
+        "cited_source_turn_ids": audit.get("cited_source_turn_ids"),
+        "candidate_evidence_ids": None if candidate_ids is None else [turn.removeprefix(f"{conversation.id}:") for turn in candidate_ids],
+        "final_evidence_ids": sorted(final_ids),
         "admitted_evidence_ids": sorted(admitted_turn_ids),
-        "candidate_evidence_recall": evidence_recall(expected_evidence, candidate_ids),
-        "final_evidence_recall": evidence_recall(expected_evidence, final_ids),
-        "memory_admission_recall": evidence_recall(expected_evidence, admitted_turn_ids),
-        "answer_token_coverage": answer_token_coverage(question.answer or "", final_texts),
+        "candidate_evidence_recall": recall(candidate_ids),
+        "accumulated_evidence_recall": recall(audit.get("accumulated_source_turn_ids")),
+        "supplied_evidence_recall": recall(audit.get("supplied_source_turn_ids")),
+        "cited_evidence_recall": recall(audit.get("cited_source_turn_ids")),
+        "final_evidence_recall": evidence_recall(expected_evidence, final_ids) if expected_evidence else None,
+        "memory_admission_recall": evidence_recall(expected_evidence, admitted_turn_ids) if expected_evidence else None,
+        "answer_token_coverage": answer_token_coverage(question.answer or "", final_texts) if expected_evidence else None,
         "memory_growth": len(created_memory_ids),
         "maintenance_complete": _maintenance_complete(
             response.diagnostics.maintenance if response is not None else {}
@@ -363,8 +440,20 @@ def _question_record(
         "model_call_count": response.diagnostics.model_call_count if response else 0,
         "model_usage": dict(response.diagnostics.model_usage) if response else {},
         "raw_runtime_response": response_dict,
-        "ingestion_error": ingestion_error, "runtime_error": runtime_error,
-        "execution_failed": bool(ingestion_error or runtime_error), "scored": True,
+        "ingestion_error": ingestion_error, "runtime_error": runtime_error, "parse_error": parse_error,
+        "execution_failed": bool(ingestion_error or runtime_error or parse_error), "scored": True,
+    }
+    record["evidence_diagnostics_status"] = (
+        "not_applicable" if not expected_evidence else "unavailable" if not audit
+        else "available" if all(audit.get(f"{stage}_source_turn_ids") is not None for stage in ("candidate", "accumulated", "supplied", "cited"))
+        else "partial"
+    )
+    record["evidence_flags"] = {
+        name: None if record[field] is None else record[field] < 1.0
+        for name, field in (("admission_incomplete", "memory_admission_recall"),
+                            ("candidate_incomplete", "candidate_evidence_recall"),
+                            ("supplied_incomplete", "supplied_evidence_recall"),
+                            ("cited_incomplete", "cited_evidence_recall"))
     }
     record["failure_category"] = _classify_failure(record, profile)
     record["failure_stage"] = FAILURE_STAGES.get(str(record["failure_category"]))
@@ -372,23 +461,7 @@ def _question_record(
 
 
 def _classify_failure(record: dict[str, Any], profile: ExecutionProfile) -> str | None:
-    if record["ingestion_error"]:
-        return "INGESTION_FAILURE"
-    if record["runtime_error"]:
-        return "RUNTIME_FAILURE"
-    if str(record.get("category")) == "5" and record.get("outcome") == "abstained":
-        return None
-    if not str(record["prediction"]).strip():
-        record["execution_failed"] = True
-        return "ANSWER_PARSE_FAILURE"
-    if profile is not ExecutionProfile.MODEL_ONLY and record["expected_evidence"]:
-        if record["candidate_evidence_recall"] == 0:
-            return "RETRIEVAL_MISS"
-        if record["final_evidence_recall"] < record["candidate_evidence_recall"]:
-            return "EVIDENCE_SELECTION_FAILURE"
-    if not normalized_exact_match(str(record["prediction"]), str(record["expected_answer"])):
-        return "ANSWER_SCORING_FAILURE"
-    return None
+    return classify_failure(record, profile.value)
 
 
 def _failure_record(record: dict[str, Any]) -> FailureRecord | None:
@@ -535,6 +608,8 @@ def run_locomo_experiment(
     resume: bool = False, runtime_factory: Callable[..., Any] = PrimaRuntime,
     generation_config: GenerationConfig | None = None,
     _runtime_pool: SharedRuntimeFactory | None = None,
+    runtime_config: RuntimeConfig | None = None,
+    include_captions: bool = False,
 ) -> dict[str, Any]:
     """Run one canonical LoCoMo profile with exact per-question resume."""
     if parallel_workers < 1 or bounded_context_turns < 1:
@@ -548,6 +623,14 @@ def run_locomo_experiment(
     if max_conversations < 0 or max_questions < 0:
         raise ValueError("question/conversation limits cannot be negative")
     dataset = LoCoMoDataset(Path(dataset_path)) if dataset_path else LoCoMoDataset()
+    runtime_config = runtime_config or RuntimeConfig.from_environment()
+    if runtime_config.reflection_enabled is None:
+        runtime_config = runtime_config.model_copy(update={"reflection_enabled": False})
+    with use_embedding_backend_config(EmbeddingBackendConfig.from_runtime_config(runtime_config)):
+        embedding_identity = get_embedding_backend().info()
+    reranker_identity = (model_snapshot(runtime_config.reranker_model, runtime_config.reranker_revision,
+                                        runtime_config.reranker_local_snapshot)[1]
+                         if runtime_config.reranker_enabled and runtime_config.reranker_backend == "cross_encoder" else None)
     conversations = select_conversations(
         list(dataset.conversations()), seed=seed, max_conversations=max_conversations,
         max_questions=max_questions, full_dataset=full_dataset,
@@ -571,6 +654,14 @@ def run_locomo_experiment(
         "bertscore_device": bertscore_device,
         "bertscore_batch_size": bertscore_batch_size,
         "context_budget": context_budget,
+        "evidence_schema_version": "1.0", "question_schema_version": "2.0",
+        "scorer_identity": scorer_identity(),
+        "runtime_config": runtime_config.model_dump(mode="json"), "runtime_config_fingerprint": runtime_config.fingerprint,
+        "input_representation": representation_identity(conversations, include_captions),
+        "retrieval_contract_version": "2.0",
+        "answer_contract_version": "1.0",
+        "memory_policy_contract_version": "1.0",
+        "embedding_identity": embedding_identity, "reranker_identity": reranker_identity,
     }
     manifest = _manifest(dataset.dataset_path, profile, policy, generation, selected_ids, seed, config)
     if resume:
@@ -595,11 +686,13 @@ def run_locomo_experiment(
             mode=RuntimeMode.BENCHMARK, memory_backend="in_memory",
             maintenance_enabled=maintenance is not MaintenanceMode.DISABLED,
             generation_config=generation,
+            runtime_config=runtime_config,
         )
         diagnostics = asyncio.run(_run_conversation(
             conversation, runtime, profile, policy, generation, top_k,
             bounded_context_turns, maintenance, pending_ids,
-            lambda record: _checkpoint(store, record), context_budget, timing,
+            lambda record: _checkpoint(store, record), context_budget, timing, include_captions,
+            lambda record: atomic_write_json(store.layout.root / "admission" / (hashlib.sha256(conversation.id.encode()).hexdigest()[:20] + ".json"), record),
         ))
         timing({"phase": "conversation", **diagnostics,
                 "worker_seconds": time.perf_counter() - worker_started})
@@ -683,6 +776,7 @@ def main() -> None:
     parser.add_argument("--dataset-path")
     parser.add_argument("--output-path", default=str(OUTPUT_PATH))
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--include-captions", action="store_true")
     parser.add_argument("--rouge-l", action="store_true")
     parser.add_argument("--bertscore", action="store_true")
     parser.add_argument("--bertscore-device", default="cpu")

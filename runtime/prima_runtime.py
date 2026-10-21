@@ -18,7 +18,12 @@ from config.settings import get_settings
 from events.event_bus import EventBus
 from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
-from memory.embedding_backend import BACKEND_ALIASES, MODEL_BY_BACKEND, EmbeddingBackendConfig
+from memory.embedding_backend import (
+    BACKEND_ALIASES,
+    EmbeddingBackendConfig,
+    get_embedding_backend,
+    use_embedding_backend_config,
+)
 from memory.embedding_pipeline import CanonicalEmbeddingPipeline, use_embedding_pipeline
 from memory.experiment_config import EmbeddingExperimentConfig
 from memory.maintenance.background_supervisor import (
@@ -36,6 +41,7 @@ from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository, MemoryRepository
 from memory.memory_types import MemoryType
 from memory.repository_factory import RepositorySelection, select_memory_repository
+from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
 from reasoning.config import reasoning_mode as configured_reasoning_mode
@@ -112,9 +118,17 @@ class PrimaRuntime:
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
-        self.memory_repository, self.repository_selection = select_memory_repository(
-            self.mode, memory_repository, backend=memory_backend, path=memory_path
+        self.runtime_config = runtime_config or RuntimeConfig.from_environment()
+        embedding_name = BACKEND_ALIASES.get(self.runtime_config.embedding_backend, self.runtime_config.embedding_backend)
+        self.embedding_backend_config = EmbeddingBackendConfig.from_runtime_config(self.runtime_config)
+        self.embedding_pipeline = CanonicalEmbeddingPipeline(
+            EmbeddingExperimentConfig(backend=embedding_name, representation_mode=self.runtime_config.representation_mode,
+                                      identity_enabled=self.runtime_config.identity_normalization)
         )
+        with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
+            self.memory_repository, self.repository_selection = select_memory_repository(
+                self.mode, memory_repository, backend=memory_backend, path=memory_path
+            )
         self.memory_index = MemoryIndex.for_repository(self.memory_repository)
         self._owns_maintenance_supervisor = maintenance_supervisor is None
         self._maintenance_enabled = maintenance_enabled
@@ -132,21 +146,6 @@ class PrimaRuntime:
             self.state_manager = JsonStateManager(state_path)
         else:
             self.state_manager = InMemoryStateManager()
-        self.runtime_config = runtime_config or RuntimeConfig.from_environment()
-        embedding_name = BACKEND_ALIASES.get(
-            self.runtime_config.embedding_backend, self.runtime_config.embedding_backend
-        )
-        embedding_model = self.runtime_config.embedding_model or MODEL_BY_BACKEND[embedding_name]
-        self.embedding_backend_config = EmbeddingBackendConfig(
-            embedding_name, embedding_model, self.runtime_config.embedding_dimensions
-        )
-        self.embedding_pipeline = CanonicalEmbeddingPipeline(
-            EmbeddingExperimentConfig(
-                backend=embedding_name,
-                representation_mode=self.runtime_config.representation_mode,
-                identity_enabled=self.runtime_config.identity_normalization,
-            )
-        )
         self.affect_engine = affect_engine or DynamicAffectEngine(
             classifier=create_affect_classifier(
                 self.runtime_config.affect_backend,
@@ -166,19 +165,26 @@ class PrimaRuntime:
             model=settings.default_model,
             provider=(llm_client.provider_name if llm_client is not None else settings.default_provider),
         )
-        self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
+        self.memory_importance_engine = MemoryImportanceEngine(self.memory_index, policy=self.runtime_config.admission_policy)
         self.retrieval_controller = RetrievalController(
             self.memory_index,
             candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+            strategy_names=self.runtime_config.retrieval_strategies,
+            fusion=HybridFusion(HybridFusionConfig(self.runtime_config.retrieval_weights) if self.runtime_config.retrieval_weights is not None else HybridFusionConfig.from_file()),
             reranker=Reranker(
                 enabled=self.runtime_config.reranker_enabled,
                 backend=self.runtime_config.reranker_backend,
                 model_name=self.runtime_config.reranker_model,
+                revision=self.runtime_config.reranker_revision, device=self.runtime_config.reranker_device,
+                local_snapshot=self.runtime_config.reranker_local_snapshot, batch_size=self.runtime_config.reranker_batch_size,
+                cpu_threads=self.runtime_config.retrieval_cpu_threads,
             ),
         )
         self.reflection_advisor = reflection_advisor or ReasoningReflectionAdapter(self.reflection_engine)
+        self.reflection_enabled = (self.runtime_config.reflection_enabled if self.runtime_config.reflection_enabled is not None
+                                   else self.mode is not RuntimeMode.BENCHMARK)
         self.correction_budget = correction_budget or CorrectionBudget()
-        self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
+        self.reasoning_controller = ReasoningController()
         self.llm_client = llm_client or LLMClient(provider_name=self.generation_config.provider, settings=settings)
         self.state_simulator = state_simulator or StateSimulator()
         self.uncertainty_estimator = uncertainty_estimator or UncertaintyEstimator()
@@ -199,6 +205,7 @@ class PrimaRuntime:
             reflection_advisor=self.reflection_advisor,
             correction_budget=self.correction_budget,
             maintenance_supervisor=self.maintenance_supervisor,
+            memory_importance_engine=self.memory_importance_engine,
         )
         self.logger = self._build_logger(self.log_path)
 
@@ -237,11 +244,15 @@ class PrimaRuntime:
                 "correction_budget": self.correction_budget.to_dict(),
                 "generation_config": generation,
                 "runtime_config": self.runtime_config,
+                "reflection_enabled": self.reflection_enabled,
                 "top_k": request.options.top_k,
                 "reasoning_mode": request.options.reasoning_mode,
                 "max_hops": request.options.max_hops,
                 "max_retrieval_calls": request.options.max_retrieval_calls,
                 "max_context_tokens": request.options.max_context_tokens,
+                "max_llm_calls": request.options.max_llm_calls,
+                "time_budget_seconds": request.options.time_budget_seconds,
+                "answer_reserve_seconds": request.options.answer_reserve_seconds,
                 "context_compression_enabled": request.options.context_compression_enabled,
                 "required_reranker_backend": request.options.required_reranker_backend,
                 "execution_policy": request.options.execution_policy,
@@ -253,6 +264,9 @@ class PrimaRuntime:
                 execution_context = await self.workflow.run(request.input_text, execution_context)
         except WorkflowExecutionError as exc:
             execution_context = exc.context
+        except (TypeError, ValueError) as exc:
+            execution_context.workflow_state.status = WorkflowStatus.FAILED
+            execution_context.workflow_state.errors.append(str(exc))
         execution_context.metadata["workflow_trace"] = [
             {
                 "event_type": event.event_type.value,
@@ -345,17 +359,22 @@ class PrimaRuntime:
             if self._owns_maintenance_supervisor:
                 self.maintenance_supervisor = self._create_maintenance_supervisor()
             self.repository_selection = RepositorySelection("in_memory", False)
-            self.memory_importance_engine = MemoryImportanceEngine(self.memory_index)
+            self.memory_importance_engine = MemoryImportanceEngine(self.memory_index, policy=self.runtime_config.admission_policy)
             self.retrieval_controller = RetrievalController(
                 self.memory_index,
                 candidate_pool_size=self.runtime_config.retrieval_candidate_pool_size,
+                strategy_names=self.runtime_config.retrieval_strategies,
+                fusion=HybridFusion(HybridFusionConfig(self.runtime_config.retrieval_weights) if self.runtime_config.retrieval_weights is not None else HybridFusionConfig.from_file()),
                 reranker=Reranker(
                     enabled=self.runtime_config.reranker_enabled,
                     backend=self.runtime_config.reranker_backend,
                     model_name=self.runtime_config.reranker_model,
+                    revision=self.runtime_config.reranker_revision, device=self.runtime_config.reranker_device,
+                    local_snapshot=self.runtime_config.reranker_local_snapshot, batch_size=self.runtime_config.reranker_batch_size,
+                    cpu_threads=self.runtime_config.retrieval_cpu_threads,
                 ),
             )
-            self.reasoning_controller = ReasoningController(reflection_advisor=self.reflection_advisor)
+            self.reasoning_controller = ReasoningController()
             self.workflow = PrimaWorkflow.from_controllers(
                 affect_engine=self.affect_engine,
                 retrieval_controller=self.retrieval_controller,
@@ -371,6 +390,7 @@ class PrimaRuntime:
                 reflection_advisor=self.reflection_advisor,
                 correction_budget=self.correction_budget,
                 maintenance_supervisor=self.maintenance_supervisor,
+                memory_importance_engine=self.memory_importance_engine,
             )
 
     def _create_maintenance_supervisor(self) -> BackgroundMaintenanceSupervisor:
@@ -461,6 +481,8 @@ class PrimaRuntime:
     def runtime_manifest(self) -> dict[str, Any]:
         """Return schema-versioned runtime/storage configuration for benchmark manifests."""
 
+        with use_embedding_backend_config(self.embedding_backend_config):
+            embedding = get_embedding_backend().info()
         return {
             "schema_version": "1.0",
             "runtime_mode": self.mode.value,
@@ -473,6 +495,9 @@ class PrimaRuntime:
             "maintenance": self.maintenance_supervisor.diagnostics(),
             "runtime_config": self.runtime_config.model_dump(mode="json"),
             "runtime_config_fingerprint": self.runtime_config.fingerprint,
+            "embedding": embedding, "reranker": self.retrieval_controller.reranker.diagnostics(),
+            "retrieval_weights": dict(self.retrieval_controller.fusion.config.weights),
+            "reflection_enabled": self.reflection_enabled,
         }
 
     def process(self, user_input: str, context: RuntimeContext | None = None) -> RuntimeResult:
@@ -552,6 +577,7 @@ class PrimaRuntime:
             state_changes["emotional_state"] = context.affect_update.emotional_state.to_dict()
         state_changes["version"] = context.cognitive_state.version
         state_changes["committed"] = bool(context.metadata.get("state_committed", False))
+        reflection_audit = _reflection_audit(context)
         output_data: dict[str, Any] = {
             "latency_ms": latency_ms,
             "affect_state": affect_state,
@@ -562,13 +588,22 @@ class PrimaRuntime:
                 else _default_memory_admission(request.task_kind, outcome, bool(ingestion_id))
             ),
             "confidence": float(reasoning.confidence if reasoning is not None else self._confidence_score(context)),
-            "reflection_triggered": bool(context.correction_attempts) or bool(
-                getattr(context.reflection_result, "should_reflect", False)
-            ),
+            "reflection_triggered": bool(reflection_audit["engine_executed"] or reflection_audit["corrections"]["executed"]),
             "reflection_reasons": [
                 dict(reason) for reason in getattr(context.reflection_result, "trigger_reasons", ())
             ],
             "generation": generation.to_dict() if generation is not None else {},
+            "reflection_audit": reflection_audit,
+            "answer_attempt": {
+                "schema_version": "1.0",
+                "permitted": reasoning.answer_attempt_permitted if reasoning is not None else None,
+                "retrieval_stop_reason": reasoning.stop_reason if reasoning is not None else None,
+                "attempted": bool(getattr(generation, "llm_called", False)),
+                "outcome": getattr(getattr(generation, "outcome", None), "value", None),
+                "blocked_reason": getattr(generation, "blocked_reason", None),
+            },
+            "request_budget": context.request_budget.to_dict() if context.request_budget is not None else None,
+            "reflection_suppressed_reason": context.metadata.get("reflection_suppressed_reason"),
             "world_prediction": (
                 context.world_prediction.to_dict() if context.world_prediction is not None else {}
             ),
@@ -579,6 +614,7 @@ class PrimaRuntime:
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
             "retrieval": _retrieval_audit(context.retrieval_response),
+            "evidence_audit": _request_evidence_audit(context),
             "context_compression": (
                 context.compressed_context.to_dict() if context.compressed_context is not None else {}
             ),
@@ -591,6 +627,7 @@ class PrimaRuntime:
             output_data.update(
                 {
                     "sufficiency_status": reasoning.status.value,
+                    "answer_attempt_permitted": reasoning.answer_attempt_permitted,
                     "hop_count": reasoning.hop_count,
                     "stop_reason": reasoning.stop_reason,
                     "effective_budget": reasoning.effective_budget.to_dict(),
@@ -600,6 +637,8 @@ class PrimaRuntime:
                     ),
                 }
             )
+        if request.task_kind is TaskKind.HISTORICAL_REPLAY:
+            output_data["memory_admission"]["configured_policy"] = self.runtime_config.admission_policy
         if ingestion_id:
             output_data["memory_id"] = ingestion_id
             output_data["memory_type"] = getattr(
@@ -671,6 +710,8 @@ class PrimaRuntime:
             max_llm_calls=int(budget_data.get("max_llm_calls", 4)),
             max_documents=int(budget_data.get("max_documents", 12)),
             max_context_tokens=int(budget_data.get("max_context_tokens", 1600)),
+            time_budget_seconds=float(budget_data.get("time_budget_seconds", 15.0)),
+            answer_reserve_seconds=float(budget_data.get("answer_reserve_seconds", 3.0)),
         )
         return AnswerResult(
             answer=response.output_text or "",
@@ -687,6 +728,7 @@ class PrimaRuntime:
                 **dict(response.output_data),
                 "runtime_diagnostics": response.diagnostics.model_dump(mode="json"),
             },
+            answer_attempt_permitted=response.output_data.get("answer_attempt_permitted"),
         )
 
     def _runtime_result_from_response(self, response: PrimaResponse) -> RuntimeResult:
@@ -875,6 +917,29 @@ class PrimaRuntime:
         return logger
 
 
+def _reflection_audit(context: ExecutionContext) -> dict[str, Any]:
+    gates = list(context.metadata.get("reflection_gate_audit", ()))
+    attempts = context.correction_attempts
+    original = attempts[0].before_answer if attempts else str(getattr(context.generation_result, "text", "") or "")
+    original_generation = attempts[0].before_generation if attempts else context.generation_result
+    original_observed = bool(getattr(original_generation, "llm_called", False))
+    return {"schema_version": "2.0", "enabled": bool(context.metadata.get("reflection_enabled", True)),
+        "confidence_interpretation": "heuristic_uncalibrated", "gate_decisions": gates,
+        "heuristic_recommended": sum(row["recommendation"] == "reflect" for row in gates),
+        "gate_authorized": sum(row["decision"] == "reflect" for row in gates),
+        "gate_suppressed": sum(row["recommendation"] == "reflect" and row["decision"] != "reflect" for row in gates),
+        "engine_executed": int(context.metadata.get("reflection_execution_count", 0)),
+        "corrections": {"attempted": len(attempts), "executed": sum(item.executed for item in attempts),
+            "accepted": sum(item.accepted for item in attempts),
+            "rejected": sum(not item.proposal_accepted or item.validated is False for item in attempts),
+            "pending": sum(item.proposal_accepted and item.validated is None for item in attempts),
+            "suppressed": sum(not item.proposal_accepted and ("budget" in item.decision_reason
+                or item.decision_reason in {"reflection_off", "max_llm_calls", "gate_terminal_decision", "answer_attempt_exhausted"}) for item in attempts)},
+        "original_output": original if original_observed else None, "original_output_observed": original_observed,
+        "counterfactual_baseline": False, "final_output": str(getattr(context.generation_result, "text", "") or ""),
+        "original_generation": original_generation.to_dict() if original_generation is not None and hasattr(original_generation, "to_dict") else None}
+
+
 def _retrieval_audit(response: Any) -> dict[str, Any]:
     diagnostics = dict(getattr(response, "diagnostics", {}))
     audit = {
@@ -888,9 +953,12 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
             "graph_reasoning_invoked",
             "memory_index",
             "reranker",
+            "timings_ms",
+            "fusion_weights",
         )
         if key in diagnostics
     }
+    audit["scope"] = "last_retrieval_call"
     audit["stage_source_ids"] = {
         stage: [
             str(item["source_turn_id"])
@@ -899,6 +967,27 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         ]
         for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
     }
+    return audit
+
+
+def _request_evidence_audit(context: ExecutionContext) -> dict[str, Any]:
+    from reasoning.evidence_audit import summarize_hops
+
+    audit = summarize_hops(context.retrieval_hops)
+    supplied = context.prompt_evidence
+    generation = context.generation_result
+    cited = set(getattr(generation, "selected_source_ids", ())) if not getattr(generation, "fallback_used", False) else set()
+    if isinstance(context.output, dict) and context.output.get("outcome") != "answered":
+        cited = set()
+    audit.update({
+        "supplied_source_turn_ids": sorted({item["source_turn_id"] for item in supplied if item["source_turn_id"]}),
+        "supplied_memory_ids": sorted({item["memory_id"] for item in supplied}),
+        "cited_source_turn_ids": sorted({item["source_turn_id"] for item in supplied if item["memory_id"] in cited and item["source_turn_id"]}),
+        "cited_memory_ids": sorted(cited),
+        "untraceable_supplied_memory_count": len({item["memory_id"] for item in supplied if not item["source_turn_id"]}),
+        "untraceable_cited_memory_count": len({item["memory_id"] for item in supplied if item["memory_id"] in cited and not item["source_turn_id"]}),
+        "untraceable_accumulated_memory_count": len({memory for hop in audit["hops"] for memory in hop["untraceable_added_memory_ids"]}),
+    })
     return audit
 
 
@@ -984,11 +1073,18 @@ def _executed_components(context: ExecutionContext) -> tuple[RuntimeComponent, .
         executed.add(RuntimeComponent.WORLD_MODEL)
     if WorkflowPhase.UNCERTAINTY_ESTIMATION in completed:
         executed.add(RuntimeComponent.UNCERTAINTY_ESTIMATOR)
-    if WorkflowPhase.REFLECTION in completed:
+    # The legacy component trace includes reflection-gate work; the audit counts actual engine calls.
+    if ((WorkflowPhase.REFLECTION in completed and int(context.metadata.get("reflection_execution_count", 0)))
+            or (WorkflowPhase.REFLECTION in context.metadata.get("route", ())
+                and bool(context.metadata.get("reflection_enabled", True))
+                and any(row.get("recommendation") == "reflect"
+                        for row in context.metadata.get("reflection_gate_audit", ())))):
         executed.add(RuntimeComponent.REFLECTION)
     if WorkflowPhase.ACTION in completed and str(context.metadata.get("task_kind")) == "tool_request":
         executed.add(RuntimeComponent.TOOL_EXECUTOR)
-    if WorkflowPhase.ANSWER_GENERATION in completed and bool(getattr(context.generation_result, "llm_called", False)):
+    if WorkflowPhase.ANSWER_GENERATION in completed and (
+        int(context.metadata.get("model_call_count", 0)) > 0 or bool(getattr(context.generation_result, "llm_called", False))
+    ):
         executed.add(RuntimeComponent.MODEL_EXECUTOR)
     if WorkflowPhase.OUTPUT_VALIDATION in completed:
         executed.add(RuntimeComponent.OUTPUT_VALIDATOR)
@@ -1211,7 +1307,7 @@ def _route_diagnostics(
     budget_usage = {}
     if reasoning is not None and reasoning.trace_summary:
         budget_usage = dict(reasoning.trace_summary[-1].fields.get("budget_usage", {}))
-    retrieval_call_count = int(budget_usage.get("retrieval_calls", 0))
+    retrieval_call_count = len(context.retrieval_hops)
     provider_details = {
         "name": str(getattr(generation, "provider", "")),
         "model": str(getattr(generation, "model", "")),
@@ -1220,10 +1316,7 @@ def _route_diagnostics(
         "fallback_used": bool(getattr(generation, "fallback_used", False)),
         "fallback_reason": getattr(generation, "fallback_reason", None),
     }
-    workflow_reflection_count = sum(
-        event.get("event_type") == "phase_completed" and event.get("phase") == "reflection"
-        for event in trace
-    )
+    workflow_reflection_count = int(context.metadata.get("reflection_execution_count", 0))
     reasoning_attempts = (
         tuple(reasoning.answer_diagnostics.get("reflection_attempts", ())) if reasoning is not None else ()
     )

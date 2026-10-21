@@ -178,6 +178,9 @@ class ExecutionOptions(ContractModel):
     max_hops: int = Field(default=3, gt=0)
     max_retrieval_calls: int = Field(default=3, gt=0)
     max_context_tokens: int = Field(default=1600, gt=0)
+    max_llm_calls: int = Field(default=4, ge=0)
+    time_budget_seconds: float = Field(default=15.0, gt=0, allow_inf_nan=False)
+    answer_reserve_seconds: float = Field(default=3.0, ge=0, allow_inf_nan=False)
     context_compression_enabled: bool = True
     required_reranker_backend: Literal["disabled", "lexical_fallback", "cross_encoder"] | None = None
     execution_policy: ExecutionPolicy = Field(default_factory=ExecutionPolicy)
@@ -195,11 +198,15 @@ _INTERNAL_CONTROL_KEYS = {
     "max_hops",
     "max_retrieval_calls",
     "max_context_tokens",
+    "max_llm_calls",
+    "time_budget_seconds",
+    "answer_reserve_seconds",
     "context_compression_enabled",
     "required_reranker_backend",
     "retrieval_query_override",
     "correction_budget",
     "tool_results",
+    "reflection_enabled",
 }
 
 

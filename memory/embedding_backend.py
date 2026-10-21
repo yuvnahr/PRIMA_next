@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import math
 import os
+import re
 import sys
 import time
 import tracemalloc
@@ -13,11 +15,15 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
-from typing import Any
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from config.runtime_config import RuntimeConfig
 
 DEFAULT_DIMENSIONS = 64
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -34,6 +40,25 @@ class EmbeddingBackendConfig:
     name: str
     model_identifier: str
     dimensions: int = DEFAULT_DIMENSIONS
+    revision: str | None = None
+    device: str = "cpu"
+    local_snapshot: str | None = None
+    batch_size: int = 16
+    cpu_threads: int = 2
+
+    @classmethod
+    def from_runtime_config(cls, config: RuntimeConfig) -> EmbeddingBackendConfig:
+        name = _resolve_backend_name(config.embedding_backend)
+        return cls(name, config.embedding_model or MODEL_BY_BACKEND[name], config.embedding_dimensions,
+                   revision=config.embedding_revision, device=config.embedding_device,
+                   local_snapshot=config.embedding_local_snapshot, batch_size=config.embedding_batch_size,
+                   cpu_threads=config.retrieval_cpu_threads)
+
+    def __post_init__(self) -> None:
+        if self.dimensions < 1 or self.batch_size < 1 or self.cpu_threads < 1:
+            raise ValueError("Embedding dimensions, batch size and CPU threads must be positive")
+        if self.device == "auto" or not self.device:
+            raise ValueError("Embedding device must be explicit")
 
 
 _CONFIG_OVERRIDE: ContextVar[EmbeddingBackendConfig | None] = ContextVar(
@@ -114,13 +139,28 @@ class SentenceTransformerEmbeddingBackend(EmbeddingBackend):
         super().__init__(config)
         self.name = config.name
         self._model = _sentence_transformer_model(
-            self.model_identifier,
-            _requires_trust_remote_code(config.name),
+            self.model_identifier, revision=config.revision, device=config.device,
+            local_snapshot=config.local_snapshot, cpu_threads=config.cpu_threads,
         )
+        native = self._model.get_sentence_embedding_dimension()
+        if native != self.dimensions:
+            raise ValueError(f"Native embedding dimension {native} does not match configured {self.dimensions}; rebuild with the native dimension")
+        if config.device == "cpu" and str(self._model.device) != "cpu":
+            raise RuntimeError("Required CPU embedding model loaded on another device")
 
     def embed(self, text: str) -> list[float]:
-        vector = self._model.encode(text, normalize_embeddings=True)
-        return _resize(_normalize([float(value) for value in vector]), self.dimensions)
+        vector = np.asarray(self._model.encode(text, normalize_embeddings=True, batch_size=self.config.batch_size,
+                                               show_progress_bar=False, convert_to_numpy=True), dtype="float32")
+        norm = float(np.linalg.norm(vector))
+        if vector.shape != (self.dimensions,) or not np.isfinite(vector).all() or not math.isfinite(norm) or norm == 0:
+            raise ValueError("Learned embedding must be a finite, nonzero vector of the native dimension")
+        return _normalize(vector.tolist())
+
+    def info(self) -> dict[str, Any]:
+        return {**super().info(), "revision": self.config.revision, "device": str(self._model.device),
+                "batch_size": self.config.batch_size, "cpu_threads": self.config.cpu_threads,
+                "local_files_only": True, "trust_remote_code": False,
+                "snapshot": getattr(self._model, "_prima_snapshot_identity", None)}
 
     def available(self) -> bool:
         return _sentence_transformers_available()
@@ -175,7 +215,7 @@ def embedding_backend_config(dimensions: int | None = None) -> EmbeddingBackendC
         return (
             override
             if dimensions is None or dimensions == override.dimensions
-            else EmbeddingBackendConfig(override.name, override.model_identifier, dimensions)
+            else replace(override, dimensions=dimensions)
         )
     configured = os.getenv("PRIMA_EMBEDDING_BACKEND", "stable").lower().strip()
     name = _resolve_backend_name(configured)
@@ -183,7 +223,11 @@ def embedding_backend_config(dimensions: int | None = None) -> EmbeddingBackendC
     model = configured_model or MODEL_BY_BACKEND[name]
     if name == "stable":
         model = MODEL_BY_BACKEND["stable"]
-    return EmbeddingBackendConfig(name=name, model_identifier=model, dimensions=dimensions or _configured_dimensions())
+    return EmbeddingBackendConfig(name=name, model_identifier=model,
+        dimensions=dimensions if dimensions is not None else _configured_dimensions(64 if name == "stable" else 384),
+        revision=os.getenv("PRIMA_EMBEDDING_REVISION") or None, device=os.getenv("PRIMA_EMBEDDING_DEVICE", "cpu"),
+        local_snapshot=os.getenv("PRIMA_EMBEDDING_LOCAL_SNAPSHOT") or None,
+        batch_size=int(os.getenv("PRIMA_EMBEDDING_BATCH_SIZE", "16")), cpu_threads=int(os.getenv("PRIMA_RETRIEVAL_CPU_THREADS", "2")))
 
 
 def embedding_backend_info() -> dict[str, Any]:
@@ -206,15 +250,52 @@ def reset_embedding_backend_cache() -> None:
 
 
 @lru_cache(maxsize=4)
-def _sentence_transformer_model(model_identifier: str, trust_remote_code: bool = False) -> Any:
+def _sentence_transformer_model(
+    model_identifier: str, *, revision: str | None = None, device: str = "cpu",
+    local_snapshot: str | None = None, cpu_threads: int = 2,
+) -> Any:
+    path, identity = model_snapshot(model_identifier, revision, local_snapshot)
+    import torch
     from sentence_transformers import SentenceTransformer
 
-    try:
-        return SentenceTransformer(model_identifier, trust_remote_code=trust_remote_code)
-    except TypeError:
-        if trust_remote_code:
-            raise
-        return SentenceTransformer(model_identifier)
+    if device == "cpu":
+        torch.set_num_threads(cpu_threads)
+    model: Any = SentenceTransformer(path, device=device, trust_remote_code=False, local_files_only=True)
+    model._prima_snapshot_identity = identity
+    return model
+
+
+def model_snapshot(model_identifier: str, revision: str | None, local_snapshot: str | None = None) -> tuple[str, dict[str, Any]]:
+    """Resolve staged files only and fingerprint the exact artifacts handed to a loader."""
+    if not revision or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Learned models require an immutable 40-character revision")
+    if local_snapshot:
+        path = Path(local_snapshot)
+        manifest = json.loads((path / "prima_model_manifest.json").read_text(encoding="utf-8"))
+        if manifest.get("model_identifier") != model_identifier or manifest.get("revision") != revision:
+            raise ValueError("Local model manifest identity does not match the selected model/revision")
+    else:
+        from huggingface_hub import snapshot_download
+
+        path = Path(snapshot_download(model_identifier, revision=revision, local_files_only=True))
+        manifest = None
+    if not path.is_dir():
+        raise FileNotFoundError(f"Required model snapshot is missing: {path}")
+    hashes = {}
+    for file in sorted(path.rglob("*")):
+        if not file.is_file() or file.name == "prima_model_manifest.json" or any(part.startswith(".") or part == "__pycache__" for part in file.relative_to(path).parts):
+            continue
+        digest = hashlib.sha256()
+        with file.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        hashes[file.relative_to(path).as_posix()] = digest.hexdigest()
+    if not hashes or not (path / "config.json").is_file():
+        raise ValueError("Model snapshot has no loadable configuration/artifacts")
+    if manifest is not None and manifest.get("files") != hashes:
+        raise ValueError("Local model manifest file hashes do not match the staged snapshot")
+    return str(path), {"model_identifier": model_identifier, "revision": revision, "files": hashes,
+                       "artifact_sha256": hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest()}
 
 
 @lru_cache(maxsize=1)
@@ -226,9 +307,9 @@ def _sentence_transformers_available() -> bool:
     return True
 
 
-def _configured_dimensions() -> int:
+def _configured_dimensions(default: int = DEFAULT_DIMENSIONS) -> int:
     try:
-        dimensions = int(os.getenv("PRIMA_EMBEDDING_DIMENSIONS", str(DEFAULT_DIMENSIONS)))
+        dimensions = int(os.getenv("PRIMA_EMBEDDING_DIMENSIONS", str(default)))
     except ValueError as exc:
         raise ValueError("PRIMA_EMBEDDING_DIMENSIONS must be an integer") from exc
     if dimensions <= 0:
@@ -244,26 +325,12 @@ def _resolve_backend_name(configured: str) -> str:
     return name
 
 
-def _requires_trust_remote_code(backend_name: str) -> bool:
-    return backend_name == "nomic"
-
-
 def _normalize(values: list[float]) -> list[float]:
     vector = np.array(values, dtype="float32")
     norm = np.linalg.norm(vector)
     if norm:
         vector = vector / norm
     return [float(value) for value in vector.tolist()]
-
-
-def _resize(values: list[float], dimensions: int) -> list[float]:
-    if len(values) == dimensions:
-        return values
-    if len(values) > dimensions:
-        return _normalize(values[:dimensions])
-    padded = list(values)
-    padded.extend(0.0 for _ in range(dimensions - len(padded)))
-    return _normalize(padded)
 
 
 def _cosine_similarity(left: list[float], right: list[float]) -> float:
@@ -290,6 +357,10 @@ def _run_self_test() -> int:
         dimensions = len(embeddings[0])
         model_loaded = backend.name == "stable" or getattr(backend, "_model", None) is not None
         passed = bool(model_loaded and sanity_passed and all(len(vector) == dimensions for vector in embeddings))
+        if backend.learned:
+            validation = validate_learned_backend(backend)
+            passed = passed and validation["passed"]
+            print(json.dumps(validation, sort_keys=True))
 
         print(f"active backend: {backend.name}")
         print(f"embedding dimension: {dimensions}")
@@ -309,6 +380,26 @@ def _run_self_test() -> int:
         print(f"cosine similarity sanity check: failed ({exc})")
         print("pass/fail: fail")
         return 1
+
+
+def validate_learned_backend(backend: EmbeddingBackend | None = None) -> dict[str, Any]:
+    """Opt-in local-model preflight with held-out paraphrases, not benchmark answer hints."""
+    backend = backend or get_embedding_backend()
+    if not backend.learned:
+        raise ValueError("Semantic validation requires an actual learned backend")
+    probes = (
+        ("The physician treated the patient.", "A doctor cared for someone who was ill.", "A spacecraft orbits a distant planet."),
+        ("A puppy is running through grass.", "A young dog races across a field.", "The quarterly financial report was published."),
+    )
+    rankings = []
+    for query, related, distractor in probes:
+        vectors = [backend.embed(text) for text in (query, related, distractor)]
+        rankings.append({"paraphrase": _cosine_similarity(vectors[0], vectors[1]),
+                         "distractor": _cosine_similarity(vectors[0], vectors[2])})
+    passed = all(row["paraphrase"] > row["distractor"] for row in rankings)
+    if not passed:
+        raise RuntimeError(f"Learned paraphrase/ranking sanity check failed: {rankings}")
+    return {"passed": passed, "probe_version": "held-out-paraphrases-v1", "rankings": rankings, "backend": backend.info()}
 
 
 def _benchmark_sentences() -> list[str]:

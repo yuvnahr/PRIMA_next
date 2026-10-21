@@ -39,6 +39,7 @@ class _Client:
     [
         "route", "task_kind", "profile", "execution_policy", "top_k", "max_hops",
         "max_retrieval_calls", "max_context_tokens", "context_compression_enabled",
+        "max_llm_calls", "time_budget_seconds", "answer_reserve_seconds",
         "required_reranker_backend", "retrieval_query_override", "tool_results",
     ],
 )

@@ -1,5 +1,21 @@
 # Three-benchmark Kaggle smoke validation
 
+## Current execution contract (21 October 2026)
+
+The Goal 4 handoff and [campaign runbook](benchmarks/RUNBOOK.md) supersede the
+operating instructions below. Historical timings remain observations for their
+recorded source/model/configuration; they do not admit the repaired runtime.
+Use reviewed `dev` with an explicitly agreed `PINNED_COMMIT_SHA`, an immutable
+executed-notebook input, one shared pinned 27B model and one worker initially.
+Full execution defaults off. Unknown/one backend slot retains one worker;
+HTTP request overlap is not evidence of concurrent model execution. Optional
+repeated pilots require equal native outcomes, an unambiguous measured wall win,
+a passing budget and successful backend restoration. LoCoMo CPU overlap with
+serialized inference is labeled separately. Report the actual sampling gaps;
+a configured cadence is not a guarantee. Live quota, fresh source/config/model/
+data identities, 20% margin and a 900-second reserve are mandatory. Current
+LoCoMo and learned-policy candidates remain unpromoted pending measured gates.
+
 `PRIMA_Kaggle_Benchmark.ipynb` defaults to `SMOKE_MODE=True`,
 `SMOKE_ITEMS=2`, and `RUN_FULL_BENCHMARK=False`. Each benchmark uses two
 unique examples, evaluated again by the pilot. This means four example
@@ -15,10 +31,11 @@ upper bound. No training is launched.
    [LoCoMo](https://www.kaggle.com/datasets/thegifman/prima-locomo),
    [HotpotQA](https://www.kaggle.com/datasets/thegifman/prima-hotpot-qa), and
    [GoEmotions](https://www.kaggle.com/datasets/thegifman/prima-goemotions).
-2. The edited repository changes are published to `3.10_to_3.14`. Setup clones only
-   that branch and records its fetched commit for the session; running an
-   uploaded notebook against the unchanged remote branch will omit the
-   required campaign helpers. Do not change an existing full-run checkout.
+2. After human review, publish the integrated changes to `dev` and enter its
+   explicitly agreed `PINNED_COMMIT_SHA`. Setup refuses a different fetched head
+   and cannot refresh source after pilots. Supply `EXECUTED_NOTEBOOK_PATH` as an
+   immutable uploaded/input copy; only literal CONFIG edits may differ from the
+   tracked notebook code. No publication is performed by these implementation goals.
 3. Provide an **already available** Ollama cache containing the configured
    `qwen3.8:27b` model. Set `OLLAMA_MODELS_PATH` to that cache and verify
    `EXPECTED_MODEL_DIGEST`. If the configured default has no cache, the
@@ -29,7 +46,7 @@ upper bound. No training is launched.
    process sets HF offline flags. Attached caches use a writable metadata
    mirror with links to immutable blobs, avoiding a full weight copy.
    Native default dependencies come from `requirements-kaggle.txt`; optional
-   model backends/BERTScore explicitly use the full requirements list.
+   CPU learned retrieval uses `requirements-kaggle-retrieval.txt`; snapshots must already be pinned and cached. BERTScore belongs in a separately measured phase after Qwen is released.
    The default model digest is the available 2026-10-05 27B revision. Set the
    old expected digest explicitly when using the original cached snapshot;
    never mix the two model revisions in one reported experiment.
@@ -56,14 +73,12 @@ upper bound. No training is launched.
    blocked stage, never a pass. A failed pilot is recorded in the results
    file and must be investigated before accepting concurrency.
 
-LoCoMo's pilot uses the existing isolated two-conversation worker path.
-It must preserve native predictions/evaluation decisions and actually show
-two overlapping provider requests. HotpotQA and GoEmotions now exercise
-their existing isolated native two-worker paths too. HotpotQA compares
-answers, supporting facts and reasoning decisions; GoEmotions compares raw
-model output, baseline/final labels and bounded affect decisions. The real
-pilot must preserve those results and pass resource/overlap checks before
-concurrency can be accepted; the implementation alone is not validation.
+Both tiny smoke stages use one worker by default and remain non-reportable.
+`RUN_THROUGHPUT_PILOT=False` does not infer scheduling capability from two T4s.
+An explicitly enabled client pilot preserves benchmark-native outcomes, but smoke
+never selects production workers or supplies a reliable full-run estimate.
+Representative selection requires repeated measured wall benefit, observed slots,
+resource compliance and budget acceptance; request overlap alone is insufficient.
 
 ## Validation and measurements
 
@@ -79,7 +94,7 @@ Each stage records setup, Ollama model-load duration, inference wall time,
 elapsed campaign time, per-GPU sampled peaks, system RAM and process-tree
 RSS peaks, maximum active requests, selected IDs and artifact status.
 Model load/warmup also has resource sampling. Peaks are observations from
-polls at most two seconds apart; brief peaks between polls can be missed.
+periodic polls with a one-second target and a two-second maximum-gap gate; measured median/max gaps and coverage are reported, and brief peaks between polls can still be missed.
 The canary/pilot monitor retains the existing GPU placement/context/digest,
 12 GiB/GPU, 19 GB RAM planning cap and 3 GB reserve checks. Complete LoCoMo
 history replay can still dominate smoke runtime despite the tiny QA count.
@@ -93,8 +108,7 @@ replace inference/evaluation. The actual Kaggle run always uses Ollama.
 Full-run artifact validation now compares **every mode** against independently
 selected source IDs, full dataset count and hash, complete checkpoint
 statuses, repository/model identity and GoEmotions validation/test hashes.
-Missing, duplicate, unexpected, truncated or unsuccessful coverage fails
-closed. Existing metric, post-evaluation, diagnostic, resource and archive
+Missing, duplicate, unexpected or truncated coverage fails closed. Full coverage retains auditable terminal failures and reports execution success separately; timing canaries still require successful cases. Existing metric, post-evaluation, diagnostic, resource and archive
 checks remain. The representative timing/full-run path is selected only
 with `SMOKE_MODE=False` in a new session.
 
@@ -106,7 +120,7 @@ benchmark per session. A smoke pass does not provide production timing evidence.
 
 For each selector, start a new session with `SMOKE_MODE=False`,
 `RUN_FULL_BENCHMARK=False`, the pinned model digest and selected Kaggle inputs. The fetched
-`3.10_to_3.14` branch commit is recorded and a fresh `FULL_RUN_ID` is automatic.
+`dev` commit must equal the explicit reviewed pin; a fresh `FULL_RUN_ID` is automatic. Live quota and its UTC observation must be refreshed before full execution.
 Run sections 1–9 to obtain representative fresh timing:
 
 | Selector | Representative canary | Full selection | Scheduling |

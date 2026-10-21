@@ -46,6 +46,8 @@ class QueryAnalysis:
     temporal_constraints: tuple[TemporalConstraint, ...] = ()
     aliases: dict[str, tuple[str, ...]] = field(default_factory=dict)
     pronouns: tuple[str, ...] = ()
+    reference_time: datetime | None = None
+    historical: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -60,6 +62,8 @@ class QueryAnalysis:
             "temporal_constraints": [constraint.to_dict() for constraint in self.temporal_constraints],
             "aliases": {key: list(value) for key, value in self.aliases.items()},
             "pronouns": list(self.pronouns),
+            "reference_time": self.reference_time.isoformat() if self.reference_time else None,
+            "historical": self.historical,
         }
 
 
@@ -224,7 +228,7 @@ class QueryAnalyzer:
             if operator in token_set:
                 expressions.append(operator)
                 constraints.append(TemporalConstraint(operator=_canonical_temporal_operator(operator), expression=operator))
-        for phrase in ("last week", "last month", "last year", "next week", "next month", "earlier that summer"):
+        for phrase in ("today", "yesterday", "tomorrow", "last week", "last month", "last year", "next week", "next month", "earlier that summer"):
             if phrase in lower_query:
                 expressions.append(phrase)
         expressions.extend(token for token in sorted(token_set) if token.isdigit() and len(token) == 4)
@@ -271,18 +275,23 @@ def temporal_agreement(analysis: QueryAnalysis, timestamp: datetime | None) -> f
         return 0.0
     if timestamp.tzinfo is None:
         timestamp = timestamp.replace(tzinfo=timezone.utc)
-    now = datetime.now(timezone.utc)
     terms = set(analysis.temporal_expressions)
     if str(timestamp.year) in terms:
         return 1.0
-    age_days = max(0.0, (now - timestamp).total_seconds() / 86400.0)
-    if "today" in terms and age_days <= 1:
+    anchor = analysis.reference_time or (None if analysis.historical else datetime.now(timezone.utc))
+    if anchor is None:
+        return 0.5
+    anchor = anchor.replace(tzinfo=anchor.tzinfo or timezone.utc)
+    age_days = (anchor - timestamp).total_seconds() / 86400.0
+    if "last year" in terms:
+        return 1.0 if timestamp.year == anchor.year - 1 else 0.0
+    if "today" in terms and 0 <= age_days <= 1:
         return 1.0
     if "yesterday" in terms and 1 <= age_days <= 2:
         return 1.0
-    if "last week" in terms and age_days <= 7:
+    if "last week" in terms and 0 <= age_days <= 7:
         return 1.0
-    if "last month" in terms and age_days <= 31:
+    if "last month" in terms and 0 <= age_days <= 31:
         return 1.0
     operators = {constraint.operator for constraint in analysis.temporal_constraints}
     if operators & {"first", "last", "before", "after", "during", "while", "temporal"}:
