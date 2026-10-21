@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from benchmarks.common.bundle import artifact_bytes, require_writable_artifact
 from benchmarks.common.contracts import (
     BenchmarkManifest,
     BenchmarkSummary,
@@ -187,6 +188,7 @@ def atomic_write_json(path: str | Path, payload: Any) -> None:
     """Replace a JSON file atomically without exposing a truncated destination."""
 
     destination = Path(path)
+    require_writable_artifact(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
@@ -213,6 +215,7 @@ def append_jsonl(path: str | Path, payload: dict[str, Any]) -> None:
     """Append one flushed, single-line JSON record."""
 
     destination = Path(path)
+    require_writable_artifact(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(redact(payload, redact_prompts=False), sort_keys=True, ensure_ascii=False)
     with destination.open("a", encoding="utf-8", newline="\n") as stream:
@@ -225,6 +228,7 @@ def atomic_write_jsonl(path: str | Path, rows: list[dict[str, Any]]) -> None:
     """Atomically replace a derived JSONL projection."""
 
     destination = Path(path)
+    require_writable_artifact(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
@@ -248,7 +252,7 @@ def read_json(path: str | Path) -> Any:
 
     source = Path(path)
     try:
-        return json.loads(source.read_text(encoding="utf-8"))
+        return json.loads(artifact_bytes(source).decode("utf-8"))
     except json.JSONDecodeError as exc:
         raise ValueError(f"Malformed JSON artifact {source}: {exc}") from exc
 
@@ -257,10 +261,12 @@ def read_jsonl(path: str | Path) -> list[dict[str, Any]]:
     """Read JSONL strictly; an interrupted/malformed row invalidates resume."""
 
     source = Path(path)
-    if not source.exists():
+    try:
+        content = artifact_bytes(source).decode("utf-8")
+    except FileNotFoundError:
         return []
     rows: list[dict[str, Any]] = []
-    for line_number, line in enumerate(source.read_text(encoding="utf-8").splitlines(), 1):
+    for line_number, line in enumerate(content.splitlines(), 1):
         if not line.strip():
             continue
         try:

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from benchmarks.common import atomic_write_json
-from benchmarks.common.artifacts import read_jsonl
+from benchmarks.common.artifacts import read_json, read_jsonl
 from benchmarks.common.reporting import classification_report, locomo_report
 from security.redaction import redact
 
@@ -33,7 +33,7 @@ def write_aggregate(
         if not item.child_manifest:
             continue
         child = root / item.child_manifest
-        manifest = json.loads(child.read_text(encoding="utf-8"))
+        manifest = read_json(child)
         benchmark = manifest["benchmark"]["name"]
         if benchmark not in {"GoEmotions", "LoCoMo"}:
             continue
@@ -49,7 +49,13 @@ def write_aggregate(
             report_semantics[mode_id] = classification_report(records, item.summary.get("metrics"))
         else:
             replay = child.parent / "raw/conversation_diagnostics.json"
-            report_semantics[mode_id] = locomo_report(records, json.loads(replay.read_text(encoding="utf-8")) if replay.is_file() else None)
+            try:
+                replay_records = read_json(replay)
+            except FileNotFoundError:
+                replay_records = None
+            admission_dir = child.parent / "admission"
+            admission_audits = [read_json(path) for path in sorted(admission_dir.glob("*.json"))] if admission_dir.is_dir() else None
+            report_semantics[mode_id] = locomo_report(records, replay_records, admission_audits)
         report_semantics[mode_id]["selected_id_count"] = len(manifest["selected_ids"])
         report_semantics[mode_id]["checkpoint_count"] = len(checkpoints)
         report_semantics[mode_id]["embedded_record_count"] = len(records)

@@ -15,6 +15,7 @@ from benchmarks.campaign.provider_session import SharedProviderSession
 from benchmarks.campaign.registry import child_manifest_path, execute_mode
 from benchmarks.campaign.scheduler import schedule_modes
 from benchmarks.campaign.telemetry import collect_host_telemetry
+from benchmarks.common.artifacts import append_jsonl, read_jsonl
 from benchmarks.common.contracts import BenchmarkManifest, RunStatus
 from benchmarks.common.timing import AttemptTimer
 
@@ -85,6 +86,12 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
         schedule_modes(pending, config.scheduler, run_one)
     except BaseException:
         timer.record("interrupted", finished=True)
+        try:
+            interrupted_telemetry = session.telemetry()
+        except Exception as exc:
+            interrupted_telemetry = {"available": False, "error": str(exc)}
+        append_jsonl(config.output_root / "provider_sessions.jsonl", {
+            "attempt_id": timer.attempt_id, "status": "interrupted", "provider_session": interrupted_telemetry})
         raise
     timer.record("execution")
     current = store.read()
@@ -125,6 +132,17 @@ def run_campaign(config: CampaignConfig, *, resume: bool = False) -> dict[str, A
     timer.record("reporting_snapshot", finished=True)
     telemetry["campaign_timing"] = timer.summary()
     telemetry["campaign_timing"]["scope"] = "through mode execution, comparisons and telemetry; aggregate/manifest refresh excluded"
+    append_jsonl(config.output_root / "provider_sessions.jsonl", {
+        "attempt_id": timer.attempt_id, "status": "finished", "provider_session": telemetry.copy()})
+    sessions = read_jsonl(config.output_root / "provider_sessions.jsonl")
+    observed_ids = [row["attempt_id"] for row in sessions]
+    if len(observed_ids) != len(set(observed_ids)):
+        raise ValueError("Provider attempt identities are duplicated")
+    telemetry["provider_session_history"] = {
+        "path": "provider_sessions.jsonl", "observed_sessions": len(sessions),
+        "active_attempts": telemetry["campaign_timing"]["attempt_count"],
+        "complete": len(sessions) == telemetry["campaign_timing"]["attempt_count"],
+        "scope": "one provider snapshot per finished/interrupted active attempt; missing observations remain unavailable"}
     current = store.read()
     write_aggregate(config.output_root, current.campaign_id, current.modes, comparisons, telemetry,
                     run_kind=config.run_kind)

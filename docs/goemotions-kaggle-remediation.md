@@ -666,3 +666,173 @@ Local ignored model/evidence directories are preserved in the original checkout:
 `evaluation/goemotions/models/b3_word_unbalanced`,
 `evaluation/goemotions/models/b3_word_frozen`, and
 `evaluation/goemotions/smoke/b3_cpu`. No existing destination was overwritten.
+
+## Goal 4: final implementation and review handoff
+
+Status: **READY FOR HUMAN REVIEW — implementation acceptance complete**.
+All mandatory local checks passed on the exact combined snapshot below. No
+benchmark improvement or production promotion is claimed. The successful fourth checkpoint is the commit
+containing this final handoff; its own SHA is reported in the completion response.
+
+### Checkpoints, ownership and tested integration
+
+| Delivery checkpoint | Commit | Scope |
+|---|---|---|
+| Goal 1 | `e0dd105484a2f78fc7a13811c83ef4e04aaad440` | B1 preserve-label safety/provenance |
+| Goal 2 | `def8f76dbe25699e63fd10cedcb9a6afe311ac93` | B2 paired bootstrap and truthful metrics |
+| Goal 3 | `e926c4f0286cc193e3026bd2323cde8f8c0d58f7` | B3 frozen dev comparisons/CPU baseline |
+| Goal 4 | Containing commit; subject `fix(kaggle): enforce measured pilots and integrate auditable benchmark reports` | B4 plus final B2 consumers/integration |
+
+Planning base remains `c25a178d6308bc48b3a5e44d9519316a5179c499`.
+The exact Person 1 final producer checkpoint is
+`4d4b76b1462f18d70450d51a4ee1c2714d558dd9`.
+Person 2 candidate snapshot `274edec66fc66655b33637f2edfe3800b280c146`
+contains Goal 3 plus every proposed Goal 4 implementation/config/test file.
+Tested integration `1e994cc364b6ed2bf493456b17b9bed2d5eb7d5e` has exactly
+those Person 1 and candidate parents. Its tree was verified against Git's clean
+merge-tree result; there was no blanket conflict resolution or Person 1 patch.
+Local snapshot/integration commits are validation evidence, not delivery-goal
+commits, and are never merged into delivery branches or `dev`.
+
+The machine-readable `docs/goemotions-kaggle-goal4-review.json` records the tested
+parents, commands/results and normalized Git-blob SHA-256 identities of every
+Goal 4 implementation file. Final delivery must match those bytes. Only review
+prose/evidence under `docs/` can differ without repeating affected checks. The
+original `dev-p2` checkout retains its unrelated untracked documents/directories.
+No push, PR, merge to `dev`, full campaign or dependency upgrade was performed.
+
+### B4 requirement-to-evidence ledger
+
+| Goal 4 item | Implemented behavior / owned files | Acceptance evidence |
+|---|---|---|
+| 1, 12: producer boundary | Registry passes typed runtime config to the actual LoCoMo experiment; pinned final fixtures; no producer edits | `tests/integration/test_person1_person2_contracts.py` runs real canonical replay/QA and notebook consumers for normal and controlled ingestion |
+| 2: measured worker choice | `campaign/kaggle.py` rejects slower/noisy/unknown-slot/mismatched repeats; runner log supplies actual slots, never environment requests | Measured-rejection/slot/identity cases in `test_kaggle_remediation.py` |
+| 3: serialized CPU pipeline and restoration | Optional LoCoMo CPU overlap retains one inference slot; equivalent predictions and repeated wall win required; failed placement/restoration blocks | CPU pipeline and actual notebook restoration/pilot-refusal tests |
+| 4: conservative budget | Existing LoCoMo history estimator plus independent measured overlap floor; loading/setup/pilots/restoration, report/ZIP cost, >=20% margin and 900-second reserve once | Existing estimator allocation/tail tests plus worker-independent projection, live quota/freshness and full-launch guards |
+| 5: runtime safety | Exact two-T4/per-device/RAM/cgroup caps; absolute monotonic observation deadlines; actual gaps/coverage; recoverable resource/deadline stops | Resource/cache/cadence and fake subprocess notebook tests; real hardware remains pending |
+| 6: dependencies and models | Base/optional CPU retrieval requirements; compatible pip install without upgrade, pre/post conflict diff; pinned local model manifests and CPU placement; BERTScore separate | Local staging/tamper/missing/device tests and local pip check; actual Kaggle environment pending |
+| 7, 9: compact trustworthy bundles | Shared `common/bundle.py` derives exact prediction/failure/native views from checkpoints and deduplicates prompt templates; original responses/checkpoints/metadata retained | Round-trip all logical JSON/JSONL, prompt hashes, CRC, safe paths, duplicates, secrets, malformed records, selected/terminal counts, immutable export and recovery tests |
+| 8: reproducible identities | Worktree-aware commit; tracked source/notebook/config/dependency hashes, dirty state, uploaded notebook code/CONFIG check; expected/observed data pins and resume checks | Temporary Git/worktree, preflight dirty/pin/fingerprint, notebook-code and changed-source resume cases |
+| 10: truthful consumers | Common/campaign and notebook distinguish label correction/reflection, unavailable confidence, calls/tokens/cache/wall scopes, all four evidence stages and official/legacy scores | B2 regressions, actual producer tests, notebook adversarial/correctness/missing-latency tests |
+| 11: canonical notebook | Explicit agreed `dev` SHA, full off, fresh namespaces, typed safe config, frozen test 5,427 IDs, LoCoMo promotion blocked, separate control sessions | JSON/code compile; original previously excluded GoEmotions smoke now included; full-launch guards and native fake-provider smoke flows |
+| 13: wider checks | Current CI-equivalent commands on exact combined snapshot using existing Python 3.14.8 environment | Final results below and review JSON; no test deselections |
+| 14: review package | This ledger, B1-B3 evidence above, tested-file hashes, migrations, decisions, pending gates and rollback | Final staged/committed file and implementation-hash verification |
+
+### Producer contract and compatibility
+
+Person 1's safe fixture is `stable64_normal_admission_reflection_off`:
+normal admission, stable 64-dimensional CPU retrieval, unchanged importance
+threshold, captions off, reflection off. Native MiniLM384 and optional CPU
+cross-encoder remain unpromoted; existing CPU retrieval evidence is not an answer
+quality/resource win. Typed revisions, devices, local snapshots, batches and
+representation settings are serialized without hidden environment overrides.
+
+Evidence audit stays 1.0; question/metric diagnostics are 2.0; answer attempt and
+request budget are 1.0. The final reflection/correction audit is 2.0. Reports read
+candidate/accumulated/supplied/cited recalls separately, official/legacy/category
+scores, answer attempts and budgets, QA memory writes, reflection recommendation/
+authorization/execution/suppression and accepted/rejected corrections. Replay
+coverage is once per conversation. Complete admission decisions are canonical
+child `admission/*.json` artifacts, not an invented field inside every question
+or replay summary. Reports summarize their accepted/rejected/reason populations
+and preserve unavailable decisions. Controlled ingestion remains an explicit
+ablation. Correct answers can carry annotation-miss flags; successful adversarial
+abstentions do not enter ordinary answerable evidence-miss totals.
+
+Missing old observations remain null/unavailable. GoEmotions label-only confidence
+is unavailable; 0/1 label indicators are not probabilities. Native same-response
+label corrections retain their valid paired population and raw hashes. Prompt
+and trained-baseline gains require their own frozen separate inference identity.
+Active resumed work, calendar time, current-attempt inference, actual uncached
+provider tokens and logical case tokens have separate scopes. Each completed or
+interrupted provider attempt has its own `provider_sessions.jsonl` snapshot;
+missing attempts/tokens remain explicitly incomplete. Legacy aliases retain their
+old interpretation. The GoEmotions worktree commit bug is fixed, including the
+previously excluded native notebook smoke case.
+
+New source/runtime/prompt/policy/representation identities invalidate old pilots
+and incompatible resumes. Old archives are readable without rewriting them;
+resume is stricter than reading. New ZIP schema 1.0 maps logical artifacts to
+checkpoint-derived views or physical hashed files and reconstructs exact prompts.
+Only proven-equal redundant views are removed; ordinary metadata/admission/log
+paths remain physical. Shared artifact/comparison/aggregation readers resolve
+references; notebook native projections use shared reads. External plain-path
+analysis tools must first use `materialize_bundle()` into a fresh directory. The
+materializer verifies all references/counts and preserves export provenance;
+immutable exported evidence cannot be resumed/mutated in place. Original live
+artifacts are never deleted to achieve compression. Historical ZIPs without the
+new sidecar retain their legacy validation scope rather than invented hashes.
+
+### Compute/selection ledger and pending production gates
+
+| Work | Actual result / disposition | Production implication |
+|---|---|---|
+| B1 saved-response replay | Hash-verified historical result above; unsupported correction removed | Preserve labels; no new inference improvement claimed |
+| B2 bootstrap | Seeded-statistic equivalence and measured CPU costs above | Correctness and profiling scope preserved |
+| B3 CPU baseline/development controls | Train/dev artifacts and frozen safe unpromoted selection above | Test is not used to tune prompts/policies |
+| B4 local fake/native integration | Real runtime producers, native artifacts, synthetic provider/hardware, full CI recorded below | Wiring/safety evidence only; no T4 timing or Qwen quality claim |
+| Optional encoder/correction/learned retrieval/reflection promotion | Unpromoted/not admitted pending their declared measured gates | No hidden default or GPU training alongside Qwen |
+| Integrated representative Qwen canary | Externally pending reviewed merged dev, model endpoint, exact input/source, two T4s and live quota | Full execution remains disabled |
+| Full GoEmotions / LoCoMo | Pending separately admitted sessions: 5,427 test IDs / all ten histories and 1,986 questions, including failures | No completion/resource/quality acceptance claimed |
+| Extra model-only/simplified retrieval controls | Separate frozen identities and independently admitted budgets | No unbudgeted extra full mode in one session |
+
+Retain the exact shared `qwen3.8:27b` digest
+`aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813`,
+8,192 context and 512 output, full GPU residency. Start one worker; two T4s do not
+prove two slots. CPU auxiliaries and one GPU experiment at a time remain required.
+Caps: <=12,288 MiB each GPU, <=16,000,000,000 working-used RAM and >=3,000,000,000
+available (stricter cgroup limits apply), <=10.5h projected campaign and <=12h
+session from setup, >=20% margin and >=900s export reserve counted once. Keep
+30 GiB storage precheck, 2 GiB model reserve and 5 GiB artifact reserve plus growth.
+Live quota/reset must be checked immediately before scheduling; none is assumed.
+No local fake-provider timing substitutes for a fresh representative resource gate.
+
+Actual Kaggle Python/package compatibility, immutable model loading and native
+ranking where required, Qwen development quality/cost comparisons, reflection
+gain/harm and full evaluations remain explicit human review blockers before any
+production/release claim. The integration checkout's three external submodules
+are uninitialized at their recorded gitlink pins; upstream scorer equivalence
+uses Person 1's frozen core fixtures here, not a fresh external checkout test.
+Disclose prior evaluation exposure, annotation ambiguity, unknown model training
+contamination and that in-memory QA does not prove durable persistence.
+
+### Human review and rollback
+
+Review the final implementation hash manifest and both pinned integration parents,
+all mandatory check results and the B1-B4 scope ledger. Review measured versus
+pending evidence and the unchanged unpromoted defaults before merging. Production
+requires a later reviewed, merged and explicitly pinned `dev` SHA, verified uploaded
+notebook code, full coverage and new matching pilot/quota/resource/time gates.
+
+Rollback is a scoped commit revert or an explicitly selected prior safe
+configuration with a new run identity. Preserve measurement/reporting fixes and
+all evidence; never reset `dev`, overwrite unrelated files or resume incompatible
+checkpoints. A rejected policy keeps the safe fallback and an honest negative
+result. This delivery stops after its fourth successful implementation checkpoint.
+
+### Final verification results
+
+The final combined snapshot passed **726 tests, 2 skipped, no deselections,
+2 warnings in 187.45 seconds**. The skips are the opt-in pinned-cache learned CPU
+model check and the unavailable configured Ollama production/persistence smoke.
+An offline, local-files-only lookup independently confirmed that the exact MiniLM
+revision is absent here; no download was attempted. The warnings are the deliberate
+duplicate-ZIP rejection fixture and an existing Chroma asyncio deprecation.
+Actual canonical normal/controlled replay, answer paths, all-hop reports, admission
+files, immutable bundles and notebook consumers were included and did not skip.
+
+All current CI-equivalent commands passed: capability preflight; compileall with
+CI exclusions; full pytest; full Ruff; Xenon; full mypy (**236 source files**);
+and full Bandit. Local `pip check` returned **no broken requirements**; dependency
+versions were captured without installation/upgrade. Notebook JSON parses, every
+code cell compiles and all execution counts/outputs are cleared. The review JSON
+records exact commands, final log hashes, integration source fingerprint and tested
+implementation hashes. Logs and intermediate diagnostics are preserved locally in
+`evaluation/goemotions/smoke/b4`, outside version control; they are not model or
+benchmark acceptance evidence. Earlier incomplete snapshots/test failures were
+corrected and are diagnostic history only. No mandatory implementation failure or
+cross-owner producer repair remains.
+
+Final delivery compares every non-documentation Goal 4 Git blob with the tested
+candidate. The review JSON and final handoff prose are the only post-test additions.
+No implementation/config/test change is hidden in that evidence-only difference.

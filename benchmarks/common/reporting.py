@@ -33,12 +33,15 @@ def classification_report(records: list[dict[str, Any]], metrics: dict[str, Any]
         "confidence": metrics["confidence"] if metrics.get("report_schema_version") == "2.0" else {"available": False, "mean": None, "reason": "legacy_confidence_unavailable"},
         "label_correction": correction, "runtime_reflection": {"applicable": False, "executed": 0},
         "classification_provider_calls": metrics.get("performance", {}).get("classification_provider_calls"),
+        "performance": metrics.get("performance") if metrics.get("report_schema_version") == "2.0" else None,
+        "cooccurrence_interpretation": "gold/predicted co-occurrence; off-diagonal cells are not necessarily errors",
         "generic_runtime_generation": "not_applicable; classification provider calls reported separately",
         "classification_component_coverage": component_coverage([row.get("runtime") for row in records]),
     }
 
 
-def locomo_report(records: list[dict[str, Any]], conversations: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+def locomo_report(records: list[dict[str, Any]], conversations: list[dict[str, Any]] | None = None,
+                  admission_audits: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Consume observed producer fields; last-hop legacy recall is not all-hop recall."""
     observed = [row for row in records if row.get("schema_version") == "2.0"]
     evidence_populations = {}
@@ -73,6 +76,13 @@ def locomo_report(records: list[dict[str, Any]], conversations: list[dict[str, A
         "qa_component_coverage": component_coverage([(row.get("raw_runtime_response") or {}).get("diagnostics") for row in records]),
         "replay_scope": "conversation_level_once; unavailable when producer records are absent",
         "reflection_audits": [row.get("reflection_audit") for row in records],
+        "answer_attempts": [row.get("answer_attempt") for row in records],
+        "request_budgets": [row.get("request_budget") for row in records],
+        "reflection": _reflection_counts(records),
+        "admission_logs": [row.get("admission_log") for row in (conversations or [])],
+        "admission_audit": _admission_counts(admission_audits),
+        "qa_memory_writes": (sum(row["qa_memory_write_count"] for row in observed)
+                              if observed and all(row.get("qa_memory_write_count") is not None for row in observed) else None),
     }
 
 
@@ -82,3 +92,33 @@ def component_coverage(diagnostics: list[dict[str, Any] | None]) -> dict[str, An
         "record_count": len(diagnostics), "observed_count": len(observed),
         "executed_counts": dict(Counter(name for row in observed for name in set(row["executed_components"]))) if observed else None,
     }
+
+
+def _reflection_counts(records: list[dict[str, Any]]) -> dict[str, Any]:
+    audits = [row["reflection_audit"] for row in records if isinstance(row.get("reflection_audit"), dict)]
+    def total(name: str) -> int | None:
+        return sum(int(row[name]) for row in audits) if audits and all(type(row.get(name)) is int for row in audits) else None
+    corrections = [row["corrections"] for row in audits if isinstance(row.get("corrections"), dict)]
+    return {"observed_count": len(audits), "unavailable_count": len(records) - len(audits),
+            "heuristic_recommended": total("heuristic_recommended"), "gate_authorized": total("gate_authorized"),
+            "gate_suppressed": total("gate_suppressed"), "engine_executed": total("engine_executed"),
+            "corrections": {key: sum(row[key] for row in corrections)
+                            if corrections and all(type(row.get(key)) is int for row in corrections) else None
+                            for key in ("attempted", "executed", "accepted", "rejected", "suppressed")},
+            "interpretation": "legacy component flags do not prove engine/correction execution"}
+
+
+def _admission_counts(audits: list[dict[str, Any]] | None) -> dict[str, Any]:
+    if audits is None:
+        return {"observed_conversations": None, "turn_count": None, "accepted": None, "rejected": None,
+                "unavailable_decisions": None, "reasons": None}
+    turns = [turn for audit in audits for turn in audit["turns"]]
+    decisions = [row["admission"] for row in turns if isinstance(row.get("admission"), dict)]
+    return {"observed_conversations": len(audits), "turn_count": len(turns),
+            "accepted": sum(row.get("stored") is True for row in decisions),
+            "rejected": sum(row.get("stored") is False for row in decisions),
+            "unavailable_decisions": len(turns) - len(decisions),
+            "reasons": dict(Counter(str(row.get("reason") or "unavailable") for row in decisions)),
+            "complete": bool(audits) and all(audit.get("complete") is True and audit.get("turn_count") == len(audit["turns"]) for audit in audits),
+            "policies": sorted({audit["ingestion_policy"] for audit in audits}),
+            "scope": "one canonical admission artifact per conversation; full decisions remain in child admission/*.json"}

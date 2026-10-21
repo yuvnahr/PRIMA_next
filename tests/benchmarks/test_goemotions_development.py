@@ -341,8 +341,12 @@ def test_delivery_freezes_safe_status_and_optional_non_admission():
     assert not status["correction_policy"]["admitted"] and status["correction_policy"]["allowed_edits"] == []
     assert status["correction_policy"]["preserve_labels_correction_gain"] == 0
     import hashlib
+
+    from benchmarks.common.source_identity import _git
+    # This is B3's immutable historical snapshot; later goals can change current source.
     for name, expected in status["source_file_sha256"].items():
-        assert hashlib.sha256((root / name).read_text(encoding="utf-8").encode()).hexdigest() == expected
+        source = _git(root, "show", f"e926c4f0286cc193e3026bd2323cde8f8c0d58f7:{name}")
+        assert hashlib.sha256(source.encode()).hexdigest() == expected
     contract = read_frozen_json(folder / "selection.json")
     assert status["selection_fingerprint"] == contract["fingerprint"]
     assert len(contract["prompt_templates"]) == 3

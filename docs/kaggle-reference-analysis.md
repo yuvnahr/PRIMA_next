@@ -8,7 +8,7 @@ not executed or edited. No new tests or benchmark runs were performed.
 
 The notebook records a run on 16–17 August 2026, Python 3.12.13, two Tesla T4s,
 and repository commit `6442fd58a0230ae0535827672ee583768eb92f11`. It fetched
-`master`; the current notebook instead clones only `3.10_to_3.14`.
+`master`; the notebook at that review used `3.10_to_3.14`. The current implementation requires reviewed `dev` at an explicit agreed SHA; these old timings do not admit it.
 
 | Observation | Saved value | Interpretation |
 |---|---:|---|

@@ -291,7 +291,7 @@ class _BoundedProvider(Provider):
             "prompt_tokens": prompt,
             "completion_tokens": completion,
             "total_tokens": prompt + completion,
-            "token_scope": "successful_uncached_provider_requests",
+            "token_scope": "successful_uncached_provider_requests",  # nosec B105
             "actual_uncached_tokens": prompt + completion if tokens_complete else None,
             "observed_successful_uncached_tokens": prompt + completion,
             "actual_token_usage_complete": tokens_complete,

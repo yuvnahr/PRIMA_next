@@ -89,7 +89,8 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     store = CampaignManifestStore(config.output_root)
     manifest = store.read()
     assert len(manifest.preflight["runtime_config_fingerprint"]) == 64
-    assert manifest.repository == {"url": None, "requested_ref": None, "commit_sha": None}
+    assert manifest.repository == {"url": None, "requested_ref": None, "commit_sha": None,
+                                   "require_clean_pinned_source": False, "source_fingerprint": None}
     assert manifest.preflight["effective_generation"]["hotpot"]["structured_output"] == "json_schema"
     assert all(
         state.child_manifest and not Path(state.child_manifest).is_absolute()
@@ -109,6 +110,11 @@ def test_smoke_campaign_runs_three_canonical_benchmarks_and_resumes(tmp_path: Pa
     store.update_mode("hotpot", status="partial")
     second = run_campaign(config, resume=True)
     assert second["campaign_id"] == manifest.campaign_id
+    sessions = read_jsonl(config.output_root / "provider_sessions.jsonl")
+    assert len(sessions) == len({row["attempt_id"] for row in sessions}) == 2
+    assert second["telemetry"]["provider_session_history"]["complete"]
+    assert second["telemetry"]["provider_session_history"]["active_attempts"] == 2
+    assert all("prompt_tokens" in row["provider_session"] for row in sessions)
     checkpoint = config.output_root / "modes" / "hotpot" / "distractor" / "model_only" / "checkpoints" / "records.jsonl"
     case_ids = [row["case_id"] for row in read_jsonl(checkpoint)]
     assert len(case_ids) == len(set(case_ids)) == 2

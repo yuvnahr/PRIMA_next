@@ -109,6 +109,7 @@ def run_goemotions_experiment(
     model: str = DEFAULT_MODEL,
     system: str = DEFAULT_SYSTEM,
     prompt_variant: str = "definitions_schema",
+    comparison_mode: str = "same_response",
     split: str = "test",
     sample_manifest: Path | None = None,
     write_sample_manifest: Path | None = None,
@@ -122,6 +123,8 @@ def run_goemotions_experiment(
 ) -> dict[str, Any]:
     """Run a split-safe affect/classification campaign with per-example resume."""
 
+    if comparison_mode not in {"same_response", "prompt", "trained_baseline"}:
+        raise ValueError("Unsupported comparison mode")
     if prompt_variant not in PROMPT_VARIANTS:
         raise ValueError("Unsupported GoEmotions prompt variant")
     attempt_started = time.perf_counter()
@@ -189,6 +192,7 @@ def run_goemotions_experiment(
         seed,
         max_samples,
         bootstrap_samples,
+        comparison_mode=comparison_mode,
     )
     if resume:
         manifest = resume_manifest(store.read_manifest(), manifest)
@@ -300,6 +304,7 @@ def run_goemotions_experiment(
     failures = [record for record in all_records if record.get("execution_failed")]
     metrics = _metrics(records, labels, seed, bootstrap_samples, failures=failures, expected_dev_hash=expected_dev_hash)
     timer.record("metrics")
+    metrics["comparison_mode"] = comparison_mode
     metrics["failed_example_count"] = len(failures)
     metrics["selected_example_count"] = len(examples)
     metrics["completed_example_count"] = len(records)
@@ -502,6 +507,7 @@ def _manifest(
     seed: int,
     max_samples: int,
     bootstrap_samples: int,
+    comparison_mode: str = "same_response",
 ) -> BenchmarkManifest:
     commit = _git_commit()
     route = select_route(TaskKind.EMOTION_CLASSIFICATION, ExecutionProfile.AFFECT_ONLY)
@@ -528,6 +534,7 @@ def _manifest(
             "system": system.name,
             "system_family": system.system_family,
             "prompt_variant": getattr(system, "prompt_variant", "definitions_schema"),
+            "comparison_mode": comparison_mode,
             "label_audit_schema_version": LABEL_AUDIT_SCHEMA_VERSION,
             "label_policy_version": LABEL_POLICY_VERSION if system.system_family != "trained_encoder" else None,
             "legacy_correction_enabled": False,
@@ -783,14 +790,9 @@ def _dependencies() -> dict[str, str]:
 
 
 def _git_commit() -> str | None:
-    try:
-        head = Path(".git/HEAD").read_text(encoding="utf-8").strip()
-        if not head.startswith("ref: "):
-            return head or None
-        ref = Path(".git") / head.removeprefix("ref: ")
-        return ref.read_text(encoding="utf-8").strip() if ref.is_file() else None
-    except OSError:
-        return None
+    from benchmarks.common.source_identity import git_commit
+
+    return git_commit(Path(__file__).resolve().parents[2])
 
 
 def _progress_update(current: int, total: int, enabled: bool) -> None:
@@ -810,6 +812,7 @@ def main() -> None:
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--system", choices=SYSTEMS + tuple(SYSTEM_ALIASES), default=DEFAULT_SYSTEM)
+    parser.add_argument("--comparison-mode", choices=("same_response", "prompt", "trained_baseline"), default="same_response")
     parser.add_argument("--prompt-variant", choices=PROMPT_VARIANTS, default="definitions_schema")
     parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
     parser.add_argument("--sample-manifest", type=Path)

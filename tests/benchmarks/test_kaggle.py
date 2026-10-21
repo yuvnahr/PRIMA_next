@@ -222,7 +222,7 @@ def test_progress_detects_duplicates_and_malformed_tails(tmp_path):
 
 
 def sample():
-    return {"gpus": [{"index": i, "memory_used_mib": 12000, "utilization_percent": 50} for i in range(2)],
+    return {"gpus": [{"index": i, "name": "Tesla T4", "memory_used_mib": 12000, "utilization_percent": 50} for i in range(2)],
             "ram": {"total_bytes": 19 * 10**9, "available_bytes": 4 * 10**9,
                     "process_rss_bytes": {"123": 1000}}}
 
@@ -461,7 +461,7 @@ def test_notebook_contract_and_full_gate_no_launch_without_measurement():
     code = ["".join(c["source"]) for c in notebook["cells"] if c["cell_type"] == "code"]
     for cell in code:
         ast.parse(cell)
-    ns = {}
+    ns = {"math": __import__("math")}
     exec(code[0], ns)  # noqa: S102 - execute checked-in notebook config in an isolated namespace
     config = ns["CONFIG"]
     assert config["RUN_FULL_BENCHMARK"] is False
@@ -529,7 +529,7 @@ def test_notebook_updates_persisted_shallow_branch_without_discarding_local_comm
     def git(*args, cwd=remote):
         return subprocess.run([git_path, *args], cwd=cwd, check=True, capture_output=True, text=True)  # noqa: S603  # nosec B603 - fixed local Git fixture commands
 
-    branch = "3.10_to_3.14"
+    branch = "dev"
     git("init", "-q", "-b", branch)
     commit_args = ("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "-c", "commit.gpgsign=false",
                    "commit", "-qam", "fixture")
@@ -541,29 +541,37 @@ def test_notebook_updates_persisted_shallow_branch_without_discarding_local_comm
     tree = ast.parse(notebook["cells"][8]["source"])
     tree.body = tree.body[:next(i for i, node in enumerate(tree.body) if isinstance(node, ast.FunctionDef))]
     setup = compile(tree, "notebook-branch-setup", "exec")
-    ns = {"CONFIG": {"GIT_REF": branch, "REPOSITORY_URL": remote.as_uri()}, "REPOSITORY_DIR": checkout,
-          "subprocess": subprocess, "time": time,
+    first_head = git("rev-parse", "HEAD").stdout.strip()
+    ns = {"CONFIG": {"GIT_REF": branch, "REPOSITORY_URL": remote.as_uri(), "PINNED_COMMIT_SHA": first_head,
+                     "PERSON1_FINAL_CHECKPOINT": first_head}, "STATE": {}, "REPOSITORY_DIR": checkout,
+          "re": __import__("re"), "subprocess": subprocess, "time": time,
           "run_checked": lambda args, cwd=None, **kwargs: git(*args[1:], cwd=cwd or remote)}
     exec(setup, ns)  # noqa: S102 - checked-in Git setup only, local fixture origin
-    assert git("rev-parse", "--is-shallow-repository", cwd=checkout).stdout.strip() == "true"
+    assert git("rev-parse", "--is-shallow-repository", cwd=checkout).stdout.strip() == "false"
     source.write_text("upstream update\n")
     git(*commit_args)
     # Reproduce the old notebook's two disconnected grafted tips.
     git("fetch", "--depth", "1", "origin", f"+refs/heads/{branch}:refs/remotes/origin/{branch}", cwd=checkout)
     with pytest.raises(subprocess.CalledProcessError):
         git("merge", "--ff-only", f"origin/{branch}", cwd=checkout)
+    with pytest.raises(RuntimeError, match="differs from agreed SHA"):
+        exec(setup, ns)  # noqa: S102 - a new remote head cannot override the user's pin
+    assert git("rev-parse", "HEAD", cwd=checkout).stdout.strip() == first_head
+    ns["CONFIG"]["PINNED_COMMIT_SHA"] = git("rev-parse", "HEAD").stdout.strip()
     exec(setup, ns)  # noqa: S102
     assert (checkout / "owned.py").read_text() == "upstream update\n"
     assert git("rev-parse", "--is-shallow-repository", cwd=checkout).stdout.strip() == "false"
     source.write_text("another upstream update\n")
     git(*commit_args)
-    exec(setup, ns)  # noqa: S102 - subsequent non-shallow update must also work
+    ns["CONFIG"]["PINNED_COMMIT_SHA"] = git("rev-parse", "HEAD").stdout.strip()
+    exec(setup, ns)  # noqa: S102 - explicitly pinned subsequent non-shallow update
     assert (checkout / "owned.py").read_text() == "another upstream update\n"
     (checkout / "owned.py").write_text("local committed work\n")
     git(*commit_args, cwd=checkout)
     local_head = git("rev-parse", "HEAD", cwd=checkout).stdout.strip()
     source.write_text("divergent upstream update\n")
     git(*commit_args)
+    ns["CONFIG"]["PINNED_COMMIT_SHA"] = git("rev-parse", "HEAD").stdout.strip()
     with pytest.raises(subprocess.CalledProcessError):
         exec(setup, ns)  # noqa: S102 - retain fast-forward-only refusal for local commits
     assert git("rev-parse", "HEAD", cwd=checkout).stdout.strip() == local_head
@@ -573,7 +581,7 @@ def test_notebook_updates_persisted_shallow_branch_without_discarding_local_comm
 def notebook_namespace(*, smoke=False):
     """Load only definitions from checked-in cells; never run setup or inference cells."""
     notebook = json.loads((REPO / "PRIMA_Kaggle_Benchmark.ipynb").read_text(encoding="utf-8"))
-    ns = {}
+    ns = {"math": __import__("math")}
     exec("".join(notebook["cells"][2]["source"]), ns)  # noqa: S102 - trusted notebook definitions
     ns["CONFIG"]["SMOKE_MODE"] = smoke
     ns["CONFIG"]["INFERENCE_TOPOLOGY"] = "shared"
@@ -641,7 +649,7 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     ns["CONFIG"]["FULL_RUN_ID"] = "synthetic-full"
     ns.update(SELECTED_DATASET=dataset, conversations=list(LoCoMoDataset(dataset).conversations()),
               dataset_summary={"items": 6, "sha256": fingerprint(dataset)}, STATE={
-                  "repository": {"url": "https://example.invalid", "requested_ref": "test", "commit_sha": git_commit()},
+                  "repository": {"url": "https://example.invalid", "requested_ref": "dev", "commit_sha": git_commit()},
                   "model_identity": {"name": "fake", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "mode_id": "locomo-prima",
                   "ollama_parallel_slots": 1, "timing_started": time.monotonic(),
@@ -669,7 +677,8 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     ns["subprocess"] = types.SimpleNamespace(Popen=FakeProcess, STDOUT=subprocess.STDOUT,
                                             TimeoutExpired=subprocess.TimeoutExpired)
     monkeypatch.setattr(time, "sleep", lambda _: None)
-    ns["safety_sample"] = lambda started, process=None: {**sample(), "timestamp": "synthetic", "elapsed_seconds": 1}
+    observed_times = iter(index / 10 for index in range(1, 1000))
+    ns["safety_sample"] = lambda started, process=None: {**sample(), "timestamp": "synthetic", "elapsed_seconds": next(observed_times)}
     ns["check_safety"] = resource_guard
     config, config_path, root, _ = ns["build_campaign_config"]("canary-1", full=False, max_items=2)
     samples, log, wall = ns["execute_campaign"](config_path, root, 4, fresh=True)

@@ -1,5 +1,21 @@
 # Plan: complete each benchmark in one 12-hour Kaggle session
 
+## Current execution contract (21 October 2026)
+
+The Goal 4 handoff and [campaign runbook](benchmarks/RUNBOOK.md) supersede the
+operating instructions below. Historical timings remain observations for their
+recorded source/model/configuration; they do not admit the repaired runtime.
+Use reviewed `dev` with an explicitly agreed `PINNED_COMMIT_SHA`, an immutable
+executed-notebook input, one shared pinned 27B model and one worker initially.
+Full execution defaults off. Unknown/one backend slot retains one worker;
+HTTP request overlap is not evidence of concurrent model execution. Optional
+repeated pilots require equal native outcomes, an unambiguous measured wall win,
+a passing budget and successful backend restoration. LoCoMo CPU overlap with
+serialized inference is labeled separately. Report the actual sampling gaps;
+a configured cadence is not a guarantee. Live quota, fresh source/config/model/
+data identities, 20% margin and a 900-second reserve are mandatory. Current
+LoCoMo and learned-policy candidates remain unpromoted pending measured gates.
+
 Use one separate two-T4 session for LoCoMo, HotpotQA and GoEmotions. The goal
 is every source example scored and packaged within that session. Dataset
 coverage, native evaluation, evidence checks, maintenance barriers and durable
@@ -18,13 +34,12 @@ pinned Qwen3.8 27B, 8192 context and two T4 GPUs. Both representative pilots
 completed the same 30 questions with zero execution failures and complete
 maintenance. The native equality check passed all 30 predictions, evidence
 and evaluation decisions. The concurrent pilot observed two active requests;
-its resource checks and partial artifact validation passed.
+its resource checks and partial artifact validation passed. This is request overlap; it does not establish backend inference slots or simultaneous model execution.
 
 The admitted two-worker estimate is **9.2202 campaign hours**, including the
 20% safety margin and 900-second artifact reserve. Rechecking the native gate
 after result inspection gave **10.1859 total session hours** and `allowed=true`.
-This supports starting a full LoCoMo run, not a claim that full completion has
-already been observed. A new session must obtain its own fresh measurements.
+That historical gate applied to its recorded configuration and does not admit the repaired runtime or establish full completion. A new session must obtain its own fresh measurements.
 The one-worker estimate was 11.5958 campaign hours and remains inadmissible.
 
 On the same 15 cases as the previous pilot, native F1 was 14.10% versus 15.18%,
@@ -247,13 +262,13 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
 ## Implementation order
 
 1. **Commit and publish the prepared setup/guard fixes.** Clone only
-   `3.10_to_3.14`, capture its commit, generate fresh run IDs, reuse cached
+   `dev` after human review, require the agreed exact SHA, generate fresh run IDs, reuse cached
    model weights, keep the model resident and retain all full-coverage gates.
    spaCy now loads once per worker instead of attempting a load repeatedly.
    Use existing caches for smoke; do not download large resources to hide a
    missing-cache blocker. The notebook now installs `requirements-kaggle.txt`
    for the native default profile, reusing compatible Kaggle packages without
-   upgrades. HF/encoder backends or BERTScore explicitly select the full list.
+   upgrades. CPU learned retrieval selects the minimal optional retrieval list and verified local snapshots. Encoder work and BERTScore require separately budgeted phases.
 
 2. **Remove repeated CPU work before increasing GPU workers.** Source
    inspection found that runtime trace assembly copies/scans the complete
@@ -289,7 +304,7 @@ Do not substitute guessed dataset counts or tiny-smoke throughput.
 4. **Enable measured concurrency for the other native runners.** HotpotQA
    already constructs isolated runtimes per independent case. GoEmotions has
    thread-local runtime/source state and a native parallel worker path.
-   Start with two workers; update the campaign admission gate, notebook
+   Start with one worker; update the measured admission gate, notebook
    pilot and benchmark-specific equality checks together. HotpotQA equality
    must include answer/supporting facts and reasoning outcomes; GoEmotions
    must include raw response, baseline/final labels and bounded decisions.

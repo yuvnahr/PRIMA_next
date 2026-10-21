@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 from benchmarks.goemotions.dataset import GoEmotionsExample, load_examples, load_labels
 
@@ -15,7 +16,7 @@ def load_split(data_dir: Path, split: str) -> list[GoEmotionsExample]:
     return load_examples(data_dir / f"{split}.tsv", data_dir / "emotions.txt")
 
 
-def validate_splits(data_dir: Path) -> dict[str, object]:
+def validate_splits(data_dir: Path) -> dict[str, Any]:
     labels = load_labels(data_dir / "emotions.txt")
     splits = {name: load_split(data_dir, name) for name in ("train", "dev", "test")}
     ids = {name: {row.example_id for row in rows} for name, rows in splits.items()}
@@ -29,7 +30,7 @@ def validate_splits(data_dir: Path) -> dict[str, object]:
     if any(overlap.values()):
         raise ValueError("GoEmotions split ID leakage detected.")
     texts = {name: {row.text for row in rows} for name, rows in splits.items()}
-    result = {
+    result: dict[str, Any] = {
         "labels": labels,
         "label_sha256": hashlib.sha256((data_dir / "emotions.txt").read_bytes()).hexdigest(),
         "exact_text_overlap": {

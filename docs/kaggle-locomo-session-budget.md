@@ -1,5 +1,21 @@
 # Kaggle LoCoMo session budget
 
+## Current execution contract (21 October 2026)
+
+The Goal 4 handoff and [campaign runbook](benchmarks/RUNBOOK.md) supersede the
+operating instructions below. Historical timings remain observations for their
+recorded source/model/configuration; they do not admit the repaired runtime.
+Use reviewed `dev` with an explicitly agreed `PINNED_COMMIT_SHA`, an immutable
+executed-notebook input, one shared pinned 27B model and one worker initially.
+Full execution defaults off. Unknown/one backend slot retains one worker;
+HTTP request overlap is not evidence of concurrent model execution. Optional
+repeated pilots require equal native outcomes, an unambiguous measured wall win,
+a passing budget and successful backend restoration. LoCoMo CPU overlap with
+serialized inference is labeled separately. Report the actual sampling gaps;
+a configured cadence is not a guarantee. Live quota, fresh source/config/model/
+data identities, 20% margin and a 900-second reserve are mandatory. Current
+LoCoMo and learned-policy candidates remain unpromoted pending measured gates.
+
 The supervised October 5 run at `c6e11648` completed the fresh 15-question
 sequential canary in 415.5 seconds. Its full-history, full-coverage projection
 was **16.9800 hours for the campaign** and **17.3781 hours for that session**,
@@ -74,34 +90,21 @@ The notebook now defaults to an isolated two-example smoke mode. See
 steps and limitations. The production timing steps below require
 `SMOKE_MODE=False` in a new session.
 
-1. Publish the accompanying notebook/campaign/runtime changes to
-   `3.10_to_3.14` before uploading the notebook. Setup clones only that branch
-   with `--single-branch --branch 3.10_to_3.14`, keeps it checked out, and records
-   its exact fetched commit for all subsequent identity checks. There is no
-   commit/tag override or detached checkout. Verify the expected model digest
-   and dataset hash. `FULL_RUN_ID` is generated automatically for a fresh run;
-   supply an existing ID only for intentional partial resume.
-2. For an unattended production session, set `SMOKE_MODE=False` and
-   `RUN_FULL_BENCHMARK=True` in the initial configuration, then run all cells.
-   This authorizes automatic full execution only if every measured admission
-   gate passes. For staged review, keep `RUN_FULL_BENCHMARK=False` until after
-   the pilots and set it to true immediately before the full-run cell.
-   The initial server uses one model slot. Context reduction and CPU offload
-   are forbidden.
-3. Run the fresh sequential canary. The default sample is three conversations
-   selected by the original seed-shuffled runner and five ordered questions
-   **per conversation** (normally 15 questions). Each sampled conversation
-   replays every historical turn. The separate default smoke mode does not
-   provide representative timing evidence for this production gate.
-4. The enabled throughput pilot repeats exactly the same IDs in a fresh
-   namespace with two isolated conversation workers and two model slots.
-   Each conversation still processes turns and questions serially. Predictions,
-   outcomes and evidence/evaluation decisions must match the sequential run.
-   Provider telemetry must show two actually overlapping requests. A failed,
-   changed-prediction or slower pilot retains/restores one-worker execution.
-5. The full-run cell requires a passing timing/budget report and the full-run
-   flag. It rechecks live repository/model/dataset identities, unchanged
-   effective config, full selected IDs, resources and elapsed session time.
+1. After human review, use the integrated `dev` commit and enter its exact
+   `PINNED_COMMIT_SHA`; no automatic publication or implicit latest-head update.
+   Keep the model digest/context/output fixed. Pin the uploaded notebook input.
+2. Keep full execution off. The current LoCoMo candidate also requires a hashed,
+   reviewed promotion manifest with matched answerable official-F1/adversarial,
+   citation/failure/read-only-QA and integrated resource/time evidence.
+3. Run a fresh one-worker canary on three complete histories and ten ordered
+   questions each. Tiny smoke is a separate two-example wiring check.
+4. Optional two-client trials use fixed native IDs and repeated timings.
+   Slower/noisy results, unknown backend slots, outcome changes or failed budgets
+   retain one. CPU overlap with a single inference queue is an explicit LoCoMo
+   experiment. Never infer model slots from requested settings or HTTP overlap.
+5. Restore/re-preflight the selected backend. Recheck actual source/model/data/
+   config, sampling coverage, remaining session time and live quota. Count setup,
+   downloads, pilots, restore, reports and export; reserve is counted once.
 
 Canary and pilot namespaces include a unique session suffix and **never
 resume**. An existing canary root fails before launch. Full campaigns resume
@@ -135,7 +138,7 @@ model, with full GPU residency and unchanged context. RAM planning uses
 stricter measured cgroup limit. RAM measurement failure blocks execution.
 Resource violations stop the campaign/model and leave recoverable checkpoints.
 
-GPU/RAM safety sampling remains at most two seconds apart. Progress renders
+GPU/RAM sampling uses monotonic deadlines and records actual gaps; missed two-second deadlines fail closed rather than being described as a cadence guarantee. Progress renders
 every 30 seconds by default and consumes only appended checkpoint bytes.
 Samples include used GPU memory/utilization, system available memory,
 process-tree RSS and cgroup usage/limit where available. They are appended,
