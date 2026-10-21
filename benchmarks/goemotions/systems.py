@@ -22,6 +22,9 @@ from llm.llm_client import LLMClient
 from runtime.contracts import ExecutionOutcome, ExecutionProfile, PrimaRequest, RuntimeComponent, TaskKind
 from runtime.prima_runtime import PrimaRuntime
 
+LABEL_POLICY_VERSION = "preserve_labels_v1"
+LABEL_AUDIT_SCHEMA_VERSION = "1.0"
+
 
 @dataclass(frozen=True, slots=True)
 class ClassifierSettings:
@@ -83,6 +86,24 @@ class _LLMPredictionSource:
             "baseline_labels": sorted(selected),
             "baseline_parse_error": parse_error,
             "baseline_empty_output": not response.text.strip(),
+            "raw_model_response": response.text,
+            "final_scored_labels": sorted(selected),
+            "label_audit_schema_version": LABEL_AUDIT_SCHEMA_VERSION,
+            "label_policy_version": LABEL_POLICY_VERSION,
+            "parse_recovery": {
+                "applied": parse_error is not None,
+                "labels": ["neutral"] if parse_error else [],
+                "scope": "runtime_only_not_scored",
+            },
+            "label_correction": {
+                "policy_version": LABEL_POLICY_VERSION,
+                "evidence_source": "unavailable",
+                "accepted": False,
+                "added_labels": [],
+                "removed_labels": [],
+                "reason": "baseline_parse_failure" if parse_error else "no_validated_correction_policy",
+                "preserved_baseline": True,
+            },
         }
         return _prediction_from_labels(selected or frozenset({"neutral"}), self.generation.model)
 
@@ -103,12 +124,10 @@ class _StaticPredictionSource:
 
 @dataclass(slots=True)
 class _BoundedLLMPredictionSource(_LLMPredictionSource):
-    """Transform one model response before it reaches the runtime affect engine."""
+    """Audit the disabled legacy heuristic without changing the model label set."""
 
     def predict(self, text: str) -> EmotionPrediction:
         baseline_prediction = _LLMPredictionSource.predict(self, text)
-        raw_model_response = self.last_raw
-        baseline = set(self.last_metadata.get("baseline_labels", []))
         profile = LegacyAffectClassifier().classify(text)
         candidate = profile.dominant_emotion
         derived = (
@@ -116,38 +135,22 @@ class _BoundedLLMPredictionSource(_LLMPredictionSource):
             if profile.emotional_keywords and candidate in {"anger", "disgust", "fear", "joy", "sadness", "surprise"}
             else set()
         )
-        final = set(baseline)
-        reason = "preserve_model_labels"
-        if (not baseline or baseline == {"neutral"}) and derived:
-            final.update(derived)
-            reason = "add_bounded_lexical_emotion"
-        elif not baseline:
-            final.add("neutral")
-            reason = "recover_parse_failure_as_neutral"
-        self.last_raw = json.dumps({"labels": sorted(final)})
+        decision = {
+            **self.last_metadata["label_correction"],
+            "evidence_source": profile.evidence_source,
+            "reason": "unvalidated_legacy_correction_suppressed",
+        }
         self.last_metadata.update(
             {
-                "raw_model_response": raw_model_response,
                 "affect_derived_labels": sorted(derived),
-                "final_scored_labels": sorted(final),
-                "affect_decision": {
-                    "added_labels": sorted(final - baseline),
-                    "removed_labels": sorted(baseline - final),
-                    "reason": reason,
-                    "preserved_baseline": final == baseline,
-                },
-                "prima_decision": {
-                    "added_labels": sorted(final - baseline),
-                    "removed_labels": sorted(baseline - final),
-                    "reason": {
-                        "add_bounded_lexical_emotion": "add_prima_lexical_emotion",
-                        "preserve_model_labels": "preserve_qwen_labels",
-                    }.get(reason, reason),
-                    "preserved_baseline": final == baseline,
-                },
+                "legacy_policy_version": "bounded_lexical_v0",
+                "legacy_policy_enabled": False,
+                "label_correction": decision,
+                "affect_decision": dict(decision),
+                "prima_decision": dict(decision),
             }
         )
-        return _prediction_from_labels(frozenset(final), baseline_prediction.model_id)
+        return baseline_prediction
 
 
 @dataclass(slots=True)
@@ -200,20 +203,26 @@ class _RuntimeClassificationSystem:
         if response.outcome is not ExecutionOutcome.CLASSIFIED or prediction is None:
             raise RuntimeError(f"Canonical emotion-classification route failed: {response.errors}")
         forbidden = {
+            RuntimeComponent.QUERY_REWRITER,
             RuntimeComponent.DENSE_RETRIEVAL,
             RuntimeComponent.SPARSE_RETRIEVAL,
+            RuntimeComponent.TEMPORAL_RETRIEVAL,
+            RuntimeComponent.GRAPH_TRAVERSAL,
             RuntimeComponent.GRAPH_REASONING,
+            RuntimeComponent.FUSION,
+            RuntimeComponent.RERANKER,
             RuntimeComponent.PLANNER,
             RuntimeComponent.WORLD_MODEL,
             RuntimeComponent.TOOL_EXECUTOR,
             RuntimeComponent.MODEL_EXECUTOR,
+            RuntimeComponent.REFLECTION,
         }
         if forbidden & set(response.diagnostics.executed_components):
             raise RuntimeError("GoEmotions activated a component outside the bounded affect route.")
         return source.last_raw, {
             **source.last_metadata,
             "prediction": prediction.to_dict(),
-            "final_scored_labels": list(prediction.selected_labels),
+            "final_scored_labels": source.last_metadata.get("final_scored_labels", list(prediction.selected_labels)),
             "system_name": self.name,
             "system_family": self.system_family,
             "runtime": {
@@ -264,7 +273,7 @@ class AffectTelemetrySystem(SchemaConstrainedModelOnlySystem):
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
         raw, metadata = SchemaConstrainedModelOnlySystem.predict(self, text, labels)
         baseline = metadata.get("baseline_labels", [])
-        decision = {"added_labels": [], "removed_labels": [], "reason": "telemetry_only_preserve_model_labels"}
+        decision = {**metadata["label_correction"], "reason": "telemetry_only_preserve_model_labels"}
         metadata.update(
             {
                 "final_scored_labels": list(baseline),
@@ -272,12 +281,12 @@ class AffectTelemetrySystem(SchemaConstrainedModelOnlySystem):
                 "prima_decision": {**decision, "reason": "telemetry_only_preserve_qwen"},
             }
         )
-        return json.dumps({"labels": baseline}), metadata
+        return raw, metadata
 
 
 @dataclass(slots=True)
 class BoundedAffectDecisionSystem(SchemaConstrainedModelOnlySystem):
-    """Apply only a bounded lexical affect correction to the same model response."""
+    """Deprecated legacy entry point; v1 preserves labels and disables lexical edits."""
 
     name: str = "bounded_prima_affect_decision"
     system_family: str = "bounded_affect_decision"
@@ -322,6 +331,7 @@ class EncoderSystem(_RuntimeClassificationSystem):
                             "system_family": "trained_baseline",
                             "wrapper_attribution": False,
                             "probabilities_available": True,
+                            "evidence_source": "trained_probability",
                         },
                     ),
                 )

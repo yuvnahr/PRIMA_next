@@ -52,6 +52,8 @@ from benchmarks.goemotions.metrics import (
 from benchmarks.goemotions.prompts import build_prompt
 from benchmarks.goemotions.schemas import parse_label_response
 from benchmarks.goemotions.systems import (
+    LABEL_AUDIT_SCHEMA_VERSION,
+    LABEL_POLICY_VERSION,
     AffectTelemetrySystem,
     BoundedAffectDecisionSystem,
     ClassifierSettings,
@@ -69,6 +71,7 @@ from runtime.route_profiles import select_route
 
 OUTPUT_PATH = Path("evaluation/goemotions")
 DEFAULT_MODEL = "qwen3.5:4b"
+DEFAULT_SYSTEM = "affect_telemetry_preserve_labels"
 SYSTEM_ALIASES = {
     "qwen_zero_shot": "model_only_zero_shot",
     "qwen_definitions": "schema_constrained_model_only",
@@ -99,7 +102,7 @@ def run_goemotions_experiment(
     parallel_workers: int = 1,
     provider: str = "ollama",
     model: str = DEFAULT_MODEL,
-    system: str = "model_only_zero_shot",
+    system: str = DEFAULT_SYSTEM,
     split: str = "test",
     sample_manifest: Path | None = None,
     write_sample_manifest: Path | None = None,
@@ -329,12 +332,19 @@ def _classify_response(
     final = metadata.get("final_scored_labels")
     if isinstance(final, list) and all(isinstance(value, str) and value in labels for value in final):
         predicted = frozenset(final)
-    response_hash = hashlib.sha256(
-        str(metadata.get("raw_model_response", raw_response)).encode("utf-8")
-    ).hexdigest()
+    raw_model_response = str(metadata.get("raw_model_response", raw_response))
+    response_hash = hashlib.sha256(raw_model_response.encode("utf-8")).hexdigest()
     recorded_hash = metadata.get("raw_model_response_hash")
     if recorded_hash is not None and str(recorded_hash) != response_hash:
         raise ValueError("GoEmotions paired scoring refused: cached raw-response hashes do not match")
+    if "baseline_labels" in metadata:
+        baseline, baseline_error = _parse_labels(raw_model_response, labels)
+        if baseline != frozenset(metadata["baseline_labels"]):
+            raise ValueError("GoEmotions paired scoring refused: baseline labels do not match the raw response")
+        metadata = {**metadata, "baseline_parse_error": baseline_error}
+        parse_error = baseline_error or parse_error
+        if metadata.get("label_policy_version") == LABEL_POLICY_VERSION and predicted != baseline:
+            raise ValueError("GoEmotions preserve-label policy refused a changed label set")
     return {
         "id": example.example_id,
         "text": example.text,
@@ -345,6 +355,7 @@ def _classify_response(
         "response_hash": response_hash,
         **metadata,
         "parse_error": parse_error,
+        "same_response_comparison_eligible": "baseline_labels" in metadata and parse_error is None,
         "latency_ms": latency_ms,
         "execution_failed": False,
     }
@@ -397,14 +408,20 @@ def _metrics(
         metrics["baseline_empty_output_count"] = sum(baseline_empty)
         metrics["baseline_empty_output_rate"] = sum(baseline_empty) / len(records) if records else 0.0
         metrics["paired_outcome_groups"] = paired_outcomes(gold, baseline, predicted, parse_errors)
-        if any(record.get("system_family") == "bounded_affect_decision" for record in records):
-            comparable = [index for index, failed in enumerate(parse_errors) if not failed]
+        if any(record.get("system_family") in {"affect_telemetry", "bounded_affect_decision"} for record in records):
+            comparable = [
+                index for index, failed in enumerate(parse_errors)
+                if not failed and "baseline_labels" in records[index]
+                and records[index].get("parse_error") is None
+                and records[index].get("same_response_comparison_eligible", True)
+            ]
             comparable_gold = [gold[index] for index in comparable]
             comparable_baseline = [baseline[index] for index in comparable]
             comparable_final = [predicted[index] for index in comparable]
             metrics["headline_affect_comparison"] = {
                 "excludes_parse_recovery": True,
                 "sample_count": len(comparable),
+                "excluded_count": len(records) - len(comparable),
                 "baseline": evaluate(comparable_gold, comparable_baseline, labels) if comparable else {},
                 "final": evaluate(comparable_gold, comparable_final, labels) if comparable else {},
                 "paired_bootstrap_sample_f1": paired_bootstrap_sample_f1(
@@ -450,6 +467,9 @@ def _manifest(
         benchmark_config={
             "system": system.name,
             "system_family": system.system_family,
+            "label_audit_schema_version": LABEL_AUDIT_SCHEMA_VERSION,
+            "label_policy_version": LABEL_POLICY_VERSION if system.system_family != "trained_encoder" else None,
+            "legacy_correction_enabled": False,
             "split": split,
             "dataset_scope": "full_split" if split_count == len(examples) else "sample",
             "max_samples": max_samples,
@@ -685,7 +705,7 @@ def main() -> None:
     parser.add_argument("--parallel-workers", type=int, default=1)
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--system", choices=SYSTEMS + tuple(SYSTEM_ALIASES), default="model_only_zero_shot")
+    parser.add_argument("--system", choices=SYSTEMS + tuple(SYSTEM_ALIASES), default=DEFAULT_SYSTEM)
     parser.add_argument("--split", choices=("train", "dev", "test"), default="test")
     parser.add_argument("--sample-manifest", type=Path)
     parser.add_argument("--write-sample-manifest", type=Path)

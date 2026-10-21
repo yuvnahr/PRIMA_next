@@ -1,0 +1,11 @@
+[
+  {"id": "hash-neighbour", "text": "The book is on the table.", "raw": "{\"labels\":[\"neutral\"]}", "expected": ["neutral"], "evidence_source": "hash_neighbour"},
+  {"id": "literal-disagreement", "text": "I am angry.", "raw": "{\"labels\":[\"neutral\"]}", "expected": ["neutral"], "evidence_source": "literal_span"},
+  {"id": "negation", "text": "I am not happy.", "raw": "{\"labels\":[\"joy\"]}", "expected": ["joy"], "evidence_source": "literal_span"},
+  {"id": "sarcasm", "text": "I am so happy to wait in traffic again, what a treat.", "raw": "{\"labels\":[\"annoyance\"]}", "expected": ["annoyance"], "evidence_source": "literal_span"},
+  {"id": "mixed-neutral", "text": "I am happy, and that is all.", "raw": "{\"labels\":[\"neutral\",\"joy\"]}", "expected": ["joy", "neutral"], "evidence_source": "literal_span"},
+  {"id": "empty", "text": "I am angry.", "raw": "", "expected": [], "evidence_source": "literal_span"},
+  {"id": "malformed", "text": "The book is on the table.", "raw": "not JSON", "expected": [], "evidence_source": "hash_neighbour"},
+  {"id": "duplicate-label", "text": "I am happy.", "raw": "{\"labels\":[\"joy\",\"joy\"]}", "expected": [], "evidence_source": "literal_span"},
+  {"id": "unknown-label", "text": "I am happy.", "raw": "{\"labels\":[\"unknown\"]}", "expected": [], "evidence_source": "literal_span"}
+]

@@ -156,9 +156,10 @@ def test_prima_qwen_is_order_independent_and_auditable(monkeypatch) -> None:
         text: result[0] for text, result in reverse.items()
     }
     angry = forward["I am angry."]
-    assert set(json.loads(angry[0])["labels"]) == {"anger", "neutral"}
-    assert angry[1]["prima_decision"]["reason"] == "add_prima_lexical_emotion"
-    assert forward["I am happy."][1]["prima_decision"]["reason"] == "preserve_qwen_labels"
+    assert set(json.loads(angry[0])["labels"]) == {"neutral"}
+    assert angry[1]["prima_decision"]["reason"] == "unvalidated_legacy_correction_suppressed"
+    assert forward["I am happy."][1]["prima_decision"]["preserved_baseline"]
+    assert angry[1]["legacy_policy_enabled"] is False
 
 
 def test_prima_telemetry_preserves_qwen_labels(monkeypatch) -> None:
@@ -189,8 +190,11 @@ def test_bounded_layer_reports_parse_recovery_separately(monkeypatch) -> None:
     monkeypatch.setattr("llm.llm_client.LLMClient.chat", lambda self, prompt, **kwargs: LLMResponse(text="", raw={}))
     raw, metadata = PrimaQwenSystem().predict("I am angry.", list(LABELS))
     assert metadata["baseline_parse_error"]
-    assert set(json.loads(raw)["labels"]) == {"anger"}
-    assert metadata["affect_decision"]["reason"] == "add_bounded_lexical_emotion"
+    assert raw == ""
+    assert metadata["final_scored_labels"] == []
+    assert metadata["prediction"]["selected_labels"] == ["neutral"]
+    assert metadata["parse_recovery"]["scope"] == "runtime_only_not_scored"
+    assert metadata["affect_decision"]["accepted"] is False
 
 
 def test_trained_baseline_uses_canonical_classification_route() -> None:

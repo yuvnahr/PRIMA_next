@@ -1,6 +1,10 @@
 # GoEmotions
 
-`qwen_zero_shot` is the label-names-only baseline, `qwen_definitions` adds the official definitions, and `qwen_schema` also constrains Ollama output. `qwen_with_prima_telemetry` preserves Qwen labels while recording an independent PRIMA update. `prima_qwen` scores a documented PRIMA augmentation of the same schema-constrained Qwen labels. Every Reddit comment receives fresh affect state.
+The default is `affect_telemetry_preserve_labels`: the existing schema-constrained `AffectTelemetrySystem` runs the affect-only classification route and preserves the model's parsed labels, including neutral-plus-emotion combinations. `model_only_zero_shot` is the label-names-only baseline; `schema_constrained_model_only` adds taxonomy definitions and schema constraints. Neither uses a semantic correction policy.
+
+`qwen_zero_shot`, `qwen_definitions`, `qwen_schema` and `qwen_with_prima_telemetry` remain compatibility aliases. `prima_qwen` / `bounded_prima_affect_decision` are deprecated entry points: new runs explicitly record `label_policy_version=preserve_labels_v1`, `legacy_policy_version=bounded_lexical_v0` and `legacy_policy_enabled=false`. The historical unversioned bounded experiment added lexical/hash-derived labels; old records retain that meaning. New runs suppress that heuristic, including literal-word and negation-based changes. Do not pool old/new policies by system name alone.
+
+Each response retains its original text/hash, baseline/final labels, parse error, correction decision and evidence source. `label_correction` is the canonical audit; `affect_decision` and `prima_decision` remain compatibility views, not runtime reflection. A neutral fallback may keep runtime telemetry operating after malformed output, but it is explicitly `runtime_only_not_scored`: parsing still fails, scored labels remain empty and the record is excluded from the valid same-response headline. QA, retrieval, planning, tools and runtime reflection are outside this route.
 
 Learned backends are opt-in via `PRIMA_AFFECT_BACKEND=goemotions_pretrained` or `goemotions_deberta`; otherwise PRIMA keeps `LegacyAffectClassifier`.
 
@@ -15,18 +19,18 @@ Create the fixed diagnostic development manifest and run a 20-example smoke:
 
 ```powershell
 .venv\Scripts\python.exe -m benchmarks.goemotions.smoke
-.venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system prima_qwen --provider ollama --model qwen3.5:4b --split dev --sample-manifest evaluation/goemotions/smoke/dev_diagnostic_manifest.json --output-path evaluation/goemotions/smoke/repaired_dev20_prima --seed 13 --parallel-workers 1
+.venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system affect_telemetry_preserve_labels --provider ollama --model qwen3.5:4b --split dev --sample-manifest evaluation/goemotions/smoke/dev_diagnostic_manifest.json --output-path evaluation/goemotions/smoke/preserve_dev20 --seed 13 --parallel-workers 1
 ```
 
 This manifest deliberately covers neutral combinations, multilabel rows, rare labels, and commonly confused labels. It is for interface validation, not model selection.
 
-`prima_qwen` reports its same-response Qwen baseline beside the final PRIMA metrics. Use that comparison for PRIMA attribution: separate Ollama runs can vary slightly despite a fixed seed and temperature zero. The current PRIMA augmentation is deliberately narrow (lexical evidence for six core emotions); validate any expansion on the full development split before evaluating the untouched test split.
+The preserve-label default reports its same-response baseline beside the final metrics; its correction gain is zero. Separate provider runs can vary despite a fixed seed and temperature zero. No replacement policy is enabled. A future policy requires pinned trained per-label scores, dev-only calibration/threshold identities, predeclared allowed edits/margins, paired benefit with acceptable per-label harm and integrated cost. The test split has prior review exposure and must not tune the policy. See `docs/goemotions-kaggle-remediation.md` for the Goal 1 evidence and later prerequisites.
 
 Full development validation:
 
 ```powershell
 .venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system qwen_schema --provider ollama --model qwen3.5:4b --split dev --output-path evaluation/goemotions/dev/qwen_schema --seed 13 --parallel-workers 1
-.venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system prima_qwen --provider ollama --model qwen3.5:4b --split dev --output-path evaluation/goemotions/dev/prima_qwen --seed 13 --parallel-workers 1
+.venv\Scripts\python.exe -m benchmarks.goemotions.experiment --system affect_telemetry_preserve_labels --provider ollama --model qwen3.5:4b --split dev --output-path evaluation/goemotions/dev/preserve_labels --seed 13 --parallel-workers 1
 ```
 
 The locally frozen TF-IDF PRIMA candidate is ignored by Git. Build it once, then run its full test split with:
