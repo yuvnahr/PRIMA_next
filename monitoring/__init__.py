@@ -7,6 +7,7 @@ application can import helpers without depending directly on OpenTelemetry.
 from .health_checks import check_health
 from .metrics import create_counter
 from .telemetry import init_telemetry
-from .tracing import get_tracer, init_tracing
+from .tracing import configure_tracing, get_tracer, init_tracing, shutdown_tracing
 
-__all__ = ["create_counter", "init_tracing", "get_tracer", "check_health", "init_telemetry"]
+__all__ = ["create_counter", "init_tracing", "get_tracer", "check_health", "init_telemetry",
+           "configure_tracing", "shutdown_tracing"]

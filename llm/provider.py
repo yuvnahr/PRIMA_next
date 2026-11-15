@@ -312,10 +312,11 @@ class OllamaProvider(Provider):
         response = parse_generic_response(raw, provider=self.name)
         if isinstance(raw, dict):
             response.usage = {
-                "prompt_tokens": int(raw.get("prompt_eval_count", 0)),
-                "completion_tokens": int(raw.get("eval_count", 0)),
-                "total_tokens": int(raw.get("prompt_eval_count", 0)) + int(raw.get("eval_count", 0)),
+                name: raw[key] for key, name in (("prompt_eval_count", "prompt_tokens"), ("eval_count", "completion_tokens"))
+                if type(raw.get(key)) is int and raw[key] >= 0
             }
+            if "prompt_tokens" in response.usage and "completion_tokens" in response.usage:
+                response.usage["total_tokens"] = response.usage["prompt_tokens"] + response.usage["completion_tokens"]
             for source, field in (
                 ("load_duration", "model_load_duration_ns"),
                 ("prompt_eval_duration", "prompt_eval_duration_ns"),

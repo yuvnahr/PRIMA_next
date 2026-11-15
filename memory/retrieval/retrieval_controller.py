@@ -22,6 +22,8 @@ from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_strategy import RetrievalStrategy
 from memory.retrieval.sparse_strategy import SparseRetrievalStrategy
 from memory.retrieval.temporal_strategy import TemporalRetrievalStrategy
+from monitoring.runtime_spans import record_retrieval
+from monitoring.tracing import span
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
 SEMANTIC_BOOST_WEIGHT = 0.08
@@ -65,6 +67,12 @@ class RetrievalController:
         self.candidate_pool_size = max(1, candidate_pool_size)
 
     def retrieve(self, request: RetrievalRequest) -> RetrievalResponse:
+        with span("memory_retrieval") as observation:
+            result = self._retrieve(request)
+            record_retrieval(observation, result)
+            return result
+
+    def _retrieve(self, request: RetrievalRequest) -> RetrievalResponse:
         request = self._prepare_request(request)
         if request.profile == "prima_full":
             self.memory_index.ensure_graph_index()

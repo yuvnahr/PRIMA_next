@@ -65,6 +65,12 @@ def test_ollama_payload_preserves_system_schema_and_generation_config(monkeypatc
     assert response.usage == {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}
 
 
+def test_ollama_omits_usage_not_reported_by_provider(monkeypatch) -> None:
+    monkeypatch.setattr("llm.provider.post_json", lambda *args, **kwargs: {"response": "ok"})
+    response = OllamaProvider(settings=_settings()).send(_request("ollama"))
+    assert response.usage == {}
+
+
 def test_openai_payload_preserves_system_schema_and_seed(monkeypatch) -> None:
     captured = {}
 

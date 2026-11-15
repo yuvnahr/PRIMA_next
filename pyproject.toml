@@ -83,6 +83,7 @@ module = [
     "action.*",
     "benchmarks.common.*",
     "benchmarks.preflight",
+    "demo_cli.*",
     "events.*",
     "llm.*",
     "planning.*",

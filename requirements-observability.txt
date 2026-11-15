@@ -1,0 +1,7 @@
+# Optional: Langfuse's supported OpenTelemetry cohort (Python >=3.10).
+langfuse==4.18.0
+opentelemetry-api==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-exporter-otlp-proto-http==1.45.2
+# Chroma imports this exporter; it must match the SDK even when unused by Langfuse.
+opentelemetry-exporter-otlp-proto-grpc==1.45.2

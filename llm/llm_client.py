@@ -12,6 +12,7 @@ from llm.llm_types import LLMRequest, LLMResponse
 from llm.provider import Provider, ProviderError, ProviderFactory
 from llm.rate_limiter import RateLimiter
 from llm.request_budget import before_provider_call
+from monitoring.tracing import generation_span
 from security.output_validator import validate_output
 
 
@@ -86,9 +87,13 @@ class LLMClient:
                 budget = before_provider_call()
                 bounded_request = (replace(request, generation=config.with_overrides(
                     timeout_seconds=min(config.timeout_seconds, budget.remaining_seconds))) if budget else request)
-                response = self.provider.send(bounded_request)
-                validate_output(response.text)
-                return response
+                with generation_span(bounded_request.generation) as observation:
+                    observation.set_attributes({"attempt": attempt + 1})
+                    response = self.provider.send(bounded_request)
+                    observation.usage(response.usage)
+                    validate_output(response.text)
+                    observation.set_attributes({"status": "completed"})
+                    return response
             except ProviderError as exc:
                 last_error = exc
                 if attempt < config.retries:

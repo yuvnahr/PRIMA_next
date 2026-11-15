@@ -44,6 +44,7 @@ from memory.repository_factory import RepositorySelection, select_memory_reposit
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
+from monitoring.tracing import Tracing, configure_tracing, root_attributes
 from planning.plan import Plan
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
@@ -116,6 +117,7 @@ class PrimaRuntime:
         maintenance_failure_path: str | Path | None = None,
         generation_config: GenerationConfig | None = None,
         runtime_config: RuntimeConfig | None = None,
+        observability: Tracing | None = None,
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
@@ -162,6 +164,7 @@ class PrimaRuntime:
         )
         self.reflection_engine = reflection_engine or ReflectionEngine()
         settings = get_settings()
+        self.observability = observability or configure_tracing(settings)
         self.generation_config = generation_config or GenerationConfig(
             model=settings.default_model,
             provider=(llm_client.provider_name if llm_client is not None else settings.default_provider),
@@ -215,6 +218,17 @@ class PrimaRuntime:
 
         if not isinstance(request, PrimaRequest):
             raise TypeError("request must be a PrimaRequest")
+        with self.observability.turn(request) as observation:
+            generation = request.generation_config or self.generation_config
+            observation.set_attributes({"provider": generation.provider, "model": generation.model})
+            response = await self._execute(request)
+            observation.set_attributes({"status": response.status.value,
+                                        "outcome": response.outcome.value if response.outcome else None})
+            if response.status in {ExecutionStatus.FAILED, ExecutionStatus.REJECTED, ExecutionStatus.CANCELLED}:
+                observation.fail()
+            return response
+
+    async def _execute(self, request: PrimaRequest) -> PrimaResponse:
         try:
             route = select_route(request.task_kind, request.profile)
         except InvalidRouteError as exc:
@@ -260,6 +274,7 @@ class PrimaRuntime:
                 "tool_results": request.options.tool_results,
             },
         )
+        root_attributes({"execution_id": execution_context.execution_id})
         try:
             with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
                 execution_context = await self.workflow.run(request.input_text, execution_context)
@@ -268,6 +283,8 @@ class PrimaRuntime:
         except (TypeError, ValueError) as exc:
             execution_context.workflow_state.status = WorkflowStatus.FAILED
             execution_context.workflow_state.errors.append(str(exc))
+        if execution_context.workflow_state.status in {WorkflowStatus.FAILED, WorkflowStatus.CANCELLED}:
+            root_attributes({"failed_stage": execution_context.workflow_state.current_phase.value})
         execution_context.metadata["workflow_trace"] = [
             {
                 "event_type": event.event_type.value,
