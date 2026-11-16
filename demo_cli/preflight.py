@@ -5,12 +5,14 @@ from __future__ import annotations
 import asyncio
 import sys
 from argparse import Namespace
+from dataclasses import replace
 
 from config.settings import Settings
 from demo_cli.config import resolve_config
 from demo_cli.errors import safe_reason
 from demo_cli.renderer import Renderer
 from demo_cli.session import DemoSession
+from demo_cli.storage import check_storage
 from monitoring.tracing import Tracing, langfuse_readiness
 
 
@@ -35,9 +37,17 @@ def preflight(args: Namespace, settings: Settings, renderer: Renderer) -> int:
         rows.append(("Langfuse", status if status in {"disabled", "ready"} else f"{status} (optional)"))
         if hint:
             warnings.append(hint)
-        session = DemoSession(config, settings=settings, observability=Tracing())
+        if config.persist:
+            check_storage(config)
+        # Default preflight must not open or create the user's persistent database.
+        construction_config = replace(config, persist=False) if config.persist and not args.strict else config
+        session = DemoSession(construction_config, settings=settings, observability=Tracing())
         rows.extend((("PRIMA runtime", "OK"), ("Provider setup", "OK"),
-                     ("Memory", session.runtime.repository_selection.backend)))
+                     ("Memory", "chroma" if config.persist else session.runtime.repository_selection.backend),
+                     ("Persistence", "enabled" if config.persist else "disabled")))
+        if config.persist:
+            label = "ready" if args.strict else "available (not opened; use --strict)"
+            rows.extend((("State store", label), ("Memory store", label)))
         if args.strict and not fixes:
             session.runtime.llm_client.chat(
                 "Reply OK.", generation_config=config.generation.with_overrides(

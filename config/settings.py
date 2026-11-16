@@ -40,6 +40,7 @@ class Settings(BaseSettingsCls):
     groq_url: str = "https://api.groq.com/openai"
     anthropic_url: str = "https://api.anthropic.com"
     rate_limit_per_minute: int = 60
+    prima_demo_data_dir: str = ".demo_data"
     langfuse_enabled: bool = False
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None

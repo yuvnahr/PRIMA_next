@@ -14,6 +14,7 @@ try:
     from demo_cli.preflight import preflight
     from demo_cli.renderer import Renderer
     from demo_cli.session import DemoSession
+    from demo_cli.storage import PersistenceError
     from llm.provider import ProviderError
     from monitoring.tracing import shutdown_tracing
     from runtime.contracts import ExecutionStatus
@@ -32,6 +33,8 @@ def build_parser() -> argparse.ArgumentParser:
         command = commands.add_parser(name)
         if name in {"chat", "preflight"}:
             command.add_argument("--langfuse", action="store_true", help="Enable optional Langfuse tracing for this process.")
+        if name == "chat":
+            command.add_argument("--live-trace", action="store_true", help="Display actual foreground workflow events during each turn.")
         if name == "preflight":
             command.add_argument("--strict", action="store_true", help="Make one small live provider request (may use tokens).")
         command.add_argument("--provider", help="Provider name (e.g. groq or ollama); defaults to project settings.")
@@ -42,19 +45,24 @@ def build_parser() -> argparse.ArgumentParser:
         command.add_argument("--temperature", type=float)
         command.add_argument("--max-tokens", type=int)
         command.add_argument("--no-color", action="store_true")
+        command.add_argument("--persist", action="store_true", help="Opt into session-scoped persistent state and memory.")
+        command.add_argument("--data-dir", help="Demo persistence root; defaults to PRIMA_DEMO_DATA_DIR or .demo_data.")
     return parser
 
 
 async def chat(session: DemoSession, renderer: Renderer) -> None:
     try:
+        session.observe_workflow(renderer)
         await session.start()
-        renderer.rows("PRIMA-NEXT Interactive Demo", (row for row in session.status_rows() if row[0] != "Memory"))
+        renderer.rows("PRIMA-NEXT Interactive Demo", (row for row in session.status_rows() if row[0] not in {"Memory", "Data root"}))
+        for message in session.persistence_messages():
+            renderer.message(message)
         if session.observability.warning:
             renderer.message(f"Warning: {session.observability.warning}")
         renderer.message("Type /help for commands.")
         while True:
             try:
-                # shortcut: stdin blocks idle maintenance; use cancellable async input when live events are added.
+                # shortcut: stdin blocks idle maintenance; use async input if idle/background UI is added.
                 text = input("You > ")
             except (EOFError, KeyboardInterrupt):
                 renderer.message("\nSession ended.")
@@ -65,6 +73,8 @@ async def chat(session: DemoSession, renderer: Renderer) -> None:
                 try:
                     if not await dispatch_command(text, session, renderer):
                         break
+                except PersistenceError:
+                    raise
                 except Exception:
                     renderer.error("The command did not complete.", provider=session.config.generation.provider)
                 continue
@@ -72,6 +82,8 @@ async def chat(session: DemoSession, renderer: Renderer) -> None:
                 response = await session.send(text)
             except (KeyboardInterrupt, asyncio.CancelledError):
                 renderer.message("Interrupted. Shutting down; an active provider request may run until its timeout.")
+                raise
+            except PersistenceError:
                 raise
             except Exception as exc:
                 renderer.error(safe_reason(exc, provider=session.config.generation.provider), provider=session.config.generation.provider)
@@ -114,7 +126,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         renderer = Renderer(no_color=config.no_color)
         session = DemoSession(config, settings=settings)
         if args.command == "status":
-            renderer.rows("PRIMA STATUS", session.status_rows())
+            try:
+                renderer.rows("PRIMA STATUS", session.status_rows())
+            finally:
+                asyncio.run(session.close())
         else:
             asyncio.run(chat(session, renderer))
         return 0

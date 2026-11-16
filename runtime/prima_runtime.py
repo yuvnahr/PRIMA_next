@@ -305,6 +305,7 @@ class PrimaRuntime:
     async def start_maintenance(self) -> None:
         """Start the local cold-path worker for an async application lifecycle."""
 
+        # The worker inherits this task's embedding context, just as hot-path execution does.
         with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
             await self.maintenance_supervisor.start()
 

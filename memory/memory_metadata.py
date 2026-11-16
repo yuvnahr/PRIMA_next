@@ -20,6 +20,12 @@ JSON_FIELDS = {
 }
 
 
+def configure_collection_sync(collection: Any) -> None:
+    # Chroma 1.x can evict unsynced small HNSW indexes; flush each write (chroma-core/chroma#7946).
+    if hasattr(collection, "configuration"):
+        collection.modify(configuration={"hnsw": {"sync_threshold": 1}})
+
+
 def encode_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
     encoded: dict[str, Any] = {}
     for key, value in metadata.items():

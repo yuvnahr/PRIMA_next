@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import re
 
+from demo_cli.storage import PersistenceError
+
 
 def safe_reason(error: BaseException | str, *, provider: str = "") -> str:
+    if isinstance(error, PersistenceError):
+        return str(error)
     text = str(error)
     lower = text.lower()
     if "api key is not configured" in lower and provider in {"groq", "openai", "anthropic"}:
@@ -32,6 +36,8 @@ def safe_reason(error: BaseException | str, *, provider: str = "") -> str:
         "Generation model and provider must be configured.",
         "Profile must be prima, rag or model.", "Trace must be off, summary or full.",
         "Session ID must not be empty.", "Temperature must be numeric and max-tokens must be an integer.",
+        "Demo data directory must not be empty.",
+        "Unable to resolve demo data directory. Check PRIMA_DEMO_DATA_DIR or --data-dir.",
         "temperature must be between 0 and 2",
         "Token limit and timeout must be positive; retries cannot be negative.",
     }:

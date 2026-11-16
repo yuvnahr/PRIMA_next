@@ -10,13 +10,14 @@ HELP = """COMMANDS
 /help                    Show commands
 /status                  Show current runtime configuration
 /trace off|summary|full   Change trace display
+/live [on|off]           Show or change live workflow tracing
 /state                   Show current cognitive state
 /memory                  Show up to five stored memories
 /plan                    Show the last turn's plan
 /world                   Show the last turn's world simulation
 /profile prima|rag|model Change the next turn's profile
 /clear                   Clear terminal output only
-/reset                   Start a fresh in-memory conversation
+/reset                   Start a fresh conversation
 /quit                    Exit (/exit also works)"""
 
 
@@ -52,6 +53,8 @@ async def dispatch_command(text: str, session: DemoSession, renderer: Renderer) 
             previous, current = await session.reset()
             renderer.rows("SESSION RESET", (("Previous session", previous), ("New session", current),
                                              ("State", "fresh"), ("Memory", "empty")))
+            for message in session.persistence_messages():
+                renderer.message(message)
     elif command == "/profile":
         if not args:
             renderer.rows("PROFILE", (("Current", session.current_profile.value), ("Available", ", ".join(PROFILES))))
@@ -68,6 +71,13 @@ async def dispatch_command(text: str, session: DemoSession, renderer: Renderer) 
         renderer.message(HELP)
     elif command == "/status" and not args:
         renderer.rows("PRIMA STATUS", session.status_rows())
+    elif command == "/live":
+        if len(args) > 1 or (args and args[0] not in {"on", "off"}):
+            renderer.message("Usage: /live [on|off]")
+        else:
+            if args:
+                session.live_trace = args[0] == "on"
+            renderer.message(f"Live workflow trace: {'on' if session.live_trace else 'off'}")
     elif command == "/trace":
         if not args:
             renderer.message(f"Trace: {session.trace_mode.value}. Choices: off, summary, full.")

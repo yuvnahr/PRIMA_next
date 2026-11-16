@@ -125,7 +125,38 @@ Start your local Ollama server and supply an exact model ID already installed; t
 
 Replace the angle-bracket placeholder with the actual ID before running.
 
-The CLI keeps one canonical `PrimaRuntime` and one session ID until `/reset`. Memory and cognitive state are in memory and last only for the running process; `--session capstone-demo` labels the session without enabling persistence. Provider/model selection stays fixed until exit.
+The CLI keeps one canonical `PrimaRuntime` and one session ID until `/reset`. Provider/model selection stays fixed until exit.
+
+### In-memory default
+
+`.\demo.ps1 chat` starts fresh, process-local state and memory. Closing the process ends that state. `--session capstone-demo` alone labels the conversation without enabling persistence or initializing Chroma.
+
+### Persistent session and resume
+
+```powershell
+.\demo.ps1 preflight --persist --session capstone-demo
+.\demo.ps1 chat --persist --session capstone-demo
+```
+
+Quit and run the same chat command again to resume canonical cognitive state, affect/PAD and momentum, state version, and admitted memories. Without a supplied session ID, a new readable ID is generated and a resume command is displayed; no previous session is automatically selected. `/state` and `/memory` work immediately after reopening. Latest `/plan` and `/world` responses remain local to the current process. The affect engine's rolling history window also starts fresh; evolution still reads the persisted emotional state.
+
+Data defaults to `.demo_data/sessions/<SHA-256-of-session-id>/state.json` and `chroma/`. Set `PRIMA_DEMO_DATA_DIR` in the environment/ignored `.env`, or override it with `--data-dir PATH`. Relative roots resolve from the repository. `.demo_data/` is ignored by Git; keep custom roots outside version control too. These stores contain real conversation memories and state. Use one writer per persistent session.
+
+Persistent preflight checks local dependencies, existing state JSON and advisory directory permissions without creating session data or opening Chroma. `--strict` also opens/closes the stores and runs the existing tiny provider check; it never inserts test memories or advances state. Strict opening is the authoritative check for vector compatibility and actual backend access. No packages are installed automatically.
+
+### Reset
+
+`/reset` drains maintenance, clears only the active persistent session's canonical memories/graph and JSON state, closes its Chroma client, and starts a fresh persistent session ID. Provider/model/profile/trace/live-trace/Langfuse and data root stay unchanged. Reopening the old ID starts empty; other sessions are untouched. Empty backend files/directories may remain. JSON and Chroma do not share a transaction: a partial reset error closes the session and exits without claiming success; inspect storage before reusing that ID.
+
+Stored embedding fingerprints must match the current embedding configuration; generation provider/model can change across launches independently. Incompatibility fails without rebuilding/deleting stored data. Reopen using the original embedding configuration to reset, or choose a new session ID. Chroma writes are durable as they occur; cleanup calls its public client `close()` where available. Older Chroma versions without that method manage resources until process exit.
+
+### Live workflow trace
+
+```powershell
+.\demo.ps1 chat --live-trace
+```
+
+Live tracing is off by default. `/live`, `/live on`, and `/live off` show or change it for subsequent turns; `/status` reports the setting. It shows actual foreground workflow events while a turn executes. `/trace off|summary|full` independently controls completed post-turn diagnostics. Live output keeps emitted order and repeats, shows generation starting, and displays up to 50 events per turn. It omits values absent from events, skipped phases without skip events, raw payloads and background maintenance. `[OK]` means a phase-completion event; final request errors/diagnostics determine the turn outcome. No tokens are streamed. Live tracing works with either storage mode and independently of Langfuse.
 
 ### Architecture commands
 
@@ -133,13 +164,14 @@ The CLI keeps one canonical `PrimaRuntime` and one session ID until `/reset`. Me
 |---|---|
 | `/help`, `/status` | Show commands or active configuration. |
 | `/trace off\|summary\|full` | Change display only; diagnostic collection remains enabled. |
+| `/live [on\|off]` | Show or change live workflow event rendering for subsequent turns. |
 | `/state` | Read the active session's current state manager, including evolved PAD, affect confidence, stability and volatility. Empty goal/task/confidence sections show `n/a`; these values are not reconstructed from a previous answer. |
 | `/memory` | List up to five recent stored notes, with type, timestamp, salience and 240-character previews. This does not run retrieval. The repository is dedicated to the demo session; explicitly foreign-tagged notes are excluded, and untagged derived notes remain visible. |
 | `/plan` | Show the latest public plan summary, with up to ten actions and ten constraints. |
 | `/world` | Show the latest reported risk/failure probabilities, constraint-prediction count, up to ten predicted state deltas and ten warnings. Constraint predictions are not counted as confirmed violations. |
 | `/profile prima\|rag\|model` | Change only future request profiles; no runtime/provider reconstruction or prompt rerun. `/profile` alone lists the current profile and choices. |
 | `/clear` | Clear an ANSI-capable terminal, or scroll the viewport with blank lines; it never clears conversation data. |
-| `/reset` | Drain/stop the old maintenance worker and replace only this demo's runtime, state and memory with a fresh session ID. Reuses the same LLM client/generation configuration and preserves the active profile and trace mode. |
+| `/reset` | Drain/stop maintenance and start a fresh session ID. In persistent mode, clear only the old active session's state/memory/graph. Preserve the provider/model, profile, trace/live settings, Langfuse, persistence mode and data root. |
 | `/quit`, `/exit` | Drain maintenance and exit. |
 
 `/plan` and `/world` identify the last turn's profile, report missing/skipped/failed components, and handle the period before a first turn. Switching profile preserves that last response until another request begins; reset discards it. An attempt that raises without returning a response leaves no retained plan/world output, so older results cannot appear as the latest turn. Inspection commands never call the LLM or rerun cognitive stages. Long values are bounded and omitted list entries are counted. State inspection uses PAD `pleasure` for the persisted valence dimension; salience is not stored in the current emotional-state model and is omitted. Predicted world effects are forecasts, not committed state changes.
@@ -152,7 +184,7 @@ Summary trace shows the actual profile, selected/candidate/context counts, plan 
 
 ### Exit
 
-Type `/quit` (or `/exit`). EOF also exits: Ctrl+Z then Enter in Windows consoles, Ctrl+D in Git Bash. Ctrl+C at the prompt exits gracefully. These paths drain/stop maintenance and attempt telemetry shutdown once. Console input is synchronous inside the single async session loop, so cold maintenance may wait while the prompt is idle. During a request, Ctrl+C requests shutdown; an already-running HTTP worker may still run until its configured timeout (normally 60 seconds). The CLI reports this limitation rather than claiming the HTTP request was cancelled. Telemetry shutdown waits at most three seconds; failure/timeout warns and preserves normal exit, but queued traces may be lost. Avoid repeated Ctrl+C during cleanup. Persistence and live workflow rendering remain separate future work.
+Type `/quit` (or `/exit`). EOF also exits: Ctrl+Z then Enter in Windows consoles, Ctrl+D in Git Bash. Ctrl+C at the prompt exits gracefully. These paths detach the live observer, drain/stop maintenance, close owned persistent resources, and attempt telemetry shutdown once. Console input is synchronous inside the single async session loop, so cold maintenance may wait while the prompt is idle. During a request, Ctrl+C requests shutdown; an already-running HTTP worker may still run until its configured timeout (normally 60 seconds). The CLI reports this limitation rather than claiming the HTTP request was cancelled. Telemetry shutdown waits at most three seconds; failure/timeout warns and preserves normal exit, but queued traces may be lost. Avoid repeated Ctrl+C during cleanup.
 
 See the short [presentation runbook](docs/demo_cli_runbook.md) for the operator checklist and suggested prompts.
 

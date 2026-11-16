@@ -37,7 +37,18 @@ class Renderer:
         value = _terminal_text(text)
         if self.color:
             value = f"\033[{31 if error else 90}m{value}\033[0m"
-        print(value, file=self.output)
+        print(value, file=self.output, flush=True)
+
+    def live_start(self) -> None:
+        self.message("PRIMA EXECUTION")
+        self.message("-" * min(self.width, 40))
+
+    def live_event(self, marker: str, phase: str, detail: str = "") -> None:
+        label = phase.replace("_", " ").title()
+        self.message(f"{marker} {label}" + (f" - {detail}" if detail else ""))
+
+    def live_end(self) -> None:
+        self.message("-" * min(self.width, 40))
 
     def rows(self, title: str, rows: Iterable[tuple[str, str]]) -> None:
         self.message(title)

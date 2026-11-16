@@ -7,6 +7,7 @@ from argparse import Namespace
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from uuid import uuid4
 
 from config.settings import Settings, get_settings
@@ -34,6 +35,9 @@ class DemoConfig:
     trace_mode: TraceMode
     no_color: bool
     langfuse: bool = False
+    persist: bool = False
+    data_dir: Path = Path(__file__).resolve().parents[1] / ".demo_data"
+    live_trace: bool = False
 
 
 def resolve_config(
@@ -75,8 +79,22 @@ def resolve_config(
         max_tokens = int(args.max_tokens if args.max_tokens is not None else env.get("PRIMA_DEMO_MAX_TOKENS", "4096"))
     except ValueError:
         raise ValueError("Temperature must be numeric and max-tokens must be an integer.") from None
+    directory = getattr(args, "data_dir", None)
+    if directory is None:
+        directory = env.get("PRIMA_DEMO_DATA_DIR", settings.prima_demo_data_dir)
+    if not directory.strip():
+        raise ValueError("Demo data directory must not be empty.")
+    try:
+        data_dir = Path(directory).expanduser()
+        if not data_dir.is_absolute():
+            data_dir = Path(__file__).resolve().parents[1] / data_dir
+        data_dir = data_dir.resolve()
+    except (OSError, ValueError, RuntimeError):
+        raise ValueError("Unable to resolve demo data directory. Check PRIMA_DEMO_DATA_DIR or --data-dir.") from None
     return DemoConfig(
         GenerationConfig(model=model.strip(), provider=provider, temperature=temperature, max_output_tokens=max_tokens),
         PROFILES[profile_name], session_id, trace_mode, args.no_color or "NO_COLOR" in env,
         getattr(args, "langfuse", False) or settings.langfuse_enabled,
+        persist=getattr(args, "persist", False), data_dir=data_dir,
+        live_trace=getattr(args, "live_trace", False),
     )
