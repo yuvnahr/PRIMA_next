@@ -28,7 +28,7 @@ Live trace shows actual workflow events emitted while the turn executes. `/live 
 
 ## Fallbacks and limits
 
-- Groq unavailable: exit, start the local Ollama server and use `.\demo.ps1 preflight --strict --provider ollama --model "EXACT-INSTALLED-ID"`, then `.\demo.ps1 chat --provider ollama --model "EXACT-INSTALLED-ID"`. No model downloads or provider changes inside a session.
+- Groq unavailable: exit, start the local Ollama server and use `.\demo.ps1 preflight --strict --provider ollama --model "EXACT-INSTALLED-ID"`, then `.\demo.ps1 chat --provider ollama --model "EXACT-INSTALLED-ID"`. No model downloads or provider changes inside a session. Transport failures do not trigger output regeneration; only the configured client retries apply (zero by default). Invalid generated output can still trigger bounded correction.
 - Langfuse unavailable: continue chatting. Install/fix optional dependencies and credentials before the next run; successful chat does not prove export delivery.
 - Telemetry shutdown waits at most three seconds and may drop queued traces. Warnings do not fail the demo.
 - An in-flight HTTP worker may continue until its configured timeout after Ctrl+C. Wait for cleanup rather than repeatedly interrupting. Idle console input can delay cold maintenance.

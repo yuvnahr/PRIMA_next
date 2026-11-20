@@ -77,6 +77,7 @@ class GenerationResult:
     validation_errors: tuple[str, ...] = ()
     rejected_output: str | None = None
     raw_output: str | None = None
+    provider_failed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible generation record."""
@@ -100,6 +101,7 @@ class GenerationResult:
             "validation_errors": list(self.validation_errors),
             "rejected_output": self.rejected_output,
             "raw_output": self.raw_output,
+            "provider_failed": self.provider_failed,
         }
 
 
@@ -188,6 +190,7 @@ class AnswerGenerationController:
         started = time.perf_counter()
         failure_kind = "provider"
         raw: str | None = None
+        usage: dict[str, int] | None = None
         try:
             budget.reserve_call()
             if bounded:
@@ -206,9 +209,12 @@ class AnswerGenerationController:
             if budget.remaining_seconds <= 0:
                 return blocked("time_budget", called=True)
             raw = response.text.strip()
+            reported_usage = response.usage if isinstance(response.usage, dict) else {}
+            usage = {key: reported_usage[key] for key in ("prompt_tokens", "completion_tokens", "total_tokens")
+                     if type(reported_usage.get(key)) is int and reported_usage[key] >= 0}
             aggregate_usage = dict(context.metadata.get("model_usage", {}))
-            for key, value in (response.usage or {}).items():
-                aggregate_usage[str(key)] = int(aggregate_usage.get(str(key), 0)) + int(value)
+            for key, value in usage.items():
+                aggregate_usage[key] = aggregate_usage.get(key, 0) + value
             context.metadata["model_usage"] = aggregate_usage
             failure_kind = "parse"
             parsed = self._parse(
@@ -220,7 +226,7 @@ class AnswerGenerationController:
                 model,
                 config,
                 round((time.perf_counter() - started) * 1000, 3),
-                response.usage,
+                usage,
             )
             return replace(parsed, raw_output=raw)
         except TimeoutError:
@@ -234,6 +240,8 @@ class AnswerGenerationController:
                 str(exc),
                 round((time.perf_counter() - started) * 1000, 3),
                 failure_kind=failure_kind,
+                usage=usage,
+                provider_failed=isinstance(exc, ProviderError),
             )
             return replace(fallback, raw_output=raw)
         finally:
@@ -359,7 +367,10 @@ class AnswerGenerationController:
         config: GenerationConfig,
         reason: str,
         latency_ms: float,
-        *, failure_kind: str = "generation",
+        *,
+        failure_kind: str = "generation",
+        usage: dict[str, int] | None = None,
+        provider_failed: bool = False,
     ) -> GenerationResult:
         def result(
             outcome: GenerationOutcome,
@@ -377,11 +388,13 @@ class AnswerGenerationController:
                 model=config.model,
                 llm_called=True,
                 latency_ms=latency_ms,
+                usage=usage,
                 fallback_policy=config.fallback_policy.value,
                 fallback_used=fallback_used,
                 fallback_reason=reason,
                 provider_capabilities=dict(getattr(self.llm_client, "capabilities", {})),
                 failure_kind=failure_kind,
+                provider_failed=provider_failed,
             )
         if config.fallback_policy is FallbackPolicy.EXTRACTIVE and reasoning is not None:
             evidence = reasoning.evidence_references

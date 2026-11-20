@@ -136,6 +136,48 @@ def test_real_persistent_runtime_resumes_state_affect_memory_and_retrieval(tmp_p
     asyncio.run(run())
 
 
+def test_graph_read_failure_refuses_reopen_and_closes_owned_storage(tmp_path, monkeypatch):
+    from chromadb.api.models.Collection import Collection
+
+    first = open_session(tmp_path)
+
+    async def populate():
+        try:
+            await first.send("Please remember that I prefer concise explanations.")
+        finally:
+            await first.close()
+
+    asyncio.run(populate())
+    state_path = session_directory(first.config, "alpha") / "state.json"
+    before = state_path.read_bytes()
+    read = Collection.get
+    close = ChromaMemoryRepository.close
+    closed = []
+
+    def fail_graph_read(self, *args, **kwargs):
+        if self.name == "graph_index":
+            raise RuntimeError("fixture graph read failed")
+        return read(self, *args, **kwargs)
+
+    def record_close(self):
+        closed.append(self)
+        close(self)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Collection, "get", fail_graph_read)
+        patch.setattr(ChromaMemoryRepository, "close", record_close)
+        with pytest.raises(RuntimeError, match="fixture graph read failed"):
+            open_session(tmp_path)
+    assert len(closed) == 1 and closed[0]._closed
+    assert state_path.read_bytes() == before
+    reopened = open_session(tmp_path)
+    try:
+        assert reopened.runtime.memory_repository.count() > 0
+        assert reopened.runtime.memory_index.graph_repository.nodes
+    finally:
+        asyncio.run(reopened.close())
+
+
 def test_sessions_isolate_state_affect_memories_and_retrieval(tmp_path):
     async def run():
         for label, preference in (("alpha", "concise explanations"), ("beta", "detailed explanations")):

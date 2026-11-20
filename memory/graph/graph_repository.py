@@ -169,10 +169,7 @@ class ChromaGraphRepository(GraphRepository):
         return saved
 
     def _load_existing(self) -> None:
-        try:
-            result = self.collection.get(include=["metadatas"])
-        except Exception:
-            return
+        result = self.collection.get(include=["metadatas"])
         deferred_edges: list[dict[str, Any]] = []
         for metadata in result.get("metadatas", []):
             decoded = decode_metadata(metadata)

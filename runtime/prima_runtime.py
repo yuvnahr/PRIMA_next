@@ -927,7 +927,7 @@ class PrimaRuntime:
 
     def _build_logger(self, log_path: Path) -> logging.Logger:
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        logger = logging.getLogger(f"prima_runtime.{id(self)}")
+        logger = logging.getLogger(f"prima_runtime.{log_path.resolve()}")
         logger.setLevel(logging.INFO)
         logger.propagate = False
         if not logger.handlers:

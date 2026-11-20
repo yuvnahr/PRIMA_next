@@ -17,6 +17,7 @@ class OutputValidationSignal(StrEnum):
     """Observable post-execution failures eligible for correction."""
 
     OUTPUT_SCHEMA_FAILURE = "output_schema_failure"
+    PROVIDER_FAILURE = "provider_failure"
     UNSUPPORTED_CLAIM = "unsupported_claim_evidence_mismatch"
     TOOL_FAILURE = "tool_failure"
     LOGICAL_INCONSISTENCY = "logical_inconsistency"
@@ -53,6 +54,9 @@ class OutputValidationController:
         if not signals:
             return OutputValidationResult(valid=True)
         primary = signals[0]
+        if primary is OutputValidationSignal.PROVIDER_FAILURE:
+            # Transport retries belong to the client config, not output correction.
+            return OutputValidationResult(valid=False, signals=signals)
         action = {
             OutputValidationSignal.OUTPUT_SCHEMA_FAILURE: ReflectionAction.REGENERATE,
             OutputValidationSignal.UNSUPPORTED_CLAIM: ReflectionAction.REVISE_QUERY,
@@ -93,7 +97,9 @@ class OutputValidationController:
                 signals.append(OutputValidationSignal.UNSUPPORTED_CLAIM)
             errors = " ".join(generation.errors).lower()
             if generation.outcome is GenerationOutcome.FAILED:
-                if any(token in errors for token in ("json", "schema", "invalid", "empty", "evidence")):
+                if generation.provider_failed:
+                    signals.append(OutputValidationSignal.PROVIDER_FAILURE)
+                elif any(token in errors for token in ("json", "schema", "invalid", "empty", "evidence")):
                     signals.append(OutputValidationSignal.OUTPUT_SCHEMA_FAILURE)
                 elif any(token in errors for token in ("inconsistent", "contradict")):
                     signals.append(OutputValidationSignal.LOGICAL_INCONSISTENCY)

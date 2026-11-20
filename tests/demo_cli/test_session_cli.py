@@ -85,6 +85,106 @@ def test_two_turns_use_same_real_runtime_session_and_memory(monkeypatch) -> None
     assert runtime.maintenance_supervisor.diagnostics()["queue_size"] == 0
 
 
+@pytest.mark.parametrize("usage,expected", [
+    ({"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11,
+      "completion_tokens_details": {"reasoning_tokens": 2}, "prompt_time": 0.01, "queue_time": None},
+     {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}),
+    ({"prompt_tokens": True, "completion_tokens": -1, "total_tokens": "11"}, {}),
+])
+def test_real_groq_runtime_accepts_extended_usage_without_inventing_counts(monkeypatch, usage, expected):
+    session, _ = _session()
+    session.runtime.llm_client.provider = GroqProvider(session.runtime.llm_client.settings)
+    calls = []
+
+    def transport(*args, **kwargs):
+        calls.append(True)
+        return {"choices": [{"message": {"content": "Focus on your opening sentence."}}], "usage": usage}
+
+    monkeypatch.setattr("llm.provider.post_json", transport)
+
+    async def run():
+        try:
+            response = await session.send("I am nervous about my presentation.")
+            assert response.status is ExecutionStatus.COMPLETED
+            assert response.diagnostics.state_version == 1
+            assert response.diagnostics.model_usage == expected
+            assert response.output_data["generation"]["usage"] == expected
+        finally:
+            await session.close()
+
+    asyncio.run(run())
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize("failure", ["HTTP 400", "HTTP 401", "HTTP 403", "HTTP 404", "HTTP 429", "HTTP 500", "TimeoutError"])
+@pytest.mark.parametrize("retries", [0, 1])
+def test_provider_failure_does_not_trigger_output_regeneration(monkeypatch, failure, retries):
+    session, _ = _session()
+    session.runtime.generation_config = session.config.generation.with_overrides(retries=retries)
+    session.runtime.llm_client.provider = GroqProvider(session.runtime.llm_client.settings)
+    calls = []
+
+    def transport(*args, **kwargs):
+        calls.append(True)
+        raise ProviderError(f"HTTP request failed: {failure}")
+
+    monkeypatch.setattr("llm.provider.post_json", transport)
+
+    async def run():
+        try:
+            response = await session.send("I am nervous about my presentation.")
+            assert response.status is ExecutionStatus.FAILED
+            assert response.diagnostics.model_call_count == 1
+            assert response.diagnostics.state_version == 0
+            assert not response.state_delta.changes["committed"]
+            assert not response.output_data["memory_ids_created"]
+            assert not response.output_data["correction_attempts"]
+        finally:
+            await session.close()
+
+    asyncio.run(run())
+    assert len(calls) == retries + 1
+
+
+def test_failed_output_retains_actual_usage_through_bounded_correction(monkeypatch):
+    session, _ = _session()
+    session.runtime.llm_client.provider = GroqProvider(session.runtime.llm_client.settings)
+    calls = []
+
+    def transport(*args, **kwargs):
+        calls.append(True)
+        return {"choices": [{"message": {"content": ""}}],
+                "usage": {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}}
+
+    monkeypatch.setattr("llm.provider.post_json", transport)
+
+    async def run():
+        try:
+            response = await session.send("Give a short answer.")
+            assert response.status is ExecutionStatus.FAILED
+            assert response.diagnostics.model_usage == {"prompt_tokens": 16, "completion_tokens": 6, "total_tokens": 22}
+            assert response.output_data["generation"]["usage"] == {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}
+        finally:
+            await session.close()
+
+    asyncio.run(run())
+    assert len(calls) == 2
+
+
+def test_reset_reuses_runtime_log_handler():
+    session, _ = _session()
+    handler = session.runtime.logger.handlers[0]
+
+    async def run():
+        try:
+            await session.reset()
+            assert session.runtime.logger.handlers == [handler]
+        finally:
+            await session.close()
+
+    asyncio.run(run())
+
+
 def test_cli_recovers_after_failure_and_commands_do_not_execute_turns(monkeypatch, capsys) -> None:
     sessions = []
     requests = []
