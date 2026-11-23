@@ -12,9 +12,10 @@ if TYPE_CHECKING:
 
 try:
     from config.settings import get_settings
-    from demo_cli.commands import dispatch_command
+    from demo_cli.commands import HELP, dispatch_command
     from demo_cli.config import PROFILES, TraceMode, resolve_config
     from demo_cli.errors import safe_reason
+    from demo_cli.live_eval import EvalUnavailable
     from demo_cli.preflight import preflight
     from demo_cli.renderer import Renderer
     from demo_cli.session import DemoSession
@@ -42,6 +43,8 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--live-trace", action="store_true", help="Display actual foreground workflow events during each turn.")
         if name == "preflight":
             command.add_argument("--strict", action="store_true", help="Make one small live provider request (may use tokens).")
+        if name == "compare":
+            command.add_argument("--judge-model", help="Model for /eval on the same provider (Groq defaults to GPT-OSS 20B).")
         command.add_argument("--provider", help="Provider name (e.g. groq or ollama); defaults to project settings.")
         command.add_argument("--model", help="Exact model ID; required for Ollama unless DEFAULT_MODEL is configured.")
         command.add_argument("--profile", choices=tuple(PROFILES))
@@ -120,7 +123,7 @@ async def compare(session: ComparisonSession, renderer: Renderer) -> None:
         await session.prima.start()
         renderer.rows("PRIMA / BASE MODEL COMPARISON", session.status_rows())
         renderer.message("Same model/settings; separate histories. Technical completion does not assess answer quality.")
-        renderer.message("/help for commands. /state, /memory, /plan and /world inspect PRIMA.")
+        renderer.message("/eval grades the latest pair. /help lists workflow inspections and other commands.")
         if session.prima.observability.warning:
             renderer.message(f"Warning: {session.prima.observability.warning}")
         while True:
@@ -141,15 +144,23 @@ async def compare(session: ComparisonSession, renderer: Renderer) -> None:
                     elif command == "/status":
                         renderer.rows("COMPARISON STATUS", session.status_rows())
                     elif command == "/help":
-                        renderer.message("/status /reset /clear /quit /exit\n"
-                                         "/state /memory /plan /world inspect PRIMA; /trace and /live control PRIMA diagnostics.\n"
-                                         "/profile is fixed: base chat versus prima. /reset clears both branches.")
+                        renderer.message("\n".join(line for line in HELP.splitlines() if not line.startswith("/profile")))
+                        renderer.message("/eval                    Grade the latest paired answers with one judge request")
+                        renderer.message("Workflow inspections describe PRIMA. /reset clears both branches.")
+                    elif command.split()[0] == "/eval":
+                        if command != "/eval":
+                            renderer.message("Usage: /eval")
+                        else:
+                            try:
+                                evaluation = await session.evaluate_latest(renderer.message)
+                            except EvalUnavailable as exc:
+                                renderer.message(f"Evaluation unavailable. {exc}", error=True)
+                            else:
+                                renderer.rows("QUICK RUBRIC ESTIMATE", evaluation.rows())
                     elif command.split()[0] == "/profile":
                         renderer.message("Comparison profiles are fixed: ordinary base chat versus prima.")
-                    elif command.split()[0] in {"/state", "/memory", "/plan", "/world", "/trace", "/live", "/clear"}:
-                        await dispatch_command(text, session.prima, renderer)
                     else:
-                        renderer.message("Unknown command or arguments. Type /help for commands.")
+                        await dispatch_command(text, session.prima, renderer)
                     continue
                 turn = await session.send(text)
                 renderer.comparison(turn)

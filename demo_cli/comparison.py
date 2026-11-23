@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from typing import Any
 from uuid import uuid4
@@ -12,9 +13,20 @@ from config.runtime_config import RuntimeConfig
 from config.settings import Settings, get_settings
 from demo_cli.config import DemoConfig
 from demo_cli.errors import safe_reason
+from demo_cli.live_eval import (
+    GROQ_JUDGE_MODEL,
+    JUDGE_POLICY,
+    JUDGE_SCHEMA,
+    EvalUnavailable,
+    PairedEvaluation,
+    judge_prompt,
+    parse_evaluation,
+)
 from demo_cli.session import DemoSession
+from llm.generation_config import GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
 from llm.prompt_builder import CONVERSATION_POLICY
+from llm.provider import ProviderError
 from monitoring.tracing import Tracing
 from runtime import ExecutionProfile, ExecutionStatus, PrimaRequest, TaskKind
 
@@ -56,11 +68,22 @@ class ComparisonSession:
         self.turn_index = 0
         self.needs_reset = False
         self.latest_turn: ComparisonTurn | None = None
+        self._eval_transcript: list[tuple[str, str, str]] = []
+        self._evaluation: PairedEvaluation | None = None
+        self._base_first = int(self.comparison_id[-1], 16) % 2 == 0
+        self._judge = GenerationConfig(
+            model=config.judge_model or (GROQ_JUDGE_MODEL if config.generation.provider == "groq" else config.generation.model),
+            provider=config.generation.provider,
+            max_output_tokens=2048,
+            timeout_seconds=15,
+            structured_output=StructuredOutputMode.JSON_SCHEMA,
+        )
 
     def status_rows(self) -> tuple[tuple[str, str], ...]:
         return (*self.prima.status_rows(), ("Comparison", self.comparison_id), ("Base session", self.base_session_id),
                 ("Base context", f"{len(self.base_history) // 2} complete turns; full history, no dropped messages"),
                 ("History limit", f"{HISTORY_CHARACTER_LIMIT} characters including current prompt/policy"),
+                ("Live judge", self._judge.model),
                 ("Comparison state", "reset required after failure" if self.needs_reset else "ready"))
 
     def _metadata(self, branch: str) -> dict[str, Any]:
@@ -129,7 +152,36 @@ class ComparisonSession:
         prima = await self._prima(text)
         self.needs_reset = base.status == "failed" or prima.status in {"failed", "rejected", "cancelled", "not_implemented"}
         self.latest_turn = ComparisonTurn(self.comparison_id, self.turn_index, base, prima)
+        self._eval_transcript.append((text, base.text, prima.text))
+        self._evaluation = None
         return self.latest_turn
+
+    async def evaluate_latest(self, announce: Callable[[str], None]) -> PairedEvaluation:
+        turn = self.latest_turn
+        if turn is None:
+            raise EvalUnavailable("Send a paired turn before using /eval.")
+        if any(branch.status not in {"completed", "abstained"} or not branch.text.strip()
+               or branch.text == "No answer returned." for branch in (turn.base, turn.prima)):
+            raise EvalUnavailable("Both branches must return an answer to score this pair.")
+        if self._evaluation is not None:
+            return self._evaluation
+
+        client = self.prima.runtime.llm_client
+        if StructuredOutputMode.JSON_SCHEMA not in client.provider.capabilities.structured_output:
+            raise EvalUnavailable("The current provider adapter does not support the judge's JSON schema.")
+        base_first = self._base_first
+        secrets = self.prima.observability.secrets
+        prompt = judge_prompt(self._eval_transcript, base_first=base_first, secrets=secrets)
+        announce(f"Evaluating paired turn {turn.index} with {self._judge.model}...")
+        try:
+            response = await asyncio.to_thread(client.chat, prompt, generation_config=self._judge,
+                                               system_prompt=JUDGE_POLICY, response_schema=JUDGE_SCHEMA)
+        except (ProviderError, RuntimeError, ValueError) as exc:
+            raise EvalUnavailable(safe_reason(exc, provider=self._judge.provider)) from None
+        evaluation = parse_evaluation(response.text, model=self._judge.model, base_first=base_first, secrets=secrets)
+        self._evaluation = evaluation
+        self._base_first = not base_first
+        return evaluation
 
     async def reset(self) -> None:
         await self.prima.reset()
@@ -139,6 +191,8 @@ class ComparisonSession:
         self.turn_index = 0
         self.needs_reset = False
         self.latest_turn = None
+        self._eval_transcript.clear()
+        self._evaluation = None
 
     async def close(self) -> None:
         await self.prima.close()

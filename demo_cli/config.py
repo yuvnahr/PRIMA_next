@@ -39,6 +39,7 @@ class DemoConfig:
     data_dir: Path = Path(__file__).resolve().parents[1] / ".demo_data"
     live_trace: bool = False
     trace_content: bool = False
+    judge_model: str | None = None
 
 
 def resolve_config(
@@ -108,4 +109,5 @@ def resolve_config(
         persist=getattr(args, "persist", False), data_dir=data_dir,
         live_trace=getattr(args, "live_trace", False),
         trace_content=trace_content,
+        judge_model=getattr(args, "judge_model", None),
     )

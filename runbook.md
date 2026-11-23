@@ -169,11 +169,15 @@ Presenter cue sheet (enter each prompt once at `Both >`, without resetting betwe
 2. `Give me a one-sentence explanation of retrieval-augmented generation for a nontechnical audience.`
 3. `The slot has just been cut to one minute and the network is down. I am worried about overrunning. What should I do next? Keep it practical.`
 
-Read both answers first. Then use `/memory`, `/plan` and `/world` to inspect PRIMA, and open the displayed trace IDs in Langfuse. Filter on metadata `comparison_id`, `comparison_turn` and `comparison_branch`; `base.turn` contains only a real generation child, while `prima.turn` contains its actual phases. `/status` shows both session IDs and baseline history coverage. `/trace summary` and `/live on` enable PRIMA diagnostics if needed. `/profile` is fixed. `/reset` clears both branches and creates a new comparison group; use it between scenarios. `/quit` exits.
+Read both answers first. After turn 1, use `/affect` to show the classifier scores and `/decision` to explain the gate path. After turn 3, use `/evidence` to show the excerpts PRIMA assembled for generation. `/memory why` explains what was saved, `/action` shows recorded action results, and `/review` shows reflection, corrections, and validation. Open the printed trace IDs in Langfuse to inspect the corresponding phases. Filter by `comparison_id`, `comparison_turn`, and `comparison_branch`. `/status` shows both session IDs and baseline history coverage. Use `/trace summary` or `/live on` for more PRIMA diagnostics. The comparison profiles are fixed. Use `/reset` between scenarios to clear both branches and start a new comparison group. `/quit` exits.
 
 The baseline retains full history up to a 100,000-character input/history/policy guard; no messages are silently dropped. Compare mode rejects `--persist`. If either branch fails, its peer's answer remains visible but further turns require `/reset`, since histories may differ. `/state`, `/memory`, `/plan` and `/world` always refer to PRIMA. Technical success, estimator confidence and symbolic predictions are not proof of answer quality. Similar answers are a valid result of this qualitative control.
 
 Before presenting, run non-strict preflight, check the selected model/capture mode and rehearse once. Keep a clearly labeled saved rehearsal transcript for network/rate-limit trouble; do not present it as a live request. Allow asynchronous cloud ingestion time before opening the trace.
+
+Type `/eval` after the paired turn you want to discuss. It sends one judge request using the latest answers and both branches' preceding replies. Earlier user facts and corrections are part of the grading context. The output shows four rubric grades out of 4, reasons, an equally weighted aggregate out of 100, and a near-tie indication when the raw totals differ by at most one point. The context grade can be N/A for both answers when the task calls for no adaptation or prior context.
+
+On Groq, the judge defaults to `openai/gpt-oss-20b` and uses the same provider credentials. Set `--judge-model MODEL` to use a different model that supports JSON Schema output on that provider. The judge request has a 15-second transport timeout, a 2,048-token output budget, and no automatic retry. The transcript limit is 24,000 UTF-8 bytes. If the full context exceeds that budget, the pair is incomplete, or the scorecard is invalid, the CLI reports that the evaluation is unavailable. After a successful evaluation, repeat `/eval` to show the cached result for that pair. The score is a quick model judgment. Rehearse it on hand-graded examples before presenting it.
 
 ## 5. Run the two-turn presentation and inspect intermediate results
 
@@ -219,7 +223,14 @@ Expect the same session, a second state-version advance, and earlier relevant me
 | `/help` | List commands |
 | `/status` | Provider/model/profile/session/backend, persistence, live/diagnostic modes and Langfuse initialization status |
 | `/state` | Actual current state/version and persisted affect/PAD; salience is not a stored state field |
+| `/affect`, `/affect detail` | All emotion scores emitted for the last turn, heuristic confidence, PAD, and the state update. Detail adds classifier cues, salience, dissonance, evolution, momentum, retrieval priors, and reflection cues. |
+| `/decision`, `/decision detail` | Actual gate path and rules, followed by the final estimator's recommendation and candidate probabilities. Detail adds the confidence interval, subsystem signals, and policy thresholds. |
+| `/evidence` | Latest retrieval selection and final assembled context, with bounded excerpts, scores, confidence, and compression counts. |
 | `/memory` | Up to five recent stored memories; lists notes without semantic retrieval |
+| `/memory why` | Last memory admission policy, decision, available score components and threshold, and created note IDs. |
+| `/action` | Recorded action result and steps, with counts of submissions to the tool executor. A submission can be blocked by policy. |
+| `/review` | Reflection and reasoning reviews, workflow correction attempts, and final technical validation. |
+| `/eval` | In `compare`, grade the latest pair with one judge call. Shows grades, short reasons and an aggregate out of 100 for each branch. |
 | `/plan` | Latest turn's public plan, actions and constraints |
 | `/world` | Latest symbolic forecasts, risk/failure probabilities, effects and warnings; not confirmed real-world violations |
 | `/trace` | Show current post-turn diagnostic mode |

@@ -166,7 +166,13 @@ Live tracing is off by default. `/live`, `/live on`, and `/live off` show or cha
 | `/trace off\|summary\|full` | Change display only; diagnostic collection remains enabled. |
 | `/live [on\|off]` | Show or change live workflow event rendering for subsequent turns. |
 | `/state` | Read the active session's current state manager, including evolved PAD, affect confidence, stability and volatility. Empty goal/task/confidence sections show `n/a`; these values are not reconstructed from a previous answer. |
+| `/affect [detail]` | Inspect all emitted emotion scores and the last turn's affect update. Detail adds classifier cues, salience, momentum, retrieval priors, and reflection cues. |
+| `/decision [detail]` | Read the actual gate path and rules alongside the estimator's four candidate probabilities. Detail adds signal weights, the confidence interval, and policy thresholds. |
+| `/evidence` | Compare the latest retrieval selection with the final assembled context, with bounded excerpts. |
 | `/memory` | List up to five recent stored notes, with type, timestamp, salience and 240-character previews. This does not run retrieval. The repository is dedicated to the demo session; explicitly foreign-tagged notes are excluded, and untagged derived notes remain visible. |
+| `/memory why` | Inspect the latest admission decision, score versus threshold, and created note IDs. |
+| `/action` | Inspect recorded action steps and tool or external submissions. |
+| `/review` | Inspect reflection, accepted or rejected corrections, and technical validation. |
 | `/plan` | Show the latest public plan summary, with up to ten actions and ten constraints. |
 | `/world` | Show the latest reported risk/failure probabilities, constraint-prediction count, up to ten predicted state deltas and ten warnings. Constraint predictions are not counted as confirmed violations. |
 | `/profile prima\|rag\|model` | Change only future request profiles; no runtime/provider reconstruction or prompt rerun. `/profile` alone lists the current profile and choices. |
@@ -261,11 +267,13 @@ Use a non-sensitive session label; SDK session propagation requires ASCII IDs of
 
 Each entered message runs sequentially through ordinary model chat and a separate full PRIMA session. Both use the same model, generation settings, task-level policy, provider client and rate limiter. The base branch receives its own full user/assistant history; PRIMA uses its actual state and selected memories. The base branch has no cognitive workflow. OpenAI-compatible providers with role-based history (including Groq) are supported; unsupported adapters fail explicitly. No second key or dependency is needed.
 
-Answers appear side by side at widths of at least 100 columns and stacked otherwise, with actual latency, provider-call counts, reported tokens and trace IDs. `/reset` clears both branches and changes the comparison group. `/state`, `/memory`, `/plan` and `/world` inspect PRIMA; `/profile` is fixed. Compare mode is process-local and rejects `--persist`. Baseline input/history plus policy is limited to 100,000 characters; exceeding it stops both branches before a call and asks for reset, without silently dropping messages. This character bound does not guarantee an arbitrary provider model's context-window limit. A branch failure retains the other answer and requires a paired reset before more turns.
+Answers appear side by side at widths of at least 100 columns and stacked otherwise, with actual latency, provider-call counts, reported tokens and trace IDs. `/reset` clears both branches and changes the comparison group. All workflow inspection commands describe PRIMA in comparison mode. `/profile` is fixed. Compare mode is process-local and rejects `--persist`. Baseline input/history plus policy is limited to 100,000 characters; exceeding it stops both branches before a call and asks for reset, without silently dropping messages. This character bound does not guarantee an arbitrary provider model's context-window limit. A branch failure retains the other answer and requires a paired reset before more turns.
 
 Langfuse receives two independent traces per paired turn: `base.turn` with a generation child, and `prima.turn` with its actual phases. Shared `comparison_id`, `comparison_turn` and `comparison_branch` metadata links the records; branch session IDs remain separate. Langfuse works without a graph framework. This is a qualitative demonstration of an application layer, not a claim that PRIMA always improves answers; the same model may answer equally well from ordinary history.
 
 Applications embedding the runtime can call `monitoring.configure_tracing()` and `monitoring.shutdown_tracing()` at process lifecycle boundaries. Resetting a runtime must not shut down the shared telemetry setup. Tests inject isolated providers and in-memory exporters; no Langfuse service is needed.
+
+In `compare`, type `/eval` after a paired response for a quick rubric estimate. A single judge request grades both answers on task fulfillment, correctness and grounding, context use and adaptation, and clarity and usefulness. It sees the full conversation so far with each branch's own replies. The CLI computes the score out of 100 and flags near ties. Groq defaults to `openai/gpt-oss-20b` as judge. Use `--judge-model MODEL` to choose a schema-capable model on the same provider. Repeated evaluations of a successfully graded pair reuse its score. The judge runs from local conversation data and works with Langfuse disabled.
 
 ## Development
 

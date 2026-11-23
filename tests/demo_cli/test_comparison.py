@@ -183,12 +183,16 @@ def test_compare_cli_routes_commands_and_resets_both_branches(monkeypatch, capsy
     settings = _settings()
     monkeypatch.setattr(cli, "get_settings", lambda: settings)
     monkeypatch.setattr("demo_cli.comparison.ComparisonSession", lambda *args, **kwargs: session)
-    inputs = iter(["A practical tip.", "/status", "/profile model", "/plan", "/reset", "/status", "/quit"])
+    inputs = iter(["A practical tip.", "/status", "/profile model", "/plan", "/affect", "/decision",
+                   "/evidence", "/memory why", "/action", "/review", "/reset", "/affect", "/status", "/quit"])
     monkeypatch.setattr("builtins.input", lambda prompt: next(inputs))
     assert cli.main(["compare", "--provider", "groq", "--no-color"]) == 0
     text = capsys.readouterr().out
     assert "BASE MODEL (ordinary chat)" in text and "PRIMA (same model + pipeline)" in text
     assert "profiles are fixed" in text and "BOTH BRANCHES RESET" in text
+    for title in ("AFFECT", "EXECUTION DECISION", "MEMORY EVIDENCE", "MEMORY ADMISSION", "ACTION RESULT", "TURN REVIEW"):
+        assert f"\n{title}\n" in text
+    assert "No turn response is available yet." in text
     assert session.turn_index == 0 and not session.base_history
     assert not session.prima.runtime.maintenance_supervisor.running
 

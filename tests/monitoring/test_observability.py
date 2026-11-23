@@ -449,6 +449,9 @@ def test_content_real_sdk_full_answers_phase_results_and_reset(local_traces, mon
         assert content_field(children["world_simulation"], "output")["risk_score"] == response.output_data["world_prediction"]["risk_score"]
         assert content_field(children["action"], "output")["requires_external_tool"] is False
         assert content_field(children["memory_retrieval"], "output")["selected"] == []
+        evidence = content_field(children["evidence_acquisition"], "output")
+        assert evidence["selected_evidence"] == [] and evidence["stop_reason"]
+        assert evidence["retrieval"]["selected"] == []
         assert "technical" in content_field(children["output_validation"], "output")["validation_scope"]
         for name, child in children.items():
             assert "langfuse.observation.input" in child.attributes, name

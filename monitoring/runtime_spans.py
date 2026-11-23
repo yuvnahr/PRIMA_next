@@ -110,7 +110,7 @@ def _phase_output(phase: str, result: Any) -> Any:
     return _record(result)
 
 
-def record_retrieval(observation: SafeSpan, result: Any) -> None:
+def record_retrieval(observation: SafeSpan, result: Any, *, include_output: bool = True) -> None:
     try:
         diagnostics = result.diagnostics
         observation.set_attributes({
@@ -118,7 +118,7 @@ def record_retrieval(observation: SafeSpan, result: Any) -> None:
             "selected_count": len(result.results), "retrieval_confidence": result.confidence.confidence,
             "memory_types": sorted({item.note.memory_type.value for item in result.results}),
         })
-        if observation.capture_enabled:
+        if include_output and observation.capture_enabled:
             observation.content(output=_retrieval(result))
     except Exception as exc:
         if observation.owner:
@@ -145,7 +145,7 @@ def record_phase(observation: SafeSpan, phase: str, result: Any, context: Any) -
                           volatility=result.evolution.get("volatility"))
         elif phase == "evidence_acquisition":
             if result.latest_retrieval is not None:
-                record_retrieval(observation, result.latest_retrieval)
+                record_retrieval(observation, result.latest_retrieval, include_output=False)
             values["final_context_count"] = len(result.answer_result.evidence_references)
         elif phase == "planning":
             values = {"action_count": len(result.actions), "constraint_count": len(result.constraints),

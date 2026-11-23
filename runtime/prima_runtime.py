@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from action import ActionExecutor
+from action.execution_result import ExecutionResult
 from affect.affect_engine import DynamicAffectEngine
+from affect.affect_types import AffectUpdate
 from affect.classifier_factory import create_affect_classifier
 from config.runtime_config import RuntimeConfig
 from config.runtime_mode import RuntimeMode
@@ -58,6 +60,7 @@ from reasoning.models import (
 from reasoning.reflection_advisor import ReflectionAdvisor
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
+from reflection.reflection_result import ReflectionResult
 from runtime.contracts import (
     ComponentCapability,
     DiagnosticMode,
@@ -79,10 +82,12 @@ from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 from security.redaction import redact
 from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
+from tools.tool_result import ToolResult
 from uncertainty import UncertaintyEstimator, UncertaintyGate, UncertaintyGatePolicy
 from workflow.correction_loop import CorrectionBudget
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import WorkflowExecutionError
+from workflow.output_validation import OutputValidationResult
 from workflow.prima_workflow import PrimaWorkflow
 from workflow.workflow_state import WorkflowPhase, WorkflowStatus
 from world import StateSimulator
@@ -665,6 +670,8 @@ class PrimaRuntime:
             )
         if request.task_kind is TaskKind.HISTORICAL_REPLAY:
             output_data["memory_admission"]["configured_policy"] = self.runtime_config.admission_policy
+        if request.diagnostic_mode is DiagnosticMode.DIAGNOSTIC:
+            output_data["inspection"] = _inspection_details(context)
         if ingestion_id:
             output_data["memory_id"] = ingestion_id
             output_data["memory_type"] = getattr(
@@ -964,6 +971,52 @@ def _reflection_audit(context: ExecutionContext) -> dict[str, Any]:
         "original_output": original if original_observed else None, "original_output_observed": original_observed,
         "counterfactual_baseline": False, "final_output": str(getattr(context.generation_result, "text", "") or ""),
         "original_generation": original_generation.to_dict() if original_generation is not None and hasattr(original_generation, "to_dict") else None}
+
+
+def _inspection_details(context: ExecutionContext) -> dict[str, Any]:
+    details: dict[str, Any] = {}
+    affect = context.affect_update
+    if isinstance(affect, AffectUpdate):
+        details["affect"] = {
+            "salience": affect.salience_score,
+            "dissonance": affect.dissonance_score,
+            "evolution": dict(affect.evolution),
+            "retrieval_priors": dict(affect.retrieval_priors),
+            "reflection_signals": [
+                {"type": signal.signal_type, "strength": signal.strength}
+                for signal in affect.reflection_signals
+            ],
+        }
+    action = context.action_result.get("execution_result") if isinstance(context.action_result, dict) else None
+    if isinstance(action, ExecutionResult):
+        details["action"] = {
+            "status": action.status.value,
+            "intent": action.intent_type,
+            "tool_invocations": action.metadata.get("tool_invocation_count"),
+            "external_actions": action.metadata.get("external_action_count"),
+            "step_count": len(action.steps),
+            "steps": [
+                {
+                    "status": step.status.value,
+                    "id": step.action_id,
+                    "message": step.message,
+                    "tool_name": step.tool_result.tool_name if isinstance(step.tool_result, ToolResult) else None,
+                    "tool_status": step.tool_result.status.value if isinstance(step.tool_result, ToolResult) else None,
+                }
+                for step in action.steps[:10]
+            ],
+        }
+    reflection = context.reflection_result
+    if isinstance(reflection, ReflectionResult):
+        details["reflection"] = {
+            "triggered": reflection.should_reflect,
+            "trigger_score": reflection.trigger_score,
+            "advice": reflection.advice.action.value if reflection.advice is not None else None,
+        }
+    validation = context.output_validation
+    if isinstance(validation, OutputValidationResult):
+        details["validation"] = {"valid": validation.valid, "signals": [signal.value for signal in validation.signals]}
+    return details
 
 
 def _plan_summary(plan: Any) -> dict[str, Any] | None:

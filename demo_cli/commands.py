@@ -5,6 +5,7 @@ from __future__ import annotations
 from demo_cli.config import PROFILES, TraceMode
 from demo_cli.renderer import Renderer
 from demo_cli.session import DemoSession
+from demo_cli.turn_inspection import turn_rows
 
 HELP = """COMMANDS
 /help                    Show commands
@@ -12,13 +13,28 @@ HELP = """COMMANDS
 /trace off|summary|full   Change trace display
 /live [on|off]           Show or change live workflow tracing
 /state                   Show current cognitive state
+/affect [detail]         Show the last turn's emotion scores and affect update
+/decision [detail]       Show decision probabilities and the actual gate path
+/evidence                Show retrieved memories and final evidence
 /memory                  Show up to five stored memories
+/memory why              Explain the last turn's memory admission decision
 /plan                    Show the last turn's plan
 /world                   Show the last turn's world simulation
+/action                  Show recorded steps and tool submissions
+/review                  Show reflection, corrections and technical validation
 /profile prima|rag|model Change the next turn's profile
 /clear                   Clear terminal output only
 /reset                   Start a fresh conversation
 /quit                    Exit (/exit also works)"""
+
+TURN_INSPECTIONS = {
+    "/affect": ("AFFECT", "detail"),
+    "/decision": ("EXECUTION DECISION", "detail"),
+    "/evidence": ("MEMORY EVIDENCE", ""),
+    "/memory": ("MEMORY ADMISSION", "why"),
+    "/action": ("ACTION RESULT", ""),
+    "/review": ("TURN REVIEW", ""),
+}
 
 
 async def dispatch_command(text: str, session: DemoSession, renderer: Renderer) -> bool:
@@ -29,6 +45,15 @@ async def dispatch_command(text: str, session: DemoSession, renderer: Renderer) 
     command, args = parts[0].lower(), parts[1:]
     if command in {"/quit", "/exit"} and not args:
         return False
+    if command in TURN_INSPECTIONS and (command != "/memory" or args):
+        title, option = TURN_INSPECTIONS[command]
+        if not args or (option and args == [option]):
+            renderer.rows(title, turn_rows(session.latest_response, session.session_id, command,
+                                            detail=args == ["detail"], secrets=session.observability.secrets))
+        else:
+            suffix = " why" if command == "/memory" else " [detail]" if option else ""
+            renderer.message(f"Usage: {command}{suffix}")
+        return True
     inspections = {
         "/state": ("COGNITIVE STATE", session.current_state),
         "/memory": ("MEMORY", session.stored_memories),
