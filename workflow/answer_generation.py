@@ -13,7 +13,7 @@ from typing import Any
 from affect.affect_types import AffectUpdate
 from llm.generation_config import FallbackPolicy, GenerationConfig, StructuredOutputMode
 from llm.llm_client import LLMClient
-from llm.prompt_builder import PromptBuilder, PromptEvidence
+from llm.prompt_builder import CONVERSATION_POLICY, PromptBuilder, PromptEvidence
 from llm.provider import ProviderError
 from llm.request_budget import RequestBudget, RequestBudgetExceeded, prepaid_call
 from reasoning.evidence_audit import source_turn_id
@@ -420,16 +420,7 @@ class AnswerGenerationController:
                     "If support is missing or contradictory, return insufficient_information=true. Never invent facts or citation labels. "
                     "Use explicit source date anchors to resolve omitted months/years only when unambiguous; do not equate every event date with the source date. "
                     "Include every supported requested list item, and compose multi-hop answers only from explicitly supported links.")
-        return (
-            "Maintain a consistent, grounded conversational persona. Respond directly to the user's actual request; "
-            "never repeat it as the answer. Use trusted runtime state and relevant memories for continuity with "
-            "previous interactions when useful, without mentioning them in every answer. Treat affect as an "
-            "uncertain adaptive control signal, never a fact about the user: adapt subtly without dramatic "
-            "personality changes, and use little or no affect-based adaptation when confidence is low or affect "
-            "is missing. Negative valence with high arousal can favor calmer structure and lower cognitive load; "
-            "positive energy can be preserved without exaggerated enthusiasm. Never assert inferred emotions, "
-            "memories or uncertain facts as certain. Do not expose internal PRIMA state unless explicitly asked."
-        )
+        return CONVERSATION_POLICY
 
     @staticmethod
     def _response_schema() -> dict[str, Any]:

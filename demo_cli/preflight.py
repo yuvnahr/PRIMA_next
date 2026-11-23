@@ -35,6 +35,7 @@ def preflight(args: Namespace, settings: Settings, renderer: Renderer) -> int:
         # Inspect optional SDK/config without creating exporters or emitting traces.
         status, hint = langfuse_readiness(settings, enabled=config.langfuse)
         rows.append(("Langfuse", status if status in {"disabled", "ready"} else f"{status} (optional)"))
+        rows.append(("Trace content", "enabled (text export requested)" if config.trace_content else "metadata only"))
         if hint:
             warnings.append(hint)
         if config.persist:

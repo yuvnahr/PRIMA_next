@@ -74,6 +74,15 @@ def test_groq_default_and_generated_session_ids(settings) -> None:
     assert _config(["status"], settings).generation.model == settings.default_model
 
 
+def test_trace_content_is_explicit_and_requires_langfuse(settings):
+    assert not _config(["chat"], settings).trace_content
+    with pytest.raises(ValueError, match="requires --langfuse"):
+        _config(["chat", "--trace-content"], settings)
+    assert _config(["chat", "--langfuse", "--trace-content"], settings).trace_content
+    enabled = Settings(_env_file=None, langfuse_enabled=True)
+    assert _config(["chat", "--trace-content"], enabled).trace_content
+
+
 def test_ollama_model_must_be_explicit(settings) -> None:
     with pytest.raises(ValueError, match="Ollama requires --model"):
         _config(["chat", "--provider", "ollama"], settings)

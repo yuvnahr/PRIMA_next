@@ -68,6 +68,10 @@ class RetrievalController:
 
     def retrieve(self, request: RetrievalRequest) -> RetrievalResponse:
         with span("memory_retrieval") as observation:
+            if observation.capture_enabled:
+                observation.content(input={"query": request.query, "top_k": request.top_k,
+                                           "profile": request.profile, "memory_types": request.memory_types,
+                                           "state_filter": request.state_filter})
             result = self._retrieve(request)
             record_retrieval(observation, result)
             return result

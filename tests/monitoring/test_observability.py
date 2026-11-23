@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import builtins
+import json
 import logging
 import sys
 import threading
 import time
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -18,7 +20,9 @@ from config.settings import Settings
 from demo_cli import cli
 from demo_cli.config import resolve_config
 from llm.llm_types import LLMResponse
+from llm.prompt_builder import CONVERSATION_POLICY
 from monitoring import tracing
+from monitoring.trace_content import CONTENT_BUDGET, TEXT_LIMIT, sanitize_content
 from runtime import ExecutionProfile, ExecutionStatus, PrimaRequest, PrimaRuntime, TaskKind
 from tests.demo_cli.test_session_cli import _session
 from uncertainty import UncertaintyGatePolicy
@@ -379,5 +383,172 @@ def test_official_langfuse_sdk_propagates_sessions_and_generation(local_traces, 
             assert generation.attributes["langfuse.observation.model.name"] == session.config.generation.model
             assert generation.attributes["langfuse.observation.usage_details"]
         assert "test-secret" not in str([dict(s.attributes) for s in exporter.get_finished_spans()])
+    finally:
+        handle.shutdown()
+
+
+def content_handle(provider, monkeypatch):
+    """Exercise the installed SDK with an in-memory exporter, never HTTP."""
+    from uuid import uuid4
+
+    import langfuse
+
+    exporter = InMemorySpanExporter()
+    actual_client = langfuse.Langfuse
+    monkeypatch.setattr(langfuse, "Langfuse", lambda **kwargs: actual_client(**kwargs, span_exporter=exporter))
+    monkeypatch.setattr(tracing, "_CLIENTS", {})
+    settings = configured_settings().model_copy(update={"langfuse_public_key": f"test-{uuid4().hex}"})
+    return tracing.configure_tracing(settings, provider=provider), exporter
+
+
+def content_field(observation, name):
+    value = observation.attributes[f"langfuse.observation.{name}"]
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return value
+
+
+def test_content_real_sdk_full_answers_phase_results_and_reset(local_traces, monkeypatch):
+    provider, _ = local_traces
+    handle, exporter = content_handle(provider, monkeypatch)
+    session, fake = _session()
+    session.config = replace(session.config, trace_content=True)
+    session.observability = session.runtime.observability = handle
+    session.runtime.trace_content = True
+    answer = "A complete answer. " * 400
+    monkeypatch.setattr(fake, "send", lambda request: LLMResponse(answer, usage={"total_tokens": 12}))
+    text = "Please remember I prefer concise explanations."
+
+    async def run():
+        try:
+            response = await session.send(text)
+            session.runtime.trace_content = False
+            await session.send("metadata-only turn")
+            await session.reset()
+            await session.send("fresh content after reset")
+            return response
+        finally:
+            await session.close()
+
+    try:
+        response = asyncio.run(run())
+        handle.shutdown()
+        first, second, third = turn_spans(exporter)
+        root, children = first
+        assert content_field(root, "input")["user_input"] == text
+        assert content_field(root, "output")["answer"] == response.output_text == answer.strip()
+        generation = children["llm.generation"]
+        assert content_field(generation, "output") == answer
+        messages = content_field(generation, "input")["messages"]
+        assert messages[-1]["role"] == "user" and text in messages[-1]["content"]
+        assert messages[0]["content"] == CONVERSATION_POLICY
+        assert content_field(children["planning"], "output")["objective"] == text
+        first_plan = next(s for s in exporter.get_finished_spans() if s.name == "planning")
+        assert content_field(first_plan, "input")["plan"] is None
+        assert content_field(children["world_simulation"], "output")["risk_score"] == response.output_data["world_prediction"]["risk_score"]
+        assert content_field(children["action"], "output")["requires_external_tool"] is False
+        assert content_field(children["memory_retrieval"], "output")["selected"] == []
+        assert "technical" in content_field(children["output_validation"], "output")["validation_scope"]
+        for name, child in children.items():
+            assert "langfuse.observation.input" in child.attributes, name
+            assert "langfuse.observation.output" in child.attributes, name
+        assert all("langfuse.observation.input" not in child.attributes for child in second[1].values())
+        assert content_field(third[0], "input")["user_input"] == "fresh content after reset"
+        assert text not in content_field(third[1]["llm.generation"], "input")["messages"][-1]["content"]
+        assert len([s for s in exporter.get_finished_spans() if s.name == "llm.generation"]) == 3
+    finally:
+        handle.shutdown()
+
+
+def test_content_context_is_scoped_and_failures_are_noncritical(local_traces, monkeypatch, caplog):
+    provider, _ = local_traces
+    handle, exporter = content_handle(provider, monkeypatch)
+    request = PrimaRequest(task_kind=TaskKind.CONVERSATION, profile=ExecutionProfile.MODEL_ONLY,
+                           input_text="before mutation")
+    try:
+        with handle.turn(request, capture_content=True):
+            data = {"items": ["original"]}
+            with tracing.span("snapshot") as observation:
+                observation.content(input=data)
+                data["items"].append("later mutation")
+                observation.content(output={"ok": True})
+            with handle.turn(request):
+                with tracing.span("nested-private") as observation:
+                    observation.content(input="do not export")
+            with tracing.span("resumed") as observation:
+                observation.content(output="visible again")
+            monkeypatch.setattr(handle, "span_type", lambda **kwargs: (_ for _ in ()).throw(ValueError("test-secret")))
+            with tracing.span("broken") as observation:
+                observation.content(output="still returns normally")
+        handle.shutdown()
+        children = {s.name: s for s in exporter.get_finished_spans()}
+        assert content_field(children["snapshot"], "input") == {"items": ["original"]}
+        assert "langfuse.observation.input" not in children["nested-private"].attributes
+        assert content_field(children["resumed"], "output") == "visible again"
+        assert "test-secret" not in caplog.text
+    finally:
+        handle.shutdown()
+
+
+def test_content_serializer_redacts_credentials_and_bounds_unsafe_values():
+    cycle = []
+    cycle.append(cycle)
+    class Unsafe:
+        def __str__(self):
+            pytest.fail("Arbitrary objects must not be stringified")
+
+    payload = {"user_input": "Keep this prompt", "api_key": "nested-value", "cycle": cycle,
+               "text": "Bearer abc-credential and gsk_12345678901234567890 fixture-credential",
+               "url": "https://user:pass@example.org/path?token=private-token&topic=demo",
+               "unsafe": Unsafe(), "long": "x" * (TEXT_LIMIT + 1)}
+    clean = sanitize_content(payload, ("fixture-credential",))
+    serialized = json.dumps(clean)
+    for secret in ("nested-value", "abc-credential", "gsk_12345678901234567890", "fixture-credential", "private-token", "user:pass"):
+        assert secret not in serialized
+    assert clean["user_input"] == "Keep this prompt"
+    assert clean["cycle"] == [{"unavailable": "cycle"}]
+    assert clean["long"]["truncated"] and clean["long"]["original_characters"] == TEXT_LIMIT + 1
+    assert len(json.dumps(sanitize_content(["x" * TEXT_LIMIT] * 100))) < CONTENT_BUDGET + 2500
+
+
+@pytest.mark.parametrize("text", ['{"api_key": "quoted-value"}', "Authorization: Bearer unconfigured-value",
+                                 "password='two word value'", "Basic bXktY3JlZGVudGlhbA=="])
+def test_content_redacts_credentials_embedded_in_free_text(text):
+    clean = sanitize_content(text)
+    assert "[REDACTED]" in clean
+    assert not any(value in clean for value in ("quoted-value", "unconfigured-value", "two word value", "bXktY3JlZGVudGlhbA"))
+
+
+def test_paired_sdk_traces_are_correlated_and_base_has_no_cognitive_spans(local_traces, monkeypatch):
+    from tests.demo_cli.test_comparison import paired
+
+    provider, _ = local_traces
+    handle, exporter = content_handle(provider, monkeypatch)
+    session, fake = paired(monkeypatch, observability=handle, flags=("--langfuse", "--trace-content"))
+    async def run():
+        try:
+            return await session.send("Please remember I prefer concise explanations.")
+        finally:
+            await session.close()
+
+    try:
+        turn = asyncio.run(run())
+        handle.shutdown()
+        spans = exporter.get_finished_spans()
+        roots = {span.name: span for span in spans if span.parent is None}
+        assert set(roots) == {"base.turn", "prima.turn"}
+        assert turn.base.trace_id != turn.prima.trace_id
+        for branch, root in (("base", roots["base.turn"]), ("prima", roots["prima.turn"])):
+            assert root.attributes["prima.comparison_branch"] == branch
+            assert root.attributes["langfuse.trace.metadata.comparison_id"] == session.comparison_id
+            assert root.attributes["langfuse.trace.metadata.comparison_turn"] == "1"
+            children = [s for s in spans if s.context.trace_id == root.context.trace_id and s is not root]
+            assert all(s.attributes["langfuse.trace.metadata.comparison_branch"] == branch for s in children)
+            generation = next(s for s in children if s.name == "llm.generation")
+            assert content_field(generation, "input")["messages"] == fake.requests[0 if branch == "base" else 1].chat_messages()
+            assert content_field(generation, "output") == getattr(turn, branch).text
+        base_children = [s.name for s in spans if s.context.trace_id == roots["base.turn"].context.trace_id]
+        assert sorted(base_children) == ["base.turn", "llm.generation"]
     finally:
         handle.shutdown()

@@ -5,6 +5,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from demo_cli.comparison import ComparisonSession
 
 try:
     from config.settings import get_settings
@@ -29,11 +33,12 @@ except Exception:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Chat through the canonical PRIMA runtime.")
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("chat", "status", "preflight"):
+    for name in ("chat", "compare", "status", "preflight"):
         command = commands.add_parser(name)
-        if name in {"chat", "preflight"}:
+        if name in {"chat", "compare", "status", "preflight"}:
             command.add_argument("--langfuse", action="store_true", help="Enable optional Langfuse tracing for this process.")
-        if name == "chat":
+            command.add_argument("--trace-content", action="store_true", help="Export redacted prompt, answer and phase content to Langfuse (opt in).")
+        if name in {"chat", "compare"}:
             command.add_argument("--live-trace", action="store_true", help="Display actual foreground workflow events during each turn.")
         if name == "preflight":
             command.add_argument("--strict", action="store_true", help="Make one small live provider request (may use tokens).")
@@ -109,6 +114,56 @@ async def chat(session: DemoSession, renderer: Renderer) -> None:
             renderer.message("Warning: runtime cleanup did not complete; session is ending.")
 
 
+async def compare(session: ComparisonSession, renderer: Renderer) -> None:
+    try:
+        session.prima.observe_workflow(renderer)
+        await session.prima.start()
+        renderer.rows("PRIMA / BASE MODEL COMPARISON", session.status_rows())
+        renderer.message("Same model/settings; separate histories. Technical completion does not assess answer quality.")
+        renderer.message("/help for commands. /state, /memory, /plan and /world inspect PRIMA.")
+        if session.prima.observability.warning:
+            renderer.message(f"Warning: {session.prima.observability.warning}")
+        while True:
+            try:
+                text = input("Both > ")
+            except (EOFError, KeyboardInterrupt):
+                break
+            if not text.strip():
+                continue
+            try:
+                if text.lstrip().startswith("/"):
+                    command = text.strip().lower()
+                    if command in {"/quit", "/exit"}:
+                        break
+                    if command == "/reset":
+                        await session.reset()
+                        renderer.rows("BOTH BRANCHES RESET", session.status_rows())
+                    elif command == "/status":
+                        renderer.rows("COMPARISON STATUS", session.status_rows())
+                    elif command == "/help":
+                        renderer.message("/status /reset /clear /quit /exit\n"
+                                         "/state /memory /plan /world inspect PRIMA; /trace and /live control PRIMA diagnostics.\n"
+                                         "/profile is fixed: base chat versus prima. /reset clears both branches.")
+                    elif command.split()[0] == "/profile":
+                        renderer.message("Comparison profiles are fixed: ordinary base chat versus prima.")
+                    elif command.split()[0] in {"/state", "/memory", "/plan", "/world", "/trace", "/live", "/clear"}:
+                        await dispatch_command(text, session.prima, renderer)
+                    else:
+                        renderer.message("Unknown command or arguments. Type /help for commands.")
+                    continue
+                turn = await session.send(text)
+                renderer.comparison(turn)
+                if session.needs_reset:
+                    renderer.message("A branch failed; histories may differ. The successful answer is retained. Use /reset before continuing.")
+                if session.prima.latest_diagnostics:
+                    renderer.trace(session.prima.latest_diagnostics, session.prima.trace_mode)
+            except Exception as exc:
+                renderer.error(safe_reason(exc, provider=session.config.generation.provider), provider=session.config.generation.provider)
+            await asyncio.sleep(0)
+    finally:
+        await session.close()
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     renderer = Renderer(no_color=args.no_color)
@@ -124,6 +179,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             return preflight(args, settings, renderer)
         config = resolve_config(args, settings)
         renderer = Renderer(no_color=config.no_color)
+        if args.command == "compare":
+            from demo_cli.comparison import ComparisonSession
+
+            asyncio.run(compare(ComparisonSession(config, settings=settings), renderer))
+            return 0
         session = DemoSession(config, settings=settings)
         if args.command == "status":
             try:

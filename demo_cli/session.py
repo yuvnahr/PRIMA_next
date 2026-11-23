@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import uuid4
 
 from config.runtime_config import RuntimeConfig
@@ -57,6 +58,7 @@ class DemoSession:
                 mode=RuntimeMode.TEST, memory_repository=repository,
                 state_manager=state, runtime_config=runtime_config,
                 observability=self.observability,
+                trace_content=self.config.trace_content,
             )
         except BaseException:
             repository.close()
@@ -76,6 +78,7 @@ class DemoSession:
             ("Trace", self.trace_mode.value),
             ("Live trace", "on" if self.live_trace else "off"),
             ("Langfuse", self.observability.status),
+            ("Trace content", "enabled (text exported)" if self.config.trace_content else "metadata only"),
         )
 
     def observe_workflow(self, renderer: Renderer) -> None:
@@ -102,7 +105,7 @@ class DemoSession:
             raise ProviderError(f"{provider.name} API key is not configured. Set {provider.name.upper()}_API_KEY.")
         await self.runtime.start_maintenance()
 
-    async def send(self, text: str) -> PrimaResponse:
+    async def send(self, text: str, *, trace_metadata: dict[str, Any] | None = None) -> PrimaResponse:
         if self.config.persist and self._closed:
             raise PersistenceError("The persistent session is closed. Reopen it before sending another request.")
         self.latest_response = None
@@ -114,6 +117,7 @@ class DemoSession:
             response = await self.runtime.execute(PrimaRequest(
                 task_kind=TaskKind.CONVERSATION, profile=self.current_profile,
                 session_id=self.session_id, input_text=text, diagnostic_mode=DiagnosticMode.DIAGNOSTIC,
+                metadata=trace_metadata or {},
             ))
         finally:
             if self._live_observer is not None:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
-from monitoring.runtime_spans import record_phase
+from monitoring.runtime_spans import record_phase, record_phase_input
 from monitoring.tracing import span
 from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice
 from state.cognitive_state import CognitiveState
@@ -124,6 +124,7 @@ class OrchestrationEngine:
                 controller = self.registry.get(phase)
                 with span(phase.value) as observation:
                     observation.set_attributes({"attempt": attempts + 1})
+                    record_phase_input(observation, phase.value, context)
                     result = await controller.execute(context)
                     self._route_phase_output(context, phase, result)
                     if attempts:

@@ -67,9 +67,10 @@ class LiveTraceObserver:
             marker, phase = "[!!]", "workflow"
             detail = "failed" if kind is EventType.WORKFLOW_FAILED else "cancelled"
         else:
-            phase = event.payload.get("phase")
-            if not isinstance(phase, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", phase):
+            raw_phase = event.payload.get("phase")
+            if not isinstance(raw_phase, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", raw_phase):
                 return
+            phase = raw_phase
             if kind is EventType.WORKFLOW_PHASE_STARTED and phase == "answer_generation":
                 marker = "[>>]"
             elif kind is EventType.WORKFLOW_PHASE_COMPLETED:

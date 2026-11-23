@@ -40,6 +40,15 @@ def safe_reason(error: BaseException | str, *, provider: str = "") -> str:
         "Unable to resolve demo data directory. Check PRIMA_DEMO_DATA_DIR or --data-dir.",
         "temperature must be between 0 and 2",
         "Token limit and timeout must be positive; retries cannot be negative.",
+        "--trace-content requires --langfuse or LANGFUSE_ENABLED=true.",
+        "Comparison requires --profile prima; the other branch is a direct model chat.",
+        "Comparison uses process-local histories. Omit --persist; reset starts both branches fresh.",
+        "Comparison requires process-local storage and the prima profile.",
+        "Comparison requires an OpenAI-compatible provider with role-based history (e.g. Groq).",
+        "The branches have uneven histories after a failure. Use /reset before continuing.",
+        "Enter a nonempty comparison prompt.",
+        "Baseline history limit reached; no messages were dropped and neither branch ran. Use /reset.",
+        "The base model returned an empty answer.",
     }:
         return text
     return "operation did not complete; check configuration or use the existing diagnostic logs."

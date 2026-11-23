@@ -38,6 +38,7 @@ class DemoConfig:
     persist: bool = False
     data_dir: Path = Path(__file__).resolve().parents[1] / ".demo_data"
     live_trace: bool = False
+    trace_content: bool = False
 
 
 def resolve_config(
@@ -91,10 +92,20 @@ def resolve_config(
         data_dir = data_dir.resolve()
     except (OSError, ValueError, RuntimeError):
         raise ValueError("Unable to resolve demo data directory. Check PRIMA_DEMO_DATA_DIR or --data-dir.") from None
+    langfuse = getattr(args, "langfuse", False) or settings.langfuse_enabled
+    trace_content = getattr(args, "trace_content", False)
+    if trace_content and not langfuse:
+        raise ValueError("--trace-content requires --langfuse or LANGFUSE_ENABLED=true.")
+    if getattr(args, "command", None) == "compare":
+        if profile_name != "prima":
+            raise ValueError("Comparison requires --profile prima; the other branch is a direct model chat.")
+        if getattr(args, "persist", False):
+            raise ValueError("Comparison uses process-local histories. Omit --persist; reset starts both branches fresh.")
     return DemoConfig(
         GenerationConfig(model=model.strip(), provider=provider, temperature=temperature, max_output_tokens=max_tokens),
         PROFILES[profile_name], session_id, trace_mode, args.no_color or "NO_COLOR" in env,
-        getattr(args, "langfuse", False) or settings.langfuse_enabled,
+        langfuse,
         persist=getattr(args, "persist", False), data_dir=data_dir,
         live_trace=getattr(args, "live_trace", False),
+        trace_content=trace_content,
     )

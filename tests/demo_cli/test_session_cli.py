@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
 import pytest
 
@@ -173,12 +174,12 @@ def test_failed_output_retains_actual_usage_through_bounded_correction(monkeypat
 
 def test_reset_reuses_runtime_log_handler():
     session, _ = _session()
-    handler = session.runtime.logger.handlers[0]
+    handler = next(item for item in session.runtime.logger.handlers if isinstance(item, logging.FileHandler))
 
     async def run():
         try:
             await session.reset()
-            assert session.runtime.logger.handlers == [handler]
+            assert [item for item in session.runtime.logger.handlers if isinstance(item, logging.FileHandler)] == [handler]
         finally:
             await session.close()
 

@@ -211,7 +211,7 @@ def adapt_response(response: PrimaResponse, *, previous_state_version: int | Non
                          else f"v{previous_state_version} -> v{current_version}")
     model_calls = f"{diagnostics.model_call_count} model call(s)" if "model_call_count" in fields else "n/a"
     latency = diagnostics.latency_ms if "latency_ms" in fields else data.get("latency_ms")
-    architecture = (
+    architecture: tuple[tuple[str, str], ...] = (
         ("Affect", module(RuntimeComponent.AFFECT_ENGINE, (f"{_value(affect.get('dominant_emotion'))} / valence {_value(affect.get('valence'))}" + (f" / arousal {_value(affect['arousal'])}" if "arousal" in affect else "")) if affect else "n/a")),
         ("Retrieval", module(RuntimeComponent.DENSE_RETRIEVAL, f"{_value(retrieval.get('selected_count'))} selected / {_value(retrieval.get('candidate_count'))} candidates / {_value(retrieval.get('final_context_count'))} in context" if retrieval else "n/a")),
         ("Planning", module(RuntimeComponent.PLANNER, f"{_value(plan.get('action_count'))} actions / confidence {_value(plan.get('confidence'))}" if plan else "n/a")),

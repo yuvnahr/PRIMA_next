@@ -13,6 +13,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from config.settings import Settings, get_settings
+from monitoring.trace_content import sanitize_content
 
 try:
     from opentelemetry import trace
@@ -31,6 +32,8 @@ _CONSOLE_PROVIDERS: set[Any] = set()
 _OWNED_PROVIDERS: set[Any] = set()
 _CURRENT: ContextVar[Tracing | None] = ContextVar("prima_tracing", default=None)
 _ROOT: ContextVar[SafeSpan | None] = ContextVar("prima_root", default=None)
+_CAPTURE: ContextVar[bool] = ContextVar("prima_trace_content", default=False)
+_UNSET = object()
 
 
 class _ExportLogFilter(logging.Filter):
@@ -80,6 +83,31 @@ class SafeSpan:
         self.raw = raw
         self.owner = owner
         self.generation: Any = None
+        self.observation: Any = None
+        self.capture_enabled = bool(_CAPTURE.get() and raw is not None and owner and owner.client and not owner.closed)
+
+    @property
+    def trace_id(self) -> str | None:
+        try:
+            context = self.raw.get_span_context() if self.raw is not None else None
+            return f"{context.trace_id:032x}" if context and context.is_valid else None
+        except Exception:
+            return None
+
+    def content(self, *, input: Any = _UNSET, output: Any = _UNSET) -> None:
+        owner = self.owner
+        if not self.capture_enabled or owner is None:
+            return
+        try:
+            wrapper = self.generation or self.observation
+            if wrapper is None:
+                wrapper = owner.span_type(otel_span=self.raw, langfuse_client=owner.client)
+                self.observation = wrapper
+            values = {key: sanitize_content(value, owner.secrets)
+                      for key, value in (("input", input), ("output", output)) if value is not _UNSET}
+            wrapper.update(**values)
+        except Exception as exc:
+            owner.warn("content capture", exc)
 
     def set_attributes(self, values: dict[str, Any]) -> None:
         if self.raw is None:
@@ -131,6 +159,7 @@ class Tracing:
         self.client: Any = None
         self.propagate: Any = None
         self.generation_type: Any = None
+        self.span_type: Any = None
         self.closed = False
         self.warning: str | None = None
         self.exporting = threading.Event()
@@ -175,20 +204,27 @@ class Tracing:
                     self.warn("span end", exc)
 
     @contextmanager
-    def turn(self, request: Any) -> Iterator[SafeSpan]:
+    def turn(self, request: Any, *, capture_content: bool = False, name: str = "prima.turn") -> Iterator[SafeSpan]:
         token = _CURRENT.set(self)
+        capture_token = _CAPTURE.set(capture_content)
         try:
-            with self.span("prima.turn", root=True) as observation:
+            with self.span(name, root=True) as observation:
                 root_token = _ROOT.set(observation)
                 propagation = None
                 observation.set_attributes({"request_id": request.request_id, "session_id": request.session_id,
                                             "task_kind": request.task_kind.value, "execution_profile": request.profile.value})
+                correlation = {key: request.metadata[key] for key in
+                               ("comparison_id", "comparison_turn", "comparison_branch") if key in request.metadata}
+                observation.set_attributes(correlation)
+                observation.content(input={"user_input": request.input_text, "task": request.task_kind.value,
+                                           "profile": request.profile.value})
                 try:
                     if self.propagate is not None:
                         session = request.session_id
                         if session and (not session.isascii() or len(session) > 200 or any(s in session for s in self.secrets)):
                             raise ValueError("Session ID cannot be propagated safely")
-                        candidate = self.propagate(session_id=session)
+                        safe_metadata = sanitize_content(correlation, self.secrets)
+                        candidate = self.propagate(session_id=session, metadata={key: str(value) for key, value in safe_metadata.items()})
                         candidate.__enter__()
                         propagation = candidate
                 except Exception as exc:
@@ -203,6 +239,7 @@ class Tracing:
                             self.warn("session propagation exit", exc)
                     _ROOT.reset(root_token)
         finally:
+            _CAPTURE.reset(capture_token)
             _CURRENT.reset(token)
 
     def shutdown(self, timeout: float = 3.0) -> None:
@@ -270,6 +307,7 @@ def configure_tracing(settings: Settings | None = None, *, enabled: bool | None 
         handle.warning = hint
         return handle
     try:
+        import langfuse
         from langfuse import Langfuse, LangfuseGeneration, propagate_attributes
 
         if trace is None:
@@ -293,6 +331,7 @@ def configure_tracing(settings: Settings | None = None, *, enabled: bool | None 
             )
             handle.propagate = propagate_attributes
             handle.generation_type = LangfuseGeneration
+            handle.span_type = getattr(langfuse, "LangfuseSpan", None)
             _CLIENTS[selected] = handle
             return handle
     except Exception as exc:

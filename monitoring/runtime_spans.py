@@ -1,10 +1,113 @@
-"""Bounded aggregate metadata from canonical phase results, never prompt content."""
+"""Aggregate metadata and opt-in projections of canonical phase inputs/results."""
 
 from __future__ import annotations
 
 from typing import Any
 
 from monitoring.tracing import SafeSpan, root_attributes
+
+
+def _record(value: Any) -> Any:
+    return value.to_dict() if value is not None and hasattr(value, "to_dict") else value
+
+
+def _state(value: Any) -> dict[str, Any]:
+    return {"version": value.version, "goal": dict(value.goal), "task": dict(value.task),
+            "confidence": dict(value.confidence), "environment": dict(value.environment),
+            "emotional": value.emotional.to_dict()}
+
+
+def _retrieval(result: Any) -> Any:
+    if result is None:
+        return None
+    return {"confidence": result.confidence.to_dict(), "selected_count": len(result.results),
+            "selected": [{"id": item.note.id, "text": item.note.content, "score": item.score,
+                          "memory_type": item.note.memory_type.value, "provenance": item.note.context}
+                         for item in result.results]}
+
+
+def _evidence(result: Any) -> list[dict[str, Any]]:
+    return [{"id": item.evidence_id, "source_id": item.source_id, "text": item.text,
+             "query": item.query, "hop": item.hop, "provenance": item.provenance}
+            for item in getattr(result, "evidence_references", ())]
+
+
+def record_phase_input(observation: SafeSpan, phase: str, context: Any) -> None:
+    """Snapshot only the relevant inputs, before controller-owned mutations."""
+    if not observation.capture_enabled:
+        return
+    try:
+        fields = {
+            "affect": ("cognitive_state",),
+            "planning": ("cognitive_state", "retrieval_response", "affect_update", "plan"),
+            "world_simulation": ("cognitive_state", "plan"),
+            "uncertainty_estimation": ("cognitive_state", "retrieval_response", "affect_update", "plan", "reflection_result"),
+            "execution_decision": ("uncertainty", "world_prediction"),
+            "reflection": ("cognitive_state", "retrieval_response", "affect_update"),
+            "action": ("cognitive_state", "plan", "world_prediction", "uncertainty"),
+            "answer_generation": ("cognitive_state", "plan", "affect_update", "reasoning_result"),
+            "output_validation": ("generation_result", "action_result", "reasoning_result", "plan"),
+            "output": ("generation_result", "action_result", "execution_decision", "output_validation"),
+            "state_commit": ("cognitive_state", "output"),
+            "memory_commit": ("output", "affect_update", "reflection_result"),
+            "maintenance_enqueue": ("memory_admission",),
+        }
+        values: dict[str, Any] = {"phase": phase}
+        if phase in {"affect", "planning", "reflection", "answer_generation", "memory_commit", "document_ingestion"}:
+            values["user_input"] = context.user_input
+        for name in fields.get(phase, ()):
+            value = getattr(context, name)
+            values[name] = (_state(value) if name == "cognitive_state" else
+                            _retrieval(value) if name == "retrieval_response" else
+                            {"selected_evidence": _evidence(value)} if name == "reasoning_result" else
+                            _record(value))
+        metadata_fields = {
+            "state_load": ("state_session_id",),
+            "evidence_acquisition": ("top_k", "reasoning_mode", "max_hops", "max_retrieval_calls", "max_context_tokens", "profile"),
+            "planning": ("replan_reason", "reflection_signals"),
+            "world_simulation": ("execution_policy",),
+            "uncertainty_estimation": ("execution_policy",),
+            "execution_decision": ("retrieval_retry_count", "clarification_required"),
+            "reflection": ("reflection_history",),
+            "action": ("execution_policy",),
+            "answer_generation": ("tool_results",),
+            "output": ("correction_terminal_action",),
+        }
+        for name in metadata_fields.get(phase, ()):
+            if name in context.metadata:
+                values[name] = _record(context.metadata[name])
+        if phase == "evidence_acquisition":
+            values["query"] = context.metadata.get("retrieval_query_override", context.user_input)
+        if phase == "maintenance_enqueue":
+            values["memory_ids"] = [note.id for note in context.memory_notes_created]
+        observation.content(input=values)
+    except Exception as exc:
+        if observation.owner:
+            observation.owner.warn("phase input", exc)
+
+
+def _phase_output(phase: str, result: Any) -> Any:
+    if phase == "affect":
+        return {**result.to_dict(), "confidence_interpretation": "heuristic estimate, not a calibrated probability"}
+    if phase == "state_load":
+        return _state(result)
+    if phase == "evidence_acquisition":
+        answer = result.answer_result
+        return {"selected_evidence": _evidence(answer), "retrieval": _retrieval(result.latest_retrieval),
+                "confidence": answer.confidence, "stop_reason": answer.stop_reason, "hop_count": answer.hop_count}
+    if phase == "state_commit":
+        return {"committed": result["committed"], "state": _state(result["state"])}
+    if phase == "memory_commit":
+        return {"admission": result.get("admission"),
+                "notes": [{"id": note.id, "text": note.content, "memory_type": note.memory_type.value}
+                          for note in result.get("notes", ())]}
+    if phase == "action":
+        return _record(result.get("execution_result"))
+    if phase == "output_validation":
+        return {**result.to_dict(), "validation_scope": "technical; answer quality not assessed"}
+    if phase == "document_ingestion":
+        return {"memory_id": result.memory_id, "memory_type": result.memory_type.value}
+    return _record(result)
 
 
 def record_retrieval(observation: SafeSpan, result: Any) -> None:
@@ -15,12 +118,20 @@ def record_retrieval(observation: SafeSpan, result: Any) -> None:
             "selected_count": len(result.results), "retrieval_confidence": result.confidence.confidence,
             "memory_types": sorted({item.note.memory_type.value for item in result.results}),
         })
+        if observation.capture_enabled:
+            observation.content(output=_retrieval(result))
     except Exception as exc:
         if observation.owner:
             observation.owner.warn("retrieval metadata", exc)
 
 
 def record_phase(observation: SafeSpan, phase: str, result: Any, context: Any) -> None:
+    if observation.capture_enabled:
+        try:
+            observation.content(output=_phase_output(phase, result))
+        except Exception as exc:
+            if observation.owner:
+                observation.owner.warn("phase output", exc)
     try:
         values: dict[str, Any] = {}
         if phase == "state_load":

@@ -118,6 +118,7 @@ class PrimaRuntime:
         generation_config: GenerationConfig | None = None,
         runtime_config: RuntimeConfig | None = None,
         observability: Tracing | None = None,
+        trace_content: bool = False,
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
@@ -165,6 +166,8 @@ class PrimaRuntime:
         self.reflection_engine = reflection_engine or ReflectionEngine()
         settings = get_settings()
         self.observability = observability or configure_tracing(settings)
+        self.trace_content = trace_content
+        self.last_trace_id: str | None = None
         self.generation_config = generation_config or GenerationConfig(
             model=settings.default_model,
             provider=(llm_client.provider_name if llm_client is not None else settings.default_provider),
@@ -218,11 +221,14 @@ class PrimaRuntime:
 
         if not isinstance(request, PrimaRequest):
             raise TypeError("request must be a PrimaRequest")
-        with self.observability.turn(request) as observation:
+        with self.observability.turn(request, capture_content=self.trace_content) as observation:
+            self.last_trace_id = observation.trace_id
             generation = request.generation_config or self.generation_config
             observation.set_attributes({"provider": generation.provider, "model": generation.model})
             response = await self._execute(request)
             observation.set_attributes({"status": response.status.value,
+                                        "outcome": response.outcome.value if response.outcome else None})
+            observation.content(output={"answer": response.output_text, "status": response.status.value,
                                         "outcome": response.outcome.value if response.outcome else None})
             if response.status in {ExecutionStatus.FAILED, ExecutionStatus.REJECTED, ExecutionStatus.CANCELLED}:
                 observation.fail()

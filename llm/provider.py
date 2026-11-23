@@ -70,6 +70,7 @@ class Provider(ABC):
     """Provider session configured once when the client is built."""
 
     name = "generic"
+    supports_history = False
     capabilities: ProviderCapabilities
 
     def __init__(self, settings: Settings | None = None) -> None:
@@ -79,6 +80,8 @@ class Provider(ABC):
         """Reject unsupported fields instead of silently dropping them."""
 
         config = request.generation
+        if request.history and not self.supports_history:
+            raise ProviderCapabilityError(f"{self.name} does not support role-based chat history")
         if request.system_prompt and not self.capabilities.system_prompts:
             raise ProviderCapabilityError(f"{self.name} does not support system prompts")
         if config.structured_output not in self.capabilities.structured_output:
@@ -126,6 +129,7 @@ class OpenAICompatibleProvider(Provider):
     """Shared transport for servers exposing ``/v1/chat/completions``."""
 
     capabilities = _OPENAI_CAPABILITIES
+    supports_history = True
     default_base_url = ""
     requires_api_key = False
 
@@ -143,13 +147,9 @@ class OpenAICompatibleProvider(Provider):
         if not self.base_url:
             raise ProviderError(f"{self.name} base URL is not configured")
         config = request.generation
-        messages = []
-        if request.system_prompt:
-            messages.append({"role": "system", "content": request.system_prompt})
-        messages.append({"role": "user", "content": request.prompt})
         payload: dict[str, Any] = {
             "model": config.model,
-            "messages": messages,
+            "messages": request.chat_messages(),
             "temperature": config.temperature,
             "max_tokens": config.max_output_tokens,
         }

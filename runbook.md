@@ -115,7 +115,7 @@ Expect `groq`, `openai/gpt-oss-120b`, `prima_full`, an in-memory backend, and a 
 | Exit `1`, NOT READY | Fix the displayed configuration/dependency/storage issue |
 | Exit `2` | Invalid command-line syntax; inspect `--help` |
 
-`status` reports construction/configuration, not provider health. Its Langfuse status can be `disabled`, `enabled`, or `misconfigured`; `enabled` means SDK initialization succeeded. To inspect an invocation enabled with `--langfuse`, use `/status` **inside that chat**. Standalone `status` does not accept `--langfuse`.
+`status` reports construction/configuration, not provider health. Its Langfuse status can be `disabled`, `enabled`, or `misconfigured`; `enabled` means SDK initialization succeeded. Use `/status` inside chat or `status --langfuse --trace-content` to check capture configuration; no model call is made by status.
 
 ### Optional Groq connectivity diagnostic — consumes a provider request
 
@@ -132,19 +132,19 @@ This makes one generation with an eight-token limit, ten-second timeout, and zer
 ### Groq with Langfuse and live terminal events
 
 ```powershell
-.\demo.ps1 chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-demo-01 --trace summary --live-trace --langfuse --temperature 0 --max-tokens 256 --no-color
+.\demo.ps1 chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-demo-01 --trace summary --live-trace --langfuse --trace-content --temperature 0 --max-tokens 4096 --no-color
 ```
 
 Use a fresh, non-sensitive ASCII session label shorter than 200 characters, and keep the exact label for finding traces. Reusing it groups later traces under the same Langfuse session; it does not itself enable local persistence.
 
-The explicit 256-token cap keeps the smoke test small while allowing reasoning and a short answer. The application's default is 4096 if you omit the flag. Every conversational prompt can consume provider tokens; inspection commands below do not. Client retries default to zero, but invalid generated output can still trigger bounded output correction and another request. Do not repeat authentication/configuration failures unchanged.
+The 4096-token completion budget is also the application default. Reasoning models can spend part of it on reasoning; a small cap such as 256 can leave a clipped or empty final answer. Every conversational prompt can consume provider tokens; inspection commands below do not. Client retries default to zero, but invalid generated output can still trigger bounded output correction and another request. Do not repeat authentication/configuration failures unchanged. Omit `--trace-content` for metadata-only export.
 
 ### Groq without Langfuse
 
 Ensure `LANGFUSE_ENABLED=false` in `.env` and any process override, then omit `--langfuse`:
 
 ```powershell
-.\demo.ps1 chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-offline-traces-01 --trace summary --live-trace --temperature 0 --max-tokens 256 --no-color
+.\demo.ps1 chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-offline-traces-01 --trace summary --live-trace --temperature 0 --max-tokens 4096 --no-color
 ```
 
 There is no interactive `/langfuse` or `--no-langfuse` switch. Disable the setting and restart. Live terminal events and post-turn diagnostics continue to work without Langfuse.
@@ -152,8 +152,28 @@ There is no interactive `/langfuse` or `--no-langfuse` switch. Disable the setti
 If script execution is blocked, an equivalent module invocation is:
 
 ```powershell
-python -m demo_cli.cli chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-demo-01 --trace summary --live-trace --langfuse --temperature 0 --max-tokens 256 --no-color
+python -m demo_cli.cli chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-demo-01 --trace summary --live-trace --langfuse --trace-content --temperature 0 --max-tokens 4096 --no-color
 ```
+
+### Side-by-side qualitative comparison
+
+```powershell
+.\demo.ps1 compare --provider groq --model openai/gpt-oss-120b --session capstone-compare --langfuse --trace-content --trace off --temperature 0 --max-tokens 4096 --no-color
+```
+
+The same key/model/settings serve two sequential requests per paired turn, except for real retries/corrections. The base model receives its own ordinary chat history; PRIMA has separate state/memory. No graph or extra key is needed for base-model Langfuse tracing. Use a terminal at least 100 columns wide for columns; narrower terminals show stacked full answers.
+
+Presenter cue sheet (enter each prompt once at `Both >`, without resetting between these turns):
+
+1. `I have a three-minute project presentation. I prefer concrete checklists rather than breathing exercises. The venue Wi-Fi is unreliable, but I have an offline PDF. Help me prepare.`
+2. `Give me a one-sentence explanation of retrieval-augmented generation for a nontechnical audience.`
+3. `The slot has just been cut to one minute and the network is down. I am worried about overrunning. What should I do next? Keep it practical.`
+
+Read both answers first. Then use `/memory`, `/plan` and `/world` to inspect PRIMA, and open the displayed trace IDs in Langfuse. Filter on metadata `comparison_id`, `comparison_turn` and `comparison_branch`; `base.turn` contains only a real generation child, while `prima.turn` contains its actual phases. `/status` shows both session IDs and baseline history coverage. `/trace summary` and `/live on` enable PRIMA diagnostics if needed. `/profile` is fixed. `/reset` clears both branches and creates a new comparison group; use it between scenarios. `/quit` exits.
+
+The baseline retains full history up to a 100,000-character input/history/policy guard; no messages are silently dropped. Compare mode rejects `--persist`. If either branch fails, its peer's answer remains visible but further turns require `/reset`, since histories may differ. `/state`, `/memory`, `/plan` and `/world` always refer to PRIMA. Technical success, estimator confidence and symbolic predictions are not proof of answer quality. Similar answers are a valid result of this qualitative control.
+
+Before presenting, run non-strict preflight, check the selected model/capture mode and rehearse once. Keep a clearly labeled saved rehearsal transcript for network/rate-limit trouble; do not present it as a live request. Allow asynchronous cloud ingestion time before opening the trace.
 
 ## 5. Run the two-turn presentation and inspect intermediate results
 
@@ -268,9 +288,9 @@ Check these PRIMA attributes/metadata when present; UI placement depends on the 
 | `llm.generation` | Model, parameters, actual reported token usage and attempt; also check failed status |
 | `state_commit` / `memory_commit` | Whether state committed, resulting version, admission and created-note count |
 
-The UI intentionally has **no prompt, answer or memory content** for these traces. PRIMA exports metadata only; an empty input/output pane is expected. Session grouping does not enable content replay. Use the terminal to inspect answer text and memory previews. Missing token usage must not be treated as zero; enqueue is not proof that cold maintenance finished.
+Without `--trace-content`, the export remains metadata-only and empty input/output panes are expected. With the flag, open the root's actual request/final answer, the generation's logical messages/provider response, and structured planning/world/action inputs and results. Configured credentials and recognized credential patterns are redacted. Content is bounded (65,536 characters per string, 131,072-character traversal budget per input/output, 64 collection entries, 10 nesting levels) with explicit limit markers. This exports real text to the project; use synthetic demo data. Missing usage is not zero; symbolic predictions are not executed effects; enqueue is not proof that cold maintenance finished. Technical validation does not assess general answer quality.
 
-Do not declare Langfuse delivery verified until you can see the new `prima.turn` and its actual children in the correct project. The prior audit validated the modern SDK locally; it did not validate cloud delivery.
+Do not declare a new invocation's Langfuse delivery verified until you see its new root and actual children in the correct project. SDK initialization alone does not prove delivery. The five-turn audit on 2026-11-16 verified cloud delivery for that run; a metadata-only old trace will not gain content retroactively.
 
 ## 7. Diagnostics when Langfuse traces are missing
 
@@ -317,7 +337,7 @@ finally:
 | Authentication works but no trace | Send an actual turn; confirm correct project/session/time/environment filters; wait for asynchronous ingestion and inspect shutdown warnings |
 | Root visible but no child rows in table | Open the trace tree or clear the root-observation-only table filter |
 | Session not found | Exact ASCII session label; remove old UI filters; after reset use the new displayed ID |
-| Empty input/output | Expected metadata-only policy, not missing instrumentation |
+| Empty input/output | Expected without `--trace-content`; with it, inspect a new trace, check capture mode and watch for safe content-capture warnings. Old traces are unchanged. |
 | Missing reflection span | Check actual routing/diagnostics; do not force extra paid prompts solely to trigger reflection |
 | Generic export warning | PRIMA intentionally hides raw SDK/server diagnostics; continue chat if needed, investigate configuration privately |
 
@@ -329,7 +349,7 @@ Persistence is off by default, even when `--session` is supplied. To demonstrate
 
 ```powershell
 .\demo.ps1 preflight --persist --session capstone-persist-01 --provider groq --model openai/gpt-oss-120b --langfuse --no-color
-.\demo.ps1 chat --persist --session capstone-persist-01 --provider groq --model openai/gpt-oss-120b --live-trace --langfuse --temperature 0 --max-tokens 256 --no-color
+.\demo.ps1 chat --persist --session capstone-persist-01 --provider groq --model openai/gpt-oss-120b --live-trace --langfuse --temperature 0 --max-tokens 4096 --no-color
 ```
 
 Inspect `/state` and `/memory`, enter turns if needed, then `/quit`. Run the same chat command again to resume; inspection itself makes no model request. Default non-strict persistent preflight checks advisory permissions/existing JSON without opening Chroma or creating session data. `--strict` additionally opens stores and makes the small provider request described above.
@@ -354,7 +374,7 @@ In the demo terminal, replace `EXACT-INSTALLED-MODEL-ID` with a name from that l
 
 ```powershell
 .\demo.ps1 preflight --provider ollama --model 'EXACT-INSTALLED-MODEL-ID' --langfuse --no-color
-.\demo.ps1 chat --provider ollama --model 'EXACT-INSTALLED-MODEL-ID' --session capstone-local-01 --live-trace --langfuse --max-tokens 256 --no-color
+.\demo.ps1 chat --provider ollama --model 'EXACT-INSTALLED-MODEL-ID' --session capstone-local-01 --live-trace --langfuse --max-tokens 4096 --no-color
 ```
 
 Non-strict preflight does not check server reachability. Optional `preflight --strict` generates locally to check the server/model. No Groq tokens are used on this provider. The demo does not download models or switch providers/models inside a session. Omit `--langfuse` with the setting disabled if tracing is unavailable.
@@ -365,7 +385,7 @@ Git Bash on Windows uses the same configuration and CLI flags:
 cd /c/Users/prate/Code/GitHub/PRIMA_next
 source .venv/Scripts/activate
 ./demo preflight --provider groq --model openai/gpt-oss-120b --langfuse --no-color
-./demo chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-bash-01 --trace summary --live-trace --langfuse --temperature 0 --max-tokens 256 --no-color
+./demo chat --provider groq --model openai/gpt-oss-120b --profile prima --session capstone-bash-01 --trace summary --live-trace --langfuse --temperature 0 --max-tokens 4096 --no-color
 ```
 
 Use `bash ./demo ...` if executable permissions prevent `./demo`. On POSIX systems, use your checkout path and `.venv/bin/activate` instead.

@@ -243,7 +243,27 @@ Retries/corrections can repeat stages. Model-only and RAG profiles produce only 
 
 PRIMA reuses the existing OpenTelemetry provider or installs one when tracing is first enabled. Existing processors remain attached; Langfuse initialization adds one processor once per provider. Explicit `init_tracing()` still opts into console diagnostics and is idempotent. Langfuse exports only marked PRIMA spans from the `prima.runtime` scope, including generation observations wrapping those same spans; unrelated instrumentation is filtered out. Session grouping uses the SDK's official `propagate_attributes(session_id=...)`. `/reset` reuses this process-scoped tracing setup and propagates the fresh session ID. `/profile` affects future turn metadata and actual stage selection.
 
-Exported data is metadata only: identifiers, configuration labels, bounded aggregate results, reported token usage, timings and safe error types. No user text, generated answers, prompts, memory bodies, embeddings, arbitrary metadata, headers, exception messages or stack traces are attached. No content-capture switch is implemented. Use a non-sensitive session label; SDK session propagation requires ASCII IDs of at most 200 characters. Unsupported labels retain their bounded PRIMA metadata but omit Langfuse session grouping with a warning. Known configured keys are redacted from PRIMA string attributes. No token counts are estimated, and missing provider usage is omitted.
+The default export is metadata only: identifiers, configuration labels, bounded aggregate results, reported token usage, timings and safe error types. Add `--trace-content` with `--langfuse` to export actual prompts, final assistant responses, selected memory content and structured phase inputs/outputs. `/status` shows the capture mode. Content capture is independent of terminal `--trace` and `--live-trace`.
+
+```powershell
+.\demo.ps1 chat --provider groq --model openai/gpt-oss-120b --langfuse --trace-content --max-tokens 4096
+```
+
+Content mode exports real text to your configured Langfuse project. Configured credentials and recognized credential patterns are redacted; headers, embeddings, arbitrary runtime objects and private model reasoning are excluded. Each input/output is bounded to a 131,072-character traversal budget, with individual strings limited to 65,536 characters, collections to 64 entries and nesting to 10 levels. Limits are explicitly marked; this is separate from the LLM completion-token limit. Use synthetic presentation data. The root shows the user request and final runtime answer; `llm.generation` shows actual logical request messages and provider assistant text before runtime shaping. Planning, world and action nodes show their real structured results. Symbolic predictions are not executed effects; technical validation is not a semantic answer-quality score. LLM-only model/token fields remain inapplicable to deterministic nodes.
+
+Use a non-sensitive session label; SDK session propagation requires ASCII IDs of at most 200 characters. Unsupported labels retain bounded PRIMA metadata but omit Langfuse session grouping with a warning. No token counts are estimated, and missing provider usage is omitted. Applications embedding the runtime opt into content with `PrimaRuntime(trace_content=True)`; the default remains off even when telemetry is enabled.
+
+### Qualitative base-model comparison
+
+```powershell
+.\demo.ps1 compare --provider groq --model openai/gpt-oss-120b --session capstone-compare --langfuse --trace-content --trace off --temperature 0 --max-tokens 4096 --no-color
+```
+
+Each entered message runs sequentially through ordinary model chat and a separate full PRIMA session. Both use the same model, generation settings, task-level policy, provider client and rate limiter. The base branch receives its own full user/assistant history; PRIMA uses its actual state and selected memories. The base branch has no cognitive workflow. OpenAI-compatible providers with role-based history (including Groq) are supported; unsupported adapters fail explicitly. No second key or dependency is needed.
+
+Answers appear side by side at widths of at least 100 columns and stacked otherwise, with actual latency, provider-call counts, reported tokens and trace IDs. `/reset` clears both branches and changes the comparison group. `/state`, `/memory`, `/plan` and `/world` inspect PRIMA; `/profile` is fixed. Compare mode is process-local and rejects `--persist`. Baseline input/history plus policy is limited to 100,000 characters; exceeding it stops both branches before a call and asks for reset, without silently dropping messages. This character bound does not guarantee an arbitrary provider model's context-window limit. A branch failure retains the other answer and requires a paired reset before more turns.
+
+Langfuse receives two independent traces per paired turn: `base.turn` with a generation child, and `prima.turn` with its actual phases. Shared `comparison_id`, `comparison_turn` and `comparison_branch` metadata links the records; branch session IDs remain separate. Langfuse works without a graph framework. This is a qualitative demonstration of an application layer, not a claim that PRIMA always improves answers; the same model may answer equally well from ordinary history.
 
 Applications embedding the runtime can call `monitoring.configure_tracing()` and `monitoring.shutdown_tracing()` at process lifecycle boundaries. Resetting a runtime must not shut down the shared telemetry setup. Tests inject isolated providers and in-memory exporters; no Langfuse service is needed.
 

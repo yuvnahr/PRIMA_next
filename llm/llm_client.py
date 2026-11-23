@@ -30,6 +30,7 @@ class LLMClient:
         self.provider_name = provider_name or self.settings.default_provider
         self.provider = provider or ProviderFactory.get_provider(self.provider_name, settings=self.settings)
         self.rate_limiter = rate_limiter or RateLimiter(self.settings.rate_limit_per_minute)
+        self.call_count = 0
 
     @property
     def capabilities(self) -> dict[str, Any]:
@@ -48,6 +49,7 @@ class LLMClient:
         system_prompt: str | None = None,
         response_format: dict[str, Any] | str | None = None,
         response_schema: dict[str, Any] | None = None,
+        history: tuple[dict[str, str], ...] = (),
     ) -> LLMResponse:
         """Send one request, retrying only according to the immutable config.
 
@@ -77,6 +79,7 @@ class LLMClient:
             generation=config,
             system_prompt=system_prompt,
             response_schema=response_schema or (response_format if isinstance(response_format, dict) else None),
+            history=history,
         )
         self.provider.validate(request)
         last_error: ProviderError | None = None
@@ -89,8 +92,14 @@ class LLMClient:
                     timeout_seconds=min(config.timeout_seconds, budget.remaining_seconds))) if budget else request)
                 with generation_span(bounded_request.generation) as observation:
                     observation.set_attributes({"attempt": attempt + 1})
+                    if observation.capture_enabled:
+                        observation.content(input={
+                            "messages": bounded_request.chat_messages(), "response_schema": bounded_request.response_schema,
+                        })
+                    self.call_count += 1
                     response = self.provider.send(bounded_request)
                     observation.usage(response.usage)
+                    observation.content(output=response.text)
                     validate_output(response.text)
                     observation.set_attributes({"status": "completed"})
                     return response
