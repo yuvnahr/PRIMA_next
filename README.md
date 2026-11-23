@@ -75,13 +75,13 @@ Configuration values and provider examples are documented in `.env.example`. The
 
 ## Demo CLI
 
-### Install core requirements
+### Install project requirements
 
-Activate your Python 3.10+ environment (the setup script uses `.venv`) and install:
+Activate your Python 3.14 environment (the setup script uses `.venv`) and install:
 
 ```powershell
 . .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-core.txt
+python -m pip install -r requirements.txt
 ```
 
 ### Optional Langfuse
@@ -190,7 +190,7 @@ Summary trace shows the actual profile, selected/candidate/context counts, plan 
 
 ### Exit
 
-Type `/quit` (or `/exit`). EOF also exits: Ctrl+Z then Enter in Windows consoles, Ctrl+D in Git Bash. Ctrl+C at the prompt exits gracefully. These paths detach the live observer, drain/stop maintenance, close owned persistent resources, and attempt telemetry shutdown once. Console input is synchronous inside the single async session loop, so cold maintenance may wait while the prompt is idle. During a request, Ctrl+C requests shutdown; an already-running HTTP worker may still run until its configured timeout (normally 60 seconds). The CLI reports this limitation rather than claiming the HTTP request was cancelled. Telemetry shutdown waits at most three seconds; failure/timeout warns and preserves normal exit, but queued traces may be lost. Avoid repeated Ctrl+C during cleanup.
+Type `/quit` (or `/exit`). For EOF, use Ctrl+Z then Enter in Windows consoles or Ctrl+D in Git Bash. Ctrl+C at the prompt exits gracefully. These paths detach the live observer, drain or stop maintenance, close owned persistent resources, and attempt telemetry shutdown once. Console input is synchronous inside the single async session loop, so cold maintenance may wait while the prompt is idle. During a request, Ctrl+C requests shutdown. An already-running HTTP worker may still run until its timeout. The PRIMA workflow caps that timeout to the remaining turn budget. Telemetry shutdown waits at most three seconds, and timeout or failure can leave queued traces unsent. Avoid repeated Ctrl+C during cleanup.
 
 See the short [presentation runbook](docs/demo_cli_runbook.md) for the operator checklist and suggested prompts.
 
@@ -202,7 +202,7 @@ Tracing is disabled by default. Install the optional, tested Langfuse/OpenTeleme
 python -m pip install -r requirements-observability.txt
 ```
 
-This pins Langfuse 4.18.0 and OpenTelemetry API/SDK/HTTP/gRPC exporters 1.45.2, compatible with Python 3.10. The gRPC exporter is aligned because Chroma imports it; mixing its older release with SDK 1.45 breaks Chroma imports. Core requirements remain unchanged. An older Langfuse SDK is treated as unavailable rather than using legacy tracing APIs. Keep optional OpenTelemetry instrumentors/exporters aligned with this cohort when installing them separately.
+This pins Langfuse 4.18.0 and OpenTelemetry API/SDK/HTTP/gRPC exporters 1.45.2. The gRPC exporter is aligned because Chroma imports it; mixing its older release with SDK 1.45 breaks Chroma imports. An older Langfuse SDK is treated as unavailable rather than using legacy tracing APIs. Keep optional OpenTelemetry instrumentors/exporters aligned with this cohort when installing them separately.
 
 Configure credentials in your local environment or ignored `.env`:
 

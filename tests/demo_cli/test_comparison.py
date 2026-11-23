@@ -66,7 +66,11 @@ def test_paired_conversations_have_independent_history_and_equal_settings(monkey
                                                     {"role": "assistant", "content": first.base.text})
             assert first.prima.text not in str(provider.requests[2].history)
             assert not provider.requests[1].history and not provider.requests[3].history
-            assert all(request.generation == session.config.generation for request in provider.requests)
+            generation = session.config.generation
+            for base, prima in zip(provider.requests[::2], provider.requests[1::2], strict=True):
+                assert base.generation == generation
+                assert 0 < prima.generation.timeout_seconds <= min(generation.timeout_seconds, 15)
+                assert prima.generation.with_overrides(timeout_seconds=generation.timeout_seconds) == generation
             assert all(request.system_prompt == CONVERSATION_POLICY for request in provider.requests)
             assert session.base_session_id != session.prima.session_id
             assert session.prima.runtime.state_manager.load(session.base_session_id).version == 0

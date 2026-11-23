@@ -263,10 +263,12 @@ class AnswerGenerationController:
             "task": dict(context.cognitive_state.task_state),
             "confidence": dict(context.cognitive_state.confidence_state),
         }
-        affect = None
-        if isinstance(context.affect_update, AffectUpdate):
+        runtime_context = _prompt_context(plan, state, label_map)
+        if not factual:
+            runtime_context["affect"] = None
+        if not factual and isinstance(context.affect_update, AffectUpdate):
             update = context.affect_update
-            affect = {
+            runtime_context["affect"] = {
                 "dominant_emotion": update.profile.dominant_emotion,
                 "confidence": update.profile.confidence,
                 "valence": update.profile.valence,
@@ -287,7 +289,7 @@ class AnswerGenerationController:
                 for label, item in zip(label_map, evidence, strict=True)
             ),
             tool_results=tuple(str(item) for item in context.metadata.get("tool_results", ())),
-            runtime_context={**_prompt_context(plan, state, label_map), "affect": affect},
+            runtime_context=runtime_context,
             response_schema=schema,
         )
         context.prompt_evidence = [

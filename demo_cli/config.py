@@ -6,7 +6,7 @@ import os
 from argparse import Namespace
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from uuid import uuid4
 
@@ -21,7 +21,7 @@ PROFILES = {
 }
 
 
-class TraceMode(str, Enum):
+class TraceMode(StrEnum):
     OFF = "off"
     SUMMARY = "summary"
     FULL = "full"

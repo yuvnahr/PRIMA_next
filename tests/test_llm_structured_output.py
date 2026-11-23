@@ -65,10 +65,18 @@ def test_ollama_payload_preserves_system_schema_and_generation_config(monkeypatc
     assert response.usage == {"prompt_tokens": 8, "completion_tokens": 3, "total_tokens": 11}
 
 
-def test_ollama_omits_usage_not_reported_by_provider(monkeypatch) -> None:
-    monkeypatch.setattr("llm.provider.post_json", lambda *args, **kwargs: {"response": "ok"})
+@pytest.mark.parametrize(
+    ("counts", "expected"),
+    [
+        ({}, {}),
+        ({"prompt_eval_count": 8, "eval_count": -1}, {"prompt_tokens": 8}),
+        ({"prompt_eval_count": True, "eval_count": 3}, {"completion_tokens": 3}),
+    ],
+)
+def test_ollama_omits_unreported_or_invalid_usage(monkeypatch, counts, expected) -> None:
+    monkeypatch.setattr("llm.provider.post_json", lambda *args, **kwargs: {"response": "ok", **counts})
     response = OllamaProvider(settings=_settings()).send(_request("ollama"))
-    assert response.usage == {}
+    assert response.usage == expected
 
 
 def test_openai_payload_preserves_system_schema_and_seed(monkeypatch) -> None:

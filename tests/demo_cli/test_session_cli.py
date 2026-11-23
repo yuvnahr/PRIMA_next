@@ -135,7 +135,8 @@ def test_provider_failure_does_not_trigger_output_regeneration(monkeypatch, fail
         try:
             response = await session.send("I am nervous about my presentation.")
             assert response.status is ExecutionStatus.FAILED
-            assert response.diagnostics.model_call_count == 1
+            assert response.diagnostics.model_call_count == retries + 1
+            assert response.output_data["request_budget"]["llm_calls"] == retries + 1
             assert response.diagnostics.state_version == 0
             assert not response.state_delta.changes["committed"]
             assert not response.output_data["memory_ids_created"]

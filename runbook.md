@@ -14,15 +14,15 @@ git log -3 --oneline
 python --version
 ```
 
-Use Python 3.10 or newer. Prefer a patched Python release over 3.10.0. If you are on another branch, preserve/review local changes before switching to `demo-cli`; do not reset or clean the working tree to follow this guide.
+Use Python 3.14, which is also the version used by CI. If you are on another branch, preserve/review local changes before switching to `demo-cli`; do not reset or clean the working tree to follow this guide.
 
-Create a virtual environment if needed, then activate it:
+Use a separate virtual environment if an older demo environment already exists:
 
 ```powershell
-if (-not (Test-Path -LiteralPath .venv\Scripts\python.exe)) {
-    python -m venv .venv
+if (-not (Test-Path -LiteralPath venv\Scripts\python.exe)) {
+    python -m venv venv
 }
-. .\.venv\Scripts\Activate.ps1
+. .\venv\Scripts\Activate.ps1
 python -c "import sys; print(sys.executable); print(sys.version)"
 ```
 
@@ -30,10 +30,10 @@ If PowerShell blocks activation, allow local scripts for this terminal process o
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-. .\.venv\Scripts\Activate.ps1
+. .\venv\Scripts\Activate.ps1
 ```
 
-Install the demo dependencies **inside that environment**. The demo requirements combine the core runtime and the tested Langfuse/OTel cohort in one pip resolution, without the general requirements file's benchmark/development tools:
+Install the demo dependencies **inside that environment**. The demo requirements combine the project dependencies and the pinned Langfuse/OTel packages in one pip resolution:
 
 ```powershell
 python -m pip install -r requirements-demo.txt
@@ -43,7 +43,7 @@ python -m pip show langfuse opentelemetry-api opentelemetry-sdk opentelemetry-ex
 
 The optional observability file pins Langfuse **4.18.0** and OTel API/SDK plus HTTP/gRPC exporters **1.45.2**. Keep this cohort together: Chroma imports the gRPC exporter too. Do not replace it with an unpinned SDK upgrade. The old Langfuse 2.x installation is not the supported tracing path. The ignored `.codex_deps/observability` audit cache is not loaded automatically by the demo.
 
-Without Langfuse, only core requirements are needed. The launchers install nothing. The broader `setup.ps1` described in [README.md](README.md#setup) also installs development/benchmark dependencies and initializes submodules; that larger setup is not required just to launch the demo.
+Use `requirements.txt` if you are running without Langfuse. The launchers install nothing. The `setup.ps1` described in [README.md](README.md#setup) also initializes submodules.
 
 ## 2. Configure Groq and Langfuse
 
@@ -161,7 +161,7 @@ python -m demo_cli.cli chat --provider groq --model openai/gpt-oss-120b --profil
 .\demo.ps1 compare --provider groq --model openai/gpt-oss-120b --session capstone-compare --langfuse --trace-content --trace off --temperature 0 --max-tokens 4096 --no-color
 ```
 
-The same key/model/settings serve two sequential requests per paired turn, except for real retries/corrections. The base model receives its own ordinary chat history; PRIMA has separate state/memory. No graph or extra key is needed for base-model Langfuse tracing. Use a terminal at least 100 columns wide for columns; narrower terminals show stacked full answers.
+Both branches use the same provider key, model and sampling settings. Base receives its own ordinary chat history, while PRIMA has separate state and memory. The PRIMA workflow has its own request budget and caps provider attempts to the remaining time. The default budget is four calls and 15 seconds per turn. Provider retries count toward that budget. No graph or extra key is needed for base-model Langfuse tracing. Use a terminal at least 100 columns wide for columns. Narrower terminals show stacked full answers.
 
 Presenter cue sheet (enter each prompt once at `Both >`, without resetting between these turns):
 
@@ -428,7 +428,7 @@ git diff --check --ignore-submodules=all
 
 The last broad suite excludes the real embedding smoke test. Audit results and exact environments are in the local ignored `handoff.md` when present: final CLI 171 passed; broad normal 567 passed, five classified benchmark failures and one old-SDK skip; modern broad 568 passed with the same five benchmark failures. These are historical results, not a promise for a newly installed environment. Windows sandbox restrictions can affect asyncio tests; use an appropriately authorized local terminal rather than diagnosing a sandbox hang as a runtime regression.
 
-Finish chat with `/quit` or `/exit`. Windows EOF is Ctrl+Z then Enter; Git Bash EOF is Ctrl+D. Ctrl+C requests cleanup, but an active HTTP worker may continue until its timeout (normally 60 seconds). Avoid repeated interrupts. Synchronous idle input can delay maintenance; normal quit drains it. Telemetry shutdown is bounded to three seconds and may drop queued exports.
+Finish chat with `/quit` or `/exit`. Windows EOF is Ctrl+Z then Enter. Git Bash EOF is Ctrl+D. Ctrl+C requests cleanup, but an active HTTP worker may continue until its timeout. Avoid repeated interrupts. Synchronous idle input can delay maintenance, which normal quit drains. Telemetry shutdown waits up to three seconds and may drop queued exports.
 
 After leaving the demo, close any trace/credential editor before sharing the screen. If credentials were supplied through process environment variables, clear them when finished; this does not remove credentials you separately saved in `.env`:
 

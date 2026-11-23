@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 from os import terminal_size
 
@@ -102,7 +102,7 @@ def test_stored_memory_is_bounded_recent_and_session_isolated(monkeypatch) -> No
     session, provider = _session()
     other, _ = _session()
     repository = session.runtime.memory_repository
-    start = datetime(2026, 11, 15, tzinfo=timezone.utc)
+    start = datetime(2026, 11, 15, tzinfo=UTC)
     for index in range(9):
         repository.add(MemoryNote.create(
             f"memory {index} " + "x" * 1000, MemoryType.EPISODIC, embedding=(987654321.0,),

@@ -4,7 +4,7 @@ Use the normal in-memory mode for the main live presentation unless cross-proces
 
 ## Before the demo
 
-1. Open the repository in PowerShell and activate the intended environment: `. .\.venv\Scripts\Activate.ps1`.
+1. Open the repository in PowerShell and activate the Python 3.14 environment from the [setup instructions](../runbook.md#1-prepare-the-environment).
 2. Set provider/model and credentials in the environment or ignored `.env`; keep keys off screen.
 3. Run `.\demo.ps1 preflight`. Fix required configuration errors. Optional Langfuse warnings permit chat.
 4. Run `.\demo.ps1 preflight --strict` to verify the selected provider with one tiny generation. This can use hosted-provider tokens. For Ollama, use an exact installed model ID; do not download models on stage.
