@@ -131,6 +131,7 @@ class OpenAICompatibleProvider(Provider):
     capabilities = _OPENAI_CAPABILITIES
     supports_history = True
     default_base_url = ""
+    completion_path = "/v1/chat/completions"
     requires_api_key = False
 
     def __init__(
@@ -140,12 +141,7 @@ class OpenAICompatibleProvider(Provider):
         self.base_url = base_url or self.default_base_url
         self.api_key = api_key
 
-    def send(self, request: LLMRequest) -> LLMResponse:
-        if self.requires_api_key and not self.api_key:
-            raise ProviderError(f"{self.name} API key is not configured.")
-        self.validate(request)
-        if not self.base_url:
-            raise ProviderError(f"{self.name} base URL is not configured")
+    def _payload(self, request: LLMRequest) -> dict[str, Any]:
         config = request.generation
         payload: dict[str, Any] = {
             "model": config.model,
@@ -164,14 +160,22 @@ class OpenAICompatibleProvider(Provider):
                 "type": "json_schema",
                 "json_schema": {"name": "prima_response", "schema": request.response_schema},
             }
-        transport_options: dict[str, Any] = {"timeout": config.timeout_seconds}
+        return payload
+
+    def send(self, request: LLMRequest) -> LLMResponse:
+        if self.requires_api_key and not (self.api_key or "").strip():
+            raise ProviderError(f"{self.name} API key is not configured.")
+        self.validate(request)
+        if not self.base_url:
+            raise ProviderError(f"{self.name} base URL is not configured")
+        transport_options: dict[str, Any] = {"timeout": request.generation.timeout_seconds}
         if self.api_key:
             transport_options["headers"] = {
                 "Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"
             }
         raw = post_json(
-            f"{self.base_url.rstrip('/')}/v1/chat/completions",
-            payload,
+            f"{self.base_url.rstrip('/')}{self.completion_path}",
+            self._payload(request),
             **transport_options,
         )
         response = parse_openai_response(raw)
@@ -201,6 +205,27 @@ class GroqProvider(OpenAICompatibleProvider):
         super().__init__(
             settings, base_url=settings.groq_url, api_key=settings.groq_api_key
         )
+
+
+class OpenRouterProvider(OpenAICompatibleProvider):
+    """OpenRouter chat completions, optionally pinned to one upstream."""
+
+    name = "openrouter"
+    requires_api_key = True
+    completion_path = "/chat/completions"
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        settings = settings or get_settings()
+        super().__init__(settings, base_url=settings.openrouter_url, api_key=settings.openrouter_api_key)
+        self.upstream = (settings.openrouter_upstream or "").strip()
+
+    def _payload(self, request: LLMRequest) -> dict[str, Any]:
+        payload = super()._payload(request)
+        routing: dict[str, Any] = {"require_parameters": True}
+        if self.upstream:
+            routing.update(only=[self.upstream], allow_fallbacks=False)
+        payload["provider"] = routing
+        return payload
 
 
 class AnthropicProvider(Provider):
@@ -347,6 +372,7 @@ class ProviderFactory:
     _map: dict[str, type[Provider]] = {
         "openai": OpenAIProvider,
         "groq": GroqProvider,
+        "openrouter": OpenRouterProvider,
         "anthropic": AnthropicProvider,
         "ollama": OllamaProvider,
         "lmstudio": LMStudioProvider,

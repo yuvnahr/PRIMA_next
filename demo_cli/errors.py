@@ -12,7 +12,7 @@ def safe_reason(error: BaseException | str, *, provider: str = "") -> str:
         return str(error)
     text = str(error)
     lower = text.lower()
-    if "api key is not configured" in lower and provider in {"groq", "openai", "anthropic"}:
+    if "api key is not configured" in lower and provider in {"groq", "openrouter", "openai", "anthropic"}:
         return f"API key is not configured. Set {provider.upper()}_API_KEY."
     if "authentication" in lower or re.search(r"\b(?:401|403)\b", text):
         return "authentication failed; check the configured API key."
@@ -28,7 +28,7 @@ def safe_reason(error: BaseException | str, *, provider: str = "") -> str:
     if "http request failed" in lower:
         return "provider HTTP request failed; check service availability."
     if "unknown provider" in lower:
-        return "Unknown provider. Select a supported provider such as groq or ollama."
+        return "Unknown provider. Select a supported provider such as groq, openrouter or ollama."
     # Only these application-owned configuration messages may pass through.
     if text in {
         "No provider configured. Set DEFAULT_PROVIDER or use --provider groq or --provider ollama.",

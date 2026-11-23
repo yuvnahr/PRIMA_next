@@ -57,6 +57,8 @@ def resolve_config(
             model = settings.default_model
         elif provider == "groq":
             model = "openai/gpt-oss-120b"
+        elif provider == "openrouter":
+            model = "openai/gpt-oss-20b"
         elif provider in {"ollama", "local"}:
             model = ""
         else:

@@ -27,7 +27,7 @@ def preflight(args: Namespace, settings: Settings, renderer: Renderer) -> int:
         provider = config.generation.provider
         rows.extend((("Configuration", "OK"), ("Provider", provider), ("Model", config.generation.model),
                      ("Profile", config.profile.value)))
-        if provider in {"groq", "openai", "anthropic"}:
+        if provider in {"groq", "openrouter", "openai", "anthropic"}:
             present = bool((getattr(settings, f"{provider}_api_key", None) or "").strip())
             rows.append((f"{provider.title()} key", "configured" if present else "missing"))
             if not present:

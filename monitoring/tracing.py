@@ -165,7 +165,7 @@ class Tracing:
         self.exporting = threading.Event()
         self._warned: set[str] = set()
         self.secrets = tuple(value for name in (
-            "langfuse_public_key", "langfuse_secret_key", "groq_api_key", "openai_api_key", "anthropic_api_key",
+            "langfuse_public_key", "langfuse_secret_key", "groq_api_key", "openai_api_key", "openrouter_api_key", "anthropic_api_key",
         ) if isinstance(value := getattr(settings, name, None), str) and value)
 
     def warn(self, operation: str, exc: BaseException) -> None:

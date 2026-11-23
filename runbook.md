@@ -157,6 +157,15 @@ python -m demo_cli.cli chat --provider groq --model openai/gpt-oss-120b --profil
 
 ### Side-by-side qualitative comparison
 
+For OpenRouter, set `OPENROUTER_API_KEY` in your ignored `.env` or environment, then select `--provider openrouter` in `chat`, `compare`, or `preflight`. The CLI accepts any OpenRouter model ID that supports the requested settings. This example uses the lower-cost GPT-OSS 20B model.
+
+```powershell
+.\demo.ps1 preflight --provider openrouter --model openai/gpt-oss-20b --no-color
+.\demo.ps1 compare --provider openrouter --model openai/gpt-oss-20b --temperature 0 --trace off --no-color
+```
+
+For a controlled comparison, set `OPENROUTER_UPSTREAM` to an endpoint slug offered for the model, such as `darkbloom/fp8` for GPT-OSS 20B. Both branches and `/eval` use that endpoint. With the setting omitted, OpenRouter chooses among eligible providers. The default judge uses the generation model for OpenRouter. If you set `--judge-model`, pick a JSON-Schema-capable model available on the pinned route.
+
 ```powershell
 .\demo.ps1 compare --provider groq --model openai/gpt-oss-120b --session capstone-compare --langfuse --trace-content --trace off --temperature 0 --max-tokens 4096 --no-color
 ```

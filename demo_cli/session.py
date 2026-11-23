@@ -101,7 +101,7 @@ class DemoSession:
         if self.config.persist and self._closed:
             raise PersistenceError("The persistent session is closed. Reopen it before sending another request.")
         provider = self.runtime.llm_client.provider
-        if provider.name in {"groq", "openai", "anthropic"} and not (getattr(provider, "api_key", None) or "").strip():
+        if provider.name in {"groq", "openrouter", "openai", "anthropic"} and not (getattr(provider, "api_key", None) or "").strip():
             raise ProviderError(f"{provider.name} API key is not configured. Set {provider.name.upper()}_API_KEY.")
         await self.runtime.start_maintenance()
 

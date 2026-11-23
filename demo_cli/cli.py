@@ -45,7 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--strict", action="store_true", help="Make one small live provider request (may use tokens).")
         if name == "compare":
             command.add_argument("--judge-model", help="Model for /eval on the same provider (Groq defaults to GPT-OSS 20B).")
-        command.add_argument("--provider", help="Provider name (e.g. groq or ollama); defaults to project settings.")
+        command.add_argument("--provider", help="Provider name (e.g. groq, openrouter or ollama); defaults to project settings.")
         command.add_argument("--model", help="Exact model ID; required for Ollama unless DEFAULT_MODEL is configured.")
         command.add_argument("--profile", choices=tuple(PROFILES))
         command.add_argument("--session", help="Stable ID for this process-local conversation.")
