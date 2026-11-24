@@ -10,6 +10,7 @@ import pytest
 from config.settings import Settings
 from demo_cli import cli
 from demo_cli.errors import safe_reason
+from demo_cli.renderer import PRIMA_BANNER
 from llm.llm_types import LLMResponse
 from monitoring import tracing
 
@@ -31,6 +32,30 @@ def test_configured_groq_is_ready_without_request(configured, capsys):
     for text in ("PRIMA DEMO PREFLIGHT", "READY", "groq", "openai/gpt-oss-120b", "prima_full", "in_memory", "disabled"):
         assert text in output
     assert "fixture-key" not in output and "Traceback" not in output
+
+
+@pytest.mark.parametrize("command", ["chat", "compare", "preflight", "status"])
+def test_interactive_startup_shows_mode_commands_and_run_settings(configured, monkeypatch, capsys, command):
+    monkeypatch.setenv("COLUMNS", "80")
+    monkeypatch.setattr("builtins.input", lambda prompt: "/quit")
+    assert cli.main([command, "--temperature", "0.3", "--max-tokens", "512", "--no-color"]) == 0
+    output = capsys.readouterr().out
+    banner_top = PRIMA_BANNER.splitlines()[0]
+    if command in {"preflight", "status"}:
+        assert not output.startswith(banner_top) and "COMMANDS" not in output
+        return
+    assert output.startswith(banner_top)
+    summary, menu = output.split("\nCOMMANDS\n", 1)
+    assert "/affect [detail]" in menu
+    summary = " ".join(summary.split())
+    menu = " ".join(menu.split())
+    for setting in ("Provider groq", "Model openai/gpt-oss-120b", "Langfuse disabled",
+                    "Temperature 0.3", "Max output tokens 512"):
+        assert setting in summary
+    for shortcut in ("/help", "/status", "/memory why", "/quit", "/exit"):
+        assert shortcut in menu
+    assert ("/eval" in menu) == (command == "compare")
+    assert ("/profile" in menu) == (command == "chat")
 
 
 def test_missing_key_is_not_ready(configured, capsys):
@@ -137,16 +162,21 @@ def test_presentation_errors_never_echo_raw_text(error, provider, expected):
     assert expected in result and "private-secret" not in result
 
 
-def test_module_import_failure_has_no_traceback(monkeypatch, capsys):
+@pytest.mark.parametrize("old_python", [False, True])
+def test_module_import_failure_has_no_traceback(monkeypatch, capsys, old_python):
     original = builtins.__import__
     def guarded(name, *args, **kwargs):
         if name == "config.settings":
             raise ImportError("private-secret")
         return original(name, *args, **kwargs)
     monkeypatch.setattr(builtins, "__import__", guarded)
+    if old_python:
+        monkeypatch.setattr(sys, "version_info", (3, 10, 0))
     monkeypatch.delitem(sys.modules, "demo_cli.cli")
     with pytest.raises(SystemExit) as result:
         runpy.run_module("demo_cli.cli", run_name="__main__")
     assert result.value.code == 1
     output = capsys.readouterr().out
     assert "NOT READY" in output and "Traceback" not in output and "private-secret" not in output
+    assert "Python 3.14" in output and "requirements-demo.txt" in output
+    assert ("Python 3.10 is active" in output) is old_python

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import sys
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 try:
     from config.settings import get_settings
-    from demo_cli.commands import HELP, dispatch_command
+    from demo_cli.commands import command_rows, dispatch_command
     from demo_cli.config import PROFILES, TraceMode, resolve_config
     from demo_cli.errors import safe_reason
     from demo_cli.live_eval import EvalUnavailable
@@ -26,8 +27,9 @@ try:
 except Exception:
     if __name__ != "__main__":
         raise
-    print("PRIMA DEMO PREFLIGHT\nPRIMA runtime / Demo CLI imports failed.\nResult: NOT READY")
-    print("Fix: activate your Python environment and install requirements-core.txt.")
+    major, minor = sys.version_info[:2]
+    print(f"PRIMA DEMO PREFLIGHT\nPRIMA runtime / Demo CLI imports failed. Python {major}.{minor} is active.\nResult: NOT READY")
+    print("Activate the Python 3.14 environment. If dependencies are missing, run python -m pip install -r requirements-demo.txt.")
     raise SystemExit(1) from None
 
 
@@ -62,12 +64,12 @@ async def chat(session: DemoSession, renderer: Renderer) -> None:
     try:
         session.observe_workflow(renderer)
         await session.start()
-        renderer.rows("PRIMA-NEXT Interactive Demo", (row for row in session.status_rows() if row[0] not in {"Memory", "Data root"}))
+        renderer.welcome("PRIMA-NEXT Interactive Demo", session.status_rows(),
+                         generation=session.config.generation, commands=command_rows())
         for message in session.persistence_messages():
             renderer.message(message)
         if session.observability.warning:
             renderer.message(f"Warning: {session.observability.warning}")
-        renderer.message("Type /help for commands.")
         while True:
             try:
                 # shortcut: stdin blocks idle maintenance; use async input if idle/background UI is added.
@@ -121,9 +123,9 @@ async def compare(session: ComparisonSession, renderer: Renderer) -> None:
     try:
         session.prima.observe_workflow(renderer)
         await session.prima.start()
-        renderer.rows("PRIMA / BASE MODEL COMPARISON", session.status_rows())
+        renderer.welcome("PRIMA / BASE MODEL COMPARISON", session.status_rows(),
+                         generation=session.config.generation, commands=command_rows(compare=True))
         renderer.message("Same model/settings; separate histories. Technical completion does not assess answer quality.")
-        renderer.message("/eval grades the latest pair. /help lists workflow inspections and other commands.")
         if session.prima.observability.warning:
             renderer.message(f"Warning: {session.prima.observability.warning}")
         while True:
@@ -144,8 +146,7 @@ async def compare(session: ComparisonSession, renderer: Renderer) -> None:
                     elif command == "/status":
                         renderer.rows("COMPARISON STATUS", session.status_rows())
                     elif command == "/help":
-                        renderer.message("\n".join(line for line in HELP.splitlines() if not line.startswith("/profile")))
-                        renderer.message("/eval                    Grade the latest paired answers with one judge request")
+                        renderer.rows("COMMANDS", command_rows(compare=True))
                         renderer.message("Workflow inspections describe PRIMA. /reset clears both branches.")
                     elif command.split()[0] == "/eval":
                         if command != "/eval":

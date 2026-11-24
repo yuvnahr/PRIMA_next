@@ -92,7 +92,7 @@ def check_storage(config: DemoConfig) -> None:
         if state_path.exists():
             JsonStateManager(state_path)
     except Exception:
-        raise PersistenceError("Persistence is unavailable. Check directory permissions, state JSON/schema and install requirements-core.txt for the Chroma backend. Use --strict to verify opening the stores.") from None
+        raise PersistenceError("Persistence is unavailable. Check directory permissions, state JSON/schema and whether the Chroma backend from requirements.txt is installed. Use --strict to verify opening the stores.") from None
 
 
 def clear_session(config: DemoConfig, session_id: str, runtime: PrimaRuntime) -> None:

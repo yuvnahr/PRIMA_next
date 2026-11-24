@@ -7,25 +7,33 @@ from demo_cli.renderer import Renderer
 from demo_cli.session import DemoSession
 from demo_cli.turn_inspection import turn_rows
 
-HELP = """COMMANDS
-/help                    Show commands
-/status                  Show current runtime configuration
-/trace off|summary|full   Change trace display
-/live [on|off]           Show or change live workflow tracing
-/state                   Show current cognitive state
-/affect [detail]         Show the last turn's emotion scores and affect update
-/decision [detail]       Show decision probabilities and the actual gate path
-/evidence                Show retrieved memories and final evidence
-/memory                  Show up to five stored memories
-/memory why              Explain the last turn's memory admission decision
-/plan                    Show the last turn's plan
-/world                   Show the last turn's world simulation
-/action                  Show recorded steps and tool submissions
-/review                  Show reflection, corrections and technical validation
-/profile prima|rag|model Change the next turn's profile
-/clear                   Clear terminal output only
-/reset                   Start a fresh conversation
-/quit                    Exit (/exit also works)"""
+COMMANDS = (
+    ("/help", "Show commands"),
+    ("/status", "Show current runtime configuration"),
+    ("/trace [off|summary|full]", "Show or change trace display"),
+    ("/live [on|off]", "Show or change live workflow tracing"),
+    ("/state", "Show current cognitive state"),
+    ("/affect [detail]", "Show the last turn's emotion scores and affect update"),
+    ("/decision [detail]", "Show decision probabilities and the actual gate path"),
+    ("/evidence", "Show retrieved memories and final evidence"),
+    ("/memory", "Show up to five stored memories"),
+    ("/memory why", "Explain the last turn's memory admission decision"),
+    ("/plan", "Show the last turn's plan"),
+    ("/world", "Show the last turn's world simulation"),
+    ("/action", "Show recorded steps and tool submissions"),
+    ("/review", "Show reflection, corrections and technical validation"),
+    ("/profile [prima|rag|model]", "Show or change the next turn's profile"),
+    ("/clear", "Clear terminal output only"),
+    ("/reset", "Start a fresh conversation"),
+    ("/quit, /exit", "Exit"),
+)
+
+
+def command_rows(*, compare: bool = False) -> tuple[tuple[str, str], ...]:
+    if compare:
+        return (("/eval", "Grade the latest paired answers with one judge request"),
+                *(row for row in COMMANDS if not row[0].startswith("/profile")))
+    return COMMANDS
 
 TURN_INSPECTIONS = {
     "/affect": ("AFFECT", "detail"),
@@ -93,7 +101,7 @@ async def dispatch_command(text: str, session: DemoSession, renderer: Renderer) 
             else:
                 renderer.message(f"Profile changed: {previous_profile.value} -> {session.current_profile.value}")
     elif command == "/help" and not args:
-        renderer.message(HELP)
+        renderer.rows("COMMANDS", command_rows())
     elif command == "/status" and not args:
         renderer.rows("PRIMA STATUS", session.status_rows())
     elif command == "/live":

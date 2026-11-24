@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import re
 from io import StringIO
 
 import pytest
 
 from demo_cli.config import TraceMode
 from demo_cli.diagnostics import adapt_response
-from demo_cli.renderer import Renderer
+from demo_cli.renderer import PRIMA_BANNER, Renderer
+from llm.generation_config import GenerationConfig
 from runtime import (
     ExecutionOutcome,
     ExecutionProfile,
@@ -16,6 +18,57 @@ from runtime import (
     RuntimeDiagnostics,
     TaskKind,
 )
+
+
+@pytest.mark.parametrize("mode", ["terminal", "pipe", "flag", "environment"])
+@pytest.mark.parametrize("width", [20, 50, 80])
+def test_welcome_shows_shadowed_logo_and_setup_frame(monkeypatch, mode, width):
+    class Terminal(StringIO):
+        def isatty(self):
+            return True
+
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setenv("WT_SESSION", "test-terminal")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    if mode == "environment":
+        monkeypatch.setenv("NO_COLOR", "1")
+    output = StringIO() if mode == "pipe" else Terminal()
+    Renderer(output=output, width=width, no_color=mode == "flag").welcome(
+        "Chat", (("Session", "q" * 100),),
+        generation=GenerationConfig(model="fixture-model", provider="groq"), commands=(("/quit", "Exit"),),
+    )
+    rendered = output.getvalue()
+    if mode == "terminal" and width > 20:
+        assert "\x1b[38;2;57;91;179m" in rendered
+        assert "\x1b[38;2;148;81;204m" in rendered
+        assert "\x1b[48;2;57;91;179m" in rendered
+        assert "\x1b[48;2;148;81;204m" in rendered
+        assert "\x1b[48;2;24;35;72m" in rendered
+    if mode == "terminal":
+        assert "\x1b[38;2;57;91;179m|" in rendered
+        assert "\x1b[38;2;148;81;204m|" in rendered
+    else:
+        assert "\x1b" not in rendered
+    plain = re.sub(r"\x1b\[[0-9;]+m", "", rendered)
+    logo_text, setup, menu = plain.split("\n\n", 2)
+    logo = logo_text.splitlines()
+    expected = PRIMA_BANNER.splitlines()
+    if width == 20:
+        expected = ["PRIMA"]
+    elif width == 50:
+        expected = [line[::2] for line in expected]
+    assert [line.replace(".", " ").rstrip() for line in logo[:len(expected)]] == expected
+    assert all(len(line) <= width for line in logo)
+    if width > 20:
+        offset = 2 if width == 80 else 1
+        assert logo[-1] == " " * offset + expected[-1].replace("#", ".")
+    frame = setup.splitlines()
+    frame_width = min(width, 78)
+    rail = "+" + "-" * (frame_width - 2) + "+"
+    assert frame[0] == frame[2] == frame[-1] == rail
+    assert all(len(line) == frame_width for line in frame)
+    assert setup.count("q") == 100
+    assert menu.startswith("COMMANDS\n/quit")
 
 
 def _response(**kwargs):
