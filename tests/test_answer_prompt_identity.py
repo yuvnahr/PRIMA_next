@@ -14,7 +14,8 @@ from workflow.execution_context import ExecutionContext
 
 
 @pytest.mark.parametrize("replan", [False, True])
-def test_storage_ids_do_not_change_model_prompt_or_citation_resolution(replan: bool) -> None:
+@pytest.mark.parametrize("factual", [False, True])
+def test_storage_ids_do_not_change_model_prompt_or_citation_resolution(replan: bool, factual: bool) -> None:
     controller = AnswerGenerationController(LLMClient(provider_name="ollama"))
     prompts = []
     for prefix in ("first-run", "second-run"):
@@ -34,14 +35,24 @@ def test_storage_ids_do_not_change_model_prompt_or_citation_resolution(replan: b
         original_plan = context.plan.to_dict()
         evidence = EvidenceItem(f"{source}:1", "Paris", source, "episodic", 0.9, 1, context.user_input)
         reasoning = AnswerResult("", SufficiencyStatus.SUFFICIENT, 0.9, (evidence,), 1, "sufficient", ReasoningBudget())
-        prompt, labels = controller._prompt(context, reasoning, True)
+        prompt, labels = controller._prompt(context, reasoning, factual)
         prompts.append(prompt)
         assert labels == {"E1": source}
-        result = controller._parse(
-            json.dumps({"answer": "Paris", "evidence": ["E1"], "insufficient_information": False}),
-            context.user_input, labels, True, "ollama", "model", GenerationConfig(model="model", provider="ollama"), 0.0, {},
-        )
-        assert result.selected_source_ids == (source,)
+        if factual:
+            assert prompt.user_prompt.endswith(f"<UNTRUSTED_USER_INPUT>\n{context.user_input}\n</UNTRUSTED_USER_INPUT>")
+            assert '"plan": null' in prompt.user_prompt
+            assert prompt.response_schema is not None
+            assert list(prompt.response_schema["properties"]) == prompt.response_schema["required"] == [
+                "evidence", "answer", "insufficient_information",
+            ]
+            result = controller._parse(
+                json.dumps({"answer": "Paris", "evidence": ["E1"], "insufficient_information": False}),
+                context.user_input, labels, True, "ollama", "model", GenerationConfig(model="model", provider="ollama"), 0.0, {},
+            )
+            assert result.selected_source_ids == (source,)
+        else:
+            assert prompt.user_prompt.endswith("</OUTPUT_SCHEMA>")
+            assert '"plan": {' in prompt.user_prompt
         assert context.plan.to_dict() == original_plan
         assert source not in prompt.user_prompt.replace("Keep this literal mem-first-run text.", "")
         assert "Keep this literal mem-first-run text." in prompt.user_prompt
