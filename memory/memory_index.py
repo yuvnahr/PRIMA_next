@@ -33,14 +33,13 @@ class MemoryIndex(MemoryRepository):
             or note.context.get("source_conversation_id", self.source_conversation_id) == self.source_conversation_id))
 
     def __post_init__(self) -> None:
-        if self.graph_repository is None:
-            self._graph_initialized = True
+        self._graph_initialized = self.graph_repository is None
 
     @classmethod
     def for_repository(cls, repository: MemoryRepository) -> MemoryIndex:
         """Use a persistent graph mirror when the content repository is Chroma."""
         graph = (
-            ChromaGraphRepository(str(repository.path))
+            ChromaGraphRepository(str(repository.path), client=repository.client)
             if isinstance(repository, ChromaMemoryRepository)
             else GraphRepository()
         )
@@ -74,6 +73,18 @@ class MemoryIndex(MemoryRepository):
 
     def list(self, memory_type: MemoryType | None = None) -> builtins.list[MemoryNote]:
         return [note for note in self.repository.list(memory_type) if self._visible(note)]
+
+    def count(self) -> int:
+        return self.repository.count()
+
+    def clear(self) -> None:
+        self.repository.clear()
+        if self.graph_repository is not None:
+            self.graph_repository.clear()
+        self._graph_initialized = self.graph_repository is None
+
+    def close(self) -> None:
+        self.repository.close()
 
     def query(
         self,

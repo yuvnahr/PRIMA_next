@@ -1,0 +1,4 @@
+# Demo CLI with the tested optional Langfuse/OpenTelemetry cohort.
+# Install in an isolated venv to avoid unrelated global-package conflicts.
+-r requirements.txt
+-r requirements-observability.txt

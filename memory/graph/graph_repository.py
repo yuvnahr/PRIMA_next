@@ -8,7 +8,7 @@ from typing import Any
 
 from memory.graph.graph_edge import GraphEdge
 from memory.graph.graph_node import GraphNode
-from memory.memory_metadata import decode_metadata, encode_metadata
+from memory.memory_metadata import configure_collection_sync, decode_metadata, encode_metadata
 
 
 class GraphRepository:
@@ -28,6 +28,11 @@ class GraphRepository:
             self._node_order[node.id] = len(self._node_order)
         self.nodes[node.id] = node
         return node
+
+    def clear(self) -> None:
+        self.nodes.clear()
+        self.edges.clear()
+        self._neighbors.clear()
 
     def add_edge(self, edge: GraphEdge) -> GraphEdge:
         with self._neighbor_lock:
@@ -109,16 +114,24 @@ class GraphRepository:
 class ChromaGraphRepository(GraphRepository):
     """Graph repository mirrored into ChromaDB's `graph_index` collection."""
 
-    def __init__(self, path: str = "./memory_db") -> None:
+    def __init__(self, path: str = "./memory_db", *, client: Any = None) -> None:
         super().__init__()
         import chromadb
 
-        self.client: Any = chromadb.PersistentClient(path=path)
+        # The memory index shares its content repository's owned client.
+        self.client: Any = client if client is not None else chromadb.PersistentClient(path=path)
         self.collection: Any = self.client.get_or_create_collection(
             name="graph_index",
             metadata={"hnsw:space": "cosine"},
         )
+        configure_collection_sync(self.collection)
         self._load_existing()
+
+    def clear(self) -> None:
+        ids = self.collection.get(include=[])["ids"]
+        if ids:
+            self.collection.delete(ids=ids)
+        super().clear()
 
     def add_node(self, node: GraphNode) -> GraphNode:
         saved = super().add_node(node)
@@ -156,10 +169,7 @@ class ChromaGraphRepository(GraphRepository):
         return saved
 
     def _load_existing(self) -> None:
-        try:
-            result = self.collection.get(include=["metadatas"])
-        except Exception:
-            return
+        result = self.collection.get(include=["metadatas"])
         deferred_edges: list[dict[str, Any]] = []
         for metadata in result.get("metadatas", []):
             decoded = decode_metadata(metadata)

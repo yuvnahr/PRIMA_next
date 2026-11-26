@@ -32,12 +32,23 @@ class Settings(BaseSettingsCls):
     default_provider: str = "openai"
     default_model: str = "gpt-4o"
     openai_api_key: str | None = None
+    groq_api_key: str | None = None
+    openrouter_api_key: str | None = None
     anthropic_api_key: str | None = None
     ollama_url: str = "http://localhost:11434"
     lmstudio_url: str = "http://localhost:1234"
     openai_url: str = "https://api.openai.com"
+    groq_url: str = "https://api.groq.com/openai"
+    openrouter_url: str = "https://openrouter.ai/api/v1"
+    openrouter_upstream: str | None = None
     anthropic_url: str = "https://api.anthropic.com"
     rate_limit_per_minute: int = 60
+    prima_demo_data_dir: str = ".demo_data"
+    langfuse_enabled: bool = False
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: str | None = None
+    langfuse_base_url: str | None = None
+    langfuse_tracing_environment: str = "demo"
 
 _SETTINGS: Settings | None = None
 

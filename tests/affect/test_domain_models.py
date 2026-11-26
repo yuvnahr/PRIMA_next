@@ -53,6 +53,11 @@ class DomainModelsTest(unittest.TestCase):
         self.assertEqual(profile.dominant_emotion, "joy")
         self.assertIn("happy", profile.emotional_keywords)
 
+    def test_neutral_procedural_steps_are_not_a_certain_joy_match(self) -> None:
+        profile = get_emotion_profile("Give me three steps for organizing a folder.")
+        self.assertNotIn("steps", profile.emotional_keywords)
+        self.assertLess(profile.confidence, 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

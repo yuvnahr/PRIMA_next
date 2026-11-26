@@ -17,6 +17,9 @@ env/
 
 # Local configuration, logs, models, and caches
 .env
+/handoff.md
+/docs/codex/
+/.demo_data/
 *.log
 models/
 cache/

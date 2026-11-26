@@ -44,7 +44,10 @@ def post_json(
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as exc:
-            raise ProviderError(f"HTTP request failed: {exc}") from exc
+            status = exc.response.status_code if exc.response is not None else None
+            detail = f"HTTP {status}" if status is not None else type(exc).__name__
+            # Transport exception text can contain credentials, headers or response bodies.
+            raise ProviderError(f"HTTP request failed: {detail}") from None
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(  # noqa: S310
         url,
@@ -56,15 +59,18 @@ def post_json(
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310  # nosec B310
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        raise ProviderError(f"HTTP request failed: {exc.code}") from exc
+        raise ProviderError(f"HTTP request failed: {exc.code}") from None
     except (urllib.error.URLError, TimeoutError) as exc:
-        raise ProviderError(f"HTTP request failed: {exc}") from exc
+        raise ProviderError(f"HTTP request failed: {type(exc).__name__}") from None
+    except ValueError:
+        raise ProviderError("Provider returned invalid JSON") from None
 
 
 class Provider(ABC):
     """Provider session configured once when the client is built."""
 
     name = "generic"
+    supports_history = False
     capabilities: ProviderCapabilities
 
     def __init__(self, settings: Settings | None = None) -> None:
@@ -74,6 +80,8 @@ class Provider(ABC):
         """Reject unsupported fields instead of silently dropping them."""
 
         config = request.generation
+        if request.history and not self.supports_history:
+            raise ProviderCapabilityError(f"{self.name} does not support role-based chat history")
         if request.system_prompt and not self.capabilities.system_prompts:
             raise ProviderCapabilityError(f"{self.name} does not support system prompts")
         if config.structured_output not in self.capabilities.structured_output:
@@ -118,27 +126,26 @@ _OPENAI_CAPABILITIES = ProviderCapabilities(
 
 
 class OpenAICompatibleProvider(Provider):
-    """Provider for local servers exposing ``/v1/chat/completions``."""
+    """Shared transport for servers exposing ``/v1/chat/completions``."""
 
     capabilities = _OPENAI_CAPABILITIES
+    supports_history = True
     default_base_url = ""
+    completion_path = "/v1/chat/completions"
+    requires_api_key = False
 
-    def __init__(self, settings: Settings | None = None, *, base_url: str | None = None) -> None:
+    def __init__(
+        self, settings: Settings | None = None, *, base_url: str | None = None, api_key: str | None = None
+    ) -> None:
         super().__init__(settings)
         self.base_url = base_url or self.default_base_url
+        self.api_key = api_key
 
-    def send(self, request: LLMRequest) -> LLMResponse:
-        self.validate(request)
-        if not self.base_url:
-            raise ProviderError(f"{self.name} base URL is not configured")
+    def _payload(self, request: LLMRequest) -> dict[str, Any]:
         config = request.generation
-        messages = []
-        if request.system_prompt:
-            messages.append({"role": "system", "content": request.system_prompt})
-        messages.append({"role": "user", "content": request.prompt})
         payload: dict[str, Any] = {
             "model": config.model,
-            "messages": messages,
+            "messages": request.chat_messages(),
             "temperature": config.temperature,
             "max_tokens": config.max_output_tokens,
         }
@@ -153,10 +160,23 @@ class OpenAICompatibleProvider(Provider):
                 "type": "json_schema",
                 "json_schema": {"name": "prima_response", "schema": request.response_schema},
             }
+        return payload
+
+    def send(self, request: LLMRequest) -> LLMResponse:
+        if self.requires_api_key and not (self.api_key or "").strip():
+            raise ProviderError(f"{self.name} API key is not configured.")
+        self.validate(request)
+        if not self.base_url:
+            raise ProviderError(f"{self.name} base URL is not configured")
+        transport_options: dict[str, Any] = {"timeout": request.generation.timeout_seconds}
+        if self.api_key:
+            transport_options["headers"] = {
+                "Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"
+            }
         raw = post_json(
-            f"{self.base_url.rstrip('/')}/v1/chat/completions",
-            payload,
-            timeout=config.timeout_seconds,
+            f"{self.base_url.rstrip('/')}{self.completion_path}",
+            self._payload(request),
+            **transport_options,
         )
         response = parse_openai_response(raw)
         response.provider = self.name
@@ -167,44 +187,45 @@ class OpenAIProvider(OpenAICompatibleProvider):
     """OpenAI chat-completions adapter."""
 
     name = "openai"
+    requires_api_key = True
 
     def __init__(self, settings: Settings | None = None) -> None:
-        super().__init__(settings, base_url=(settings or get_settings()).openai_url)
-        self.api_key = self.settings.openai_api_key
+        settings = settings or get_settings()
+        super().__init__(settings, base_url=settings.openai_url, api_key=settings.openai_api_key)
 
-    def send(self, request: LLMRequest) -> LLMResponse:
-        if not self.api_key:
-            raise ProviderError("OpenAI API key is not configured.")
-        self.validate(request)
-        config = request.generation
-        messages = []
-        if request.system_prompt:
-            messages.append({"role": "system", "content": request.system_prompt})
-        messages.append({"role": "user", "content": request.prompt})
-        payload: dict[str, Any] = {
-            "model": config.model,
-            "messages": messages,
-            "temperature": config.temperature,
-            "max_tokens": config.max_output_tokens,
-        }
-        if config.top_p is not None:
-            payload["top_p"] = config.top_p
-        if config.seed is not None:
-            payload["seed"] = config.seed
-        if config.structured_output is StructuredOutputMode.JSON_OBJECT:
-            payload["response_format"] = {"type": "json_object"}
-        elif config.structured_output is StructuredOutputMode.JSON_SCHEMA:
-            payload["response_format"] = {
-                "type": "json_schema",
-                "json_schema": {"name": "prima_response", "schema": request.response_schema},
-            }
-        raw = post_json(
-            f"{self.base_url.rstrip('/')}/v1/chat/completions",
-            payload,
-            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
-            timeout=config.timeout_seconds,
+
+class GroqProvider(OpenAICompatibleProvider):
+    """Groq hosted chat-completions adapter with its own provider identity."""
+
+    name = "groq"
+    requires_api_key = True
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        settings = settings or get_settings()
+        super().__init__(
+            settings, base_url=settings.groq_url, api_key=settings.groq_api_key
         )
-        return parse_openai_response(raw)
+
+
+class OpenRouterProvider(OpenAICompatibleProvider):
+    """OpenRouter chat completions, optionally pinned to one upstream."""
+
+    name = "openrouter"
+    requires_api_key = True
+    completion_path = "/chat/completions"
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        settings = settings or get_settings()
+        super().__init__(settings, base_url=settings.openrouter_url, api_key=settings.openrouter_api_key)
+        self.upstream = (settings.openrouter_upstream or "").strip()
+
+    def _payload(self, request: LLMRequest) -> dict[str, Any]:
+        payload = super()._payload(request)
+        routing: dict[str, Any] = {"require_parameters": True}
+        if self.upstream:
+            routing.update(only=[self.upstream], allow_fallbacks=False)
+        payload["provider"] = routing
+        return payload
 
 
 class AnthropicProvider(Provider):
@@ -316,10 +337,11 @@ class OllamaProvider(Provider):
         response = parse_generic_response(raw, provider=self.name)
         if isinstance(raw, dict):
             response.usage = {
-                "prompt_tokens": int(raw.get("prompt_eval_count", 0)),
-                "completion_tokens": int(raw.get("eval_count", 0)),
-                "total_tokens": int(raw.get("prompt_eval_count", 0)) + int(raw.get("eval_count", 0)),
+                name: raw[key] for key, name in (("prompt_eval_count", "prompt_tokens"), ("eval_count", "completion_tokens"))
+                if type(raw.get(key)) is int and raw[key] >= 0
             }
+            if "prompt_tokens" in response.usage and "completion_tokens" in response.usage:
+                response.usage["total_tokens"] = response.usage["prompt_tokens"] + response.usage["completion_tokens"]
             for source, field in (
                 ("load_duration", "model_load_duration_ns"),
                 ("prompt_eval_duration", "prompt_eval_duration_ns"),
@@ -349,6 +371,8 @@ class ProviderFactory:
 
     _map: dict[str, type[Provider]] = {
         "openai": OpenAIProvider,
+        "groq": GroqProvider,
+        "openrouter": OpenRouterProvider,
         "anthropic": AnthropicProvider,
         "ollama": OllamaProvider,
         "lmstudio": LMStudioProvider,

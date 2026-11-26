@@ -195,7 +195,7 @@ FALLBACK_LEXICON = {
     "senerity": ["peace", "peaceful", "content", "okay", "calm", "fine", "relieved", "let go", "settled"],
     "joy": [
         "joy", "happy", "happiness", "pleasure", "delighted", "delight", "glad", "smiling", "celebrate",
-        "celebrated", "promoted", "promotion", "baby", "steps", "proposal", "accepted", "love", "proud",
+        "celebrated", "promoted", "promotion", "baby", "proposal", "accepted", "love", "proud",
         "wonderful", "great news", "won", "success", "excited", "cheerful",
     ],
     "joy_ecstasy": ["amazing", "dream", "thrilled", "ecstatic", "finished", "fantastic", "overjoyed", "elated"],

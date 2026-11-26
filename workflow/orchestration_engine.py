@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
+from monitoring.runtime_spans import record_phase, record_phase_input
+from monitoring.tracing import span
 from reasoning.reflection_advisor import ReflectionAction, ReflectionAdvice
 from state.cognitive_state import CognitiveState
 from uncertainty.execution_gate import ExecutionDecision
@@ -120,10 +122,14 @@ class OrchestrationEngine:
         while True:
             try:
                 controller = self.registry.get(phase)
-                result = await controller.execute(context)
-                self._route_phase_output(context, phase, result)
-                if attempts:
-                    context.hard_error = None
+                with span(phase.value) as observation:
+                    observation.set_attributes({"attempt": attempts + 1})
+                    record_phase_input(observation, phase.value, context)
+                    result = await controller.execute(context)
+                    self._route_phase_output(context, phase, result)
+                    if attempts:
+                        context.hard_error = None
+                    record_phase(observation, phase.value, result, context)
                 context.touch()
                 return
             except asyncio.CancelledError as exc:

@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from action import ActionExecutor
+from action.execution_result import ExecutionResult
 from affect.affect_engine import DynamicAffectEngine
+from affect.affect_types import AffectUpdate
 from affect.classifier_factory import create_affect_classifier
 from config.runtime_config import RuntimeConfig
 from config.runtime_mode import RuntimeMode
@@ -44,6 +46,8 @@ from memory.repository_factory import RepositorySelection, select_memory_reposit
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_controller import RetrievalController
+from monitoring.tracing import Tracing, configure_tracing, root_attributes
+from planning.plan import Plan
 from reasoning.config import reasoning_mode as configured_reasoning_mode
 from reasoning.controller import ReasoningController
 from reasoning.models import (
@@ -56,6 +60,7 @@ from reasoning.models import (
 from reasoning.reflection_advisor import ReflectionAdvisor
 from reflection.reasoning_reflection_adapter import ReasoningReflectionAdapter
 from reflection.reflection_engine import ReflectionEngine
+from reflection.reflection_result import ReflectionResult
 from runtime.contracts import (
     ComponentCapability,
     DiagnosticMode,
@@ -77,10 +82,12 @@ from runtime.runtime_metrics import RuntimeMetrics
 from runtime.runtime_result import RuntimeResult
 from security.redaction import redact
 from state.state_manager import InMemoryStateManager, JsonStateManager, StateManager
+from tools.tool_result import ToolResult
 from uncertainty import UncertaintyEstimator, UncertaintyGate, UncertaintyGatePolicy
 from workflow.correction_loop import CorrectionBudget
 from workflow.execution_context import ExecutionContext
 from workflow.orchestration_engine import WorkflowExecutionError
+from workflow.output_validation import OutputValidationResult
 from workflow.prima_workflow import PrimaWorkflow
 from workflow.workflow_state import WorkflowPhase, WorkflowStatus
 from world import StateSimulator
@@ -115,6 +122,8 @@ class PrimaRuntime:
         maintenance_failure_path: str | Path | None = None,
         generation_config: GenerationConfig | None = None,
         runtime_config: RuntimeConfig | None = None,
+        observability: Tracing | None = None,
+        trace_content: bool = False,
     ) -> None:
         self.log_path = Path(log_path)
         self.mode = RuntimeMode(mode)
@@ -161,6 +170,9 @@ class PrimaRuntime:
         )
         self.reflection_engine = reflection_engine or ReflectionEngine()
         settings = get_settings()
+        self.observability = observability or configure_tracing(settings)
+        self.trace_content = trace_content
+        self.last_trace_id: str | None = None
         self.generation_config = generation_config or GenerationConfig(
             model=settings.default_model,
             provider=(llm_client.provider_name if llm_client is not None else settings.default_provider),
@@ -214,6 +226,20 @@ class PrimaRuntime:
 
         if not isinstance(request, PrimaRequest):
             raise TypeError("request must be a PrimaRequest")
+        with self.observability.turn(request, capture_content=self.trace_content) as observation:
+            self.last_trace_id = observation.trace_id
+            generation = request.generation_config or self.generation_config
+            observation.set_attributes({"provider": generation.provider, "model": generation.model})
+            response = await self._execute(request)
+            observation.set_attributes({"status": response.status.value,
+                                        "outcome": response.outcome.value if response.outcome else None})
+            observation.content(output={"answer": response.output_text, "status": response.status.value,
+                                        "outcome": response.outcome.value if response.outcome else None})
+            if response.status in {ExecutionStatus.FAILED, ExecutionStatus.REJECTED, ExecutionStatus.CANCELLED}:
+                observation.fail()
+            return response
+
+    async def _execute(self, request: PrimaRequest) -> PrimaResponse:
         try:
             route = select_route(request.task_kind, request.profile)
         except InvalidRouteError as exc:
@@ -259,6 +285,7 @@ class PrimaRuntime:
                 "tool_results": request.options.tool_results,
             },
         )
+        root_attributes({"execution_id": execution_context.execution_id})
         try:
             with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
                 execution_context = await self.workflow.run(request.input_text, execution_context)
@@ -267,6 +294,8 @@ class PrimaRuntime:
         except (TypeError, ValueError) as exc:
             execution_context.workflow_state.status = WorkflowStatus.FAILED
             execution_context.workflow_state.errors.append(str(exc))
+        if execution_context.workflow_state.status in {WorkflowStatus.FAILED, WorkflowStatus.CANCELLED}:
+            root_attributes({"failed_stage": execution_context.workflow_state.current_phase.value})
         execution_context.metadata["workflow_trace"] = [
             {
                 "event_type": event.event_type.value,
@@ -287,6 +316,7 @@ class PrimaRuntime:
     async def start_maintenance(self) -> None:
         """Start the local cold-path worker for an async application lifecycle."""
 
+        # The worker inherits this task's embedding context, just as hot-path execution does.
         with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
             await self.maintenance_supervisor.start()
 
@@ -581,6 +611,7 @@ class PrimaRuntime:
         output_data: dict[str, Any] = {
             "latency_ms": latency_ms,
             "affect_state": affect_state,
+            "plan": _plan_summary(context.plan),
             "memory_ids_created": created_ids,
             "memory_admission": (
                 dict(context.memory_admission)
@@ -613,7 +644,7 @@ class PrimaRuntime:
             ),
             "execution_decision_history": list(context.metadata.get("execution_decision_history", ())),
             "retrieval_retry_count": int(context.metadata.get("retrieval_retry_count", 0)),
-            "retrieval": _retrieval_audit(context.retrieval_response),
+            "retrieval": _retrieval_audit(context.retrieval_response, reasoning),
             "evidence_audit": _request_evidence_audit(context),
             "context_compression": (
                 context.compressed_context.to_dict() if context.compressed_context is not None else {}
@@ -639,6 +670,8 @@ class PrimaRuntime:
             )
         if request.task_kind is TaskKind.HISTORICAL_REPLAY:
             output_data["memory_admission"]["configured_policy"] = self.runtime_config.admission_policy
+        if request.diagnostic_mode is DiagnosticMode.DIAGNOSTIC:
+            output_data["inspection"] = _inspection_details(context)
         if ingestion_id:
             output_data["memory_id"] = ingestion_id
             output_data["memory_type"] = getattr(
@@ -907,7 +940,7 @@ class PrimaRuntime:
 
     def _build_logger(self, log_path: Path) -> logging.Logger:
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        logger = logging.getLogger(f"prima_runtime.{id(self)}")
+        logger = logging.getLogger(f"prima_runtime.{log_path.resolve()}")
         logger.setLevel(logging.INFO)
         logger.propagate = False
         if not logger.handlers:
@@ -940,7 +973,86 @@ def _reflection_audit(context: ExecutionContext) -> dict[str, Any]:
         "original_generation": original_generation.to_dict() if original_generation is not None and hasattr(original_generation, "to_dict") else None}
 
 
-def _retrieval_audit(response: Any) -> dict[str, Any]:
+def _inspection_details(context: ExecutionContext) -> dict[str, Any]:
+    details: dict[str, Any] = {}
+    affect = context.affect_update
+    if isinstance(affect, AffectUpdate):
+        details["affect"] = {
+            "salience": affect.salience_score,
+            "dissonance": affect.dissonance_score,
+            "evolution": dict(affect.evolution),
+            "retrieval_priors": dict(affect.retrieval_priors),
+            "reflection_signals": [
+                {"type": signal.signal_type, "strength": signal.strength}
+                for signal in affect.reflection_signals
+            ],
+        }
+    action = context.action_result.get("execution_result") if isinstance(context.action_result, dict) else None
+    if isinstance(action, ExecutionResult):
+        details["action"] = {
+            "status": action.status.value,
+            "intent": action.intent_type,
+            "tool_invocations": action.metadata.get("tool_invocation_count"),
+            "external_actions": action.metadata.get("external_action_count"),
+            "step_count": len(action.steps),
+            "steps": [
+                {
+                    "status": step.status.value,
+                    "id": step.action_id,
+                    "message": step.message,
+                    "tool_name": step.tool_result.tool_name if isinstance(step.tool_result, ToolResult) else None,
+                    "tool_status": step.tool_result.status.value if isinstance(step.tool_result, ToolResult) else None,
+                }
+                for step in action.steps[:10]
+            ],
+        }
+    reflection = context.reflection_result
+    if isinstance(reflection, ReflectionResult):
+        details["reflection"] = {
+            "triggered": reflection.should_reflect,
+            "trigger_score": reflection.trigger_score,
+            "advice": reflection.advice.action.value if reflection.advice is not None else None,
+        }
+    validation = context.output_validation
+    if isinstance(validation, OutputValidationResult):
+        details["validation"] = {"valid": validation.valid, "signals": [signal.value for signal in validation.signals]}
+    return details
+
+
+def _plan_summary(plan: Any) -> dict[str, Any] | None:
+    """Expose bounded plan fields without inputs, metadata or simulation objects."""
+    if not isinstance(plan, Plan):
+        return None
+    return {
+        "plan_id": plan.plan_id[:240],
+        "goal": plan.goal.description[:240],
+        "status": plan.status.value,
+        "confidence": plan.evaluation.confidence if plan.evaluation is not None else plan.goal.confidence,
+        "revision": plan.revision,
+        "action_count": len(plan.actions),
+        "actions": [
+            {
+                "action_id": action.action_id[:240],
+                "action_type": action.action_type.value,
+                "description": action.description[:240],
+                "status": action.status.value,
+            }
+            for action in plan.actions[:30]
+        ],
+        "constraint_count": len(plan.constraints),
+        "constraints": [
+            {
+                "constraint_id": constraint.constraint_id[:240],
+                "constraint_type": constraint.constraint_type.value,
+                "description": constraint.description[:240],
+                "required": constraint.required,
+            }
+            for constraint in plan.constraints[:30]
+        ],
+    }
+
+
+def _retrieval_audit(response: Any, reasoning: AnswerResult | None = None) -> dict[str, Any]:
     diagnostics = dict(getattr(response, "diagnostics", {}))
     audit = {
         key: diagnostics[key]
@@ -967,6 +1079,32 @@ def _retrieval_audit(response: Any) -> dict[str, Any]:
         ]
         for stage in ("dense_top30", "sparse_top30", "fused_top30", "reranked_top30", "final_candidates")
     }
+    results = tuple(getattr(response, "results", ()) or ())
+    evidence = reasoning.evidence_references if reasoning is not None else ()
+    audit.update({
+        "candidate_count": len(diagnostics.get("hybrid_candidates", ())),
+        "selected_count": len(results),
+        "final_context_count": len(evidence),
+        "retrieval_confidence": getattr(getattr(response, "confidence", None), "confidence", None),
+        "retrieved_memories": [
+            {
+                "id": result.note.id[:240],
+                "memory_type": result.note.memory_type.value,
+                "score": result.score,
+                "preview": result.note.content[:240],
+            }
+            for result in results[:30]
+        ],
+        "final_context_memories": [
+            {
+                "id": item.source_id[:240],
+                "memory_type": item.result.note.memory_type.value if item.result is not None else None,
+                "score": item.retrieval_score,
+                "preview": item.text[:240],
+            }
+            for item in evidence[:30]
+        ],
+    })
     return audit
 
 

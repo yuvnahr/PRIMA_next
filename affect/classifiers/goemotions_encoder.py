@@ -37,6 +37,11 @@ class GoEmotionsEncoder:
     _thresholds: dict[str, float] = field(default_factory=lambda: {label: 0.5 for label in LABELS}, init=False)
     _temperature: float = field(default=1.0, init=False)
 
+    def __post_init__(self) -> None:
+        # Python 3.10.0 omits init=False scalar defaults in slotted dataclasses.
+        self._tokenizer = self._model = self._device = None
+        self._temperature = 1.0
+
     @classmethod
     def from_environment(cls, model_id: str) -> GoEmotionsEncoder:
         return cls(
