@@ -97,7 +97,9 @@ def test_conversation_persona_policy_and_factual_policy_stay_separate() -> None:
     for guidance in ("consistent, grounded", "continuity", "adapt subtly", "uncertain adaptive control", "actual request", "unless explicitly asked"):
         assert guidance in policy
     factual = AnswerGenerationController._system_prompt(True)
-    assert "Return only JSON" in factual and "cite selected" in factual
+    assert "Return only the JSON object" in factual
+    assert 'supporting labels such as "E1" in "evidence"' in factual
+    assert "adapt subtly" not in factual
 
 
 def test_full_runtime_groq_generation_uses_affect_and_exposes_real_plan_and_memories(tmp_path, monkeypatch) -> None:
