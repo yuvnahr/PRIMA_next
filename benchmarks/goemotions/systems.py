@@ -34,6 +34,10 @@ class ClassifierSettings:
     batch_size: int = 4
     thresholds_path: Path | None = None
     calibration_path: Path | None = None
+    calibration_fingerprint: str | None = None
+    thresholds_fingerprint: str | None = None
+    expected_dev_hash: str | None = None
+    expected_dev_ids_hash: str | None = None
 
     def __post_init__(self) -> None:
         if self.batch_size < 1:
@@ -337,6 +341,10 @@ class EncoderSystem(_RuntimeClassificationSystem):
             batch_size=self.classifier.batch_size,
             thresholds_path=self.classifier.thresholds_path,
             calibration_path=self.classifier.calibration_path,
+            calibration_fingerprint=self.classifier.calibration_fingerprint,
+            thresholds_fingerprint=self.classifier.thresholds_fingerprint,
+            expected_dev_hash=self.classifier.expected_dev_hash,
+            expected_dev_ids_hash=self.classifier.expected_dev_ids_hash,
         )
 
     def predict(self, text: str, labels: list[str]) -> tuple[str, dict[str, Any]]:
@@ -372,22 +380,8 @@ class EncoderSystem(_RuntimeClassificationSystem):
         return results
 
     def _calibration_provenance(self, prediction: EmotionPrediction) -> dict[str, Any]:
-        path = self.classifier.calibration_path
-        if path is None:
-            return {"source": "trained_probability", "calibrated": False}
-        content = path.read_bytes()
-        calibration = json.loads(content)
-        return {
-            "source": "trained_probability",
-            "calibrated": (calibration.get("model_id") == prediction.model_id
-                           and calibration.get("model_revision") == prediction.model_revision
-                           and prediction.model_revision is not None
-                           and calibration.get("temperature") == (prediction.metadata or {}).get("calibration_temperature")),
-            "model_id": calibration.get("model_id"), "model_revision": calibration.get("model_revision"),
-            "method": calibration.get("method"), "split": "dev",
-            "dev_dataset_sha256": calibration.get("dev_dataset_sha256"),
-            "artifact_sha256": hashlib.sha256(content).hexdigest(),
-        }
+        provenance = (prediction.metadata or {}).get("calibration_provenance")
+        return dict(provenance) if isinstance(provenance, dict) and provenance else {"source": "trained_probability", "calibrated": False}
 
 
 def _legacy_generation(provider: str, model: str, *, schema: bool) -> GenerationConfig:

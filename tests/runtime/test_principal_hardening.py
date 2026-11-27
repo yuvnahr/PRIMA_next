@@ -235,3 +235,26 @@ def test_fake_provider_state_events_admission_barrier_and_partial_tools(tmp_path
             await runtime.stop_maintenance()
 
     asyncio.run(run())
+
+
+def test_short_lived_runtime_leaves_no_owned_log_handlers(tmp_path):
+    import asyncio
+    import gc
+    import logging
+    import weakref
+    from types import SimpleNamespace
+
+    from runtime.prima_runtime import PrimaRuntime
+
+    before = {key for key in logging.Logger.manager.loggerDict if key.startswith("prima_runtime.")}
+    for index in range(3):
+        path = tmp_path / str(index) / "runtime.log"
+        runtime = PrimaRuntime(llm_client=SimpleNamespace(provider_name="fake"),
+                               maintenance_enabled=False, log_path=path)
+        asyncio.run(runtime.shutdown())
+        reference = weakref.ref(runtime)
+        del runtime
+        gc.collect()
+        assert reference() is None
+        assert not path.exists()
+    assert {key for key in logging.Logger.manager.loggerDict if key.startswith("prima_runtime.")} == before

@@ -25,13 +25,16 @@ def main() -> None:
     parser.add_argument("--fit-calibration", type=Path, metavar="DEV_LOGITS_JSON")
     parser.add_argument("--model-id", default="microsoft/deberta-v3-small")
     parser.add_argument("--revision", default="a59be8aa63396e73dbb45a1487e4cde4be98bfa4", help="Immutable Hugging Face commit hash.")
+    parser.add_argument("--max-length", type=int, default=128)
+    parser.add_argument("--temperature-fingerprint", help="Pinned temperature transform used to generate dev probabilities")
     args = parser.parse_args()
     if args.fit_thresholds and args.fit_calibration:
         parser.error("Choose one of --fit-thresholds or --fit-calibration.")
     if args.fit_thresholds:
-        result = fit_thresholds_from_dev(args.data_dir, args.fit_thresholds, args.output_dir / "thresholds.json", model_id=args.model_id)
+        result = fit_thresholds_from_dev(args.data_dir, args.fit_thresholds, args.output_dir / "thresholds.json", model_id=args.model_id, model_revision=args.revision,
+                                         max_length=args.max_length, temperature_fingerprint=args.temperature_fingerprint)
     elif args.fit_calibration:
-        result = fit_calibration_from_dev(args.data_dir, args.fit_calibration, args.output_dir / "calibration.json", model_id=args.model_id, model_revision=args.revision)
+        result = fit_calibration_from_dev(args.data_dir, args.fit_calibration, args.output_dir / "calibration.json", model_id=args.model_id, model_revision=args.revision, max_length=args.max_length)
     else:
         config = TrainingConfig(model_id=args.model_id, revision=args.revision, device=args.device, epochs=args.epochs, loss=args.loss)
         result = train(args.data_dir, args.output_dir, config) if args.full else smoke_train(args.data_dir, args.output_dir, config, args.limit)

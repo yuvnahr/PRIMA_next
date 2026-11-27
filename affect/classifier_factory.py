@@ -21,6 +21,8 @@ def create_affect_classifier(
     thresholds_path: str | None = None,
     calibration_path: str | None = None,
     local_files_only: bool = False,
+    calibration_fingerprint: str | None = None,
+    thresholds_fingerprint: str | None = None,
 ) -> EmotionClassifier:
     """Resolve the requested backend without importing or downloading models by default."""
 
@@ -41,6 +43,8 @@ def create_affect_classifier(
             thresholds_path=Path(thresholds_path) if thresholds_path else None,
             calibration_path=Path(calibration_path) if calibration_path else None,
             local_files_only=local_files_only,
+            calibration_fingerprint=calibration_fingerprint or os.getenv("PRIMA_AFFECT_CALIBRATION_FINGERPRINT"),
+            thresholds_fingerprint=thresholds_fingerprint or os.getenv("PRIMA_AFFECT_THRESHOLDS_FINGERPRINT"),
         ))
     except Exception:
         fallback = (

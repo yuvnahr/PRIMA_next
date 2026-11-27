@@ -274,7 +274,10 @@ async def _run_conversation(
             admission_checkpoint({"schema_version": "1.0", "conversation_id": conversation.id,
                 "ingestion_policy": policy.value, "turn_count": len(conversation.turns), "turns": admissions,
                 "complete": ingestion_failure is None})
+        after_conversation_started = time.perf_counter()
+        construction_seconds = after_conversation_started - history_started
         await _barrier(runtime, maintenance, MaintenanceBarrier.AFTER_CONVERSATION)
+        maintenance_barrier_seconds = time.perf_counter() - after_conversation_started
         history_seconds = time.perf_counter() - history_started
         if timing:
             timing({"phase": "history_replay", "conversation_id": conversation.id,
@@ -295,9 +298,11 @@ async def _run_conversation(
             else:
                 barrier_started = time.perf_counter()
                 await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_QUESTION)
+                barrier_seconds = time.perf_counter() - barrier_started
+                maintenance_barrier_seconds += barrier_seconds
                 if first_question:
                     # This barrier drains historical admissions, before any QA request exists.
-                    initial_history_flush_seconds = time.perf_counter() - barrier_started
+                    initial_history_flush_seconds = barrier_seconds
                     first_question = False
                     if timing:
                         timing({"phase": "initial_history_flush", "conversation_id": conversation.id,
@@ -323,7 +328,9 @@ async def _run_conversation(
                     historical_replay_ms=historical_replay_ms,
                 )
             checkpoint(record)
+        finalization_barrier_started = time.perf_counter()
         await _barrier(runtime, maintenance, MaintenanceBarrier.BEFORE_FINALIZATION)
+        maintenance_barrier_seconds += time.perf_counter() - finalization_barrier_started
         qa_phase_seconds = time.perf_counter() - qa_started
         qa_seconds = qa_phase_seconds - initial_history_flush_seconds
         maintenance_state = (
@@ -337,6 +344,9 @@ async def _run_conversation(
             "maintenance_complete": _maintenance_complete(maintenance_state),
             "history_seconds": history_seconds + initial_history_flush_seconds, "qa_seconds": qa_seconds,
             "history_admission_seconds": history_seconds,
+            "construction_wall_seconds": construction_seconds,
+            "maintenance_barrier_wall_seconds": maintenance_barrier_seconds,
+            "maintenance_worker_wall_seconds": None,
             "initial_history_flush_seconds": initial_history_flush_seconds,
             "qa_phase_seconds": qa_phase_seconds,
             "question_count": sum(question_case_id(conversation.id, q.question_id) in pending_ids
@@ -455,6 +465,13 @@ def _question_record(
         "reflection_interventions": response.diagnostics.reflection_count if response else 0,
         "model_call_count": response.diagnostics.model_call_count if response else 0,
         "model_usage": dict(response.diagnostics.model_usage) if response else {},
+        "lifecycle_cost": {
+            "last_retrieval_stage_ms": (response.output_data.get("retrieval") or {}).get("timings_ms") if response else None,
+            "last_generation_ms": generation.get("latency_ms"),
+            "provider_attempts": response.diagnostics.provider.get("attempts") if response else None,
+            "provider_retries": response.diagnostics.provider.get("retries") if response else None,
+            "provider_cache_hits": response.diagnostics.provider.get("cache_hits") if response else None,
+        },
         "raw_runtime_response": response_dict,
         "ingestion_error": ingestion_error, "runtime_error": runtime_error, "parse_error": parse_error,
         "execution_failed": bool(ingestion_error or runtime_error or parse_error), "scored": True,

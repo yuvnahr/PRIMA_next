@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from affect.emotion_prediction import EmotionPrediction
 from affect.taxonomies.goemotions import LABELS
 from benchmarks.campaign.config import ProviderConfig
 from benchmarks.campaign.provider_session import SharedProviderSession
@@ -257,25 +256,61 @@ def test_calibrated_serialization_protects_case_identity_and_exposes_verified_co
 
 
 def test_encoder_calibration_provenance_uses_actual_artifact_and_model_identity(tmp_path):
+    from affect.classifiers.calibration_artifact import encoder_identity
+
     path = tmp_path / "calibration.json"
     revision = "b" * 40
-    write_calibration(path, {"method": "scalar_temperature", "temperature": 1.2}, model_id="trained", dev_hash="d" * 64, model_revision=revision)
+    identity = encoder_identity("trained", revision, 128, "d" * 64, "e" * 64)
+    artifact = write_calibration(path, {"temperature": 1.2}, identity=identity)
     system = EncoderSystem(
         GenerationConfig(model="trained", provider="ollama", revision=revision), "trained_encoder", "trained_encoder",
-        ClassifierSettings(calibration_path=path),
+        ClassifierSettings(calibration_path=path, calibration_fingerprint=artifact["fingerprint"]),
     )
-    assert system._encoder.revision == revision
-    prediction = EmotionPrediction.from_probabilities(
-        calibrated_record()["prediction"]["probabilities"], {}, "trained", revision,
-        metadata={"calibration_temperature": 1.2},
-    )
-    provenance = system._calibration_provenance(prediction)
-    assert provenance["calibrated"] and provenance["model_revision"] == revision
-    assert len(provenance["artifact_sha256"]) == 64
-    write_calibration(path, {"method": "scalar_temperature", "temperature": 1.2}, model_id="trained", dev_hash="d" * 64)
-    assert not system._calibration_provenance(prediction)["calibrated"]
-    with pytest.raises(ValueError, match="immutable"):
-        write_calibration(path, {}, model_id="trained", dev_hash="d" * 64, model_revision="main")
+    temperature, _, provenance, _ = system._encoder._validated_parameters(revision)
+    assert temperature == 1.2 and provenance["calibrated"] and provenance["model_revision"] == revision
+    assert provenance["artifact_sha256"] == artifact["fingerprint"]
+    with pytest.raises(ValueError, match="identity mismatch"):
+        system._encoder._validated_parameters("c" * 40)
+    path.write_text(path.read_text().replace("1.2", "1.3"))
+    with pytest.raises(ValueError, match="Frozen identity mismatch"):
+        system._encoder._validated_parameters(revision)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), False, -1, 0])
+def test_calibration_rejects_invalid_temperature(tmp_path, bad):
+    with pytest.raises(ValueError, match="calibration parameter|must be positive"):
+        write_calibration(tmp_path / "calibration.json", {"temperature": bad}, identity={})
+
+
+def test_encoder_thresholds_require_matching_split_taxonomy_and_transform(tmp_path):
+    from affect.classifiers.calibration_artifact import encoder_identity
+    from affect.classifiers.goemotions_encoder import GoEmotionsEncoder
+    from config.frozen_json import freeze_json
+
+    revision = "a" * 40
+    identity = encoder_identity("trained", revision, 128, "b" * 64, "c" * 64)
+    path = tmp_path / "thresholds.json"
+    manifest = {**identity, "version": 2, "method": "per_label_f1",
+                "thresholds": dict.fromkeys(LABELS, 0.75),
+                "probability_transform": {"method": "sigmoid", "temperature_fingerprint": None}}
+    artifact = freeze_json(path, manifest)
+    encoder = GoEmotionsEncoder("trained", revision=revision, thresholds_path=path,
+                                thresholds_fingerprint=artifact["fingerprint"])
+    assert encoder._validated_parameters(revision)[1]["joy"] == 0.75
+    encoder.expected_dev_ids_hash = "d" * 64
+    with pytest.raises(ValueError, match="identity mismatch"):
+        encoder._validated_parameters(revision)
+    encoder.expected_dev_ids_hash = None
+    for field, replacement, match in (
+        ("ordered_labels_sha256", "d" * 64, "identity mismatch"),
+        ("preprocessing", {}, "identity mismatch"),
+        ("probability_transform", {"method": "sigmoid", "temperature_fingerprint": "d" * 64}, "transform"),
+        ("thresholds", {**manifest["thresholds"], "joy": 1.1}, "parameter"),
+    ):
+        path.unlink()
+        encoder.thresholds_fingerprint = freeze_json(path, {**manifest, field: replacement})["fingerprint"]
+        with pytest.raises(ValueError, match=match):
+            encoder._validated_parameters(revision)
 
 
 def test_legacy_parse_recovery_stays_a_parse_failure_without_rewriting_prediction():
@@ -318,3 +353,29 @@ def test_serializer_respects_explicit_unpaired_exclusion():
     )
     assert record["same_response_comparison_eligible"] is False
     assert not classification_report([record])["label_correction"]["available"]
+
+
+def test_bad_calibration_cannot_publish_a_partially_loaded_model(tmp_path, monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    from affect.classifiers.calibration_artifact import encoder_identity
+    from affect.classifiers.goemotions_encoder import GoEmotionsEncoder
+
+    revision = "b" * 40
+    path = tmp_path / "calibration.json"
+    artifact = write_calibration(path, {"temperature": 1.25},
+                                 identity=encoder_identity("other", revision, 128, "d" * 64, "e" * 64))
+    encoder = GoEmotionsEncoder("trained", revision=revision, calibration_path=path,
+                                calibration_fingerprint=artifact["fingerprint"])
+    monkeypatch.setattr(GoEmotionsEncoder, "_resolve_device", lambda self: "cpu")
+    fake_model = SimpleNamespace(config=SimpleNamespace(id2label=dict(enumerate(LABELS))), eval=lambda: None)
+    fake_model.to = lambda _: fake_model
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(
+        AutoTokenizer=SimpleNamespace(from_pretrained=lambda *a, **kw: object()),
+        AutoModelForSequenceClassification=SimpleNamespace(from_pretrained=lambda *a, **kw: fake_model),
+    ))
+    for _ in range(2):
+        with pytest.raises(ValueError, match="identity mismatch"):
+            encoder.predict("fake input")
+        assert encoder._model is None and encoder._tokenizer is None

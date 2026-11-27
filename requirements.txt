@@ -39,3 +39,5 @@ ruff==0.15.18
 xenon==0.9.3
 mypy==2.1.0
 bandit==1.9.4
+coverage==7.17.5
+hypothesis==6.170.17

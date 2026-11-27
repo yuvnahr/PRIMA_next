@@ -32,7 +32,9 @@ class ConsolidationEngine:
                     context={**maintained.context, "consolidated_from": MemoryType.WORKING.value},
                 )
                 self.repository.move(note, maintained)
-            else:
+            elif maintained is not note:
                 self.repository.update(maintained)
+            else:
+                continue
             updated.append(maintained)
         return updated

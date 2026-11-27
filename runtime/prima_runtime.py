@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import time
 from pathlib import Path
@@ -33,7 +32,6 @@ from memory.maintenance.background_supervisor import (
     MaintenanceBarrier,
     MaintenanceMode,
 )
-from memory.maintenance.importance_types import MemoryAdmissionDecision
 from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 from memory.maintenance.memory_importance import MemoryImportanceEngine
 from memory.memory_index import MemoryIndex
@@ -208,7 +206,7 @@ class PrimaRuntime:
             maintenance_supervisor=self.maintenance_supervisor,
             memory_importance_engine=self.memory_importance_engine,
         )
-        self.logger = self._build_logger(self.log_path)
+        self.logger = logging.getLogger(__name__)
 
     async def execute(self, request: PrimaRequest) -> PrimaResponse:
         """Execute one typed request through the workflow-owned lifecycle."""
@@ -816,87 +814,6 @@ class PrimaRuntime:
             planning_success=plan is not None and plan_status not in {"failed", None},
         )
 
-    def _persist_turn_memory(
-        self,
-        user_input: str,
-        execution_context: ExecutionContext,
-        runtime_context: RuntimeContext,
-    ) -> tuple[tuple[MemoryNote, ...], MemoryAdmissionDecision]:
-        admission_decision = self.memory_importance_engine.decide(
-            user_input,
-            affect_update=execution_context.affect_update,
-            reflection_result=execution_context.reflection_result,
-        )
-        if not admission_decision.stored:
-            return (), admission_decision
-        affect_update = execution_context.affect_update
-        note = MemoryNote.create(
-            content=user_input,
-            memory_type=MemoryType.EPISODIC,
-            affective_state=(
-                affect_update.to_dict() if (affect_update is not None and hasattr(affect_update, "to_dict")) else {}
-            ),
-            context={
-                "source": "prima_runtime",
-                "execution_id": execution_context.execution_id,
-                "source_session_id": runtime_context.session_id,
-                "source_turn_id": runtime_context.turn_id,
-            },
-            state_snapshot=getattr(execution_context.cognitive_state, "state_snapshot", None),
-            salience_score=float(getattr(affect_update, "salience_score", 0.0) or 0.0),
-            timestamp=runtime_context.timestamp,
-        )
-        return (self.memory_repository.add(note),), admission_decision
-
-    def _build_result(
-        self,
-        execution_context: ExecutionContext,
-        created_notes: tuple[MemoryNote, ...],
-        latency_ms: float,
-        errors: tuple[str, ...],
-        admission_decision: MemoryAdmissionDecision | None = None,
-    ) -> RuntimeResult:
-        affect_update = execution_context.affect_update
-        retrieval_response = execution_context.retrieval_response
-        reflection_result = execution_context.reflection_result
-        output = execution_context.output if isinstance(execution_context.output, dict) else {}
-        confidence_score = self._confidence_score(execution_context)
-        workflow_errors = tuple(str(error) for error in execution_context.workflow_state.errors)
-        return RuntimeResult(
-            final_response=str(output.get("text") or ""),
-            prediction_before_reflection=(
-                execution_context.correction_attempts[0].before_answer
-                if execution_context.correction_attempts
-                else str(output.get("text") or "")
-            ),
-            prediction_after_reflection=(
-                execution_context.correction_attempts[-1].after_answer
-                if execution_context.correction_attempts
-                else str(output.get("text") or "")
-            ),
-            affect_state=(
-                affect_update.profile.to_dict()
-                if (
-                    affect_update is not None
-                    and hasattr(affect_update, "profile")
-                    and hasattr(affect_update.profile, "to_dict")
-                )
-                else {}
-            ),
-            retrieved_memories=tuple(getattr(retrieval_response, "results", ())),
-            memory_notes_created=created_notes,
-            reflection_triggered=bool(getattr(reflection_result, "should_reflect", False)),
-            confidence_score=confidence_score,
-            latency_ms=latency_ms,
-            errors=errors + workflow_errors,
-            reflection_reasons=tuple(dict(reason) for reason in getattr(reflection_result, "trigger_reasons", ())),
-            reflection_before_confidence=float(getattr(reflection_result, "before_confidence", 0.0) or 0.0),
-            reflection_after_confidence=float(getattr(reflection_result, "after_confidence", 0.0) or 0.0),
-            reflection_utility_score=float(getattr(reflection_result, "utility_score", 0.0) or 0.0),
-            correction_count=sum(attempt.accepted for attempt in execution_context.correction_attempts),
-            memory_admission=admission_decision.to_log_record() if admission_decision is not None else {},
-        )
-
     def _confidence_score(self, execution_context: ExecutionContext) -> float:
         plan_evaluation = getattr(getattr(execution_context.plan, "evaluation", None), "confidence", None)
         if plan_evaluation is not None:
@@ -909,43 +826,6 @@ class PrimaRuntime:
         affect_confidence = getattr(getattr(execution_context.affect_update, "profile", None), "confidence", None)
         return round(float(affect_confidence or 0.0), 6)
 
-    def _update_runtime_context(
-        self,
-        runtime_context: RuntimeContext,
-        execution_context: ExecutionContext,
-        result: RuntimeResult,
-    ) -> None:
-        runtime_context.cognitive_state = execution_context.cognitive_state
-        if execution_context.affect_update is not None and hasattr(execution_context.affect_update, "emotional_state"):
-            runtime_context.emotional_state = execution_context.affect_update.emotional_state
-        runtime_context.retrieved_memories = result.retrieved_memories
-        runtime_context.active_plan = execution_context.plan
-        runtime_context.reflection_signals = tuple(getattr(execution_context.reflection_result, "signals", ()))
-        runtime_context.confidence_score = result.confidence_score
-
-    def _log_turn(self, user_input: str, result: RuntimeResult, metrics: RuntimeMetrics) -> None:
-        payload: dict[str, Any] = {
-            "input": user_input,
-            "retrieval_count": metrics.retrieval_count,
-            "memory_creation_count": metrics.memory_creation_count,
-            "memory_admission": dict(result.memory_admission),
-            "reflection_events": metrics.reflection_trigger_count,
-            "confidence_score": metrics.confidence_score,
-            "latency_ms": metrics.latency_ms,
-            "errors": list(result.errors),
-        }
-        self.logger.info(json.dumps(payload, sort_keys=True))
-
-    def _build_logger(self, log_path: Path) -> logging.Logger:
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        logger = logging.getLogger(f"prima_runtime.{id(self)}")
-        logger.setLevel(logging.INFO)
-        logger.propagate = False
-        if not logger.handlers:
-            handler = logging.FileHandler(log_path, encoding="utf-8")
-            handler.setFormatter(logging.Formatter("%(message)s"))
-            logger.addHandler(handler)
-        return logger
 
 
 def _reflection_audit(context: ExecutionContext) -> dict[str, Any]:

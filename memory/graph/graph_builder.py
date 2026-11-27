@@ -17,7 +17,7 @@ class GraphBuilder:
     def rebuild_for_type(self, repository: MemoryRepository, memory_type: MemoryType) -> GraphRepository:
         notes = [note for note in repository.list(memory_type) if not note.context.get("superseded")]
         for note in notes:
-            self._node(note)
+            self.graph_repository.add_node(self._node(note))
         for index, note in enumerate(notes):
             self._pairs(note, notes[index + 1 :])
         for node in tuple(self.graph_repository.nodes.values()):
@@ -25,14 +25,15 @@ class GraphBuilder:
                 self.graph_repository.remove_node(node.id)
         return self.graph_repository
 
-    def _node(self, note: MemoryNote) -> None:
-        self.graph_repository.add_node(
-            GraphNode(
-                id=f"node_{note.id}",
-                memory_id=note.id,
-                labels=(note.memory_type.value, note.memory_level.value),
-                metadata={"keywords": list(note.keywords)},
-            )
+    def _node(self, note: MemoryNote) -> GraphNode:
+        metadata: dict[str, object] = {"keywords": list(note.keywords)}
+        if note.context.get("superseded"):
+            metadata["superseded"] = True
+        return GraphNode(
+            id=f"node_{note.id}",
+            memory_id=note.id,
+            labels=(note.memory_type.value, note.memory_level.value),
+            metadata=metadata,
         )
 
     def _pairs(self, note: MemoryNote, others: list[MemoryNote]) -> None:
@@ -53,8 +54,10 @@ class GraphBuilder:
             elif edge.key in self.graph_repository.edges:
                 self.graph_repository.remove_edge(edge)
 
-    def index_note(self, repository: MemoryRepository, note: MemoryNote) -> GraphRepository:
-        self._node(note)
+    def index_note(self, repository: MemoryRepository, note: MemoryNote, *, reconcile: bool = False) -> GraphRepository:
+        node = self._node(note)
+        if not reconcile and self.graph_repository.nodes.get(node.id) == node:
+            return self.graph_repository
         if note.context.get("superseded"):
             node_id = f"node_{note.id}"
             for edge in tuple(self.graph_repository.edges.values()):
@@ -62,4 +65,5 @@ class GraphBuilder:
                     self.graph_repository.remove_edge(edge)
         else:
             self._pairs(note, repository.list())
+        self.graph_repository.add_node(node)
         return self.graph_repository

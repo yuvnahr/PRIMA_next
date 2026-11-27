@@ -7,7 +7,9 @@ import subprocess
 import sys
 import threading
 import time
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -251,10 +253,54 @@ def test_preflight_uses_effective_qa_schema_and_full_window_budget(tmp_path: Pat
     with pytest.raises(ValueError, match="context, output, and safety overhead"):
         run_campaign(CampaignConfig.model_validate(payload))
 
-@pytest.mark.parametrize("interrupt", ["sigint", "sigterm"])
-def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, interrupt: str) -> None:
+
+
+@contextmanager
+def _campaign_child(command: list[str], log: Path, flags: int = 0) -> Iterator[subprocess.Popen]:
+    with log.open("wb") as output, subprocess.Popen(  # noqa: S603  # nosec B603 - test interpreter only
+        command, cwd=REPOSITORY, stdout=output, stderr=subprocess.STDOUT, creationflags=flags,
+    ) as process:
+        try:
+            yield process
+        finally:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=3)
+
+
+def _wait_for_campaign_ready(process: subprocess.Popen, ready: Path, log: Path, timeout: float = 60) -> None:
+    started = time.monotonic()
+    deadline = started + timeout
+    while not ready.exists():
+        if process.poll() is not None or time.monotonic() >= deadline:
+            tail = log.read_text(encoding="utf-8", errors="replace")[-4000:]
+            pytest.fail(f"Campaign startup failed after {time.monotonic() - started:.1f}s "
+                        f"(exit={process.poll()}):\n{tail}")
+        time.sleep(0.02)
+
+
+def test_campaign_startup_timeout_reaps_unready_child(tmp_path: Path) -> None:
+    log, ready = tmp_path / "child.log", tmp_path / "ready"
+    with pytest.raises(pytest.fail.Exception, match="Campaign startup failed"), _campaign_child(
+        [sys.executable, "-c", "import time; time.sleep(60)"], log,
+    ) as process:
+        _wait_for_campaign_ready(process, ready, log, timeout=0.1)
+    assert process.poll() is not None
+
+
+@pytest.mark.parametrize("interrupt", ["ctrl-break", "terminate-process"] if os.name == "nt" else ["sigint", "sigterm"])
+def test_campaign_process_signal_resume_has_one_record_per_case(
+    tmp_path: Path, interrupt: str, reviewed_benchmark_checkout: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from benchmarks.campaign import preflight
+    from benchmarks.common.source_identity import source_identity
+
+    monkeypatch.setattr(preflight, "source_identity", lambda _: source_identity(reviewed_benchmark_checkout))
     payload = _payload(tmp_path / interrupt)
-    payload["provider"]["fake_delay_seconds"] = 0.4
     payload["benchmarks"] = [payload["benchmarks"][1]]
     source_rows = json.loads((FIXTURES / "campaign" / "hotpot.json").read_text(encoding="utf-8"))
     interrupt_rows = []
@@ -267,36 +313,57 @@ def test_campaign_process_signal_resume_has_one_record_per_case(tmp_path: Path, 
     payload["benchmarks"][0].update(dataset_path=str(dataset_path), max_items=len(interrupt_rows))
     config_path = tmp_path / f"{interrupt}.json"
     config_path.write_text(json.dumps(payload), encoding="utf-8")
-    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
-    process = subprocess.Popen(  # noqa: S603  # nosec B603 - fixed interpreter and module
-        [sys.executable, "-m", "benchmarks.campaign.cli", "run", "--config", str(config_path)],
-        cwd=REPOSITORY,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        creationflags=creationflags,
-    )
     checkpoint = (
-        Path(payload["output_root"])
-        / "modes"
-        / "hotpot"
-        / "distractor"
-        / "model_only"
-        / "checkpoints"
-        / "records.jsonl"
+        Path(payload["output_root"]) / "modes" / "hotpot" / "distractor" / "model_only"
+        / "checkpoints" / "records.jsonl"
     )
-    deadline = time.monotonic() + 15
-    while time.monotonic() < deadline and len(read_jsonl(checkpoint)) < 1:
-        if process.poll() is not None:
-            pytest.fail(f"campaign exited before interruption with {process.returncode}")
-        time.sleep(0.02)
-    interrupted_count = len(read_jsonl(checkpoint))
-    assert 0 < interrupted_count < len(interrupt_rows)
-    if interrupt == "sigint":
-        process.send_signal(signal.CTRL_BREAK_EVENT if os.name == "nt" else signal.SIGINT)
-    else:
-        process.send_signal(signal.SIGTERM)
-    process.wait(timeout=10)
-    assert process.returncode != 0
+    ready, log = tmp_path / "ready", tmp_path / "child.log"
+    child = """
+import sys
+import time
+from pathlib import Path
+from benchmarks.campaign import preflight
+from benchmarks.campaign.cli import main
+from benchmarks.common.artifacts import BenchmarkArtifactStore
+from benchmarks.common.source_identity import source_identity
+
+ready, config, checkout = sys.argv[1:]
+preflight.source_identity = lambda _: source_identity(Path(checkout))
+append = BenchmarkArtifactStore.append_checkpoint
+
+def checkpoint_and_wait(self, record):
+    saved = append(self, record)
+    if saved:
+        Path(ready).touch()
+        while True:
+            time.sleep(0.05)
+    return saved
+
+BenchmarkArtifactStore.append_checkpoint = checkpoint_and_wait
+raise SystemExit(main(["run", "--config", config]))
+"""
+    flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+
+    with _campaign_child([sys.executable, "-c", child, str(ready), str(config_path),
+                          str(reviewed_benchmark_checkout)], log, flags) as process:
+        _wait_for_campaign_ready(process, ready, log)
+        assert len(read_jsonl(checkpoint)) == 1
+        if interrupt == "terminate-process":
+            process.terminate()
+        else:
+            signum = signal.CTRL_BREAK_EVENT if interrupt == "ctrl-break" else (
+                signal.SIGINT if interrupt == "sigint" else signal.SIGTERM
+            )
+            process.send_signal(signum)
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            tail = log.read_text(encoding="utf-8", errors="replace")[-4000:]
+            pytest.fail(f"Campaign did not exit after {interrupt}:\n{tail}")
+        if interrupt == "terminate-process":
+            assert process.returncode != 0
+        else:
+            assert process.returncode == 130
 
     config = load_campaign_config(config_path)
     result = run_campaign(config, resume=True)

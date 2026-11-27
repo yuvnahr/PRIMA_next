@@ -627,14 +627,23 @@ def test_notebook_ram_sampling_tolerates_a_process_exiting_during_poll(monkeypat
     assert ram["process_tree_rss_bytes"] == 0
 
 
-def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campaign(tmp_path, monkeypatch):
-    from benchmarks.campaign import provider_session
+def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campaign(
+    tmp_path, monkeypatch, reviewed_benchmark_checkout,
+):
+    from benchmarks.campaign import preflight, provider_session
+    from benchmarks.common.source_identity import source_identity
+
+    checkout = reviewed_benchmark_checkout
+    notebook = checkout / "PRIMA_Kaggle_Benchmark.ipynb"
+    identity = source_identity(checkout)
+    monkeypatch.setattr(preflight, "source_identity", lambda _: source_identity(checkout))
+    monkeypatch.setattr("benchmarks.locomo.experiment.git_commit", lambda: source_identity(checkout)["git_commit"])
     from benchmarks.campaign.config import load_campaign_config
     from benchmarks.campaign.orchestrator import run_campaign
     from benchmarks.locomo.loader import LoCoMoDataset
 
     ns = notebook_namespace()
-    ns.update(json=json, subprocess=subprocess, time=time, REPOSITORY_DIR=REPO, OUTPUT_ROOT=tmp_path,
+    ns.update(json=json, subprocess=subprocess, time=time, REPOSITORY_DIR=checkout, OUTPUT_ROOT=tmp_path,
               SELECTED_BENCHMARK="locomo", SESSION_STAMP="synthetic-test", OLLAMA_ENDPOINT="http://unused",
               prepare_run=prepare_run, CheckpointProgress=CheckpointProgress, persist_sample=persist_sample)
     source = fixture() + [{**copy.deepcopy(fixture()[0]), "sample_id": "conversation-2"}]
@@ -642,14 +651,15 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     dataset.write_text(json.dumps(source))
     from datetime import datetime, timezone
 
-    from benchmarks.locomo.experiment import fingerprint, git_commit
+    from benchmarks.locomo.experiment import fingerprint
     ns.update(sys=__import__("sys"), client_env={}, datetime=datetime, timezone=timezone,
               shutil=__import__("shutil"), re=__import__("re"))
     ns["sha256_file"] = lambda path: fingerprint(Path(path))
     ns["CONFIG"]["FULL_RUN_ID"] = "synthetic-full"
     ns.update(SELECTED_DATASET=dataset, conversations=list(LoCoMoDataset(dataset).conversations()),
               dataset_summary={"items": 6, "sha256": fingerprint(dataset)}, STATE={
-                  "repository": {"url": "https://example.invalid", "requested_ref": "dev", "commit_sha": git_commit()},
+                  "repository": {"url": "https://example.invalid", "requested_ref": "dev", "commit_sha": identity["git_commit"]},
+                  "source_identity": identity,
                   "model_identity": {"name": "fake", "digest": "b" * 64},
                   "preflight": {"actual_context_length": 8192}, "mode_id": "locomo-prima",
                   "ollama_parallel_slots": 1, "timing_started": time.monotonic(),
@@ -682,6 +692,20 @@ def test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campai
     ns["check_safety"] = resource_guard
     config, config_path, root, _ = ns["build_campaign_config"]("canary-1", full=False, max_items=2)
     samples, log, wall = ns["execute_campaign"](config_path, root, 4, fresh=True)
+    guarded = CampaignConfig.model_validate(config)
+    repository = guarded.repository
+    wrong_sha = guarded.model_copy(update={"repository": repository.model_copy(update={"commit_sha": "0" * 40})})
+    with pytest.raises(ValueError, match="clean, pinned"):
+        preflight.run_preflight(wrong_sha, None)
+    wrong_hash = guarded.model_copy(update={"repository": repository.model_copy(update={"source_fingerprint": "0" * 64})})
+    with pytest.raises(ValueError, match="fingerprint changed"):
+        preflight.run_preflight(wrong_hash, None)
+    with notebook.open("a", encoding="utf-8") as stream:
+        stream.write("\n")
+    with pytest.raises(ValueError, match="clean, pinned"):
+        preflight.run_preflight(guarded, None)
+    shutil.copyfile(REPO / notebook.name, notebook)
+
     manifest, records, timing = ns["validate_canary"](config, root)
     assert len(records) == ns["STATE"]["canary_measured_items"] == 4
     child = root / manifest["modes"]["locomo-prima"]["child_manifest"]

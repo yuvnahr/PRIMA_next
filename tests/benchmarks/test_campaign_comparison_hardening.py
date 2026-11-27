@@ -16,13 +16,14 @@ from benchmarks.common.contracts import (
     RunStatus,
 )
 from benchmarks.goemotions.metrics import evaluate
+from benchmarks.locomo.evaluate import paired_conversation_comparison
 
 
-def _manifest(root: Path, selected: tuple[str, ...], *, dataset_hash: str = "dataset") -> Path:
+def _manifest(root: Path, selected: tuple[str, ...], *, dataset_hash: str = "dataset", benchmark: str = "GoEmotions") -> Path:
     manifest = BenchmarkManifest(
         campaign_id=root.name,
         benchmark=BenchmarkSpec(
-            name="GoEmotions",
+            name=benchmark,
             version="1.0",
             mode=BenchmarkMode.CLASSIFICATION,
             dataset_name="test.tsv",
@@ -65,7 +66,7 @@ def _checkpoint(root: Path, case_id: str, record: dict | None, *, status: str = 
                 "finished_at": datetime.now(UTC).isoformat(),
                 "total_ms": 1.0,
             },
-            "diagnostics": {"goemotions_record": record},
+            "diagnostics": {"locomo_record" if "conversation_id" in record else "goemotions_record": record},
         },
         "failure": {"message": "failed"} if status != "complete" else None,
     }
@@ -130,3 +131,48 @@ def test_comparison_refuses_dataset_hash_mismatch(tmp_path: Path) -> None:
             512,
             512,
         )
+
+
+def test_locomo_reporting_shares_cluster_intervals_and_names_the_scoring_rules(tmp_path):
+    selected = ("a1", "a2", "b", "failure", "abstention")
+    left = _manifest(tmp_path / "left", selected, benchmark="LoCoMo")
+    right = _manifest(tmp_path / "right", selected, benchmark="LoCoMo")
+    rows_a, rows_b = [], []
+    for case_id in selected:
+        gold = "apple, peach"
+        a = {"case_id": case_id, "conversation_id": case_id[0], "category": 1,
+             "question": "Which fruits?", "expected_answer": gold, "prediction": "apple",
+             "reference_metadata": {"answer": gold}}
+        b = {**a, "prediction": "apple, peach"}
+        if case_id == "b":
+            a["prediction"], b["prediction"] = b["prediction"], a["prediction"]
+        if case_id == "failure":
+            b["execution_failed"] = True
+        if case_id == "abstention":
+            b["outcome"] = "abstained"
+        rows_a.append(a)
+        rows_b.append(b)
+        _checkpoint(left.parent, case_id, a)
+    for b in reversed(rows_b):
+        _checkpoint(right.parent, b["case_id"], b)
+
+    def campaign(metric):
+        spec = ComparisonConfig(id="locomo", left="left", right="right", metric=metric, bootstrap_samples=200)
+        return compare(spec, left, right, {}, {}, "revision", 512, 512)
+
+    native = paired_conversation_comparison(rows_a, rows_b, samples=200, seed=7)
+    official = campaign("answerable_official_f1")
+    assert official["bootstrap_95_ci"] == native["metrics"]["answerable_official_f1"]["bootstrap_95_ci"] == [-.5, .5]
+    assert official["independent_units"] == 2 and official["paired_case_ids"] == list(selected[:3])
+    assert official["exclusions_by_arm"]["right"]["failed"] == 1
+    assert official["answerable_population"]["right"] == {
+        "selected": 5, "answered": 3, "answered_official_f1": 2.5 / 3,
+        "coverage": .6, "all_selected_official_f1": .5,
+    }
+    assert campaign("f1")["metric_definition"] == "legacy_squad_f1"
+    assert campaign("f1")["left"] != campaign("official_locomo_f1")["left"]
+
+    checkpoint = right.parent / "checkpoints" / "records.jsonl"
+    checkpoint.write_text(checkpoint.read_text().replace('"case_id": "a1", "conversation_id"', '"case_id": "wrong", "conversation_id"'))
+    with pytest.raises(ValueError, match="native record ID"):
+        campaign("answerable_official_f1")

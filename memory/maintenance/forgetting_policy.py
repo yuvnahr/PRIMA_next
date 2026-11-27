@@ -15,4 +15,6 @@ class ForgettingPolicy:
         metadata = dict(note.retrieval_metadata)
         metadata["retrieval_suppressed"] = decayed_retention < self.archive_threshold
         metadata["archive_status"] = "archived" if decayed_retention < self.archive_threshold else "active"
+        if decayed_retention == note.retention_score and metadata == note.retrieval_metadata:
+            return note
         return note.with_updates(retention_score=decayed_retention, retrieval_metadata=metadata)

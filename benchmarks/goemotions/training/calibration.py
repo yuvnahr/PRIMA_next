@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from benchmarks.goemotions.training.data import load_split, multi_hot, validate_splits
+from affect.classifiers.calibration_artifact import finite_parameter
+from affect.taxonomies.goemotions import LABELS
+from benchmarks.goemotions.training.data import load_encoder_dev_predictions, multi_hot
+from config.frozen_json import freeze_json
 
 
 def fit_temperature(logits: Sequence[Sequence[float]], targets: Sequence[Sequence[float]], candidates: Sequence[float] = tuple(i / 20 for i in range(10, 81))) -> dict[str, Any]:
@@ -28,20 +30,26 @@ def _nll(logits: Sequence[Sequence[float]], targets: Sequence[Sequence[float]], 
     return sum(terms) / len(terms)
 
 
-def write_calibration(path: Path, result: dict[str, Any], *, model_id: str, dev_hash: str, model_revision: str | None = None) -> None:
-    if model_revision is not None and (len(model_revision) < 7 or any(c not in "0123456789abcdefABCDEF" for c in model_revision)):
-        raise ValueError("Calibration model revision must be an immutable commit hash")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({**result, "model_id": model_id, "model_revision": model_revision, "dev_dataset_sha256": dev_hash}, indent=2, sort_keys=True), encoding="utf-8")
+def write_calibration(path: Path, result: dict[str, Any], *, identity: dict[str, Any]) -> dict[str, Any]:
+    temperature = finite_parameter(result.get("temperature"), lower=0.0, upper=float("inf"))
+    if temperature <= 0:
+        raise ValueError("Calibration temperature must be positive")
+    return freeze_json(path, {**result, **identity, "version": 2, "method": "scalar_temperature"})
 
 
-def fit_calibration_from_dev(data_dir: Path, logits_path: Path, output_path: Path, *, model_id: str, model_revision: str | None = None) -> dict[str, Any]:
-    """Fit scalar temperature from development logits in official development order."""
-    labels = validate_splits(data_dir)["labels"]
-    logits = json.loads(logits_path.read_text(encoding="utf-8"))
-    dev = load_split(data_dir, "dev")
-    if not isinstance(logits, list) or len(logits) != len(dev):
-        raise ValueError("Development logits must match the official dev split length.")
-    result = fit_temperature(logits, [multi_hot(row, labels) for row in dev])
-    write_calibration(output_path, result, model_id=model_id, dev_hash=validate_splits(data_dir)["hashes"]["dev"], model_revision=model_revision)
-    return result
+def fit_calibration_from_dev(
+    data_dir: Path, logits_path: Path, output_path: Path, *, model_id: str, model_revision: str, max_length: int = 128,
+) -> dict[str, Any]:
+    """Fit scalar temperature from a frozen dev logit artifact."""
+    identity, dev, predictions = load_encoder_dev_predictions(
+        data_dir, logits_path, model_id=model_id, revision=model_revision,
+        max_length=max_length, representation="logits",
+    )
+    logits = predictions["rows"]
+    if any(not isinstance(row, list) or len(row) != len(LABELS) for row in logits):
+        raise ValueError("Development logits must cover every ordered label")
+    for row in logits:
+        for value in row:
+            finite_parameter(value, lower=float("-inf"), upper=float("inf"))
+    result = fit_temperature(logits, [multi_hot(row, list(LABELS)) for row in dev])
+    return write_calibration(output_path, {**result, "input_fingerprint": predictions["fingerprint"]}, identity=identity)

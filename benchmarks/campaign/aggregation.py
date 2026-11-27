@@ -83,10 +83,20 @@ def write_aggregate(
     if safe_comparisons:
         for name, item in safe_comparisons.items():
             if item.get("status") == "valid":
+                delta = item["delta"]
+                delta_text = f"{delta:.6f}" if delta is not None else "unavailable"
                 lines.append(
-                    f"- `{name}`: delta {item['delta']:.6f}; corrected {item['corrected']}, "
+                    f"- `{name}`: delta {delta_text}; corrected {item['corrected']}, "
                     f"regressed {item['regressed']}; 95% CI {item['bootstrap_95_ci']}"
                 )
+                if item.get("sampling_unit") == "conversation":
+                    lines.append(f"  Matched {item['paired_scored']}/{item['selected_cases']} selected questions "
+                                 f"across {item['independent_units']} observed conversations.")
+                    for arm, population in item["answerable_population"].items():
+                        if population is not None:
+                            lines.append(f"  {arm}: {population['answered']}/{population['selected']} answered, "
+                                         f"answered official F1 {population['answered_official_f1']}, "
+                                         f"all-selected official F1 {population['all_selected_official_f1']}.")
             else:
                 lines.append(f"- `{name}`: **refused** — {item.get('error', 'invalid pair')}")
     else:

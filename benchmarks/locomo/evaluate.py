@@ -31,13 +31,15 @@ def paired_conversation_interval(values: list[tuple[str, str, float, float]], *,
     rng = random.Random(seed)  # noqa: S311  # nosec B311
     ids = sorted(grouped)
     deltas = []
-    for _ in range(samples):
+    for _ in range(samples if len(ids) >= 2 else 0):
         chosen = [pair for _ in ids for pair in grouped[rng.choice(ids)]]
         deltas.append(mean([b - a for a, b in chosen]))
     deltas.sort()
     return {"left": mean([a for _, _, a, _ in values]), "right": mean([b for _, _, _, b in values]),
         "delta": mean([b - a for _, _, a, b in values]), "paired_questions": len(values),
-        "conversation_units": len(ids), "bootstrap_95_ci": [deltas[int(.025 * (samples - 1))], deltas[int(.975 * (samples - 1))]],
+        "conversation_units": len(ids), "sampling_unit": "conversation",
+        "paired_case_ids": sorted(row[0] for row in values),
+        "bootstrap_95_ci": [deltas[int(.025 * (samples - 1))], deltas[int(.975 * (samples - 1))]] if deltas else None,
         "gained": sum(b > a for _, _, a, b in values), "harmed": sum(b < a for _, _, a, b in values)}
 
 
@@ -49,15 +51,17 @@ def paired_conversation_comparison(left: list[Record], right: list[Record], *, s
     if {row["case_id"] for row in left} != set(right_by_id):
         raise ValueError("Paired case IDs differ")
     pairs = [(row, right_by_id[row["case_id"]]) for row in left]
-    if any(any(a.get(key) != b.get(key) for key in ("conversation_id", "question", "expected_answer", "reference_metadata", "category")) for a, b in pairs):
-        raise ValueError("Paired source/question identities differ")
+    for a, b in pairs:
+        validate_pair_identity(a, b)
     selectors: dict[str, Callable[[Record], float | bool | None]] = {
-        "answerable_official_f1": lambda row: official_locomo_score(row["prediction"],
-            row.get("reference_metadata", {}).get("answer", row.get("expected_answer", "")), row["category"])
-            if str(row["category"]) != "5" and isinstance(row.get("prediction"), str) else None,
-        "answerable_legacy_f1": lambda row: f1_score(row["prediction"], row.get("expected_answer", ""))
-            if str(row["category"]) != "5" and isinstance(row.get("prediction"), str) else None,
-        "adversarial_abstention_accuracy": lambda row: float(row["outcome"] == "abstained" and not row.get("execution_failed")) if str(row["category"]) == "5" and row.get("outcome") is not None else None,
+        "answerable_official_f1": lambda row: answerable_score(row, "official_locomo_f1"),
+        "answerable_legacy_f1": lambda row: answerable_score(row, "legacy_squad_f1"),
+        "answerable_coverage": lambda row: float(answerable_score(row, "official_locomo_f1") is not None)
+            if str(row.get("category")) != "5" else None,
+        "answerable_all_selected_official_f1": lambda row: (answerable_score(row, "official_locomo_f1") or 0.0)
+            if str(row.get("category")) != "5" else None,
+        "adversarial_abstention_accuracy": lambda row: float(row.get("outcome") == "abstained" and not row.get("execution_failed"))
+            if str(row.get("category")) == "5" else None,
         "execution_failure_rate": lambda row: float(row["execution_failed"]) if "execution_failed" in row else None,
         "invalid_citation_rate": lambda row: row.get("invalid_citations"),
         "qa_memory_write_rate": lambda row: float(row["qa_memory_write_count"] > 0) if row.get("qa_memory_write_count") is not None else None,
@@ -75,12 +79,44 @@ def paired_conversation_comparison(left: list[Record], right: list[Record], *, s
     expected_counts = {"answerable_official_f1": sum(str(a["category"]) != "5" for a, _ in pairs),
                        "adversarial_abstention_accuracy": sum(str(a["category"]) == "5" for a, _ in pairs)}
     observed = all(metrics[name] is not None and metrics[name]["paired_questions"] == expected_counts.get(name, len(pairs)) for name in required)
-    quality_pass = (observed and metrics["answerable_official_f1"]["bootstrap_95_ci"][0] > 0
+    interval = metrics["answerable_official_f1"]
+    quality_pass = (observed and interval is not None and interval["bootstrap_95_ci"] is not None
+        and interval["bootstrap_95_ci"][0] > 0
         and metrics["adversarial_abstention_accuracy"]["delta"] >= 0
         and all(metrics[name]["delta"] <= 0 for name in required[2:]))
     return {"schema_version": "1.0", "sampling_unit": "conversation", "seed": seed, "samples": samples,
-        "metrics": metrics, "quality_gates_pass": bool(quality_pass), "automatic_promotion": False,
+        "metrics": metrics, "selected_cases": len(pairs), "official_scorer": scorer_identity(), "quality_gates_pass": bool(quality_pass), "automatic_promotion": False,
         "resource_gate": "requires_fresh_integrated_measurement"}
+
+
+def validate_pair_identity(left: Record, right: Record) -> None:
+    keys = ("case_id", "conversation_id", "question", "expected_answer", "reference_metadata",
+            "category", "question_id", "expected_evidence")
+    if not left.get("conversation_id") or not left.get("question") or left.get("expected_answer") is None or (
+        str(left.get("category")) not in {"1", "2", "3", "4", "5"}
+    ) or any(left.get(key) != right.get(key) for key in keys):
+        raise ValueError("Paired source/question identities differ or are incomplete")
+
+
+def answerable_score(row: Record, metric: str) -> float | None:
+    prediction = row.get("prediction")
+    if (str(row.get("category")) not in {"1", "2", "3", "4"} or row.get("execution_failed")
+        or row.get("parse_error") or row.get("scored") is False
+        or row.get("outcome") in {"abstained", "failed"} or not isinstance(prediction, str)
+        or not prediction.strip() or row.get("expected_answer") is None):
+        return None
+    if metric == "official_locomo_f1":
+        return official_locomo_score(prediction, row.get("reference_metadata", {}).get("answer", row["expected_answer"]), row["category"])
+    return f1_score(prediction, row["expected_answer"])
+
+
+def answerable_population(rows: list[Record], *, selected: int | None = None) -> Record:
+    scores = [score for row in rows if (score := answerable_score(row, "official_locomo_f1")) is not None]
+    selected = sum(str(row.get("category")) in {"1", "2", "3", "4"} for row in rows) if selected is None else selected
+    return {"selected": selected, "answered": len(scores),
+            "answered_official_f1": sum(scores) / len(scores) if scores else None,
+            "coverage": len(scores) / selected if selected else None,
+            "all_selected_official_f1": sum(scores) / selected if selected else None}
 
 
 class LoCoMoEvaluator:
@@ -138,6 +174,7 @@ class LoCoMoEvaluator:
             raise ValueError("LoCoMo failure totals do not reconcile")
         return {
             "total_questions": len(rows),
+            "answerable_population": answerable_population(rows),
             "scored_questions": len(scored),
             "failed_questions": failed_questions,
             "evaluation_failure_questions": evaluation_failures,

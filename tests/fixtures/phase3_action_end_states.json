@@ -1,0 +1,26 @@
+[
+  {
+    "id": "changed-preference",
+    "history": ["Color preference was blue", "Color preference now green"],
+    "expected": {"selected_color": "green", "updates": 1},
+    "attempts": [{"selected_color": "blue", "updates": 1}, {"selected_color": "green", "updates": 1}]
+  },
+  {
+    "id": "partial-failure",
+    "history": ["Reservation committed", "Confirmation failed before delivery"],
+    "expected": {"reservations": 1, "confirmed": false},
+    "attempts": [{"reservations": 1, "confirmed": false}, {"reservations": 2, "confirmed": false}]
+  },
+  {
+    "id": "retraction",
+    "history": ["Preference removed", "Independent source retained"],
+    "expected": {"revoked_available": false, "unrelated_available": true},
+    "attempts": [null, {"revoked_available": false, "unrelated_available": true}]
+  },
+  {
+    "id": "stale-procedure",
+    "history": ["Procedure requires an open case", "Case already closed"],
+    "expected": {"status": "blocked", "effects": 0},
+    "attempts": [{"status": "executed", "effects": 1}, {"status": "executed", "effects": 2}]
+  }
+]

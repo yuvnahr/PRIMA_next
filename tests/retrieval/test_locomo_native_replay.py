@@ -423,3 +423,33 @@ def test_cli_rebuild_inspects_then_uses_same_publication_contract(tmp_path, caps
     active.add(MemoryNote.create("new content"))
     with pytest.raises(ValueError, match="unchanged generation"):
         embedding_rebuild.rollback_embeddings(active)
+
+
+def test_scoped_chroma_dense_query_preserves_legacy_scope_and_filters_before_limit(tmp_path):
+    from unittest.mock import patch
+
+    from memory.embedding_backend import EmbeddingBackendConfig
+    from memory.embedding_pipeline import CanonicalEmbeddingPipeline, use_embedding_pipeline
+    from memory.experiment_config import EmbeddingExperimentConfig
+    from memory.memory_index import MemoryIndex
+    from memory.memory_note import MemoryNote
+    from memory.memory_repository import ChromaMemoryRepository
+
+    config = EmbeddingBackendConfig("stable", "stable_hash_embedding", 2)
+    pipeline = CanonicalEmbeddingPipeline(EmbeddingExperimentConfig("stable", "raw", False))
+    with use_embedding_pipeline(pipeline, config), patch("memory.memory_note._context_nlp", return_value=None):
+        repo = ChromaMemoryRepository(tmp_path)
+        for note_id, vector, context in (
+            ("foreign", (1., 0.), {"source_conversation_id": "foreign"}),
+            ("hidden", (1., 0.), {"superseded": True}),
+            ("unverified", (1., 0.), {"evidence_eligible": False}),
+            ("scoped", (.8, .6), {"source_conversation_id": "selected"}),
+            ("legacy", (.6, .8), {}),
+        ):
+            note = MemoryNote.create("fixture", note_id=note_id, context=context)
+            repo.add(note.with_updates(embedding=vector))
+        view = MemoryIndex(repo, graph_repository=None, factual_only=True, source_conversation_id="selected")
+        assert [row.id for row, _ in view.query((1., 0.), limit=2)] == ["scoped", "legacy"]
+        view.visible_ids = frozenset({"legacy"})
+        assert [row.id for row, _ in view.query((1., 0.), limit=1)] == ["legacy"]
+        repo.client.close()

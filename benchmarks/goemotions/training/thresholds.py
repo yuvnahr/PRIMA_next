@@ -7,7 +7,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from benchmarks.goemotions.training.data import load_split, validate_splits
+from affect.classifiers.calibration_artifact import finite_parameter
+from affect.taxonomies.goemotions import LABELS
+from benchmarks.goemotions.training.data import load_encoder_dev_predictions
+from config.frozen_json import freeze_json
 
 
 def select_thresholds(probabilities: Sequence[Mapping[str, float]], gold: Sequence[frozenset[str]], labels: Sequence[str], grid: Sequence[float] = tuple(i / 100 for i in range(10, 91, 5)), min_support: int = 5) -> dict[str, Any]:
@@ -35,13 +38,22 @@ def write_thresholds(path: Path, result: Mapping[str, Any], *, model_id: str, de
     path.write_text(json.dumps({**result, "model_id": model_id, "dev_dataset_sha256": dev_hash}, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def fit_thresholds_from_dev(data_dir: Path, probabilities_path: Path, output_path: Path, *, model_id: str, min_support: int = 5) -> dict[str, Any]:
-    """Fit thresholds against official dev labels only; predictions must be in dev order."""
-    labels = validate_splits(data_dir)["labels"]
-    probabilities = json.loads(probabilities_path.read_text(encoding="utf-8"))
-    dev = load_split(data_dir, "dev")
-    if not isinstance(probabilities, list):
-        raise ValueError("Development predictions must be a JSON list in official dev order.")
-    result = select_thresholds(probabilities, [row.labels for row in dev], labels, min_support=min_support)
-    write_thresholds(output_path, result, model_id=model_id, dev_hash=validate_splits(data_dir)["hashes"]["dev"])
-    return result
+def fit_thresholds_from_dev(
+    data_dir: Path, probabilities_path: Path, output_path: Path, *, model_id: str, model_revision: str,
+    min_support: int = 5, max_length: int = 128, temperature_fingerprint: str | None = None,
+) -> dict[str, Any]:
+    """Fit encoder thresholds against frozen development probabilities."""
+    transform = {"method": "sigmoid", "temperature_fingerprint": temperature_fingerprint}
+    identity, dev, predictions = load_encoder_dev_predictions(
+        data_dir, probabilities_path, model_id=model_id, revision=model_revision,
+        max_length=max_length, representation="probabilities", probability_transform=transform,
+    )
+    probabilities = predictions["rows"]
+    for row in probabilities:
+        if not isinstance(row, dict) or set(row) != set(LABELS):
+            raise ValueError("Development probabilities must cover every official label")
+        for value in row.values():
+            finite_parameter(value, lower=0.0, upper=1.0)
+    result = select_thresholds(probabilities, [row.labels for row in dev], LABELS, min_support=min_support)
+    return freeze_json(output_path, {**result, **identity, "version": 2, "method": "per_label_f1",
+                                    "probability_transform": transform, "input_fingerprint": predictions["fingerprint"]})

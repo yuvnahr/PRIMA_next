@@ -3,64 +3,120 @@ name: PRIMA-NEXT CI
 on:
   push:
     branches:
-      - master
-      - dev
-      - 3.10_to_3.14
-      - feature/**
+      - '**'
   pull_request:
-    branches:
-      - master
-      - dev
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEFAULT_PROVIDER: local
+
 jobs:
   quality-checks:
-    runs-on: ubuntu-latest
-
+    name: quality-checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0 # Frozen development evidence checks historical checkpoint blobs.
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
-          python-version: "3.14"
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Report Optional Capabilities
+          python-version: "3.14.7"
+      - name: Install pinned Linux dependencies
+        run: python -m pip install --require-hashes --only-binary=':all:' -r requirements-linux-py314.lock.txt
+      - name: Report optional capabilities
         run: python -m benchmarks.preflight --json
-
-      - name: Compile Owned Python Sources
-        run: python -m compileall -q -x '(^|[\\/])(\.git|\.venv|venv|external|pytest-tmp|tmp)([\\/]|$)' .
-
-      - name: Run Pytest
-        run: python -m pytest -q
-
+      - name: Compile owned Python sources
+        run: python -m compileall -q -x '(^|[\\/])(\.git|\.venv|\.codex_deps|venv|external|pytest-tmp|tmp)([\\/]|$)' .
+      - name: Run deterministic pytest with branch measurement
+        run: |
+          set -o pipefail
+          python -m coverage run --branch --source=state,tools,workflow,events,memory -m pytest -q -ra --durations=20 | tee pytest.log
+          python -m coverage report
+          python -m coverage json -o "$RUNNER_TEMP/critical-coverage.json"
+          python scripts/check_critical_coverage.py "$RUNNER_TEMP/critical-coverage.json"
       - name: Run Ruff
         run: python -m ruff check .
-
       - name: Run Xenon
         timeout-minutes: 1
         run: python scripts/run_xenon.py
-
-      - name: Run MyPy
+      - name: Run mypy
         run: python -m mypy .
-
       - name: Run Bandit
-        run: python -m bandit -q -c bandit.yaml -r .
+        run: python scripts/run_bandit.py
+      - name: Upload pytest diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: linux-pytest
+          path: pytest.log
+          retention-days: 5
+          if-no-files-found: ignore
+
+  windows-smoke:
+    name: windows-smoke
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.14.7"
+      - name: Install pinned Windows dependencies
+        run: python -m pip install --require-hashes --only-binary=':all:' -r requirements-win-py314.lock.txt
+      - name: State, deadlines, persistence and campaign process tests
+        shell: pwsh
+        run: |
+          python -m pytest -q -ra --durations=15 tests/state tests/test_action_tool_phase5.py tests/runtime tests/retrieval/test_locomo_native_replay.py::test_chroma_rebuild_changes_dimension_with_recoverable_prior tests/benchmarks/test_campaign.py::test_campaign_startup_timeout_reaps_unready_child tests/benchmarks/test_campaign.py::test_campaign_process_signal_resume_has_one_record_per_case tests/benchmarks/test_kaggle.py::test_notebook_fresh_canary_monitor_validation_and_packaging_with_fake_campaign | Tee-Object -FilePath pytest.log
+          exit $LASTEXITCODE
+      - name: Upload pytest diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: windows-pytest
+          path: pytest.log
+          retention-days: 5
+          if-no-files-found: ignore
+
+  workflow-security:
+    name: workflow-security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.14.7"
+      - name: Lint workflows with actionlint and zizmor
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/actionlint.tar.gz" https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  $RUNNER_TEMP/actionlint.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+          python -m pip install --only-binary=':all:' --no-deps zizmor==1.33.1
+          zizmor --offline --no-progress .github/workflows
+      - name: Scan introduced PR commits for secrets
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+          printf '[extend]\nuseDefault = true\n' > "$RUNNER_TEMP/gitleaks.toml"
+          touch "$RUNNER_TEMP/gitleaks.ignore"
+          "$RUNNER_TEMP/gitleaks" git --ignore-gitleaks-allow --gitleaks-ignore-path "$RUNNER_TEMP/gitleaks.ignore" --config "$RUNNER_TEMP/gitleaks.toml" --redact=100 --no-banner --log-opts="$BASE..$HEAD" .

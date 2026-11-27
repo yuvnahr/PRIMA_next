@@ -44,11 +44,10 @@ class MaintenancePipeline:
         if note is None:
             raise KeyError(f"Maintenance memory not found: {memory_id}")
         embedded = await asyncio.to_thread(get_embedding_pipeline().embed_stored_note, note)
-        note = note.with_updates(
-            embedding=embedded.vector,
-            retrieval_metadata={**note.retrieval_metadata, **embedded.metadata},
-        )
-        await asyncio.to_thread(self.memory_index.update, note)
+        metadata = {**note.retrieval_metadata, **embedded.metadata}
+        if note.embedding != embedded.vector or note.retrieval_metadata != metadata:
+            note = note.with_updates(embedding=embedded.vector, retrieval_metadata=metadata)
+            await asyncio.to_thread(self.memory_index.update, note)
         await self._emit(EventType.MEMORY_ENCODED, event, {"embedding_dimensions": len(note.embedding)})
 
         salience = await asyncio.to_thread(
@@ -58,7 +57,8 @@ class MaintenancePipeline:
             float(event.payload.get("novelty_score", 0.0)),
             float(event.payload.get("user_relevance_score", 0.0)),
         )
-        await asyncio.to_thread(self.memory_index.update, note.with_updates(salience_score=salience))
+        if salience != note.salience_score:
+            await asyncio.to_thread(self.memory_index.update, note.with_updates(salience_score=salience))
         await self._emit(EventType.SALIENCE_SCORED, event, {"salience_score": salience})
         self.short_term_buffer.append(memory_id)
         await self._emit(

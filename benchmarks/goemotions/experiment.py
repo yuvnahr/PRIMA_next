@@ -115,6 +115,8 @@ def run_goemotions_experiment(
     write_sample_manifest: Path | None = None,
     thresholds: Path | None = None,
     calibration: Path | None = None,
+    calibration_fingerprint: str | None = None,
+    thresholds_fingerprint: str | None = None,
     progress: bool = True,
     resume: bool = False,
     bootstrap_samples: int = 1000,
@@ -172,7 +174,16 @@ def run_goemotions_experiment(
         if canonical_name == "model_only_zero_shot"
         else StructuredOutputMode.JSON_SCHEMA,
     )
-    classifier = ClassifierSettings(device, batch_size, thresholds, calibration)
+    hashes = split_validation.get("hashes")
+    dev_hash = hashes.get("dev") if isinstance(hashes, dict) else None
+    dev_ids_hash = None
+    if (thresholds or calibration) and dev_hash:
+        from benchmarks.goemotions.training.data import load_split
+        from config.frozen_json import fingerprint as identity_hash
+
+        dev_ids_hash = identity_hash([row.example_id for row in load_split(data_dir, "dev")])
+    classifier = ClassifierSettings(device, batch_size, thresholds, calibration,
+                                    calibration_fingerprint, thresholds_fingerprint, dev_hash, dev_ids_hash)
     if llm_client is None:
         _preflight_provider(provider, canonical_name, generation.model)
     active_system = _system(canonical_name, generation, classifier, llm_client)
@@ -549,6 +560,8 @@ def _manifest(
                 "batch_size": classifier.batch_size,
                 "thresholds_path": str(classifier.thresholds_path) if classifier.thresholds_path else None,
                 "calibration_path": str(classifier.calibration_path) if classifier.calibration_path else None,
+                "calibration_fingerprint": classifier.calibration_fingerprint,
+                "thresholds_fingerprint": classifier.thresholds_fingerprint,
             },
         },
         runtime_profile=ExecutionProfile.AFFECT_ONLY.value,
@@ -819,6 +832,8 @@ def main() -> None:
     parser.add_argument("--write-sample-manifest", type=Path)
     parser.add_argument("--thresholds", type=Path)
     parser.add_argument("--calibration", type=Path)
+    parser.add_argument("--calibration-fingerprint")
+    parser.add_argument("--thresholds-fingerprint")
     parser.add_argument("--bootstrap-samples", type=int, default=1000)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--no-progress", action="store_true")

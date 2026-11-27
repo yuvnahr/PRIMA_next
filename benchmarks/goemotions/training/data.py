@@ -7,7 +7,10 @@ import json
 from pathlib import Path
 from typing import Any
 
+from affect.classifiers.calibration_artifact import encoder_identity
+from affect.taxonomies.goemotions import LABELS
 from benchmarks.goemotions.dataset import GoEmotionsExample, load_examples, load_labels
+from config.frozen_json import fingerprint, read_frozen_json
 
 
 def load_split(data_dir: Path, split: str) -> list[GoEmotionsExample]:
@@ -49,3 +52,26 @@ def validate_splits(data_dir: Path) -> dict[str, Any]:
 
 def multi_hot(example: GoEmotionsExample, labels: list[str]) -> list[float]:
     return [1.0 if label in example.labels else 0.0 for label in labels]
+
+
+def load_encoder_dev_predictions(
+    data_dir: Path, path: Path, *, model_id: str, revision: str, max_length: int,
+    representation: str, probability_transform: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], list[GoEmotionsExample], dict[str, Any]]:
+    dev = load_split(data_dir, "dev")
+    if tuple(load_labels(data_dir / "emotions.txt")) != LABELS:
+        raise ValueError("Development labels must match the official ordered taxonomy")
+    ids = [row.example_id for row in dev]
+    if not ids or len(ids) != len(set(ids)):
+        raise ValueError("Development split requires unique example IDs")
+    identity = encoder_identity(model_id, revision, max_length,
+        hashlib.sha256((data_dir / "dev.tsv").read_bytes()).hexdigest(), fingerprint(ids))
+    result = read_frozen_json(path)
+    if (result.get("identity") != identity or result.get("example_ids") != ids
+        or result.get("representation") != representation
+        or result.get("probability_transform") != probability_transform):
+        raise ValueError("Development predictions have mismatched model, preprocessing, data, order or transform")
+    rows = result.get("rows")
+    if not isinstance(rows, list) or len(rows) != len(dev):
+        raise ValueError("Development predictions must cover each ordered example exactly once")
+    return identity, dev, result

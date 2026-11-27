@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import builtins
+import inspect
 import json
 import os
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
@@ -167,7 +168,7 @@ class InMemoryMemoryRepository(MemoryRepository):
                 notes.extend(typed_notes.values())
             return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
+    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10, *, eligible: Callable[[MemoryNote], bool] | None = None) -> builtins.list[tuple[MemoryNote, float]]:
         with self.transaction():
             query = np.array(list(embedding), dtype="float32")
             if query.ndim != 1 or not query.size or not np.isfinite(query).all():
@@ -189,6 +190,8 @@ class InMemoryMemoryRepository(MemoryRepository):
             query = query / query_norm
             scored: list[tuple[MemoryNote, float]] = []
             for note in notes:
+                if eligible is not None and not eligible(note):
+                    continue
                 key = (note.memory_type, note.id)
                 vector = self._normalized_vectors.get(key)
                 if vector is None:
@@ -407,7 +410,14 @@ class ChromaMemoryRepository(MemoryRepository):
                 notes.extend(self._from_chroma_result(result, index) for index in range(len(result["ids"])))
             return notes
 
-    def query(self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10) -> builtins.list[tuple[MemoryNote, float]]:
+    @property
+    def supports_filtered_query(self) -> bool:
+        return "ids" in inspect.signature(self.collections[MemoryType.EPISODIC].query).parameters
+
+    def query(
+        self, embedding: Iterable[float], memory_type: MemoryType | None = None, limit: int = 10,
+        *, eligible: Callable[[str, dict[str, Any], str], bool] | None = None,
+    ) -> builtins.list[tuple[MemoryNote, float]]:
         with self.transaction():
             if (
                 self.fingerprint_status != "valid"
@@ -417,11 +427,30 @@ class ChromaMemoryRepository(MemoryRepository):
                 raise RuntimeError("Repository fingerprint is invalid; rebuild before retrieval")
             notes: list[tuple[MemoryNote, float]] = []
             memory_types = [memory_type] if memory_type else list(MemoryType)
+            vector = list(embedding)
+            checked = np.asarray(vector, dtype="float32")
+            if checked.shape != (self.repository_metadata["embedding_dimension"],) or not np.isfinite(checked).all():
+                raise ValueError("Query embedding dimension or values are incompatible")
             for candidate_type in memory_types:
-                result = self.collections[candidate_type].query(
-                    query_embeddings=[list(embedding)],
+                collection = self.collections[candidate_type]
+                options: dict[str, Any] = {}
+                if eligible is not None:
+                    rows = collection.get(include=["documents", "metadatas"])
+                    allowed = [
+                        note_id for note_id, document, metadata in zip(
+                            rows["ids"], rows["documents"] or [], rows["metadatas"] or [], strict=True,
+                        )
+                        if eligible(note_id, dict(decode_metadata(metadata or {}).get("context", {})), document or "")
+                    ]
+                    if not allowed:
+                        continue
+                    if len(allowed) != len(rows["ids"]):
+                        options["ids"] = allowed
+                result = collection.query(
+                    query_embeddings=[vector],
                     n_results=limit,
                     include=["embeddings", "documents", "metadatas", "distances"],
+                    **options,
                 )
                 ids = result.get("ids", [[]])[0]
                 for index in range(len(ids)):
