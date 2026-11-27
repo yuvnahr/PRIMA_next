@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from affect.emotion_history import EmotionHistory
 from affect.pad_model import PADState
 
 
@@ -26,6 +27,8 @@ class EmotionalState:
     confidence: float = 0.0
     last_update_time: datetime = field(default_factory=utc_now)
 
+    history: EmotionHistory = field(default_factory=EmotionHistory)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "current_pad": self.current_pad.to_dict(),
@@ -36,6 +39,7 @@ class EmotionalState:
             "emotional_volatility": self.emotional_volatility,
             "confidence": self.confidence,
             "last_update_time": self.last_update_time.isoformat(),
+            "history": self.history.to_records(),
         }
 
     @classmethod
@@ -57,4 +61,5 @@ class EmotionalState:
             emotional_volatility=float(data.get("emotional_volatility", 0.0)),
             confidence=float(data.get("confidence", 0.0)),
             last_update_time=parsed_update,
+            history=EmotionHistory.from_records(data.get("history", [])),
         )

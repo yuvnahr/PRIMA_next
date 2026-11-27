@@ -15,63 +15,51 @@ class GraphBuilder:
         self.graph_repository = graph_repository
 
     def rebuild_for_type(self, repository: MemoryRepository, memory_type: MemoryType) -> GraphRepository:
-        notes = repository.list(memory_type)
-        keywords = [note.keywords for note in notes]
-        for note, context_chain in zip(notes, keywords, strict=True):
-            self.graph_repository.add_node(
-                GraphNode(
-                    id=f"node_{note.id}",
-                    memory_id=note.id,
-                    labels=(note.memory_type.value, note.memory_level.value),
-                    metadata={"keywords": context_chain},
-                )
-            )
-
-        for left_index, left in enumerate(notes):
-            for right_index in range(left_index + 1, len(notes)):
-                right = notes[right_index]
-                overlap = calculate_smart_overlap(keywords[left_index], keywords[right_index])
-                if overlap <= 0:
-                    continue
-                weight = min(1.0, 0.35 + overlap * 0.2)
-                self.graph_repository.add_edge(
-                    GraphEdge(
-                        source_id=f"node_{left.id}",
-                        target_id=f"node_{right.id}",
-                        relation_type="shared_context",
-                        weight=weight,
-                        metadata={"overlap": overlap},
-                    )
-                )
+        notes = [note for note in repository.list(memory_type) if not note.context.get("superseded")]
+        for note in notes:
+            self._node(note)
+        for index, note in enumerate(notes):
+            self._pairs(note, notes[index + 1 :])
+        for node in tuple(self.graph_repository.nodes.values()):
+            if node.labels[:1] == (memory_type.value,) and repository.get(node.memory_id) is None:
+                self.graph_repository.remove_node(node.id)
         return self.graph_repository
 
-    def index_note(self, repository: MemoryRepository, note: MemoryNote) -> GraphRepository:
-        """Add or refresh one memory's derived graph node and relationships."""
-        memory_id = note.id
-        keywords = tuple(note.keywords)
-        memory_type = note.memory_type
-        memory_level = note.memory_level
+    def _node(self, note: MemoryNote) -> None:
         self.graph_repository.add_node(
             GraphNode(
-                id=f"node_{memory_id}",
-                memory_id=memory_id,
-                labels=(memory_type.value, memory_level.value),
-                metadata={"keywords": list(keywords)},
+                id=f"node_{note.id}",
+                memory_id=note.id,
+                labels=(note.memory_type.value, note.memory_level.value),
+                metadata={"keywords": list(note.keywords)},
             )
         )
-        for other in repository.list():
-            if other.id == memory_id:
+
+    def _pairs(self, note: MemoryNote, others: list[MemoryNote]) -> None:
+        for other in others:
+            if other.context.get("superseded") or other.id == note.id:
                 continue
-            overlap = calculate_smart_overlap(keywords, other.keywords)
-            if overlap <= 0:
-                continue
-            self.graph_repository.add_edge(
-                GraphEdge(
-                    source_id=f"node_{memory_id}",
-                    target_id=f"node_{other.id}",
-                    relation_type="shared_context",
-                    weight=min(1.0, 0.35 + overlap * 0.2),
-                    metadata={"overlap": overlap},
-                )
+            left, right = sorted((note, other), key=lambda item: item.id)
+            overlap = calculate_smart_overlap(left.keywords, right.keywords)
+            edge = GraphEdge(
+                f"node_{left.id}",
+                f"node_{right.id}",
+                "shared_context",
+                min(1.0, 0.35 + overlap * 0.2),
+                {"producer": "graph_builder", "overlap": overlap},
             )
+            if overlap:
+                self.graph_repository.add_edge(edge)
+            elif edge.key in self.graph_repository.edges:
+                self.graph_repository.remove_edge(edge)
+
+    def index_note(self, repository: MemoryRepository, note: MemoryNote) -> GraphRepository:
+        self._node(note)
+        if note.context.get("superseded"):
+            node_id = f"node_{note.id}"
+            for edge in tuple(self.graph_repository.edges.values()):
+                if node_id in (edge.source_id, edge.target_id) and edge.key[3] in {"graph_builder", "memory_evolution"}:
+                    self.graph_repository.remove_edge(edge)
+        else:
+            self._pairs(note, repository.list())
         return self.graph_repository

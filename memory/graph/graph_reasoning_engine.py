@@ -27,7 +27,8 @@ class GraphReasoningEngine:
             for node_id in self.graph_repository.nodes:
                 graph.add_node(node_id)
             for edge in self.graph_repository.edges.values():
-                graph.add_edge(edge.source_id, edge.target_id, weight=edge.weight)
+                previous = graph.get_edge_data(edge.source_id, edge.target_id, {}).get("weight", 0)
+                graph.add_edge(edge.source_id, edge.target_id, weight=max(previous, edge.weight))
             if graph.number_of_edges() == 0:
                 return [{node_id} for node_id in graph.nodes]
             return [set(community) for community in louvain_communities(graph, weight="weight", seed=42)]

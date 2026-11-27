@@ -7,6 +7,7 @@ from memory.maintenance.background_supervisor import (
     MaintenanceBarrier,
     MaintenanceFailure,
     MaintenanceMode,
+    MaintenanceUnavailable,
 )
 from memory.maintenance.maintenance_pipeline import MaintenancePipeline
 
@@ -18,4 +19,5 @@ __all__ = [
     "MaintenanceFailure",
     "MaintenanceMode",
     "MaintenancePipeline",
+    "MaintenanceUnavailable",
 ]

@@ -101,6 +101,7 @@ def test_only_verified_generated_descriptions_are_marked_and_lineage_is_retained
     assert not factual_evidence_eligible(generated)
     assert generated.lineage.parent_ids == ("parent0", "parent1")
     class FactualSummary(SemanticAbstractionEngine):
+        derivation_version = "fixture-v1"
         def summarize_cluster(self, notes, max_words=40):
             return "Maya visited her aunt in August."
     factual = MemoryEvolutionEngine(repository, GraphRepository(), abstraction_engine=FactualSummary()).evolve().evolved_memories[0]

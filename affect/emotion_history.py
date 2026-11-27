@@ -6,6 +6,7 @@ from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import Any
 
 from affect.emotion_profile import EmotionProfile
 from affect.pad_model import PADState
@@ -31,6 +32,27 @@ class EmotionHistory:
         entry = EmotionHistoryEntry(timestamp or datetime.now(timezone.utc), profile, pad_state)
         self._entries.append(entry)
         return entry
+
+    def to_records(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "timestamp": item.timestamp.isoformat(),
+                "profile": item.profile.to_dict(),
+                "pad_state": item.pad_state.to_dict(),
+            }
+            for item in self._entries
+        ]
+
+    @classmethod
+    def from_records(cls, records: list[dict[str, Any]]) -> EmotionHistory:
+        history = cls()
+        for item in records[-50:]:
+            history.add(
+                EmotionProfile(**item["profile"]),
+                PADState.from_dict(item["pad_state"]),
+                datetime.fromisoformat(item["timestamp"]),
+            )
+        return history
 
     def get_recent(self, count: int = 5) -> list[EmotionHistoryEntry]:
         if count <= 0:

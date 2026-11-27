@@ -5,10 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from memory.embedding_backend import (
@@ -26,7 +27,7 @@ from memory.semantic_representation import (
 )
 
 REPRESENTATION_VERSION = "semantic-v1"
-IDENTITY_VERSION = "identity-v1"
+IDENTITY_VERSION = "identity-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,7 +46,7 @@ def current_embedding_metadata(experiment: EmbeddingExperimentConfig | None = No
         "embedding_model": config.model_identifier,
         "embedding_dimension": config.dimensions,
         "representation_version": f"{REPRESENTATION_VERSION}:{experiment.representation_mode}",
-        "identity_version": f"{IDENTITY_VERSION}:{'on' if experiment.identity_enabled else 'off'}",
+        "identity_version": f"{IDENTITY_VERSION}:on" if experiment.identity_enabled else "identity-v1:off",
     }
     if config.name != "stable":
         info = get_embedding_backend().info()
@@ -70,13 +71,17 @@ class CanonicalEmbeddingPipeline:
         speaker: str | None = None,
         embedding_text: str | None = None,
     ) -> EmbeddedText:
+        return self._embed(content, speaker, embedding_text, normalize=self.config.identity_enabled)
+
+    def _embed(self, content: str, speaker: str | None, embedding_text: str | None, *, normalize: bool) -> EmbeddedText:
         source = embedding_text if embedding_text is not None else content
         identity_references: list[str] = []
-        if self.config.identity_enabled:
-            identity_result = self.identity_normalizer.observe(source, speaker=speaker)
+        if normalize:
+            identity_result = IdentityNormalizer().observe(source, speaker=speaker)
             source = identity_result.text
             identity_references = [f"{alias} -> {canonical}" for alias, canonical in identity_result.replacements.items() if alias != canonical]
         representation = build_semantic_representation(source, speaker=speaker, normalize_identities=False)
+        representation = replace(representation, original_text=embedding_text if embedding_text is not None else content)
         if self.config.representation_mode == "raw":
             serialized = source
         elif self.config.representation_mode == "event":
@@ -92,6 +97,8 @@ class CanonicalEmbeddingPipeline:
         vector = tuple(embed_text(serialized, dimensions=metadata["embedding_dimension"]))
         metadata.update(
             {
+                **({"embedding_source_text": embedding_text} if embedding_text is not None else {}),
+                **({"embedding_speaker": speaker} if speaker is not None else {}),
                 "embedding_text": serialized,
                 "semantic_representation": representation.to_dict(),
                 "identity_references": identity_references,
@@ -100,6 +107,31 @@ class CanonicalEmbeddingPipeline:
         )
         return EmbeddedText(vector, serialized, representation, metadata)
 
+    @staticmethod
+    def stored_embedding_source(note: Any) -> str | None:
+        source = note.retrieval_metadata.get("embedding_source_text")
+        if source is None and note.context.get("type") == "event_memory":
+            source = note.retrieval_metadata.get("embedding_text")
+        if source is None:
+            original = note.retrieval_metadata.get("semantic_representation", {}).get("original_text")
+            if original and original != note.content:
+                reconstructed = note.content
+                for declaration in note.retrieval_metadata.get("identity_references", []):
+                    alias, separator, name = declaration.partition(" -> ")
+                    if separator:
+                        reconstructed = re.sub(rf"\b{re.escape(alias)}\b", name.replace("\\", "\\\\"), reconstructed)
+                if original != reconstructed:
+                    raise ValueError("Ambiguous legacy embedding input; supply reviewed embedding_source_text.")
+        return source
+
+    def embed_stored_note(self, note: Any) -> EmbeddedText:
+        source = self.stored_embedding_source(note)
+        return self.embed_memory(
+            note.content,
+            speaker=note.retrieval_metadata.get("embedding_speaker", note.context.get("speaker")),
+            embedding_text=source,
+        )
+
     def create_memory_note(self, content: str, **kwargs: Any) -> Any:
         from memory.memory_note import MemoryNote
         embedded = self.embed_memory(content, speaker=kwargs.pop("speaker", None), embedding_text=kwargs.pop("embedding_text", None))
@@ -107,7 +139,7 @@ class CanonicalEmbeddingPipeline:
         return note.with_updates(retrieval_metadata={**note.retrieval_metadata, **embedded.metadata})
 
     def embed_query(self, query: str) -> EmbeddedText:
-        return self.embed_memory(query)
+        return self._embed(query, None, None, normalize=False)
 
 
 _PIPELINE = CanonicalEmbeddingPipeline(

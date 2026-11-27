@@ -174,7 +174,21 @@ def select_conversations(
 
 
 def _bounded_question(conversation: Any, question: Any, turns: int, include_captions: bool = False) -> str:
-    context = conversation.turns[-turns:] if turns else ()
+    from memory.retrieval.retrieval_request import observation_time
+
+    eligible = conversation.turns
+    if question.metadata.get("reference_time") is not None:
+        cutoff = observation_time(question.metadata["reference_time"], end_of_day=True)
+        eligible = [
+            turn
+            for turn in eligible
+            if observation_time(
+                str(turn.timestamp)[:10] if turn.metadata.get("timestamp_precision") == "date" else turn.timestamp,
+                end_of_day=True,
+            )
+            <= cutoff
+        ]
+    context = eligible[-turns:] if turns else ()
     transcript = "\n".join(_turn_text(turn, include_captions) for turn in context)
     return f"Bounded conversation context:\n{transcript}\n\nQuestion: {question.question}"
 
@@ -330,7 +344,9 @@ async def _run_conversation(
             "historical_turn_count": len(conversation.turns),
         }
     finally:
-        if hasattr(runtime, "stop_maintenance"):
+        if isinstance(runtime, PrimaRuntime):
+            await runtime.shutdown()
+        elif hasattr(runtime, "stop_maintenance"):
             await runtime.stop_maintenance(graceful=True)
 
 

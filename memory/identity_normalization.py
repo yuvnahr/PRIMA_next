@@ -49,46 +49,24 @@ class IdentityNormalizer:
 
     def __init__(self) -> None:
         self._chains: dict[str, IdentityChain] = {}
-        self._alias_to_canonical: dict[str, str] = {}
-        self._last_named_entity: str | None = None
 
     def observe(self, text: str, speaker: str | None = None) -> IdentityNormalizationResult:
-        replacements: dict[str, str] = {}
+        chains: dict[str, IdentityChain] = {}
+        claims: dict[str, set[str]] = {}
         if speaker:
-            self._remember(speaker, speaker)
-            self._last_named_entity = speaker
+            chains[speaker] = IdentityChain(speaker, {speaker})
         for pattern in INTRO_PATTERNS:
             for match in pattern.finditer(text):
-                name = match.groupdict().get("name")
+                name = match["name"]
                 alias = match.groupdict().get("alias") or name
-                if name and alias:
-                    canonical = self._canonical_for(name)
-                    self._remember(canonical, name)
-                    self._remember(canonical, alias)
-                    replacements[alias] = canonical
-                    self._last_named_entity = canonical
-        for name in _capitalized_names(text):
-            canonical = self._canonical_for(name)
-            self._remember(canonical, name)
-            replacements[name] = canonical
-            self._last_named_entity = canonical
-        normalized = self._replace_aliases(text, replacements)
-        normalized = self._replace_pronouns(normalized, replacements)
-        return IdentityNormalizationResult(text=normalized, replacements=replacements, chains=list(self._chains.values()))
+                chains.setdefault(name, IdentityChain(name, {name})).add(alias)
+                claims.setdefault(alias, set()).add(name)
+        replacements = {alias: next(iter(names)) for alias, names in claims.items() if len(names) == 1}
+        self._chains = chains
+        return IdentityNormalizationResult(self._replace_aliases(text, replacements), replacements, list(chains.values()))
 
     def chains(self) -> list[IdentityChain]:
         return list(self._chains.values())
-
-    def _canonical_for(self, alias: str) -> str:
-        key = alias.lower()
-        if key in self._alias_to_canonical:
-            return self._alias_to_canonical[key]
-        return alias
-
-    def _remember(self, canonical: str, alias: str) -> None:
-        chain = self._chains.setdefault(canonical.lower(), IdentityChain(canonical=canonical))
-        chain.add(alias)
-        self._alias_to_canonical[alias.lower()] = chain.canonical
 
     def _replace_aliases(self, text: str, replacements: dict[str, str]) -> str:
         normalized = text
@@ -98,26 +76,5 @@ class IdentityNormalizer:
             normalized = re.sub(rf"\b{re.escape(alias)}\b", canonical, normalized)
         return normalized
 
-    def _replace_pronouns(self, text: str, replacements: dict[str, str]) -> str:
-        if not self._last_named_entity:
-            return text
-
-        def repl(match: re.Match[str]) -> str:
-            pronoun = match.group(0)
-            replacements[pronoun] = self._last_named_entity or pronoun
-            return self._last_named_entity or pronoun
-
-        return re.sub(r"\b(he|him|his|she|her|hers|they|them|their|theirs)\b", repl, text, flags=re.IGNORECASE)
-
-
 def normalize_identity_text(text: str, speaker: str | None = None) -> IdentityNormalizationResult:
     return IdentityNormalizer().observe(text, speaker=speaker)
-
-
-def _capitalized_names(text: str) -> list[str]:
-    names: list[str] = []
-    for token in re.findall(r"\b[A-Z][a-z]+\b", text):
-        if token.lower() in {"i", "we", "the", "a", "an"}:
-            continue
-        names.append(token)
-    return list(dict.fromkeys(names))

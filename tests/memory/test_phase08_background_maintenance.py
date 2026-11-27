@@ -377,3 +377,125 @@ def test_typed_maintenance_events_reject_invalid_kinds() -> None:
             memory_id="memory-1",
             source="test",
         )
+
+
+@pytest.mark.parametrize("queued", [False, True])
+def test_worker_death_retains_failure_without_replaying_handler(queued):
+    from memory.maintenance.background_supervisor import InMemoryMaintenanceFailureStore
+
+    seen = []
+
+    class Sink(InMemoryMaintenanceFailureStore):
+        broken = True
+
+        def append(self, failure):
+            if self.broken:
+                raise OSError("disk unavailable")
+            super().append(failure)
+
+    def handler(event):
+        seen.append(event.event_id)
+        if event.event_id == "bad":
+            raise ValueError("handler failed")
+
+    sink = Sink()
+    supervisor = BackgroundMaintenanceSupervisor(handler, failure_store=sink, max_retries=0)
+
+    async def run():
+        supervisor.enqueue(_event("bad"))
+        if queued:
+            supervisor.enqueue(_event("other"))
+        with pytest.raises(RuntimeError, match="disk unavailable"):
+            await asyncio.wait_for(supervisor.flush(), 1)
+        with pytest.raises(RuntimeError, match="disk unavailable"):
+            await asyncio.wait_for(supervisor.stop(), 1)
+        sink.broken = False
+        await supervisor.recover()
+        await supervisor.flush()
+        await supervisor.stop()
+        assert [item.event_id for item in sink.all()] == ["bad"]
+        assert seen == (["bad", "other"] if queued else ["bad"])
+
+    asyncio.run(run())
+
+
+def test_failure_store_handles_only_torn_tail(tmp_path):
+    from memory.maintenance.background_supervisor import MaintenanceFailure
+
+    file = tmp_path / "failed.jsonl"
+    first = MaintenanceFailure("old", "memory_admitted", "m", 1, "old error")
+    second = MaintenanceFailure("new", "memory_admitted", "m", 1, "new error")
+    JsonlMaintenanceFailureStore(file).append(first)
+    with file.open("ab") as stream:
+        stream.write(b'{"event_id":')
+    sink = JsonlMaintenanceFailureStore(file)
+    sink.append(second)
+    assert JsonlMaintenanceFailureStore(file).all() == (first, second)
+    file.write_bytes(b"invalid\n" + file.read_bytes())
+    with pytest.raises(ValueError):
+        JsonlMaintenanceFailureStore(file)
+
+
+def test_run_history_can_only_be_released_after_pending_work_finishes():
+    supervisor = BackgroundMaintenanceSupervisor(lambda event: None)
+    event = _event()
+    supervisor.enqueue(event)
+    with pytest.raises(RuntimeError):
+        supervisor.release_history()
+    asyncio.run(supervisor.stop())
+    assert not supervisor.enqueue(event)
+    supervisor.release_history()
+    assert supervisor.enqueue(event)
+
+
+def test_cancel_with_full_queue_preserves_inflight_and_waiting_events():
+    started = asyncio.Event()
+    completed = []
+
+    async def handler(event):
+        if not started.is_set():
+            started.set()
+            await asyncio.Event().wait()
+        completed.append(event.event_id)
+
+    supervisor = BackgroundMaintenanceSupervisor(handler, max_queue_size=1, timeout=1)
+
+    async def run():
+        supervisor.enqueue(_event("first"))
+        await supervisor.start()
+        await started.wait()
+        supervisor.enqueue(_event("second"))
+        await supervisor.stop(graceful=False)
+        await supervisor.flush()
+        await supervisor.stop()
+        assert sorted(completed) == ["first", "second"]
+        assert supervisor.diagnostics()["failure_count"] == 0
+
+    asyncio.run(run())
+
+
+def test_event_publication_recovery_preserves_one_failure_record(monkeypatch):
+    from events.event_store import EventStore
+    from memory.maintenance import MaintenanceUnavailable
+
+    def fail(_event):
+        raise RuntimeError("handler failed")
+
+    supervisor = BackgroundMaintenanceSupervisor(fail, max_retries=0)
+    original = EventStore.append
+
+    def ambiguous_append(store, event):
+        original(store, event)
+        raise OSError("lost acknowledgment")
+
+    async def run():
+        with monkeypatch.context() as fault:
+            fault.setattr(EventStore, "append", ambiguous_append)
+            supervisor.enqueue(_event("bad"))
+            with pytest.raises(MaintenanceUnavailable, match="lost acknowledgment"):
+                await supervisor.flush()
+        await supervisor.recover()
+        await supervisor.stop()
+        assert len(supervisor.failure_store.all()) == len(supervisor.event_bus.events) == 1
+
+    asyncio.run(run())

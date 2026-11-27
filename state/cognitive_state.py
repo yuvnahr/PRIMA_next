@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping, MutableMapping
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
@@ -69,6 +70,7 @@ class CognitiveState:
     environment: EnvironmentState
     metadata: dict[str, Any]
     version: int
+    generation: tuple[int, int]
     created_at: datetime
     updated_at: datetime
 
@@ -83,6 +85,7 @@ class CognitiveState:
         version: int = 0,
         created_at: datetime | None = None,
         updated_at: datetime | None = None,
+        generation: tuple[int, int] = (0, 0),
         **legacy: Any,
     ) -> None:
         goal = legacy.pop("goal_state", goal)
@@ -103,6 +106,7 @@ class CognitiveState:
             environment if isinstance(environment, EnvironmentState) else EnvironmentState(dict(environment or {}))
         )
         self.metadata, self.version = dict(metadata or {}), version
+        self.generation = generation
         self.created_at, self.updated_at = created_at or now, updated_at or now
 
     goal_state = property(lambda self: self.goal)
@@ -113,7 +117,7 @@ class CognitiveState:
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize every state section and ownership field."""
-        return {
+        return deepcopy({
             "goal": dict(self.goal),
             "emotional": self.emotional.to_dict(),
             "task": dict(self.task),
@@ -121,13 +125,15 @@ class CognitiveState:
             "environment": dict(self.environment),
             "metadata": dict(self.metadata),
             "version": self.version,
+            "generation": list(self.generation),
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-        }
+        })
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> CognitiveState:
         """Load state from persisted JSON data."""
+        value = deepcopy(value)
         emotional = value.get("emotional", value.get("emotional_state", {}))
         created = value.get("created_at")
         updated = value.get("updated_at")
@@ -139,6 +145,7 @@ class CognitiveState:
             environment=value.get("environment", value.get("environment_state", {})),
             metadata=value.get("metadata", {}),
             version=int(value.get("version", 0)),
+            generation=tuple(value.get("generation", (0, 0))),
             created_at=datetime.fromisoformat(created) if isinstance(created, str) else None,
             updated_at=datetime.fromisoformat(updated) if isinstance(updated, str) else None,
         )

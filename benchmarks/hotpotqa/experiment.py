@@ -212,7 +212,9 @@ async def _execute_case(
         ))
         return None, answer, ingestion_ms, (time.perf_counter() - started) * 1000
     finally:
-        if hasattr(runtime, "stop_maintenance"):
+        if isinstance(runtime, PrimaRuntime):
+            await runtime.shutdown()
+        elif hasattr(runtime, "stop_maintenance"):
             await runtime.stop_maintenance(graceful=True)
 
 

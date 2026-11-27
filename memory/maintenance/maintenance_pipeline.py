@@ -32,6 +32,7 @@ class MaintenancePipeline:
         self.short_term_buffer: deque[str] = deque(maxlen=256)
         self.batch_size = max(1, batch_size)
         self._pending_heavy: list[Event] = []
+        self._flush_lock = asyncio.Lock()
 
     async def handle(self, event: Event) -> None:
         """Process one admitted memory outside the hot request task."""
@@ -42,7 +43,7 @@ class MaintenancePipeline:
         note = self.memory_index.get(memory_id)
         if note is None:
             raise KeyError(f"Maintenance memory not found: {memory_id}")
-        embedded = await asyncio.to_thread(get_embedding_pipeline().embed_memory, note.content)
+        embedded = await asyncio.to_thread(get_embedding_pipeline().embed_stored_note, note)
         note = note.with_updates(
             embedding=embedded.vector,
             retrieval_metadata={**note.retrieval_metadata, **embedded.metadata},
@@ -65,16 +66,21 @@ class MaintenancePipeline:
             event,
             {"buffer": "maintenance_short_term", "buffer_size": len(self.short_term_buffer)},
         )
-        self._pending_heavy.append(event)
+        if not any(cause.event_id == event.event_id for cause in self._pending_heavy):
+            self._pending_heavy.append(event)
         if len(self._pending_heavy) >= self.batch_size:
             await self.flush()
 
     async def flush(self) -> None:
         """Run expensive maintenance once for all admissions accumulated since the last batch."""
 
-        if not self._pending_heavy:
-            return
-        causes, self._pending_heavy = self._pending_heavy, []
+        async with self._flush_lock:
+            causes = list(self._pending_heavy)
+            if causes:
+                await self._flush_batch(causes)
+                del self._pending_heavy[: len(causes)]
+
+    async def _flush_batch(self, causes: list[Event]) -> None:
         event = causes[-1]
         await self._emit(EventType.CONSOLIDATION_REQUESTED, event)
         maintained = await asyncio.to_thread(self.consolidation.run)

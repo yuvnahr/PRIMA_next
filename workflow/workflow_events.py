@@ -122,24 +122,21 @@ class WorkflowEventBus:
 
     async def publish(self, event: WorkflowEvent) -> PublishResult:
         """Publish a workflow event to the shared event bus and local handlers."""
-        shared_event = event.to_event()
-
-        async def dispatch_to_local_handlers(published_event: Event) -> None:
-            workflow_event = WorkflowEvent.from_event(published_event)
-            for handler in list(self._handlers):
-                result = handler(workflow_event)
+        handlers = tuple(self._handlers)
+        published = await self.event_bus.publish(event.to_event())
+        errors = list(published.errors)
+        delivered = published.delivered_count
+        for handler in handlers:
+            try:
+                result = handler(event)
                 if inspect.isawaitable(result):
                     await result
-
-        transient = self.event_bus.subscribe(
-            dispatch_to_local_handlers,
-            event_types=(shared_event.event_type,),
-            topics=("workflow",),
-        )
-        try:
-            return await self.event_bus.publish(shared_event)
-        finally:
-            self.event_bus.unsubscribe(transient)
+                delivered += 1
+            except Exception as exc:
+                if self.event_bus.raise_subscriber_errors:
+                    raise
+                errors.append(str(exc))
+        return PublishResult(published.event, delivered, tuple(errors))
 
 
 def _workflow_type_from_event_type(event_type: EventType) -> WorkflowEventType:

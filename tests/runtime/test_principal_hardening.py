@@ -136,3 +136,102 @@ def test_tool_request_has_typed_action_outcome_and_executor_diagnostics(tmp_path
     assert "action" in response.output_data
     assert RuntimeComponent.TOOL_EXECUTOR in response.diagnostics.executed_components
     assert RuntimeComponent.MODEL_EXECUTOR in response.diagnostics.skipped_components
+
+
+def test_fake_provider_state_events_admission_barrier_and_partial_tools(tmp_path):
+    from dataclasses import replace
+
+    from action import ActionExecutor, ExecutionPolicy
+    from memory.maintenance.background_supervisor import MaintenanceBarrier, MaintenanceMode
+    from state import JsonStateManager
+    from tools import RegisteredTool, ToolExecutionStatus, ToolExecutor, ToolRegistry, ToolResult
+    from workflow.workflow_events import WorkflowEventType
+    from workflow.workflow_state import WorkflowPhase
+
+    calls = []
+
+    class Handler:
+        async def execute(self, invocation):
+            calls.append(invocation.invocation_id)
+            if invocation.tool_name == "two":
+                raise RuntimeError("fake second step failed")
+            return ToolResult(invocation.invocation_id, "one", ToolExecutionStatus.SUCCESS, output="receipt")
+
+    names = ("one", "two")
+    tools = ToolRegistry(tuple(RegisteredTool(name, Handler(), cooperative_deadline=True) for name in names))
+    repo = InMemoryMemoryRepository()
+    path = tmp_path / "state.json"
+    runtime = PrimaRuntime(
+        llm_client=_Client(),
+        memory_repository=repo,
+        state_manager=JsonStateManager(path),
+        action_executor=ActionExecutor(ToolExecutor(tools)),
+        log_path=tmp_path / "runtime.log",
+    )
+    bus = runtime.workflow.engine.event_bus
+    deliveries = []
+    bus.subscribe(lambda event: deliveries.append((event.execution_id, event.event_type, event.phase)))
+
+    async def run():
+        await runtime.start_maintenance()
+        try:
+            answer = await runtime.execute(
+                PrimaRequest(
+                    task_kind=TaskKind.CONVERSATION,
+                    profile=ExecutionProfile.MODEL_ONLY,
+                    input_text="Hello.",
+                    session_id="s",
+                )
+            )
+            assert answer.output_text == "generated" and JsonStateManager(path).load("s").version == 1
+            ingest = await runtime.execute(
+                PrimaRequest(
+                    task_kind=TaskKind.DOCUMENT_INGESTION,
+                    profile=ExecutionProfile.INGESTION_ONLY,
+                    input_text="Ada likes tea.",
+                    session_id="s",
+                )
+            )
+            assert ingest.outcome == ExecutionOutcome.INGESTED
+            assert await runtime.apply_maintenance_barrier(
+                MaintenanceMode.EVENTUAL, MaintenanceBarrier.BEFORE_FINALIZATION
+            )
+            assert runtime.maintenance_supervisor.diagnostics()["completed_count"] >= 1
+            assert any(note.content == "Ada likes tea." for note in repo.list())
+            previous = JsonStateManager(path).load("s").version
+            registry = runtime.workflow.engine.registry
+            planner = registry.get(WorkflowPhase.PLANNING)
+
+            class FakePlan:
+                phase = WorkflowPhase.PLANNING
+
+                async def execute(self, context):
+                    plan = await planner.execute(context)
+                    return replace(
+                        plan,
+                        actions=tuple(
+                            replace(plan.actions[0], action_id=name, metadata={"tool_name": name}) for name in names
+                        ),
+                    )
+
+            registry.register(FakePlan())
+            partial = await runtime.execute(
+                PrimaRequest(
+                    task_kind=TaskKind.TOOL_REQUEST,
+                    profile=ExecutionProfile.PRIMA_FULL,
+                    input_text="Prepare a safe response action.",
+                    session_id="s",
+                    options=ExecutionOptions(
+                        execution_policy=ExecutionPolicy(allowed_tools=names, allow_external_actions=True)
+                    ),
+                )
+            )
+            assert partial.outcome == ExecutionOutcome.FAILED and len(set(calls)) == len(calls) == 2
+            assert JsonStateManager(path).load("s").version == previous
+            assert not repo.list(MemoryType.PROCEDURAL)
+            assert deliveries == [(e.execution_id, e.event_type, e.phase) for e in bus.events]
+            assert sum(kind == WorkflowEventType.WORKFLOW_STARTED for _, kind, _ in deliveries) == 3
+        finally:
+            await runtime.stop_maintenance()
+
+    asyncio.run(run())

@@ -39,7 +39,7 @@ class DynamicAffectEngine:
     ) -> None:
         self.classifier = classifier or create_affect_classifier()
         self.emotional_state = emotional_state or EmotionalState()
-        self.history = history or EmotionHistory(maxlen=50)
+        self.history = history if history is not None else EmotionHistory(maxlen=50)
         self.memory_adapter = memory_adapter or EmotionalMemoryAdapter()
 
     def process(
@@ -55,14 +55,19 @@ class DynamicAffectEngine:
         decayed_current = state_source.current_pad.decay(0.92, state_source.baseline_pad)
         next_pad = decayed_current.merge(profile_pad, weight=0.45 + profile.confidence * 0.25)
 
-        dissonance_score = detect_dissonance(self.history, profile_pad, profile.confidence)
-        self.history.add(profile, next_pad)
+        history = (
+            EmotionHistory.from_records(state_source.history.to_records())
+            if cognitive_state is not None
+            else self.history
+        )
+        dissonance_score = detect_dissonance(history, profile_pad, profile.confidence)
+        history.add(profile, next_pad)
 
-        volatility = compute_volatility(self.history)
+        volatility = compute_volatility(history)
         stability = compute_stability(volatility, profile.confidence)
         momentum = update_momentum(state_source.emotional_momentum, profile)
-        evolution = evolution_metrics(self.history, state_source.baseline_pad)
-        novelty = next_pad.distance(self.history.average_pad(self.history.get_recent(5)))
+        evolution = evolution_metrics(history, state_source.baseline_pad)
+        novelty = next_pad.distance(history.average_pad(history.get_recent(5)))
         intensity = max(profile.emotions.values()) if profile.emotions else 0.0
         salience_score = compute_salience(intensity, novelty, volatility)
 
@@ -74,12 +79,14 @@ class DynamicAffectEngine:
             emotional_stability=stability,
             emotional_volatility=volatility,
             confidence=profile.confidence,
+            history=history,
             last_update_time=datetime.now(timezone.utc),
         )
 
-        self.emotional_state = updated_state
         if cognitive_state is not None:
             cognitive_state.emotional_state = updated_state
+        else:
+            self.emotional_state = updated_state
 
         retrieval_priors = generate_retrieval_priors(profile, salience_score, volatility)
         reflection_signals = generate_reflection_signals(profile, dissonance_score, evolution, volatility)
@@ -112,6 +119,10 @@ class DynamicAffectEngine:
             dissonance_score=dissonance_score,
             evolution=evolution,
         )
+
+    def reset_legacy_state(self) -> None:
+        self.emotional_state = EmotionalState()
+        self.history = EmotionHistory()
 
     def get_emotion_profile(self, text: str) -> EmotionProfile:
         return self.classifier.classify(text)

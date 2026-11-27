@@ -12,6 +12,7 @@ class DenseRetrievalStrategy(RetrievalStrategy):
     name = "dense"
 
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
+        repository = request.as_of_view(repository)
         results: list[RetrievalResult] = []
         embedding = request.embedding()
         for memory_type in request.memory_types:

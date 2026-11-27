@@ -73,6 +73,7 @@ class Phase5ActionToolTest(unittest.IsolatedAsyncioTestCase):
                 RegisteredTool(
                     name="echo",
                     handler=EchoTool(),
+                    cooperative_deadline=True,
                     schema=(
                         ToolParameterSpec(
                             name="message",
@@ -148,3 +149,102 @@ class Phase5ActionToolTest(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_numeric_schema_and_recursive_validation():
+    import pytest
+
+    from tools.tool_validator import ToolValidator
+
+    for bounds in (
+        {"min_value": True},
+        {"max_value": float("nan")},
+        {"min_value": 2, "max_value": 1},
+        {"min_length": -1},
+        {"max_length": 1.5},
+        {"min_length": 2, "max_length": 1},
+    ):
+        with pytest.raises(ValueError):
+            ToolParameterSpec("x", "int", **bounds)
+    for kind, value, valid in (
+        ("float", float("nan"), False),
+        ("dict", {"a": [(float("inf"),)]}, False),
+        ("int", True, False),
+        ("int", 10**400, False),
+        ("int", 0, True),
+        ("int", 1, True),
+        ("bool", True, True),
+    ):
+        spec = (
+            ToolParameterSpec("x", kind, min_value=0, max_value=1)
+            if kind in {"float", "int"}
+            else ToolParameterSpec("x", kind)
+        )
+        result = ToolValidator().validate(ToolInvocation("tool", {"x": value}), (spec,))
+        assert result.is_valid == valid
+
+
+def test_bounded_tools_reject_sync_before_dispatch_and_observe_late_effect():
+    import asyncio
+
+    async def run():
+        seen = []
+
+        class Sync:
+            def execute(self, invocation):
+                seen.append("sync")
+                return ToolResult(invocation.invocation_id, invocation.tool_name, ToolExecutionStatus.SUCCESS)
+
+        policy = ExecutionPolicy(allowed_tools=("t",), allow_external_actions=True, tool_timeout_seconds=0.025)
+        invocation = ToolInvocation("t")
+        executor = ToolExecutor(ToolRegistry((RegisteredTool("t", Sync()),)))
+        assert (await executor.execute(invocation, policy)).status == ToolExecutionStatus.BLOCKED
+        assert seen == []
+
+        release, cancelled = asyncio.Event(), asyncio.Event()
+
+        class Suppresses:
+            async def execute(self, invocation):
+                assert invocation.metadata["deadline_monotonic"] > 0
+                try:
+                    await asyncio.Event().wait()
+                except asyncio.CancelledError:
+                    cancelled.set()
+                    await release.wait()
+                    seen.append(invocation.invocation_id)
+                    return ToolResult(invocation.invocation_id, "t", ToolExecutionStatus.SUCCESS)
+
+        executor = ToolExecutor(ToolRegistry((RegisteredTool("t", Suppresses(), cooperative_deadline=True),)))
+        result = await asyncio.wait_for(executor.execute(invocation, policy), 1)
+        assert result.status == ToolExecutionStatus.FAILED
+        assert result.metadata["completion"] == "unknown" and not result.metadata["retry_safe"]
+        await asyncio.wait_for(cancelled.wait(), 1)
+        assert seen == []
+        release.set()
+        assert await executor.drain(timeout=1)
+        assert seen == [invocation.invocation_id]
+
+    asyncio.run(run())
+
+
+def test_deliberately_unbounded_handler_and_invalid_timeout_policy():
+    import asyncio
+    import json
+
+    import pytest
+
+    for value in (True, -1, float("inf"), float("nan")):
+        with pytest.raises(ValueError):
+            ExecutionPolicy(tool_timeout_seconds=value)
+
+    class Legacy:
+        def execute(self, invocation):
+            json.dumps(invocation.arguments, allow_nan=False)
+            return ToolResult(
+                invocation.invocation_id, "t", ToolExecutionStatus.SUCCESS, output=invocation.arguments["n"]
+            )
+
+    executor = ToolExecutor(ToolRegistry((RegisteredTool("t", Legacy(), (ToolParameterSpec("n", "int"),)),)))
+    for timeout in (0, None):
+        policy = ExecutionPolicy(allowed_tools=("t",), allow_external_actions=True, tool_timeout_seconds=timeout)
+        assert asyncio.run(executor.execute(ToolInvocation("t", {"n": 10**400}), policy)).output == 10**400

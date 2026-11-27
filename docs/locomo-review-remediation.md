@@ -107,6 +107,14 @@ git -C benchmarks/locomo/external diff --exit-code
 
 No exact historical prediction archive was supplied or located in `C:/PRIMA_next/benchmarks/locomo/outputs` (only log files were found). No historical score reproduction, fresh model inference, model download, GPU experiment or campaign pilot was performed. Synthetic correctness is not evidence of a benchmark-quality gain. Full CI-equivalent checks and actual Kaggle validation belong to the final checkpoint; Goal 1 uses affected suites and lint/diff checks.
 
+## Embedding generation migration on dev-improvements-1
+
+Stop admissions and maintenance, retain a store backup, and select the target embedding configuration. Inspect an existing store with `python -m memory.embedding_rebuild --path STORE --dry-run`. Omit `--dry-run` to stage fresh typed collections and publish after read-back verification. Reopen runtime handles after publication. Staged or prior collections can consume an additional store's worth of disk. A failed prepublication attempt leaves its staged collections available for offline inspection.
+
+For rollback, select the prior embedding configuration and run `python -m memory.embedding_rebuild --path STORE --rollback`. The operation verifies both generations and refuses intervening content changes. After subsequent writes, migrate the current content forward or reconcile it against the backup. Keep previous software offline while a generation manifest controls the store. Older clients target fixed collection names.
+
+The helper and CLI use the same single-writer path. Remove legacy `--force`, `--workers`, `--batch-size` and `--progress` arguments. New custom embedding inputs use `embedding_source_text`. Review ambiguous old inputs before migrating. Identity-enabled stores require a rebuild for turn-local alias normalization.
+
 ## Remaining sequence and rollback
 
 Goal 2 requires this committed checkpoint and tests, then historical provenance/captions and native learned retrieval with typed identities. Goal 3 repairs query drift and both answer gates/budgets. Goal 4 handles evidence eligibility/admission/reflection and the final broad review package. None is implemented or promoted by Goal 1.

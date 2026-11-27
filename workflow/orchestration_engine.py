@@ -134,7 +134,10 @@ class OrchestrationEngine:
                 attempts += 1
                 retry_count = context.workflow_state.increment_retry(phase)
                 context.workflow_state.errors.append(f"{phase.value}: {exc}")
-                if attempts > self.retry_policy.max_retries:
+                dispatched = (
+                    phase is WorkflowPhase.ACTION and context.action_context and context.action_context.dispatched
+                )
+                if dispatched or attempts > self.retry_policy.max_retries:
                     await self._publish(
                         context,
                         WorkflowEventType.PHASE_FAILED,

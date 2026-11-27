@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from memory.retrieval.query_analysis import QueryAnalysis, temporal_agreement
+from memory.retrieval.retrieval_request import effective_time
 from memory.retrieval.retrieval_result import RetrievalResult
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z']+")
@@ -63,7 +64,7 @@ class RetrievalConfidenceEstimator:
         lexical = _average(_lexical_overlap(lexical_query, result.note.content) for result in results)
         entity = _average(_entity_overlap(analysis, result.note.content) for result in results)
         relation = _average(_relation_overlap(analysis, result.note.content) for result in results)
-        temporal = _average(temporal_agreement(analysis, result.note.timestamp) for result in results) if isinstance(analysis, QueryAnalysis) else 0.5
+        temporal = _average(temporal_agreement(analysis, effective_time(result.note)) for result in results) if isinstance(analysis, QueryAnalysis) else 0.5
         reranker = _average(float(result.strategy_scores.get("reranker", 0.0)) for result in results)
         dense = _average(float(result.strategy_scores.get("dense", 0.0)) for result in results if "dense" in result.strategy_scores)
         sparse = _average(float(result.strategy_scores.get("sparse", 0.0)) for result in results if "sparse" in result.strategy_scores)

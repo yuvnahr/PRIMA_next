@@ -31,7 +31,7 @@ class ConsolidationEngine:
                     memory_level=MemoryLevel.EPISODIC_EVENT,
                     context={**maintained.context, "consolidated_from": MemoryType.WORKING.value},
                 )
-                self.repository.add(maintained)
+                self.repository.move(note, maintained)
             else:
                 self.repository.update(maintained)
             updated.append(maintained)

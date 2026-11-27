@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from action.action_context import ActionContext
 from llm.request_budget import RequestBudget
 from state.cognitive_state import CognitiveState
 from workflow.correction_loop import CorrectionAttempt
@@ -37,6 +38,7 @@ class ExecutionContext:
     execution_decision: Any | None = None
     reflection_result: Any | None = None
     action_result: Any | None = None
+    action_context: ActionContext | None = None
     generation_result: Any | None = None
     output_validation: Any | None = None
     ingestion_result: Any | None = None

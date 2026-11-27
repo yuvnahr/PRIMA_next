@@ -36,3 +36,44 @@ class MaintenancePhase5Test(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_promotion_has_one_owner_and_is_retry_safe(tmp_path):
+    import pytest
+
+    from memory.memory_repository import ChromaMemoryRepository
+
+    for repository in (InMemoryMemoryRepository(), ChromaMemoryRepository(str(tmp_path))):
+        original = repository.add(MemoryNote.create("active context", memory_type=MemoryType.WORKING))
+        (target,) = ConsolidationEngine(repository).run()
+        assert repository.get(original.id, MemoryType.WORKING) is None
+        assert [row.id for row in repository.list()] == [original.id]
+        assert repository.move(original, target).id == target.id
+        with pytest.raises(ValueError):
+            repository.update(original)
+        if isinstance(repository, ChromaMemoryRepository):
+            assert ChromaMemoryRepository(str(tmp_path)).get(original.id).memory_type == MemoryType.EPISODIC
+
+
+def test_interrupted_promotion_recovers_before_serving_reads(tmp_path, monkeypatch):
+    import pytest
+
+    from memory.memory_repository import ChromaMemoryRepository
+
+    repository = ChromaMemoryRepository(str(tmp_path))
+    source = repository.add(MemoryNote.create("pending work", memory_type=MemoryType.WORKING))
+    collection = repository.collections[MemoryType.WORKING]
+    with monkeypatch.context() as fault:
+
+        def fail_delete(*args, **kwargs):
+            raise OSError("interrupted after verified copy")
+
+        fault.setattr(collection, "delete", fail_delete)
+        with pytest.raises(OSError, match="after verified copy"):
+            ConsolidationEngine(repository).run()
+        with pytest.raises(OSError):
+            repository.list()
+    reopened = ChromaMemoryRepository(str(tmp_path))
+    (row,) = reopened.list()
+    assert row.id == source.id and row.memory_type == MemoryType.EPISODIC
+    assert reopened.move(source, row).to_record() == row.to_record()

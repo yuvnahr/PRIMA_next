@@ -293,3 +293,80 @@ def test_runtime_result_uses_actual_pre_and_post_correction_snapshots(tmp_path) 
     assert result.prediction_before_reflection == ""
     assert result.prediction_after_reflection == "Corrected answer"
     assert result.correction_count == 1
+
+
+def test_partial_tool_plan_preserves_first_effect_and_identity():
+    from action import ActionExecutor, ExecutionPolicy
+    from tools import RegisteredTool, ToolExecutionStatus, ToolExecutor, ToolRegistry, ToolResult
+    from workflow.controller_registry import ControllerRegistry
+    from workflow.orchestration_engine import OrchestrationEngine
+    from workflow.output_validation import OutputValidationController
+    from workflow.prima_workflow import ActionController
+    from workflow.workflow_state import WorkflowPhase
+
+    seen = []
+
+    class Counter:
+        async def execute(self, inv):
+            seen.append((inv.tool_name, inv.invocation_id))
+            if inv.tool_name == "two":
+                raise RuntimeError("second failed")
+            return ToolResult(inv.invocation_id, inv.tool_name, ToolExecutionStatus.SUCCESS, output="receipt")
+
+    names = ("one", "two")
+    registry = ControllerRegistry({})
+    tools = ToolRegistry(tuple(RegisteredTool(name, Counter(), cooperative_deadline=True) for name in names))
+    registry.register(ActionController(ActionExecutor(ToolExecutor(tools))))
+    registry.register(OutputValidationController())
+    for i in range(2):
+        context = ExecutionContext(
+            user_input="fake",
+            metadata={
+                "route": (WorkflowPhase.ACTION, WorkflowPhase.OUTPUT_VALIDATION),
+                "task_kind": "tool_request",
+                "execution_policy": ExecutionPolicy(allowed_tools=names, allow_external_actions=True),
+            },
+        )
+        context.plan = {"actions": [{"metadata": {"tool_name": n}} for n in names]}
+        asyncio.run(OrchestrationEngine(registry).execute(context))
+        assert [name for name, _ in seen] == list(names) * (i + 1)
+        assert context.action_result["status"] == "partial"
+        first = context.action_result["steps"][0]
+        assert first["output"] == "receipt" and first["tool_result"]["invocation_id"] == seen[-2][1]
+    assert len({key for _, key in seen}) == 4
+
+
+def test_serialization_failure_after_dispatch_retains_receipt_and_forbids_replan(monkeypatch):
+    import pytest
+
+    from action import ActionExecutor, ExecutionPolicy
+    from action.execution_result import ExecutionResult
+    from tools import RegisteredTool, ToolExecutionStatus, ToolExecutor, ToolRegistry, ToolResult
+    from workflow.controller_registry import ControllerRegistry
+    from workflow.orchestration_engine import OrchestrationEngine, WorkflowExecutionError
+    from workflow.prima_workflow import ActionController
+    from workflow.workflow_state import WorkflowPhase
+
+    seen = []
+    class Counter:
+        async def execute(self, invocation):
+            seen.append(invocation.invocation_id)
+            return ToolResult(invocation.invocation_id, "counter", ToolExecutionStatus.SUCCESS, "saved")
+    tool = RegisteredTool("counter", Counter(), cooperative_deadline=True)
+    registry = ControllerRegistry({})
+    controller = ActionController(ActionExecutor(ToolExecutor(ToolRegistry((tool,)))))
+    registry.register(controller)
+    context = ExecutionContext(user_input="test", metadata={
+        "route": (WorkflowPhase.ACTION,), "execution_policy": ExecutionPolicy(allowed_tools=("counter",), allow_external_actions=True)})
+    context.plan = {"actions": [{"metadata": {"tool_name": "counter"}}]}
+    def fail(_result):
+        raise ValueError("serialization failure")
+    monkeypatch.setattr(ExecutionResult, "to_dict", fail)
+    with pytest.raises(WorkflowExecutionError):
+        asyncio.run(OrchestrationEngine(registry).execute(context))
+    assert len(seen) == 1
+    assert context.action_context.completed_steps[0].output == "saved"
+    context.plan = {"actions": [{"metadata": {"tool_name": "counter", "tool_args": {"changed": True}}}]}
+    with pytest.raises(RuntimeError, match="reconcile"):
+        asyncio.run(controller.execute(context))
+    assert [inv.invocation_id for inv in context.action_context.dispatched] == seen

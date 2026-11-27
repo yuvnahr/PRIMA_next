@@ -25,6 +25,7 @@ from memory.maintenance.importance_types import MemoryAdmissionDecision
 from memory.memory_metadata import decode_metadata, encode_metadata
 from memory.memory_note import MemoryNote
 from memory.memory_repository import InMemoryMemoryRepository
+from memory.memory_types import MemoryType
 from memory.retrieval import reranker as reranker_module
 from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.query_analysis import QueryAnalyzer, temporal_agreement
@@ -308,3 +309,117 @@ def test_development_manifest_is_disjoint_and_ladder_uses_full_histories(tmp_pat
     assert report["production_promotion"] is False
     with pytest.raises(ValueError, match="identity"):
         run_development(dataset, {**manifest, "selected_question_ids": []}, configs, tmp_path / "other")
+
+
+def test_queries_preserve_original_and_do_not_bind_pronouns():
+    from memory.experiment_config import EmbeddingExperimentConfig
+
+    pipeline = CanonicalEmbeddingPipeline(EmbeddingExperimentConfig(representation_mode="raw"))
+    pipeline.embed_memory("Nathan is called Nate and he likes tea.")
+    for query in ("What did he prefer?", "Where does she live?"):
+        assert pipeline.embed_query(query).embedding_text == query
+        assert pipeline.embed_query(query).representation.original_text == query
+    assert pipeline.embed_memory("she swims").embedding_text == "she swims"
+    for mode in ("raw", "event", "semantic"):
+        scoped = CanonicalEmbeddingPipeline(EmbeddingExperimentConfig(representation_mode=mode))
+        original = 'Nathan is called Nate. Ada said "he ran" and she smiled.'
+        note = scoped.embed_memory(original)
+        assert note.representation.original_text == original
+        assert "Nate -> Nathan" in note.metadata["identity_references"]
+        assert "he ran" in note.embedding_text and "she smiled" in note.embedding_text
+        before = scoped.embed_query("Where is she?")
+        scoped.embed_memory("Ellen is called Ellie.")
+        assert scoped.embed_query("Where is she?").vector == before.vector
+        assert scoped.identity_normalizer.chains() == []
+
+
+def test_chroma_rebuild_changes_dimension_with_recoverable_prior(tmp_path):
+    from memory import embedding_rebuild
+    from memory.memory_repository import ChromaMemoryRepository
+
+    pipeline = CanonicalEmbeddingPipeline()
+    old = embeddings.EmbeddingBackendConfig("stable", "stable-hash", 2)
+    new = replace(old, dimensions=3)
+    with use_embedding_pipeline(pipeline, old):
+        writer = ChromaMemoryRepository(str(tmp_path))
+        first = writer.add(MemoryNote.create("Alpha tea", note_id="a"))
+        writer.add(MemoryNote.create("Beta cake", note_id="b"))
+    with use_embedding_pipeline(pipeline, new):
+        assert rebuild_embeddings(writer) == 2
+        reopened = ChromaMemoryRepository(str(tmp_path))
+        assert {n.id for n in reopened.list()} == {"a", "b"}
+        assert all(len(n.embedding) == 3 for n in reopened.list())
+        assert reopened.get("a").timestamp == first.timestamp
+        import subprocess
+        import sys
+
+        probe = """
+import sys
+from memory.embedding_backend import EmbeddingBackendConfig, use_embedding_backend_config
+from memory.memory_repository import ChromaMemoryRepository
+with use_embedding_backend_config(EmbeddingBackendConfig("stable", "stable-hash", 3)):
+    repo = ChromaMemoryRepository(sys.argv[1])
+    assert sorted((n.id, len(n.embedding)) for n in repo.list()) == [("a", 3), ("b", 3)]
+    assert len(repo.query((1, 0, 0))) == 2
+"""
+        subprocess.run([sys.executable, "-c", probe, str(tmp_path)], check=True, timeout=60)  # noqa: S603 - fixed local reopen probe
+    with use_embedding_pipeline(pipeline, old):
+        with pytest.raises(RuntimeError):
+            writer.update(first)
+        embedding_rebuild.rollback_embeddings(reopened)
+        restored = ChromaMemoryRepository(str(tmp_path))
+        assert all(len(n.embedding) == 2 for n in restored.list())
+
+
+@pytest.mark.parametrize("fault", ["row_two", "validation", "cutover"])
+def test_interrupted_rebuild_reopens_only_prior_generation(tmp_path, monkeypatch, fault):
+    from memory import embedding_rebuild
+    from memory.memory_repository import ChromaMemoryRepository
+
+    pipe = CanonicalEmbeddingPipeline()
+    old = embeddings.EmbeddingBackendConfig("stable", "stable-hash", 2)
+    with use_embedding_pipeline(pipe, old):
+        writer = ChromaMemoryRepository(str(tmp_path))
+        for key in ("a", "b"):
+            writer.add(MemoryNote.create(key, note_id=key))
+        before = [n.to_record() for n in writer.list()]
+
+    def fail(*args, **kwargs):
+        raise OSError("simulated interruption")
+
+    with use_embedding_pipeline(pipe, replace(old, dimensions=3)), monkeypatch.context() as patch:
+        if fault == "row_two":
+            original = pipe.embed_stored_note
+            patch.setattr(pipe, "embed_stored_note", lambda row: fail() if row.id == "b" else original(row))
+        elif fault == "validation":
+            patch.setattr(embedding_rebuild, "_read_generation", fail)
+        else:
+            patch.setattr(writer, "publish_manifest", fail)
+        with pytest.raises(OSError, match="interruption"):
+            embedding_rebuild.rebuild_embeddings(writer)
+    with use_embedding_pipeline(pipe, old):
+        reopened = ChromaMemoryRepository(str(tmp_path))
+        assert [n.to_record() for n in reopened.list()] == before
+        assert len(reopened.query((1, 0), MemoryType.EPISODIC)) == 2
+
+
+def test_cli_rebuild_inspects_then_uses_same_publication_contract(tmp_path, capsys):
+    from memory import embedding_rebuild
+    from memory.memory_repository import ChromaMemoryRepository
+
+    path = tmp_path / "db"
+    with pytest.raises(SystemExit):
+        embedding_rebuild.main(["--path", str(path), "--dry-run"])
+    assert not path.exists()
+    repo = ChromaMemoryRepository(str(path))
+    repo.add(MemoryNote.create("Ada", note_id="ada"))
+    assert embedding_rebuild.main(["--path", str(path), "--dry-run"]) == 0
+    assert json.loads(capsys.readouterr().out)["generation"] == "legacy"
+    assert embedding_rebuild.main(["--path", str(path)]) == 0
+    assert json.loads(capsys.readouterr().out)["status"] == "rebuilt"
+    with pytest.raises(RuntimeError, match="generation changed"):
+        repo.update(MemoryNote.create("stale", note_id="ada"))
+    active = ChromaMemoryRepository(str(path))
+    active.add(MemoryNote.create("new content"))
+    with pytest.raises(ValueError, match="unchanged generation"):
+        embedding_rebuild.rollback_embeddings(active)

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from memory.memory_note import calculate_smart_overlap, extract_dominant_context_chain, tokenize
 from memory.memory_repository import MemoryRepository
 from memory.retrieval.retrieval_request import RetrievalRequest
@@ -13,22 +15,35 @@ class SparseRetrievalStrategy(RetrievalStrategy):
     name = "sparse"
 
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
+        if not request.query.strip():
+            return []
+        repository = request.as_of_view(repository)
         query_terms = self._query_terms(request)
         required_terms = self._required_terms(request)
         entities = self._entities(request)
+        numbers = re.findall(r"\b\d+(?:[-/.]\d+)*\b", request.query)
+        names = set(re.findall(r"\b[A-Z][a-z]+\b", request.query))
+        exact_terms = {term.lower() for term in (*numbers, *names)} | entities
+        partial_terms = [term for term in query_terms if term not in exact_terms and not any(c.isdigit() for c in term)]
         results: list[RetrievalResult] = []
         for memory_type in request.memory_types:
             for note in repository.list(memory_type):
                 memory_terms = set(note.keywords) | set(tokenize(note.content))
                 memory_text = note.content.lower()
-                overlap = calculate_smart_overlap(query_terms, tuple(memory_terms))
+                overlap = calculate_smart_overlap(
+                    [t for t in partial_terms if len(t) >= 4],
+                    tuple(t for t in memory_terms if len(t) >= 4 and not any(c.isdigit() for c in t)),
+                )
+                exact_matches = sorted(term for term in exact_terms if _contains(term, memory_text))
+                overlap += len(exact_matches)
                 exact_overlap = len(set(query_terms) & memory_terms)
                 required_overlap = _term_match(required_terms, memory_terms, memory_text)
                 entity_overlap = _term_match(entities, memory_terms, memory_text)
-                if overlap <= 0 and exact_overlap <= 0 and required_overlap <= 0:
+                if not (overlap or exact_overlap or required_overlap or entity_overlap):
                     continue
                 lexical_score = min(1.0, (overlap + exact_overlap * 0.5) / max(1, len(set(query_terms))))
-                score = min(1.0, lexical_score * 0.40 + required_overlap * 0.50 + entity_overlap * 0.10)
+                weight = 0.4 + 0.5 * bool(required_terms) + 0.1 * bool(entities)
+                score = (lexical_score * 0.40 + required_overlap * 0.50 + entity_overlap * 0.10) / weight
                 results.append(
                     RetrievalResult(
                         note=note,
@@ -36,6 +51,8 @@ class SparseRetrievalStrategy(RetrievalStrategy):
                         strategy_scores={self.name: score},
                         explanation={
                             "query_terms": query_terms,
+                            "active_weight": weight,
+                            "matched_exact_terms": exact_matches,
                             "required_terms": sorted(required_terms),
                             "overlap": overlap,
                             "exact_overlap": exact_overlap,
@@ -92,9 +109,12 @@ class SparseRetrievalStrategy(RetrievalStrategy):
         return {entity.lower() for entity in entities if entity}
 
 
+def _contains(term: str, text: str) -> bool:
+    return re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text) is not None
+
+
 def _term_match(terms: set[str], memory_terms: set[str], memory_text: str) -> float:
     if not terms:
-        return 0.5
-    matches = sum(1 for term in terms if term in memory_terms or term in memory_text)
+        return 0.0
+    matches = sum(1 for term in terms if term in memory_terms or _contains(term, memory_text))
     return matches / max(1, len(terms))
-

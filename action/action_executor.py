@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from action.action_context import ActionContext
@@ -52,21 +52,24 @@ class ActionExecutor:
         """Execute a plan through bounded, audited operations."""
         context.audit("action_execution_started", "Action executor received plan.", self._plan_metadata(context.plan))
         invocations = self._tool_invocations(context.plan)
-        steps: list[ExecutionStepResult] = []
+        if context.dispatched:
+            raise RuntimeError("Tool plan already dispatched; reconcile existing operations.")
+        steps = context.completed_steps if invocations else []
 
         if invocations:
             for index, invocation in enumerate(invocations):
+                plan_id = context.plan.get("plan_id") if isinstance(context.plan, dict) else getattr(context.plan, "plan_id", None)
+                invocation = replace(invocation, metadata={
+                    **invocation.metadata, "execution_id": context.metadata.get("execution_id"), "plan_id": plan_id,
+                    "ordinal": index,
+                })
                 context.audit(
                     "tool_invocation_prepared",
                     f"Prepared invocation for tool '{invocation.tool_name}'.",
                     invocation.to_dict(),
                 )
+                context.dispatched.append(invocation)
                 tool_result = await self.tool_executor.execute(invocation, context.policy, index)
-                context.audit(
-                    "tool_invocation_completed",
-                    f"Tool invocation finished with status {tool_result.status.value}.",
-                    tool_result.to_dict(),
-                )
                 steps.append(
                     ExecutionStepResult(
                         action_id=invocation.action_id or invocation.invocation_id,
@@ -77,6 +80,13 @@ class ActionExecutor:
                         metadata={"tool_name": invocation.tool_name},
                     )
                 )
+                context.audit(
+                    "tool_invocation_completed",
+                    f"Tool invocation finished with status {tool_result.status.value}.",
+                    tool_result.to_dict(),
+                )
+                if not tool_result.succeeded:
+                    break
         else:
             steps.extend(self._internal_steps(context))
 
@@ -91,13 +101,13 @@ class ActionExecutor:
             output=output,
             metadata={
                 "plan_id": str(getattr(context.plan, "plan_id", "")),
-                "tool_invocation_count": len(invocations),
+                "tool_invocation_count": len(context.dispatched),
                 "external_action_count": sum(
-                    1 for invocation in invocations if invocation.invocation_kind == ToolInvocationKind.EXTERNAL_ACTION
+                    1 for invocation in context.dispatched if invocation.invocation_kind == ToolInvocationKind.EXTERNAL_ACTION
                 ),
                 "environment_operation_count": sum(
                     1
-                    for invocation in invocations
+                    for invocation in context.dispatched
                     if invocation.invocation_kind == ToolInvocationKind.ENVIRONMENT_OPERATION
                 ),
                 "sandboxed": True,
@@ -245,6 +255,8 @@ class ActionExecutor:
         statuses = {step.status for step in steps}
         if statuses == {ActionExecutionStatus.SUCCESS}:
             return ActionExecutionStatus.SUCCESS
+        if ActionExecutionStatus.SUCCESS in statuses:
+            return ActionExecutionStatus.PARTIAL
         if ActionExecutionStatus.FAILED in statuses:
             return ActionExecutionStatus.FAILED
         if ActionExecutionStatus.BLOCKED in statuses:

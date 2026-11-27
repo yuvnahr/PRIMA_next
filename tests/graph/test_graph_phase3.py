@@ -63,3 +63,41 @@ class GraphPhase3Test(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_refresh_removes_only_obsolete_generated_relations(tmp_path):
+    from memory.graph.graph_repository import ChromaGraphRepository
+    from memory.memory_index import MemoryIndex
+
+    for graph in (GraphRepository(), ChromaGraphRepository(str(tmp_path))):
+        index = MemoryIndex(InMemoryMemoryRepository(), graph)
+        first = index.add(MemoryNote.create("sourdough bread", note_id="a"))
+        index.add(MemoryNote.create("sourdough starter", note_id="b"))
+        manual = GraphEdge("node_b", "node_a", "shared_context", 0.9, {"producer": "curator"})
+        graph.add_edge(manual)
+        assert len(graph.edges) == 2
+        index.update(first.with_updates(content="quasar", retrieval_metadata={"keywords": ["quasar"]}))
+        assert list(graph.edges.values()) == [manual]
+        assert graph.degree("node_a") == 1
+        if isinstance(graph, ChromaGraphRepository):
+            assert list(ChromaGraphRepository(str(tmp_path)).edges.values()) == [manual]
+        index.delete("a", MemoryType.EPISODIC)
+        assert graph.degree("node_b") == 0
+
+
+def test_legacy_graph_remains_available_after_reconciliation(tmp_path):
+    import chromadb
+
+    from memory.graph.graph_repository import ChromaGraphRepository
+    from memory.memory_metadata import encode_metadata
+
+    client = chromadb.PersistentClient(path=str(tmp_path))
+    legacy = client.get_or_create_collection(name="graph_index")
+    legacy.add(ids=["graph_node_old"], documents=["gone"], embeddings=[[0.] * 8],
+               metadatas=[encode_metadata({"record_type": "node", "node_id": "old", "memory_id": "gone",
+                                           "labels": ["episodic"], "metadata": {}})])
+    graph = ChromaGraphRepository(str(tmp_path))
+    assert "old" in graph.nodes
+    GraphBuilder(graph).rebuild_for_type(InMemoryMemoryRepository(), MemoryType.EPISODIC)
+    assert "old" not in ChromaGraphRepository(str(tmp_path)).nodes
+    assert legacy.get(ids=["graph_node_old"])["ids"] == ["graph_node_old"]

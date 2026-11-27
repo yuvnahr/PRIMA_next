@@ -140,3 +140,137 @@ def test_conversation_memory_policy_records_user_and_assistant_outcomes() -> Non
     episodic = repository.list(MemoryType.EPISODIC)
     assert [note.context["role"] for note in episodic] == ["user", "assistant"]
     assert result["admission"]["record_count"] == 2
+
+
+@pytest.mark.parametrize("persistent", [False, True])
+def test_manager_owns_nested_snapshots(tmp_path, persistent):
+    manager = JsonStateManager(tmp_path / "state.json") if persistent else InMemoryStateManager()
+    nested = {"steps": [["original"]]}
+    state = CognitiveState(goal_state=nested, metadata={"extra": nested})
+    saved = manager.save("session", state, 0)
+    nested["steps"][0].append("input")
+    saved.goal["steps"][0].append("returned")
+    snapshot = manager.load("session")
+    snapshot.metadata["extra"]["steps"][0].append("loaded")
+    assert manager.load("session").goal["steps"] == [["original"]]
+    assert manager.load("session").metadata["extra"]["steps"] == [["original"]]
+
+
+@pytest.mark.parametrize("reset", [None, "one", False])
+def test_failed_publication_preserves_cache_and_disk(tmp_path, monkeypatch, reset):
+    path = tmp_path / "sessions.json"
+    manager = JsonStateManager(path)
+    original = manager.apply_delta("one", {"task": {"step": 1}}, 0)
+    with monkeypatch.context() as fault:
+
+        def fail(*args):
+            raise OSError("replace failed")
+
+        fault.setattr(type(path), "replace", fail)
+        with pytest.raises(OSError):
+            if reset is False:
+                manager.apply_delta("one", {"task": {"step": 2}}, 1)
+            else:
+                manager.reset(reset)
+    assert manager.load("one").to_dict() == original.to_dict()
+    assert JsonStateManager(path).load("one").to_dict() == original.to_dict()
+    assert manager.save("one", original, 1).version == 2
+
+
+@pytest.mark.parametrize("global_reset", [False, True])
+@pytest.mark.parametrize("persistent", [False, True])
+def test_reset_invalidates_even_uncommitted_snapshots(tmp_path, global_reset, persistent):
+    path = tmp_path / "sessions.json"
+    manager = JsonStateManager(path) if persistent else InMemoryStateManager()
+    empty = manager.load("one")
+    other = manager.load("two")
+    first = manager.save("one", empty, 0)
+    manager.reset(None if global_reset else "one")
+    if persistent:
+        manager = JsonStateManager(path)
+    with pytest.raises(StateVersionConflict):
+        manager.save("one", empty, 0)
+    manager.save("one", manager.load("one"), 0)
+    with pytest.raises(StateVersionConflict):
+        manager.save("one", first, 1)
+    if not global_reset:
+        manager.save("two", other, 0)
+
+
+@pytest.mark.parametrize("already_exists", [False, True])
+def test_json_encode_failure_can_retry_same_version(tmp_path, already_exists):
+    path = tmp_path / "state.json"
+    owner = JsonStateManager(path)
+    if already_exists:
+        owner.apply_delta("s", {"task": {"real": [1]}}, 0)
+    before = owner.load("s")
+    candidate = owner.load("s")
+    candidate.task["unserializable"] = object()
+    with pytest.raises(TypeError):
+        owner.save("s", candidate, before.version)
+    assert owner.load("s").version == JsonStateManager(path).load("s").version == before.version
+    assert "unserializable" not in owner.load("s").task
+    assert owner.save("s", before, before.version).version == before.version + 1
+
+
+def test_racing_writers_have_one_owner_and_reset_keeps_disk_consistent(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    path = tmp_path / "state.json"
+    owner = JsonStateManager(path)
+    state = owner.load("s")
+    gate = Barrier(2)
+
+    def write():
+        gate.wait(timeout=5)
+        try:
+            return owner.save("s", state, 0).version
+        except StateVersionConflict:
+            return "conflict"
+
+    with ThreadPoolExecutor(2) as pool:
+        results = [pool.submit(write) for _ in range(2)]
+        assert {f.result(timeout=5) for f in results} == {1, "conflict"}
+
+        def reset():
+            gate.wait(timeout=5)
+            owner.reset("s")
+
+        def save_other():
+            gate.wait(timeout=5)
+            owner.apply_delta("other", {"goal": {"active": True}}, 0)
+
+        results = [pool.submit(reset), pool.submit(save_other)]
+        for result in results:
+            result.result(timeout=5)
+    reopened = JsonStateManager(path)
+    assert reopened.load("s").version == owner.load("s").version == 0
+    assert reopened.load("other").to_dict() == owner.load("other").to_dict()
+
+
+def test_execute_preserves_committed_state_on_replace_failure(tmp_path, monkeypatch):
+    path = tmp_path / "state.json"
+    manager = JsonStateManager(path)
+    original = manager.apply_delta("s", {"goal": {"active": "old"}}, 0)
+    runtime = PrimaRuntime(llm_client=ModelClient(), memory_repository=InMemoryMemoryRepository(),
+                           state_manager=manager, log_path=tmp_path / "runtime.log")
+    def fail(*args):
+        raise OSError("state volume unavailable")
+    monkeypatch.setattr(type(path), "replace", fail)
+    response = asyncio.run(runtime.execute(PrimaRequest(task_kind=TaskKind.CONVERSATION, profile=ExecutionProfile.MODEL_ONLY,
+                                                         input_text="Hello", session_id="s")))
+    assert response.outcome.value == "failed"
+    assert manager.load("s").to_dict() == JsonStateManager(path).load("s").to_dict() == original.to_dict()
+
+
+def test_version_only_delta_cannot_cross_reset_recreation(tmp_path):
+    owner = JsonStateManager(tmp_path / "s.json")
+    previous = owner.apply_delta("s", {"goal": {"active": "before"}}, 0)
+    owner.reset("s")
+    fresh = owner.load("s")
+    owner.save("s", fresh, 0)
+    with pytest.raises(StateVersionConflict):
+        owner.apply_delta("s", {"goal": {"active": "stale"}}, previous.version)
+    result = owner.apply_delta("s", {"goal": {"active": "new"}}, 1, expected_generation=fresh.generation)
+    assert result.goal["active"] == "new"

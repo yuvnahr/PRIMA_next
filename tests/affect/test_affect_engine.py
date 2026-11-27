@@ -51,3 +51,52 @@ class AffectEngineTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_session_history_interleaving_reopen_and_legacy(tmp_path):
+    from affect.emotion_history import EmotionHistory
+    from state import CognitiveState, JsonStateManager
+
+    injected = EmotionHistory(2)
+    shared = DynamicAffectEngine(history=injected)
+    manager = JsonStateManager(tmp_path / "state.json")
+    standalone = DynamicAffectEngine()
+    for i, utterance in enumerate(["I feel happy"] * 4 + ["I feel angry"]):
+        state = manager.load("a")
+        actual = shared.process(utterance, state)
+        expected = standalone.process(utterance)
+        assert actual.evolution == expected.evolution
+        assert actual.dissonance_score == expected.dissonance_score
+        assert actual.salience_score == expected.salience_score
+        assert actual.reflection_signals == expected.reflection_signals
+        manager.save("a", state, i)
+        shared.process("I feel afraid", CognitiveState())
+        manager = JsonStateManager(tmp_path / "state.json")
+    assert len(injected) == 0
+    shared.process("I feel sad")
+    assert len(injected) == 1
+    manager.reset("a")
+    assert (
+        shared.process("I feel angry", manager.load("a")).evolution
+        == DynamicAffectEngine().process("I feel angry").evolution
+    )
+
+
+def test_rolling_history_is_owned_by_successful_commit(tmp_path):
+    import pytest
+
+    from state import JsonStateManager, StateVersionConflict
+
+    path = tmp_path / "state.json"
+    manager = JsonStateManager(path)
+    engine = DynamicAffectEngine()
+    state = manager.load("s")
+    loser = manager.load("s")
+    for _ in range(51):
+        engine.process("I feel calm", state)
+    engine.process("I am angry", loser)
+    saved = manager.save("s", state, 0)
+    assert len(saved.emotional.history) == 50
+    with pytest.raises(StateVersionConflict):
+        manager.save("s", loser, 0)
+    assert JsonStateManager(path).load("s").emotional.to_dict() == saved.emotional.to_dict()

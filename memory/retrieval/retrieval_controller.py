@@ -17,7 +17,7 @@ from memory.retrieval.hybrid_fusion import HybridFusion, HybridFusionConfig
 from memory.retrieval.query_analysis import ExpandedQuery, QueryAnalyzer, temporal_agreement
 from memory.retrieval.reranker import Reranker
 from memory.retrieval.retrieval_confidence import RetrievalConfidence, RetrievalConfidenceEstimator
-from memory.retrieval.retrieval_request import RetrievalRequest
+from memory.retrieval.retrieval_request import RetrievalRequest, effective_time
 from memory.retrieval.retrieval_result import RetrievalResult
 from memory.retrieval.retrieval_strategy import RetrievalStrategy
 from memory.retrieval.sparse_strategy import SparseRetrievalStrategy
@@ -80,9 +80,10 @@ class RetrievalController:
         scoped_index = (MemoryIndex(self.memory_index.repository, self.memory_index.graph_repository,
                                     factual_only=True, source_conversation_id=request.session_id or None)
                         if request.task_kind == "factual_qa" else self.repository)
+        scoped_repository = request.as_of_view(scoped_index)
         for strategy in active_strategies:
             started = perf_counter()
-            candidates = strategy.retrieve(candidate_request, scoped_index)
+            candidates = strategy.retrieve(candidate_request, scoped_repository)
             by_strategy[strategy.name] = [result for result in candidates
                 if (request.task_kind != "factual_qa" or factual_evidence_eligible(result.note))
                 and (not request.session_id or result.note.context.get("source_conversation_id", request.session_id) == request.session_id)]
@@ -206,7 +207,7 @@ class RetrievalController:
             entity_score = _entity_match(analysis.entities, analysis.aliases, text)
             relation_score = _term_match(relation_terms, text_tokens, text)
             intent_score = _term_match(intent_terms, text_tokens, text)
-            temporal_score = temporal_agreement(analysis, result.note.timestamp)
+            temporal_score = temporal_agreement(analysis, effective_time(result.note))
             semantic_score = entity_score * 0.30 + relation_score * 0.25 + intent_score * 0.25 + temporal_score * 0.20
             strategy_scores = dict(result.strategy_scores)
             strategy_scores["semantic"] = round(semantic_score, 6)

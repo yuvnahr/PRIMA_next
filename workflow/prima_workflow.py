@@ -26,7 +26,7 @@ from memory.memory_repository import MemoryRepository
 from memory.memory_types import MemoryLevel, MemoryType
 from memory.retrieval.context_compressor import ContextCompressor
 from memory.retrieval.retrieval_controller import RetrievalController
-from memory.retrieval.retrieval_request import RetrievalRequest
+from memory.retrieval.retrieval_request import RetrievalRequest, observation_time
 from planning import PlanningContext, TaskPlanner
 from planning.plan import Plan
 from reasoning.controller import ReasoningController
@@ -174,6 +174,13 @@ class MemoryRetrievalController:
             affective_context={"retrieval_priors": affect_priors, "reflection_signal_count": len(affect_signals)},
             profile=str(context.metadata.get("profile", "prima_full")),
             task_kind=str(context.metadata.get("task_kind", "conversation")),
+            session_id=str(context.metadata.get("session_id", "")),
+            historical=bool(context.metadata.get("historical_context")),
+            reference_time=(
+                observation_time(context.metadata["reference_time"], end_of_day=True)
+                if context.metadata.get("reference_time") is not None
+                else None
+            ),
             required_reranker_backend=context.metadata.get("required_reranker_backend"),
         )
         return self.retrieval_controller.retrieve(request)
@@ -212,8 +219,11 @@ class EvidenceAcquisitionController:
                     task_kind=str(context.metadata.get("task_kind", "factual_qa")),
                     session_id=str(context.metadata.get("session_id", "")),
                     historical=bool(context.metadata.get("historical_context", False)),
-                    reference_time=(datetime.fromisoformat(str(context.metadata["reference_time"]).replace("Z", "+00:00"))
-                                    if context.metadata.get("reference_time") else None),
+                    reference_time=(
+                        observation_time(context.metadata["reference_time"], end_of_day=True)
+                        if context.metadata.get("reference_time") is not None
+                        else None
+                    ),
                     required_reranker_backend=context.metadata.get("required_reranker_backend"),
                 )
             )
@@ -544,6 +554,10 @@ class ActionController:
         policy = context.metadata.get("execution_policy")
         if not isinstance(policy, ExecutionPolicy):
             policy = ExecutionPolicy()
+        if context.action_context and context.action_context.dispatched:
+            if context.action_result is None:
+                raise RuntimeError("Tool completion unknown; reconcile dispatched operations.")
+            return context.action_result
         action_context = ActionContext(
             plan=context.plan,
             cognitive_state=context.cognitive_state,
@@ -552,6 +566,7 @@ class ActionController:
             policy=policy,
             metadata={"execution_id": context.execution_id},
         )
+        context.action_context = action_context
         result = await self.action_executor.execute(action_context)
         payload = result.to_dict()
         payload["execution_result"] = result
@@ -805,6 +820,9 @@ class OutputController:
 
         gate_result = context.execution_decision
         decision = getattr(gate_result, "decision", None)
+        if context.action_context and context.action_context.dispatched and isinstance(context.action_result, dict):
+            if context.action_result.get("status") in {"failed", "partial", "blocked"}:
+                return {"text": None, "outcome": "failed", "action": context.action_result}
         correction_terminal = str(context.metadata.get("correction_terminal_action", ""))
         if correction_terminal == "ask_user":
             return {

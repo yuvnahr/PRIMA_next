@@ -56,7 +56,7 @@ class OutputValidationController:
         action = {
             OutputValidationSignal.OUTPUT_SCHEMA_FAILURE: ReflectionAction.REGENERATE,
             OutputValidationSignal.UNSUPPORTED_CLAIM: ReflectionAction.REVISE_QUERY,
-            OutputValidationSignal.TOOL_FAILURE: ReflectionAction.RETRY_TRANSIENT_FAILURE,
+            OutputValidationSignal.TOOL_FAILURE: ReflectionAction.ABSTAIN,
             OutputValidationSignal.LOGICAL_INCONSISTENCY: ReflectionAction.REGENERATE,
             OutputValidationSignal.POLICY_VIOLATION: ReflectionAction.ABSTAIN,
         }[primary]

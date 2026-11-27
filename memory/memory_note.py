@@ -220,6 +220,8 @@ class MemoryNote:
         if embedding is None:
             embedding = stable_embedding(str(record.get("document", "")))
         retrieval_metadata = dict(metadata.get("retrieval_metadata", {"keywords": metadata.get("keywords", [])}))
+        if not isinstance(timestamp, str):
+            retrieval_metadata["observation_time_unknown"] = True
         for key in ("embedding_backend", "embedding_model", "embedding_dimension", "representation_version", "identity_version", "backend_fingerprint"):
             if metadata.get(key) is not None:
                 retrieval_metadata.setdefault(key, metadata[key])
@@ -253,9 +255,3 @@ def format_memory_note(input_data: dict[str, Any]) -> dict[str, Any]:
     metadata["tags"] = list(dict.fromkeys(["memory_note", primary_emotion]))
     metadata["keywords"] = keywords
     return {"id": note.id, "embedding": list(note.embedding), "metadata": metadata}
-
-
-
-
-
-

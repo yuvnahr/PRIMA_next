@@ -31,6 +31,8 @@ class RegisteredTool:
     invocation_kinds: tuple[ToolInvocationKind, ...] = (ToolInvocationKind.TOOL_CALL,)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    cooperative_deadline: bool = False
+
     def __post_init__(self) -> None:
         object.__setattr__(self, "name", str(self.name).strip())
         object.__setattr__(self, "schema", tuple(self.schema))
@@ -49,6 +51,7 @@ class RegisteredTool:
             "name": self.name,
             "schema": [spec.to_dict() for spec in self.schema],
             "description": self.description,
+            "cooperative_deadline": self.cooperative_deadline,
             "sandbox_tags": list(self.sandbox_tags),
             "invocation_kinds": [kind.value for kind in self.invocation_kinds],
             "metadata": dict(self.metadata),

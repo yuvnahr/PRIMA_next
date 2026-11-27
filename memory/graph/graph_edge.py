@@ -15,6 +15,14 @@ class GraphEdge:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
-    def key(self) -> tuple[str, str]:
-        a, b = sorted((self.source_id, self.target_id))
-        return (a, b)
+    def key(self) -> tuple[str, str, str, str]:
+        a, b = self.source_id, self.target_id
+        if self.relation_type == "shared_context":
+            a, b = sorted((a, b))
+        legacy = ""
+        if self.relation_type == "shared_context" and set(self.metadata) == {"overlap"}:
+            legacy = "graph_builder"
+        elif self.relation_type == "evolves_into" and set(self.metadata) == {"generation"}:
+            legacy = "memory_evolution"
+        producer = self.metadata.get("producer", self.metadata.get("source", legacy))
+        return a, b, self.relation_type, str(producer)

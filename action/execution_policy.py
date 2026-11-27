@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -47,7 +48,9 @@ class ExecutionPolicy:
         object.__setattr__(self, "max_tool_invocations", max(0, int(self.max_tool_invocations)))
         object.__setattr__(self, "allowed_sandbox_tags", tuple(str(item) for item in self.allowed_sandbox_tags))
         if self.tool_timeout_seconds is not None:
-            object.__setattr__(self, "tool_timeout_seconds", max(0.0, float(self.tool_timeout_seconds)))
+            timeout = self.tool_timeout_seconds
+            if type(timeout) not in (int, float) or not math.isfinite(timeout) or timeout < 0:
+                raise ValueError("Tool timeout must be finite and nonnegative.")
 
     def evaluate_invocation(self, invocation: ToolInvocation, invocation_index: int) -> PolicyDecision:
         """Return whether a tool invocation is allowed by sandbox policy."""

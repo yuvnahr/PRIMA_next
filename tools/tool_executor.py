@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import inspect
-from dataclasses import dataclass, field
+import json
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any
 
@@ -22,6 +24,20 @@ class ToolExecutor:
 
     registry: ToolRegistry = field(default_factory=ToolRegistry)
     validator: ToolValidator = field(default_factory=ToolValidator)
+
+    _pending: set[asyncio.Future[ToolResult]] = field(default_factory=set, init=False)
+
+    def _observe(self, task: asyncio.Future[ToolResult]) -> None:
+        self._pending.discard(task)
+        if not task.cancelled():
+            task.exception()
+
+    async def drain(self, timeout: float = 1.0) -> bool:
+        """Wait for outstanding cooperative handlers; False requires reconciliation."""
+        if not self._pending:
+            return True
+        _, pending = await asyncio.wait(tuple(self._pending), timeout=timeout)
+        return not pending
 
     async def execute(
         self,
@@ -88,6 +104,14 @@ class ToolExecutor:
                 audit=tuple(audit),
                 metadata={"validation": validation.to_dict()},
             )
+        try:
+            canonical = json.dumps(validation.sanitized_arguments, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        except (ValueError, RecursionError) as exc:
+            return ToolResult(invocation.invocation_id, invocation.tool_name, ToolExecutionStatus.VALIDATION_ERROR,
+                              error=str(exc), audit=tuple(audit))
+        fingerprint = hashlib.sha256(canonical.encode()).hexdigest()
+        audit.append(self._audit("validated_operation", invocation.tool_name, invocation.invocation_id,
+                                 {**invocation.metadata, "arguments_sha256": fingerprint, "retry_safe": False}))
         invocation = ToolInvocation(
             tool_name=invocation.tool_name,
             arguments=validation.sanitized_arguments,
@@ -100,17 +124,6 @@ class ToolExecutor:
             metadata=invocation.metadata,
         )
         if not policy.require_validation:
-            invocation = ToolInvocation(
-                tool_name=invocation.tool_name,
-                arguments=invocation.arguments,
-                invocation_id=invocation.invocation_id,
-                action_id=invocation.action_id,
-                requested_by=invocation.requested_by,
-                invocation_kind=invocation.invocation_kind,
-                sandboxed=invocation.sandboxed,
-                sandbox_tags=invocation.sandbox_tags,
-                metadata=invocation.metadata,
-            )
             audit.append(
                 self._audit(
                     "validation_forced",
@@ -120,10 +133,38 @@ class ToolExecutor:
             )
 
         try:
-            result = tool.handler.execute(invocation)
-            if inspect.isawaitable(result):
-                timeout = policy.tool_timeout_seconds
-                result = await asyncio.wait_for(result, timeout=timeout) if timeout and timeout > 0 else await result
+            timeout = policy.tool_timeout_seconds
+            if timeout:
+                if (
+                    not tool.cooperative_deadline
+                    or not inspect.iscoroutinefunction(tool.handler.execute)
+                    or len(self._pending) >= 32
+                ):
+                    return ToolResult(
+                        invocation.invocation_id,
+                        invocation.tool_name,
+                        ToolExecutionStatus.BLOCKED,
+                        error="Cooperative deadline handler unavailable or at capacity.",
+                        audit=tuple(audit),
+                    )
+                loop = asyncio.get_running_loop()
+                deadline = loop.time() + timeout
+                invocation = replace(invocation, metadata={**invocation.metadata, "deadline_monotonic": deadline})
+                task = asyncio.ensure_future(tool.handler.execute(invocation))
+                self._pending.add(task)
+                task.add_done_callback(self._observe)
+                try:
+                    done, _ = await asyncio.wait((task,), timeout=max(0.0, deadline - loop.time()))
+                except asyncio.CancelledError:
+                    task.cancel()
+                    raise
+                if not done or loop.time() >= deadline:
+                    task.cancel()
+                    raise TimeoutError
+                result = task.result()
+            else:
+                value = tool.handler.execute(invocation)
+                result = await value if inspect.isawaitable(value) else value
             audit.append(self._audit("tool_execution_completed", invocation.tool_name, invocation.invocation_id))
             if not isinstance(result, ToolResult):
                 return ToolResult(
@@ -134,13 +175,13 @@ class ToolExecutor:
                     audit=tuple(audit),
                 )
             return ToolResult(
-                invocation_id=result.invocation_id,
-                tool_name=result.tool_name,
+                invocation_id=invocation.invocation_id,
+                tool_name=invocation.tool_name,
                 status=result.status,
                 output=result.output,
                 error=result.error,
                 audit=tuple((*audit, *result.audit)),
-                metadata=dict(result.metadata),
+                metadata={**result.metadata, "arguments_sha256": fingerprint, "retry_safe": False},
             )
         except TimeoutError:
             audit.append(self._audit("tool_execution_timeout", invocation.tool_name, invocation.invocation_id))
@@ -148,7 +189,8 @@ class ToolExecutor:
                 invocation_id=invocation.invocation_id,
                 tool_name=invocation.tool_name,
                 status=ToolExecutionStatus.FAILED,
-                error="Tool execution timed out.",
+                error="Tool execution timed out. Completion is unknown.",
+                metadata={"completion": "unknown", "retry_safe": False},
                 audit=tuple(audit),
             )
         except Exception as exc:

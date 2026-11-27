@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+from action.tool_invocation import ToolInvocation
+
+if TYPE_CHECKING:
+    from action.execution_result import ExecutionStepResult
 
 from action.execution_policy import ExecutionPolicy
 
@@ -39,6 +44,9 @@ class ActionContext:
     policy: ExecutionPolicy = field(default_factory=ExecutionPolicy)
     metadata: dict[str, Any] = field(default_factory=dict)
     audit_log: list[ActionAuditRecord] = field(default_factory=list)
+
+    dispatched: list[ToolInvocation] = field(default_factory=list, init=False)
+    completed_steps: list[ExecutionStepResult] = field(default_factory=list, init=False)
 
     def audit(self, event: str, message: str, metadata: dict[str, Any] | None = None) -> ActionAuditRecord:
         """Append and return an audit record when auditing is enabled."""

@@ -146,6 +146,7 @@ class PrimaRuntime:
             self.state_manager = JsonStateManager(state_path)
         else:
             self.state_manager = InMemoryStateManager()
+        self._owns_affect_engine = affect_engine is None
         self.affect_engine = affect_engine or DynamicAffectEngine(
             classifier=create_affect_classifier(
                 self.runtime_config.affect_backend,
@@ -290,17 +291,26 @@ class PrimaRuntime:
         with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
             await self.maintenance_supervisor.start()
 
-    async def flush_maintenance(self) -> None:
+    async def flush_maintenance(self) -> dict[str, Any]:
         """Wait for a deterministic maintenance barrier."""
 
         with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
-            await self.maintenance_supervisor.flush()
+            return await self.maintenance_supervisor.flush()
 
     async def stop_maintenance(self, *, graceful: bool = True) -> None:
         """Stop the local cold-path worker and optionally drain queued work."""
 
         with use_embedding_pipeline(self.embedding_pipeline, self.embedding_backend_config):
             await self.maintenance_supervisor.stop(graceful=graceful)
+
+    async def shutdown(self) -> None:
+        """Finish local maintenance and give outstanding cooperative tools a bounded drain."""
+        try:
+            await self.stop_maintenance()
+        finally:
+            drained = await self.action_executor.tool_executor.drain()
+            if not drained:
+                raise RuntimeError("Tool completions remain unknown after bounded shutdown.")
 
     async def apply_maintenance_barrier(
         self,
@@ -322,9 +332,10 @@ class PrimaRuntime:
         """Apply a barrier and close its temporary sync-loop worker."""
 
         async def apply_and_stop() -> bool:
-            flushed = await self.apply_maintenance_barrier(mode, barrier)
-            await self.stop_maintenance(graceful=flushed)
-            return flushed
+            try:
+                return await self.apply_maintenance_barrier(mode, barrier)
+            finally:
+                await self.stop_maintenance(graceful=False)
 
         try:
             asyncio.get_running_loop()
@@ -334,6 +345,10 @@ class PrimaRuntime:
 
     def execute_sync(self, request: PrimaRequest) -> PrimaResponse:
         """Run :meth:`execute` only when the caller does not own an event loop."""
+
+        policy = request.options.execution_policy
+        if policy.allow_external_actions and policy.tool_timeout_seconds:
+            raise RuntimeError("Bounded external tools require await runtime.execute() on a managed event loop.")
 
         try:
             asyncio.get_running_loop()
@@ -353,6 +368,8 @@ class PrimaRuntime:
             if self.mode is not RuntimeMode.TEST:
                 raise RuntimeError("Only test mode may replace memory with an ephemeral repository.")
         self.state_manager.reset()
+        if self._owns_affect_engine:
+            self.affect_engine.reset_legacy_state()
         if mode == "isolated" and not preserve_repository:
             self.memory_repository = InMemoryMemoryRepository()
             self.memory_index = MemoryIndex.for_repository(self.memory_repository)
@@ -489,6 +506,7 @@ class PrimaRuntime:
             "memory_repository": self.repository_selection.backend,
             "memory_persistent": self.repository_selection.persistent,
             "memory_path": self.repository_selection.path,
+            "embedding_generation": getattr(self.memory_repository, "generation", None),
             "state_repository": "json" if isinstance(self.state_manager, JsonStateManager) else "in_memory",
             "generation": self.generation_config.to_dict(),
             "provider_capabilities": dict(getattr(self.llm_client, "capabilities", {})),
@@ -648,6 +666,19 @@ class PrimaRuntime:
             )
         if isinstance(output.get("classification"), dict):
             output_data.update(output["classification"])
+        if context.action_context and context.action_context.dispatched:
+            completed = context.action_context.completed_steps
+            output_data["tool_operations"] = [
+                {
+                    "invocation_id": inv.invocation_id,
+                    "tool_name": inv.tool_name,
+                    "ordinal": ordinal,
+                    "status": completed[ordinal].status.value if ordinal < len(completed) else "unknown",
+                    "output": completed[ordinal].output if ordinal < len(completed) else None,
+                    "retry_safe": False,
+                }
+                for ordinal, inv in enumerate(context.action_context.dispatched)
+            ]
         if isinstance(output.get("action"), dict):
             output_data["action"] = output["action"]
         return PrimaResponse(

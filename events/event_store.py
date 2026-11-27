@@ -15,12 +15,16 @@ class EventStore:
     _events: list[Event] = field(default_factory=list)
     _by_execution: dict[str | None, list[Event]] = field(default_factory=dict, init=False, repr=False)
 
+    capacity: int = 100_000
+
     def __post_init__(self) -> None:
         for event in self._events:
             self._by_execution.setdefault(event.execution_id, []).append(event)
 
     def append(self, event: Event) -> None:
         """Append one event to the store."""
+        if len(self._events) >= self.capacity:
+            raise RuntimeError("Event history capacity reached; export and clear the quiescent run.")
         self._events.append(event)
         self._by_execution.setdefault(event.execution_id, []).append(event)
 

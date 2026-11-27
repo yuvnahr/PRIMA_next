@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -36,10 +37,17 @@ class ToolParameterSpec:
         object.__setattr__(self, "name", str(self.name))
         object.__setattr__(self, "parameter_type", str(self.parameter_type))
         object.__setattr__(self, "allowed_values", tuple(self.allowed_values))
-        if self.min_length is not None:
-            object.__setattr__(self, "min_length", max(0, int(self.min_length)))
-        if self.max_length is not None:
-            object.__setattr__(self, "max_length", max(0, int(self.max_length)))
+        for bound in (self.min_value, self.max_value):
+            if bound is not None and (type(bound) not in (int, float) or _sanitize_value(bound) is _UNSAFE):
+                raise ValueError("Numeric bounds must be finite numbers.")
+        for length in (self.min_length, self.max_length):
+            if length is not None and (type(length) is not int or length < 0):
+                raise ValueError("Length bounds must be nonnegative integers.")
+        for low, high in ((self.min_value, self.max_value), (self.min_length, self.max_length)):
+            if low is not None and high is not None and low > high:
+                raise ValueError("Minimum exceeds maximum.")
+        if _sanitize_value(self.allowed_values) is _UNSAFE:
+            raise ValueError("Allowed values must be finite JSON values.")
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the parameter spec into plain Python values."""
@@ -106,14 +114,21 @@ class ToolValidator:
             if not _matches_expected_type(value, expected_type):
                 errors.append(f"Argument '{spec.name}' must be {spec.parameter_type}.")
                 continue
+            try:
+                safe_value = _sanitize_value(value)
+            except RecursionError:
+                safe_value = _UNSAFE
+            if safe_value is _UNSAFE:
+                errors.append(f"Argument '{spec.name}' contains unsupported runtime values.")
+                continue
             if spec.allowed_values and value not in spec.allowed_values:
                 errors.append(f"Argument '{spec.name}' is not an allowed value.")
                 continue
             if isinstance(value, int | float):
-                if spec.min_value is not None and float(value) < spec.min_value:
+                if spec.min_value is not None and value < spec.min_value:
                     errors.append(f"Argument '{spec.name}' is below minimum {spec.min_value}.")
                     continue
-                if spec.max_value is not None and float(value) > spec.max_value:
+                if spec.max_value is not None and value > spec.max_value:
                     errors.append(f"Argument '{spec.name}' exceeds maximum {spec.max_value}.")
                     continue
             length = len(value) if isinstance(value, str | list | dict) else None
@@ -128,10 +143,6 @@ class ToolValidator:
                     errors.append(f"Argument '{spec.name}' is longer than {spec.max_length}.")
                     continue
 
-            safe_value = _sanitize_value(value)
-            if safe_value is _UNSAFE:
-                errors.append(f"Argument '{spec.name}' contains unsupported runtime values.")
-                continue
             sanitized[spec.name] = safe_value
 
         return ToolValidationResult(is_valid=not errors, errors=tuple(errors), sanitized_arguments=sanitized)
@@ -153,6 +164,8 @@ def _matches_expected_type(value: Any, expected_type: type[Any]) -> bool:
 
 
 def _sanitize_value(value: Any) -> Any | _UnsafeValue:
+    if isinstance(value, float) and not math.isfinite(value):
+        return _UNSAFE
     if value is None or isinstance(value, str | int | float | bool):
         return value
     if isinstance(value, tuple | list):

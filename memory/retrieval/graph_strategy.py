@@ -30,7 +30,15 @@ class GraphTraversalStrategy(RetrievalStrategy):
         self.reasoning_engine = reasoning_engine or GraphReasoningEngine(graph_repository)
 
     def retrieve(self, request: RetrievalRequest, repository: MemoryRepository) -> list[RetrievalResult]:
-        centrality = self.reasoning_engine.centrality_scores()
+        repository = request.as_of_view(repository)
+        graph = self.graph_repository
+        traversal = self.traversal
+        reasoning = self.reasoning_engine
+        if request.reference_time is not None or request.session_id:
+            ids = {note.id for note in repository.list()}
+            graph = graph.induced({key for key, node in graph.nodes.items() if node.memory_id in ids})
+            traversal, reasoning = GraphTraversal(graph), GraphReasoningEngine(graph)
+        centrality = reasoning.centrality_scores()
         seed_limit = max(1, min(6, request.top_k))
         seed_by_id = {}
         for seed in self.seed_strategy.retrieve(request, repository)[:seed_limit]:
@@ -42,12 +50,12 @@ class GraphTraversalStrategy(RetrievalStrategy):
         seeds = sorted(seed_by_id.values(), key=lambda item: item.score, reverse=True)[:seed_limit]
         note_scores: dict[str, RetrievalResult] = {}
         for seed in seeds:
-            seed_node = self.graph_repository.find_by_memory_id(seed.note.id)
+            seed_node = graph.find_by_memory_id(seed.note.id)
             if seed_node is None:
                 continue
-            neighborhood = self.traversal.weighted_neighborhood(seed_node.id, max_depth=2)
+            neighborhood = traversal.weighted_neighborhood(seed_node.id, max_depth=2)
             for node_id, graph_score in neighborhood.items():
-                node = self.graph_repository.nodes[node_id]
+                node = graph.nodes[node_id]
                 note = repository.get(node.memory_id)
                 if note is None:
                     continue
